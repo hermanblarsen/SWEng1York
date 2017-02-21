@@ -6,6 +6,8 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.geometry.VPos;
 import javafx.scene.Scene;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.ScrollPane;
@@ -38,7 +40,7 @@ public class MainView extends Application {
         primaryStage.setTitle("I^2LP");
 
         BorderPane border = new BorderPane();
-        Scene scene = new Scene(border, 300, 275);
+        Scene scene = new Scene(border, 1000, 600);
         scene.getStylesheets().add("bootstrapfx.css");
         primaryStage.setScene(scene);
 
@@ -147,13 +149,47 @@ public class MainView extends Application {
 
     public BorderPane addPresentationElement() {
         BorderPane border = new BorderPane();
+        // Create a wrapper Pane first
+        Pane wrapperPane = new Pane();
+        border.setCenter(wrapperPane);
 
-        // Category in column 2, row 1
+        Canvas canvas = new Canvas(border.getWidth(), border.getHeight());
+        wrapperPane.getChildren().add(canvas);
+        // Bind the width/height property to the wrapper Pane
+        canvas.widthProperty().bind(wrapperPane.widthProperty());
+        canvas.heightProperty().bind(wrapperPane.heightProperty());
+        // redraw when resized
+        canvas.widthProperty().addListener(event -> draw(canvas));
+        canvas.heightProperty().addListener(event -> draw(canvas));
+        draw(canvas);
+
+
+
+
+       /* // Category in column 2, row 1
         Text category = new Text("PRESENTATION HERE");
         category.setFont(Font.font("San Francisco", FontWeight.NORMAL, 20));
-        border.setCenter(category);
+        border.setCenter(category);*/
 
         return border;
+    }
+
+    private void draw(Canvas canvas) {
+        final GraphicsContext gc = canvas.getGraphicsContext2D();
+        gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
+
+        gc.setFill(Color.BLACK);
+        gc.setFont(Font.getDefault());
+        gc.fillText("I^2 LP is functional!!", 15, 50);
+
+        gc.setLineWidth(5);
+        gc.setStroke(Color.BLUEVIOLET);
+
+        gc.strokeOval(30, 60, 30, 30);
+        gc.setStroke(Color.BLUE);
+        gc.strokeOval(50, 60, 30, 30);
+        gc.setStroke(Color.INDIANRED);
+        gc.strokeOval(70, 60, 30, 30);
     }
 
     public ScrollPane addFlowPane() {

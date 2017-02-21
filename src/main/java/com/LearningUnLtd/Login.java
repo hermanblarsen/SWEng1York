@@ -61,5 +61,10 @@ public class Login extends Application {
         });
 
         primaryStage.show();
+
+        if(true) {
+            MainView myMainView = new MainView();
+            myMainView.start(primaryStage);
+        }
     }
 }
