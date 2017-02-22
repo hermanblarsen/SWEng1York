@@ -23,6 +23,8 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
+import javafx.scene.web.WebEngine;
+import javafx.scene.web.WebView;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.kordamp.bootstrapfx.scene.layout.Panel;
@@ -47,7 +49,7 @@ public class MainView extends Application {
         border.setTop(addHBox(primaryStage));
         border.setLeft(addVBox());
 
-        BorderPane myPresentationElement = addPresentationElement();
+        Pane myPresentationElement = addPresentationElement();
         border.setCenter(myPresentationElement);
         border.setRight(addFlowPane());
         border.setBottom(addStatBar(myPresentationElement));
@@ -147,44 +149,51 @@ public class MainView extends Application {
         return vbox;
     }
 
-    public BorderPane addPresentationElement() {
-        BorderPane border = new BorderPane();
-        // Create a wrapper Pane first
-        Pane wrapperPane = new Pane();
-        border.setCenter(wrapperPane);
+    public StackPane addPresentationElement() {
+        StackPane stack = new StackPane();
 
-        Canvas canvas = new Canvas(border.getWidth(), border.getHeight());
-        wrapperPane.getChildren().add(canvas);
+        addHtmlElement(stack, "<b><font color=\"red\">IILP </font><font color=\"blue\">HTML</font> <font color=\"green\">Support Test</font></b>");
+        addCanvas(stack);
+
+        return  stack;
+    }
+
+    private void addCanvas(Pane stackPane){
+        // Create a wrapper Pane first
+        Pane canvasPane = new Pane();
+
+        Canvas canvas = new Canvas(canvasPane.getWidth(), canvasPane.getHeight());
+        canvasPane.getChildren().add(canvas);
         // Bind the width/height property to the wrapper Pane
-        canvas.widthProperty().bind(wrapperPane.widthProperty());
-        canvas.heightProperty().bind(wrapperPane.heightProperty());
+        canvas.widthProperty().bind(canvasPane.widthProperty());
+        canvas.heightProperty().bind(canvasPane.heightProperty());
         // redraw when resized
         canvas.widthProperty().addListener(event -> draw(canvas));
         canvas.heightProperty().addListener(event -> draw(canvas));
         draw(canvas);
 
+        stackPane.getChildren().add(canvasPane);
+    }
 
+    private void addHtmlElement(Pane stackPane, String htmlString){
+        final WebView browser = new WebView();
+        final WebEngine webEngine = browser.getEngine();
 
-
-       /* // Category in column 2, row 1
-        Text category = new Text("PRESENTATION HERE");
-        category.setFont(Font.font("San Francisco", FontWeight.NORMAL, 20));
-        border.setCenter(category);*/
-
-        return border;
+        stackPane.getChildren().add(browser);
+        webEngine.loadContent(htmlString);
+        //TODO: CSS styling support so we can change fonts, etc.
+        //webEngine.setUserStyleSheetLocation(getClass().getResource("style.css").toString());
     }
 
     private void draw(Canvas canvas) {
+        //Draw Polygons in here
         final GraphicsContext gc = canvas.getGraphicsContext2D();
         gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
 
         gc.setFill(Color.BLACK);
-        gc.setFont(Font.getDefault());
-        gc.fillText("I^2 LP is functional!!", 15, 50);
-
         gc.setLineWidth(5);
-        gc.setStroke(Color.BLUEVIOLET);
 
+        gc.setStroke(Color.BLUEVIOLET);
         gc.strokeOval(30, 60, 30, 30);
         gc.setStroke(Color.BLUE);
         gc.strokeOval(50, 60, 30, 30);
@@ -221,7 +230,7 @@ public class MainView extends Application {
         return scroll;
     }
 
-    public HBox addStatBar(BorderPane presentationElement) {
+    public HBox addStatBar(Pane presentationElement) {
         HBox hbox = new HBox();
         hbox.setPadding(new Insets(0, 12, 0, 12));
         hbox.setSpacing(2);
