@@ -1,4 +1,4 @@
-package com.LearningUnLtd;
+package com.iilp.edi.viewer;
 
 import javafx.application.Application;
 import javafx.event.EventHandler;

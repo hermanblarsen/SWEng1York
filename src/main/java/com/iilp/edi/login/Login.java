@@ -1,5 +1,6 @@
-package com.LearningUnLtd;
+package com.iilp.edi.login;
 
+import com.iilp.edi.viewer.MainView;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -13,7 +14,6 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
-import org.kordamp.bootstrapfx.scene.layout.Panel;
 
 
 public class Login extends Application {
