@@ -1,6 +1,6 @@
-package com.iilp.edi.login;
+package login;
 
-import com.iilp.edi.viewer.MainView;
+import dashboard.Dashboard;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -56,15 +56,11 @@ public class Login extends Application {
         loginButton.getStyleClass().setAll("btn","btn-danger");
         grid.add(loginButton, 1, 3, 1, 1);
         loginButton.setOnAction(event ->{
-           MainView myMainView = new MainView();
-            myMainView.start(primaryStage);
+           Dashboard myDashboard = new Dashboard();
+            myDashboard.start(primaryStage);
         });
 
         primaryStage.show();
 
-        if(true) {
-            MainView myMainView = new MainView();
-            myMainView.start(primaryStage);
-        }
     }
 }
