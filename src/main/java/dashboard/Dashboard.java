@@ -1,7 +1,11 @@
 package dashboard;
 
 import javafx.application.Application;
+import javafx.beans.binding.Bindings;
+import javafx.beans.property.DoubleProperty;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -16,6 +20,18 @@ import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
+import javafx.scene.media.MediaView;
+import javafx.scene.control.Label;
+import javafx.scene.control.Slider;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
+import javafx.util.Duration;
+
+
+
 import org.kordamp.bootstrapfx.scene.layout.Panel;
 
 /**
@@ -140,9 +156,11 @@ public class Dashboard extends Application {
 
     public StackPane addPresentationElement() {
         StackPane stack = new StackPane();
-
+        addMediaPlayerElement(stack);
         addHtmlElement(stack, "<b><font color=\"red\">IILP </font><font color=\"blue\">HTML</font> <font color=\"green\">Support Test</font></b>");
-        addCanvas(stack);
+        //addCanvas(stack);
+
+
 
         return  stack;
     }
@@ -252,5 +270,46 @@ public class Dashboard extends Application {
 
         return hbox;
     }
+
+    private void addMediaPlayerElement(Pane stackPane){
+        String MEDIA_URL =
+                "http://download.oracle.com/otndocs/products/javafx/oow2010-2.flv";
+
+        Media media = new Media(MEDIA_URL);
+        MediaPlayer mediaPlayer = new MediaPlayer(media);
+        mediaPlayer.setAutoPlay(true);
+
+        MediaView mv = new MediaView(mediaPlayer);
+        DoubleProperty mvw = mv.fitWidthProperty();
+        DoubleProperty mvh = mv.fitHeightProperty();
+        mvw.bind(Bindings.selectDouble(mv.sceneProperty(), "width"));
+        mvh.bind(Bindings.selectDouble(mv.sceneProperty(), "height"));
+        mv.setPreserveRatio(true);
+
+        HBox control = mediaControl();
+
+        GridPane mediaPane = new GridPane();
+        GridPane.setConstraints(mv,0,0);
+        GridPane.setConstraints(control,0,1);
+        mediaPane.getChildren().addAll(mv,control);
+        mediaPane.setStyle("-fx-background-color: whitesmoke;");
+
+
+        stackPane.getChildren().add(mediaPane);
+
+    }
+
+    private HBox mediaControl(){
+        HBox mediaBar = new HBox();
+        mediaBar.setAlignment(Pos.CENTER);
+        mediaBar.setPadding(new Insets(5,10,5,10));
+        BorderPane.setAlignment(mediaBar, Pos.CENTER);
+
+        final Button playButton = new Button(">");
+        mediaBar.getChildren().add(playButton);
+
+        return mediaBar;
+    }
+
 }
 
