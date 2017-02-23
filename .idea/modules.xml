@@ -2,7 +2,6 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/Hello-JavaFX.iml" filepath="$PROJECT_DIR$/Hello-JavaFX.iml" />
       <module fileurl="file://$PROJECT_DIR$/InteractiveLearningPlatform.iml" filepath="$PROJECT_DIR$/InteractiveLearningPlatform.iml" />
     </modules>
   </component>
