@@ -1,11 +1,17 @@
 package dashboard;
 
+import javafx.animation.Animation;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.application.Application;
+import javafx.beans.InvalidationListener;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.DoubleProperty;
-import javafx.event.EventHandler;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -23,21 +29,25 @@ import javafx.stage.Stage;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaView;
-import javafx.scene.control.Label;
-import javafx.scene.control.Slider;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
+import javafx.stage.StageStyle;
 import javafx.util.Duration;
 
 
-
 import org.kordamp.bootstrapfx.scene.layout.Panel;
+
+import javax.swing.text.Document;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
 
 /**
  * Created by amriksadhra on 24/01/2017.
  */
 public class Dashboard extends Application {
+    ArrayList<Node> nodeList = new ArrayList<>();
+
     public static void main(String[] args) {
         launch(args);
     }
@@ -70,11 +80,11 @@ public class Dashboard extends Application {
         hbox.setStyle("-fx-background-color: #34495e;");
 
         Button createPresButton = new Button("Create Presentation");
-        createPresButton.getStyleClass().setAll("btn","btn-success");
+        createPresButton.getStyleClass().setAll("btn", "btn-success");
 
         Button loadPresButton = new Button("Load Presentation");
         loadPresButton.getStyleClass().setAll("btn", "btn-default");
-        loadPresButton.setOnAction(event ->{
+        loadPresButton.setOnAction(event -> {
             FileChooser fileChooser = new FileChooser();
             fileChooser.setTitle("Open Resource File");
             fileChooser.showOpenDialog(primaryStage);
@@ -104,16 +114,16 @@ public class Dashboard extends Application {
 
         //Buttons for shapePane
         Button triButton = new Button("Triangle");
-        triButton.getStyleClass().setAll("btn","btn-success");
+        triButton.getStyleClass().setAll("btn", "btn-success");
         shapesPane.getChildren().add(triButton);
         Button squareButton = new Button("Square");
-        squareButton.getStyleClass().setAll("btn","btn-warning");
+        squareButton.getStyleClass().setAll("btn", "btn-warning");
         shapesPane.getChildren().add(squareButton);
         Button circButton = new Button("Circle");
-        circButton.getStyleClass().setAll("btn","btn-info");
+        circButton.getStyleClass().setAll("btn", "btn-info");
         shapesPane.getChildren().add(circButton);
         Button starButton = new Button("Star");
-        starButton.getStyleClass().setAll("btn","btn-danger");
+        starButton.getStyleClass().setAll("btn", "btn-danger");
         shapesPane.getChildren().add(starButton);
 
         //Create Panel for shapes
@@ -134,13 +144,13 @@ public class Dashboard extends Application {
 
         //Buttons for textPane
         Button boldButton = new Button("Bold");
-        boldButton.getStyleClass().setAll("btn","btn-default");
+        boldButton.getStyleClass().setAll("btn", "btn-default");
         textPane.getChildren().add(boldButton);
         Button italButton = new Button("Itallic");
-        italButton.getStyleClass().setAll("btn","btn-default");
+        italButton.getStyleClass().setAll("btn", "btn-default");
         textPane.getChildren().add(italButton);
         Button underButton = new Button("Underline");
-        underButton.getStyleClass().setAll("btn","btn-default");
+        underButton.getStyleClass().setAll("btn", "btn-default");
         textPane.getChildren().add(underButton);
 
         //Create panel for text controls
@@ -156,16 +166,30 @@ public class Dashboard extends Application {
 
     public StackPane addPresentationElement() {
         StackPane stack = new StackPane();
-        addMediaPlayerElement(stack);
-        addHtmlElement(stack, "<b><font color=\"red\">IILP </font><font color=\"blue\">HTML</font> <font color=\"green\">Support Test</font></b>");
-        //addCanvas(stack);
+
+        //addMediaPlayerElement(stack);
+        addHtmlElement(stack, "<div>Lol</div>");
+        addHtmlElement(stack, "<h1><b><font color=\"red\">IILP </font><font color=\"blue\">HTML</font> <font color=\"green\">Support Test</font></b></h1>");
+        addCanvas(stack);
+
+        //Test a simple animation
+        animationTest(nodeList.get(1));
 
 
-
-        return  stack;
+        return stack;
     }
 
-    private void addCanvas(Pane stackPane){
+    private void animationTest(Node toAnimate) {
+        //Create new timer and schedule increment of first nodes Y position: Test animation
+        Timeline timeline = new Timeline(new KeyFrame(
+                Duration.millis(250),
+                ae -> toAnimate.setTranslateY(toAnimate.getTranslateY() + 1)));
+        timeline.setCycleCount(Animation.INDEFINITE);
+        timeline.play();
+    }
+
+
+    private void addCanvas(Pane stackPane) {
         // Create a wrapper Pane first
         Pane canvasPane = new Pane();
 
@@ -179,17 +203,25 @@ public class Dashboard extends Application {
         canvas.heightProperty().addListener(event -> draw(canvas));
         draw(canvas);
 
+        trackNode(canvas);
+
         stackPane.getChildren().add(canvasPane);
     }
 
-    private void addHtmlElement(Pane stackPane, String htmlString){
+    private void trackNode(Node toTrack) {
+        nodeList.add(toTrack);
+    }
+
+    private void addHtmlElement(Pane stackPane, String htmlString) {
         final WebView browser = new WebView();
         final WebEngine webEngine = browser.getEngine();
+
+        trackNode(browser);
 
         stackPane.getChildren().add(browser);
         webEngine.loadContent(htmlString);
         //TODO: CSS styling support so we can change fonts, etc.
-        //webEngine.setUserStyleSheetLocation(getClass().getResource("style.css").toString());
+        webEngine.setUserStyleSheetLocation(getClass().getResource("../style.css").toString());
     }
 
     private void draw(Canvas canvas) {
@@ -223,7 +255,7 @@ public class Dashboard extends Application {
 
         Panel[] slides = new Panel[numSlides];
 
-        for(int i = 0; i < numSlides; i ++){
+        for (int i = 0; i < numSlides; i++) {
             slides[i] = new Panel();
             slides[i].getStyleClass().add("panel-primary");
             slides[i].setBody(new Text("Slide panel preview here."));
@@ -259,10 +291,10 @@ public class Dashboard extends Application {
 
         border.setRight(coordTextBar);
 
-       presentationElement.setOnMouseMoved(event -> coordTextBar.setText(
-                "(x: "       + event.getX()      + ", y: "       + event.getY()       + ") -- " +
-                        "(sceneX: "  + event.getSceneX() + ", sceneY: "  + event.getSceneY()  + ") -- " +
-                        "(screenX: " + event.getScreenX()+ ", screenY: " + event.getScreenY() + ")"));
+        presentationElement.setOnMouseMoved(event -> coordTextBar.setText(
+                "(x: " + event.getX() + ", y: " + event.getY() + ") -- " +
+                        "(sceneX: " + event.getSceneX() + ", sceneY: " + event.getSceneY() + ") -- " +
+                        "(screenX: " + event.getScreenX() + ", screenY: " + event.getScreenY() + ")"));
 
         presentationElement.setOnMouseExited(event -> coordTextBar.setText("Mouse Exited"));
 
@@ -271,7 +303,7 @@ public class Dashboard extends Application {
         return hbox;
     }
 
-    private void addMediaPlayerElement(Pane stackPane){
+    private void addMediaPlayerElement(Pane stackPane) {
         String MEDIA_URL =
                 "http://download.oracle.com/otndocs/products/javafx/oow2010-2.flv";
 
@@ -289,9 +321,9 @@ public class Dashboard extends Application {
         HBox control = mediaControl();
 
         GridPane mediaPane = new GridPane();
-        GridPane.setConstraints(mv,0,0);
-        GridPane.setConstraints(control,0,1);
-        mediaPane.getChildren().addAll(mv,control);
+        GridPane.setConstraints(mv, 0, 0);
+        GridPane.setConstraints(control, 0, 1);
+        mediaPane.getChildren().addAll(mv, control);
         mediaPane.setStyle("-fx-background-color: whitesmoke;");
 
 
@@ -299,10 +331,10 @@ public class Dashboard extends Application {
 
     }
 
-    private HBox mediaControl(){
+    private HBox mediaControl() {
         HBox mediaBar = new HBox();
         mediaBar.setAlignment(Pos.CENTER);
-        mediaBar.setPadding(new Insets(5,10,5,10));
+        mediaBar.setPadding(new Insets(5, 10, 5, 10));
         BorderPane.setAlignment(mediaBar, Pos.CENTER);
 
         final Button playButton = new Button(">");
@@ -310,6 +342,6 @@ public class Dashboard extends Application {
 
         return mediaBar;
     }
-
 }
+
 

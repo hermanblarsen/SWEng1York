@@ -1,3 +1,4 @@
+/*
 //JAXP APIs used by DOMecho
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -6,7 +7,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
-import org.xml.sax.helpers.*
+import org.xml.sax.helpers.*;
 import java.io.IOException;
 
 //read the sample XML file and manage output:
@@ -45,9 +46,11 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+*/
 /**
  * Created by hermanblarsen on 23/02/2017.
- */
+ *//*
+
 public class parserXML {
 
     private DOMParser xmlParser;
@@ -77,7 +80,8 @@ public class parserXML {
             //TODO add all elements on a slide to slideElement array in slide
 
 
-        /*
+        */
+/*
         // for each slide in the file get all child nodes
         NodeList root = document.getElementsByTagName("slide");
 
@@ -104,7 +108,8 @@ public class parserXML {
                             break;
                     }
                 }
-            }*/
+            }*//*
+
 
             // Add parsed slide to arraylist.
             myPresentation.addSlide(slide);
@@ -112,3 +117,4 @@ public class parserXML {
         return myPresentation;
     }
 }
+*/
