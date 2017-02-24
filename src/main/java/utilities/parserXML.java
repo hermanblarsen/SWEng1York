@@ -1,5 +1,7 @@
-/*
+package utilities;
+
 //JAXP APIs used by DOMecho
+import com.sun.org.apache.xerces.internal.parsers.DOMParser;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
@@ -23,7 +25,7 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 //---
 
-import com.sun.org.apache.xerces.internal.parsers.DOMParser;
+
 import org.w3c.dom.Document;
 import java.util.ArrayList;
 import java.util.List;
@@ -46,18 +48,16 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-*/
 /**
  * Created by hermanblarsen on 23/02/2017.
- *//*
-
+ */
 public class parserXML {
 
     private DOMParser xmlParser;
     private Document xmlDocument;
     private String presentationXmlPath = "";
 
-    public parserXML(string presentationXmlPath) {
+    public parserXML(String presentationXmlPath) {
         xmlParser = new DOMParser();
         try {
             xmlParser.parse(presentationXmlPath);
@@ -80,8 +80,7 @@ public class parserXML {
             //TODO add all elements on a slide to slideElement array in slide
 
 
-        */
-/*
+        /*
         // for each slide in the file get all child nodes
         NodeList root = document.getElementsByTagName("slide");
 
@@ -108,13 +107,10 @@ public class parserXML {
                             break;
                     }
                 }
-            }*//*
-
+            }
 
             // Add parsed slide to arraylist.
-            myPresentation.addSlide(slide);
-        }
+            myPresentation.addSlide(slide);*/
         return myPresentation;
     }
 }
-*/
