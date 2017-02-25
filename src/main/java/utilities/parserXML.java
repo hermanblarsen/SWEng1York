@@ -76,8 +76,8 @@ public class parserXML {
         //TODO add attributes
         //TODO add elements to presentation
 
-        //TODO got through all slides and add to slide array
-            //TODO add all elements on a slide to slideElement array in slide
+            //TODO got through all slides and add to slide array
+                //TODO add all elements on every slide to slideElement array in slide
 
 
         /*
