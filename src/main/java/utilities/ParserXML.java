@@ -176,7 +176,6 @@ public class ParserXML {
         }
         myPresentation.setTheme(theme);
 
-
         //System.out.println(documentDetailsNode.getNextSibling().getNextSibling().getNodeName()); //Slideshow
 
             //TODO add slideshow to slideshow root of presentation
