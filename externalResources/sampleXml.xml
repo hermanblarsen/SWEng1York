@@ -1,0 +1,137 @@
+<document documentid="sampleinput">
+	<documentdetails>
+		<author>Joe Bloggs</author>
+		<version>1.0</version>
+		<documentaspectratio>1.78</documentaspectratio>
+		<description>Sample XML input</description>
+		<tags>sample,xml,input</tags>
+		<groupformat>2</groupformat>
+	</documentdetails>
+	<slideshow>
+		<defaults>
+			<bgcolour>#FF2304</bgcolour>
+			<font>Arial</font>
+			<fontsize>12</fontsize>
+			<fontcolour>#F00D33FF</fontcolour>
+			<graphicscolour>#F40D33FF</graphicscolour>
+			<autoplaymedia>true</autoplaymedia>
+		</defaults>
+		<slide slideid="1">
+			<text elementid ="1" layer="1" visibility="true" startsequence="2" endsequence="4" duration="20.5">
+				<textcontent>
+					<html>Example HTML text input. This is a list: <ul><li><i>italic</i></li><li><b>bold</b></li></ul></html>
+				</textcontent>
+				<xposition>0.12</xposition>
+				<yposition>0.3</yposition>
+				<xsize>0.05</xsize>
+				<ysize>0.6</ysize>
+				<font>Comic Sans</font>
+				<fontsize>12</fontsize>
+				<fontcolour>#EEEEEEFF</fontcolour>
+				<bgcolour>#000000FF</bgcolour>
+				<bordercolour>#ABCDEFFF</bordercolour>
+				<onclickaction>openwebsite</onclickaction>
+				<onclickinfo>https://www.google.no/</onclickinfo>
+				<aspectratiolock>false</aspectratiolock>
+				<elementaspectratio>1.2</elementaspectratio>
+			</text>
+			<text elementid ="2" layer="2" visibility="true" startsequence="3" endsequence="5">
+				<textfilepath>TextSourceFile.txt</textfilepath>
+				<textcontentreference>1,2</textcontentreference>
+				<xposition>0.12</xposition>
+				<yposition>0.3</yposition>
+				<xsize>0.1</xsize>
+				<ysize>0.4</ysize>
+				<font>Comic Sans</font>
+				<fontsize>12</fontsize>
+				<fontcolour>#EEEEEEFF</fontcolour>
+				<bgcolour>#000000FF</bgcolour>
+				<bordercolour>#ABCDEFFF</bordercolour>
+				<onclickaction>gotoslide</onclickaction>
+				<onclickinfo>3</onclickinfo>
+				<aspectratiolock>true</aspectratiolock>
+				<elementaspectratio>2</elementaspectratio>
+			</text>
+		</slide>
+		<slide slideid="2">
+			<graphic elementid ="1" layer="1" visibility="false" startsequence="1">
+				<onclickaction>dynamicmediatoggle</onclickaction>
+				<onclickinfo>3</onclickinfo>
+				<aspectratiolock>true</aspectratiolock>
+				<elementaspectratio>1.0</elementaspectratio>
+				<linecolour>#EEEEEEFF</linecolour>
+				<fillcolour>#000000FF</fillcolour>
+				<polygon>
+					<xposition>[0.12, 0.02, 0.02]</xposition>
+					<yposition>[0.3, 0.1, 0.04]</yposition>
+					<isclosed>true</isclosed>					
+				</polygon>
+			</graphic>
+			<graphic elementid ="2" layer="2" visibility="true" startsequence="3" duration="8">
+				<onclickaction>gotoslide</onclickaction>
+				<onclickinfo>1</onclickinfo>
+				<aspectratiolock>false</aspectratiolock>
+				<elementaspectratio>1.78</elementaspectratio>
+				<linecolour>#EEEEEEFF</linecolour>
+				<fillcolour>#000000FF</fillcolour>
+				<oval>
+					<xposition>0.12</xposition>
+					<yposition>0.3</yposition>
+					<rhorizontal>0.05</rhorizontal>
+					<rvertical>0.1</rvertical>
+					<rotation>45</rotation>
+				</oval>
+			</graphic>
+			<audio elementid ="3" startsequence="2" endsequence="4" duration="12.0">
+				<path>audio.mp3</path>
+				<loop>true</loop>
+				<autoplay>false</autoplay>
+				<starttime>1</starttime>
+				<endtime>5</endtime>
+			</audio>
+		</slide>
+		<slide slideid="3">
+			<image elementid ="1" layer="1" visibility="true" startsequence="2" endsequence="4" duration="12">
+				<xposition>0.12</xposition>
+				<yposition>0.3</yposition>
+				<xsize>0.8</xsize>
+				<ysize>0.8</ysize>
+				<path>http://www.amp.york.ac.uk/myImage.jpg</path>
+				<onclickaction>gotoslide</onclickaction>
+				<onclickinfo>2</onclickinfo>
+				<opacity>0.9</opacity>
+				<aspectratiolock>true</aspectratiolock>
+				<elementaspectratio>1.0</elementaspectratio>
+			</image>
+			<image elementid ="2" layer="2" visibility="true" startsequence="2" duration="4.2">
+				<xposition>0.12</xposition>
+				<yposition>0.3</yposition>
+				<xsize>0.8</xsize>
+				<ysize>0.8</ysize>
+				<path>C:\user\images\displayimage.png</path>
+				<onclickaction>gotoslide</onclickaction>
+				<onclickinfo>2</onclickinfo>
+				<opacity>0.9</opacity>
+				<aspectratiolock>true</aspectratiolock>
+				<elementaspectratio>1.5</elementaspectratio>
+			</image>
+		</slide>
+		<slide slideid="4">
+			<video elementid ="1" layer="1" visibility="true" startsequence="2" endsequence="4" duration="367.43">
+				<xposition>0.12</xposition>
+				<yposition>0.3</yposition>
+				<xsize>0.7</xsize>
+				<ysize>1</ysize>
+				<path>C:\user\videos\myvideo.mp4</path>
+				<onclickaction>openwebsite</onclickaction>
+				<onclickinfo>https://www.google.no/</onclickinfo>
+				<loop>true</loop>
+				<aspectratiolock>true</aspectratiolock>
+				<elementaspectratio>1.78</elementaspectratio>
+				<autoplay>false</autoplay>
+				<starttime>0</starttime>
+				<endtime>55</endtime>
+			</video>
+		</slide>
+	</slideshow>
+</document>

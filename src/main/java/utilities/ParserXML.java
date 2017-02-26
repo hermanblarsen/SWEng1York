@@ -51,13 +51,37 @@ import javax.xml.transform.stream.StreamResult;
 /**
  * Created by hermanblarsen on 23/02/2017.
  */
-public class parserXML {
+public class ParserXML {
 
     private DOMParser xmlParser;
     private Document xmlDocument;
-    private String presentationXmlPath = "";
+    private String presentationXmlPath = "externalResources/sampleXml.xml";
 
-    public parserXML(String presentationXmlPath) {
+    public ParserXML(String presentationXmlPath) {
+        if (this.validatePath(presentationXmlPath))
+        {
+            this.presentationXmlPath = presentationXmlPath; //Set the path if valid
+            System.out.print("Path valid");
+        } else {
+            System.out.print("Path not valid");
+            //Path remains default
+        }
+
+        //Create a DOMParser, try parsing XML
+        xmlParser = new DOMParser();
+        try {
+            xmlParser.parse(presentationXmlPath);
+        } catch (SAXException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        xmlDocument = xmlParser.getDocument();
+    }
+
+    public ParserXML() {
         xmlParser = new DOMParser();
         try {
             xmlParser.parse(presentationXmlPath);
@@ -73,7 +97,15 @@ public class parserXML {
 
     public Presentation parsePresentation() {
         Presentation myPresentation = new Presentation();
-        //TODO add attributes
+
+        //Set the root element of the XML to the "document"
+        NodeList rootElement = xmlDocument.getElementsByTagName("document");
+
+
+
+
+
+        //TODO add attributes to root presentation
         //TODO add elements to presentation
 
             //TODO got through all slides and add to slide array
@@ -112,5 +144,9 @@ public class parserXML {
             // Add parsed slide to arraylist.
             myPresentation.addSlide(slide);*/
         return myPresentation;
+    }
+
+    public Boolean validatePath(String path) {
+        return true;
     }
 }
