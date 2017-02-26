@@ -10,17 +10,16 @@ public class Presentation {
     private String documentID;
     private String author;
     private Float version;
-    private Float documenAspectRatio;
+    private Float documentAspectRatio;
+    private String description;
     private String tags;
     private Theme theme;
     private boolean autoplayMedia;
 
     private int groupFormat;
 
-    
-
-
     private List<Slide> slideList;
+
 
     public Presentation () {
         slideList = new ArrayList<Slide>();
@@ -65,12 +64,12 @@ public class Presentation {
         this.version = version;
     }
 
-    public Float getDocumenAspectRatio() {
-        return documenAspectRatio;
+    public Float getDocumentAspectRatio() {
+        return documentAspectRatio;
     }
 
-    public void setDocumenAspectRatio(Float documenAspectRatio) {
-        this.documenAspectRatio = documenAspectRatio;
+    public void setDocumentAspectRatio(Float documentAspectRatio) {
+        this.documentAspectRatio = documentAspectRatio;
     }
 
     public String getTags() {
@@ -111,5 +110,13 @@ public class Presentation {
 
     public void setSlideList(List<Slide> slideList) {
         this.slideList = slideList;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }

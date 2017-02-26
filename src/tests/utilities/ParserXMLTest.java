@@ -26,7 +26,34 @@ public class ParserXMLTest {
 
     @Test
     public void verifyCreationOfPresentation() {
+        assertNotNull(myPresentation);
         assertTrue(myPresentation instanceof Presentation);
+    }
+
+    @Test
+    public void verifyDocumentID () {
+        assertEquals(myPresentation.getDocumentID(), "sampleinput");
+    }
+
+    @Test
+    public void verifyDocumentDetails () {
+        assertEquals(myPresentation.getAuthor(), "Joe Bloggs");
+        assertEquals(myPresentation.getVersion(), 1.0, 0.01);
+        assertEquals(myPresentation.getDocumentAspectRatio(), 1.78, 0.01);
+        assertEquals(myPresentation.getDescription(), "Sample XML input");
+        assertEquals(myPresentation.getTags(), "sample,xml,input");
+        assertEquals(myPresentation.getGroupFormat(), 2, 0.01);
+    }
+
+    @Test
+    public void verifySlideshowDefaults () {
+        assertNotNull(myPresentation.getTheme());
+        assertEquals(myPresentation.getTheme().getBackgroundColour(), "#FF2304");
+        assertEquals(myPresentation.getTheme().getFont(), "Arial");
+        assertEquals(myPresentation.getTheme().getFontSize(),12, 0);
+        assertEquals(myPresentation.getTheme().getFontColour(), "#F00D33FF");
+        assertEquals(myPresentation.getTheme().getGraphicsColour(), "#F40D33FF");
+        assertEquals(myPresentation.isAutoplayMedia(), true);
     }
 
     @After

@@ -61,14 +61,12 @@ public class ParserXML {
         if (this.validatePath(presentationXmlPath))
         {
             this.presentationXmlPath = presentationXmlPath; //Set the path if valid
-            System.out.println("Path valid");
         } else {
-            System.out.println("Path not valid");
-            //Path remains default
+            System.out.println("Path not valid, default XML loaded");
         }
 
         //Create a DOMParser, try parsing XML
-        xmlParser = new DOMParser();
+        xmlParser = new DOMParser(); //Equivalent to DocumentBuilder when not writing to XML
         try {
             xmlParser.parse(presentationXmlPath);
         } catch (SAXException e) {
@@ -81,35 +79,105 @@ public class ParserXML {
         xmlDocument = xmlParser.getDocument();
     }
 
+    /* XML Sanity Check
+    * NodeName of element: actual name of element as per XML
+    * NodeName of node:  actual name of element as per XML
+    * NodeValue of node: text/value stored in node
+    * This:
+    *   NamedNodeMap presentationDocumentAttributes = presentationDocument.getAttributes();
+    *   Node documentIDNode = presentationDocumentAttributes.item(0);
+    * Is equivalent to this:
+    *   Node documentIDNode = presentationDocument.getAttributes().item(0);
+    * And results in this :
+    *   System.out.println(documentIDNode.getNodeName() + " = " + documentIDNode.getNodeValue() + " and type: " + documentIDNode.getNodeType());
+    *   (documentid = sampleinput and type: 2)
+    *
+    * node.item(0).getNodeName() + node.item(0).getFirstChild().getNodeValue() gives xml name and its value  ?
+    * */
+
     public Presentation parsePresentation() {
         Presentation myPresentation = new Presentation();
 
-        //Set the root element of the XML to the "document"
-        NodeList documentRootList = xmlDocument.getElementsByTagName("documentdetails");
+        //Store the documentID
+        NodeList presentationDocumentList = xmlDocument.getElementsByTagName("document");
+        Element presentationDocument = (Element) presentationDocumentList.item(0);
+        myPresentation.setDocumentID(presentationDocument.getAttributes().item(0).getNodeValue());
 
-        Element presentationDocument = (Element) xmlDocument.getDocumentElement();
-        System.out.println("NodeName: " + presentationDocument.getNodeName().toString());
-        NamedNodeMap presentationDocumentAttributes = null;
+        //Store the document details
+        NodeList documentDetailsList = xmlDocument.getElementsByTagName("documentdetails");
+        Node documentDetailsNode = documentDetailsList.item(0);
+        Element documentDetails = (Element) documentDetailsNode;
+        for (int i = 0; i < documentDetailsNode.getChildNodes().getLength(); i++) {
 
-//        System.out.println("DocumentID: " + presentationDocument.getAttribute("documentID").toString());
-//
-//        System.out.println("ChildNodes Number: " + presentationDocument.getChildNodes().getLength());
-//        for(int i = 0; i <5; i++) {
-//            System.out.println("ChildNodes Number: " + presentationDocument.getChildNodes().item(i).getNodeName());
-//        }
+            Node documentDetailsElement = documentDetailsNode.getChildNodes().item(i);
+            if (documentDetailsElement.getNodeType() == Node.ELEMENT_NODE) {
+                String nodeName = documentDetailsElement.getNodeName();
+                String nodeContent = documentDetailsElement.getTextContent();
 
-        Element documentDetails = (Element) documentRootList.item(0);
-        Element slideShow = (Element) documentRootList.item(1);
+                switch (nodeName) {
+                    case "author":
+                        myPresentation.setAuthor(nodeContent);
+                        break;
+                    case "version":
+                        myPresentation.setVersion(Float.valueOf(nodeContent));
+                        break;
+                    case "documentaspectratio":
+                        myPresentation.setDocumentAspectRatio(Float.valueOf(nodeContent));
+                        break;
+                    case "description":
+                        myPresentation.setDescription(nodeContent);
+                        break;
+                    case "tags":
+                        myPresentation.setTags(nodeContent);
+                        break;
+                    case "groupformat":
+                        myPresentation.setGroupFormat(Integer.valueOf(nodeContent));
+                        break;
+                }
+            }
+        }
 
-//        for (int i=0;i<; i++) {
-//            System.out.print();
-//        }
+        NodeList slideshowList = xmlDocument.getElementsByTagName("slideshow");
+        Node slideshowNode = slideshowList.item(0);
 
-            //TODO add attributes to documentdetails root presentation
+        NodeList defaultList = xmlDocument.getElementsByTagName("defaults");
+        Node defaultNode = defaultList.item(0);
+
+        //Store the theme and default settings
+        Theme theme = new Theme();
+        for (int i = 0; i < defaultNode.getChildNodes().getLength(); i++) {
+            Node defaultElementNode = defaultNode.getChildNodes().item(i);
+            if (defaultElementNode.getNodeType() == Node.ELEMENT_NODE ) {
+
+                String nodeName = defaultElementNode.getNodeName();
+                String nodeContent = defaultElementNode.getTextContent();
+
+                switch (nodeName) {
+                    case "bgcolour":
+                        theme.setBackgroundColour(nodeContent);
+                        break;
+                    case "font":
+                        theme.setFont(nodeContent);
+                        break;
+                    case "fontsize":
+                        theme.setFontSize(Integer.valueOf(nodeContent));
+                        break;
+                    case "fontcolour":
+                        theme.setFontColour(nodeContent);
+                        break;
+                    case "graphicscolour":
+                        theme.setGraphicsColour(nodeContent);
+                        break;
+                    case "autoplaymedia":
+                        myPresentation.setAutoplayMedia(Boolean.valueOf(nodeContent));
+                        break;
+                }
+            }
+        }
+        myPresentation.setTheme(theme);
 
 
-                //TODO add document details to presentation
-
+        //System.out.println(documentDetailsNode.getNextSibling().getNextSibling().getNodeName()); //Slideshow
 
             //TODO add slideshow to slideshow root of presentation
 
@@ -119,6 +187,7 @@ public class ParserXML {
 
 
                 //TODO loop through all slides and add to slide array
+        NodeList slideList = xmlDocument.getElementsByTagName("slide");
 
                     //TODO loop add all elements on every slide to slideElement array in slide
 
