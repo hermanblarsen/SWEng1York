@@ -1,5 +1,6 @@
 package dashboard;
 
+import com.sun.webkit.WebPage;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -38,8 +39,6 @@ import javafx.util.Duration;
 
 import org.kordamp.bootstrapfx.scene.layout.Panel;
 
-import javax.swing.text.Document;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 
 /**
@@ -169,12 +168,11 @@ public class Dashboard extends Application {
 
         //addMediaPlayerElement(stack);
         addHtmlElement(stack, "<div>Lol</div>");
-        addHtmlElement(stack, "<h1><b><font color=\"red\">IILP </font><font color=\"blue\">HTML</font> <font color=\"green\">Support Test</font></b></h1>");
+        addHtmlElement(stack, "<h1 style='background : rgba(0,0,0,0);'><b><font color=\"red\">IILP </font><font color=\"blue\">HTML</font> <font color=\"green\">Support Test</font></b></h1>");
         addCanvas(stack);
 
         //Test a simple animation
         animationTest(nodeList.get(1));
-
 
         return stack;
     }
@@ -219,9 +217,11 @@ public class Dashboard extends Application {
         trackNode(browser);
 
         stackPane.getChildren().add(browser);
+        webEngine.documentProperty().addListener(new WebDocumentListener(webEngine));
+
         webEngine.loadContent(htmlString);
         //TODO: CSS styling support so we can change fonts, etc.
-        webEngine.setUserStyleSheetLocation(getClass().getResource("../style.css").toString());
+        //webEngine.setUserStyleSheetLocation(getClass().getResource("../style.css").toString());
     }
 
     private void draw(Canvas canvas) {
