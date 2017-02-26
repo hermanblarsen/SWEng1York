@@ -61,9 +61,9 @@ public class ParserXML {
         if (this.validatePath(presentationXmlPath))
         {
             this.presentationXmlPath = presentationXmlPath; //Set the path if valid
-            System.out.print("Path valid");
+            System.out.println("Path valid");
         } else {
-            System.out.print("Path not valid");
+            System.out.println("Path not valid");
             //Path remains default
         }
 
@@ -81,35 +81,46 @@ public class ParserXML {
         xmlDocument = xmlParser.getDocument();
     }
 
-    public ParserXML() {
-        xmlParser = new DOMParser();
-        try {
-            xmlParser.parse(presentationXmlPath);
-        } catch (SAXException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        xmlDocument = xmlParser.getDocument();
-    }
-
     public Presentation parsePresentation() {
         Presentation myPresentation = new Presentation();
 
         //Set the root element of the XML to the "document"
-        NodeList rootElement = xmlDocument.getElementsByTagName("document");
+        NodeList documentRootList = xmlDocument.getElementsByTagName("documentdetails");
+
+        Element presentationDocument = (Element) xmlDocument.getDocumentElement();
+        System.out.println("NodeName: " + presentationDocument.getNodeName().toString());
+        NamedNodeMap presentationDocumentAttributes = null;
+
+//        System.out.println("DocumentID: " + presentationDocument.getAttribute("documentID").toString());
+//
+//        System.out.println("ChildNodes Number: " + presentationDocument.getChildNodes().getLength());
+//        for(int i = 0; i <5; i++) {
+//            System.out.println("ChildNodes Number: " + presentationDocument.getChildNodes().item(i).getNodeName());
+//        }
+
+        Element documentDetails = (Element) documentRootList.item(0);
+        Element slideShow = (Element) documentRootList.item(1);
+
+//        for (int i=0;i<; i++) {
+//            System.out.print();
+//        }
+
+            //TODO add attributes to documentdetails root presentation
 
 
+                //TODO add document details to presentation
 
 
+            //TODO add slideshow to slideshow root of presentation
 
-        //TODO add attributes to root presentation
-        //TODO add elements to presentation
+                //TODO add default to presentation theme
 
-            //TODO got through all slides and add to slide array
-                //TODO add all elements on every slide to slideElement array in slide
+                    //TODO add default elements to theme
+
+
+                //TODO loop through all slides and add to slide array
+
+                    //TODO loop add all elements on every slide to slideElement array in slide
 
 
         /*
