@@ -56,6 +56,21 @@ public class ParserXMLTest {
         assertEquals(myPresentation.isAutoplayMedia(), true);
     }
 
+    @Test
+    public void verifySlideArray () {
+        assertNotNull(myPresentation.getSlideList());
+        for (int i = 0; i < 3; i++) {
+            assertEquals(myPresentation.getSlideList().get(i).getSlideID(), (i+1), 0);
+        }
+    }
+
+    @Test
+    public void verifyElementArray () {
+        assertNotNull(myPresentation.getSlideList().get(0).getSlideElementList());
+        //assertEquals(myPresentation.getSlideList().get(0).getSlideElementList().size(), 2, 0 );
+    }
+
+
     @After
     public void tearDown() throws Exception {
         //Do nothing

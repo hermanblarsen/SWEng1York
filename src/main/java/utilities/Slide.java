@@ -8,7 +8,9 @@ import java.util.List;
  */
 public class Slide {
 
-    private List<SlideElement> slideElementList;
+    protected List<SlideElement> slideElementList;
+    protected int slideID;
+
 
     public Slide () {
         slideElementList = new ArrayList<SlideElement>();
@@ -22,11 +24,30 @@ public class Slide {
     }
 
 
-    public void deleteElementIndex(int elementIndex) {
+    public void deleteElementWithIndex(int elementIndex) {
 
     }
-    public void deleteElementID(int elementID) {
+    public void deleteElementWithID(int elementID) {
 
     }
 
+    public void moveElementToIndex (int index) {
+
+    }
+
+    public List<SlideElement> getSlideElementList() {
+        return slideElementList;
+    }
+
+    public void setSlideElementList(List<SlideElement> slideElementList) {
+        this.slideElementList = slideElementList;
+    }
+
+    public int getSlideID() {
+        return slideID;
+    }
+
+    public void setSlideID(int slideID) {
+        this.slideID = slideID;
+    }
 }
