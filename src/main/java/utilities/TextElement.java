@@ -1,9 +1,16 @@
 package utilities;
 
+import javafx.scene.Node;
+import javafx.scene.layout.Pane;
+import javafx.scene.web.WebEngine;
+import javafx.scene.web.WebView;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Created by habl on 26/02/2017.
  */
-public class TextElement implements SlideElement{
+public class TextElement implements SlideElement {
     protected int elementID;
     protected int layer;
     protected boolean visibility;
@@ -27,7 +34,33 @@ public class TextElement implements SlideElement{
     protected boolean aspectRatioLock;
     protected float elementAspectRatio;
 
+
+    Logger logger = LoggerFactory.getLogger(TextElement.class);
+    protected Pane slideCanvas;
+    protected final WebView browser;
+    Node coreNode = null;
+    protected final WebEngine webEngine;
+
     public TextElement() {
+        browser = new WebView();
+        webEngine = browser.getEngine();
+        webEngine.documentProperty().addListener(new WebDocumentListener(webEngine));
+    }
+
+
+    public Pane getSlideCanvas() {
+        return slideCanvas;
+    }
+
+    public void setSlideCanvas(Pane slideCanvas) {
+        this.slideCanvas = slideCanvas;
+
+        //Add WebBrowser Element to the Pane
+        if(browser == null){
+            logger.error("Tried to set slide internalCanvas before TextElement constructor was called!");
+        } else {
+            slideCanvas.getChildren().add(browser);
+        }
     }
 
     public int getElementID() {
@@ -204,5 +237,15 @@ public class TextElement implements SlideElement{
 
     public void setxPosition(float xPosition) {
         this.xPosition = xPosition;
+    }
+
+    @Override
+    public void renderElement(){
+        webEngine.loadContent(textContent);
+    }
+
+    @Override
+    public Node getCoreNode() {
+        return browser;
     }
 }

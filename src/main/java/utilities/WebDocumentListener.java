@@ -1,4 +1,4 @@
-package dashboard;
+package utilities;
 
 
 import com.sun.webkit.WebPage;

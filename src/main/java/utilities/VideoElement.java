@@ -1,5 +1,8 @@
 package utilities;
 
+import javafx.scene.Node;
+import javafx.scene.layout.Pane;
+
 /**
  * Created by habl on 26/02/2017.
  */
@@ -23,4 +26,19 @@ public class VideoElement implements SlideElement{
     protected boolean autoplay;
     protected int startTime;
     protected int endTime;
+
+    @Override
+    public void renderElement() {
+
+    }
+
+    @Override
+    public Node getCoreNode() {
+        return null;
+    }
+
+    @Override
+    public void setSlideCanvas(Pane slideCanvas) {
+
+    }
 }

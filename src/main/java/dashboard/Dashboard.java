@@ -1,15 +1,11 @@
 package dashboard;
 
-import com.sun.webkit.WebPage;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Application;
-import javafx.beans.InvalidationListener;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.DoubleProperty;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -23,8 +19,6 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
-import javafx.scene.web.WebEngine;
-import javafx.scene.web.WebView;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.scene.media.Media;
@@ -33,11 +27,13 @@ import javafx.scene.media.MediaView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
-import javafx.stage.StageStyle;
 import javafx.util.Duration;
 
 
 import org.kordamp.bootstrapfx.scene.layout.Panel;
+import utilities.GraphicElement;
+import utilities.SlideElement;
+import utilities.TextElement;
 
 import java.util.ArrayList;
 
@@ -45,8 +41,6 @@ import java.util.ArrayList;
  * Created by amriksadhra on 24/01/2017.
  */
 public class Dashboard extends Application {
-    ArrayList<Node> nodeList = new ArrayList<>();
-
     public static void main(String[] args) {
         launch(args);
     }
@@ -166,13 +160,26 @@ public class Dashboard extends Application {
     public StackPane addPresentationElement() {
         StackPane stack = new StackPane();
 
-        //addMediaPlayerElement(stack);
-        addHtmlElement(stack, "<div>Lol</div>");
-        addHtmlElement(stack, "<h1 style='background : rgba(0,0,0,0);'><b><font color=\"red\">IILP </font><font color=\"blue\">HTML</font> <font color=\"green\">Support Test</font></b></h1>");
-        addCanvas(stack);
+
+        //------ Testing Code!--------
+        ArrayList<SlideElement> slideElements = new ArrayList<>();
+
+        TextElement myTextElement = new TextElement();
+        myTextElement.setTextContent("<h1 style='background : rgba(0,0,0,0);'><b><font color=\"red\">IILP </font><font color=\"blue\">HTML</font> <font color=\"green\">Support Test</font></b></h1>");
+        myTextElement.setSlideCanvas(stack);
+        slideElements.add(myTextElement);
+
+        GraphicElement myGraphicElement = new GraphicElement();
+        myGraphicElement.setSlideCanvas(stack);
+        slideElements.add(myGraphicElement);
+
+        //Render Loop
+        for(SlideElement slideElement : slideElements){
+            slideElement.renderElement();
+        }
 
         //Test a simple animation
-        animationTest(nodeList.get(1));
+        animationTest(slideElements.get(1).getCoreNode());
 
         return stack;
     }
@@ -186,59 +193,6 @@ public class Dashboard extends Application {
         timeline.play();
     }
 
-
-    private void addCanvas(Pane stackPane) {
-        // Create a wrapper Pane first
-        Pane canvasPane = new Pane();
-
-        Canvas canvas = new Canvas(canvasPane.getWidth(), canvasPane.getHeight());
-        canvasPane.getChildren().add(canvas);
-        // Bind the width/height property to the wrapper Pane
-        canvas.widthProperty().bind(canvasPane.widthProperty());
-        canvas.heightProperty().bind(canvasPane.heightProperty());
-        // redraw when resized
-        canvas.widthProperty().addListener(event -> draw(canvas));
-        canvas.heightProperty().addListener(event -> draw(canvas));
-        draw(canvas);
-
-        trackNode(canvas);
-
-        stackPane.getChildren().add(canvasPane);
-    }
-
-    private void trackNode(Node toTrack) {
-        nodeList.add(toTrack);
-    }
-
-    private void addHtmlElement(Pane stackPane, String htmlString) {
-        final WebView browser = new WebView();
-        final WebEngine webEngine = browser.getEngine();
-
-        trackNode(browser);
-
-        stackPane.getChildren().add(browser);
-        webEngine.documentProperty().addListener(new WebDocumentListener(webEngine));
-
-        webEngine.loadContent(htmlString);
-        //TODO: CSS styling support so we can change fonts, etc.
-        //webEngine.setUserStyleSheetLocation(getClass().getResource("../style.css").toString());
-    }
-
-    private void draw(Canvas canvas) {
-        //Draw Polygons in here
-        final GraphicsContext gc = canvas.getGraphicsContext2D();
-        gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
-
-        gc.setFill(Color.BLACK);
-        gc.setLineWidth(5);
-
-        gc.setStroke(Color.BLUEVIOLET);
-        gc.strokeOval(30, 60, 30, 30);
-        gc.setStroke(Color.BLUE);
-        gc.strokeOval(50, 60, 30, 30);
-        gc.setStroke(Color.INDIANRED);
-        gc.strokeOval(70, 60, 30, 30);
-    }
 
     public ScrollPane addFlowPane() {
         ScrollPane scroll = new ScrollPane();
@@ -304,8 +258,7 @@ public class Dashboard extends Application {
     }
 
     private void addMediaPlayerElement(Pane stackPane) {
-        String MEDIA_URL =
-                "http://download.oracle.com/otndocs/products/javafx/oow2010-2.flv";
+        String MEDIA_URL = "http://download.oracle.com/otndocs/products/javafx/oow2010-2.flv";
 
         Media media = new Media(MEDIA_URL);
         MediaPlayer mediaPlayer = new MediaPlayer(media);
