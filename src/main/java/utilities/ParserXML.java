@@ -381,37 +381,7 @@ public class ParserXML {
         //TODO loop add all elements on every slide to slideElement array in slide
 
 
-        /*
-        // for each slide in the file get all child nodes
-        NodeList root = document.getElementsByTagName("slide");
 
-        // For all slides:
-        for (int i = 0; i < root.getLength(); i++) {
-            Slide newSlide = new Slide();
-
-            Element slideInstance = (Element) root.item(i);
-
-            newSlide.setID(slideInstance.getAttribute("id"));
-
-            NodeList slideElements = slideInstance.getChildNodes();
-            // depending on tag of child node assign the textContend to
-            // different field of the slide
-            for (int j = 0; j < slideElements.getLength(); j++) {
-                if (slideElements.item(j).getNodeType() == Node.ELEMENT_NODE) {
-
-                    Element slideElement = (Element) slideElements.item(j);
-                    String elementTag = slideElement.getTagName();
-
-                    switch (elementTag) {
-                        case "something":
-                            slide.setTitle(slideElement.getTextContent());
-                            break;
-                    }
-                }
-            }
-
-            // Add parsed slide to arraylist.
-            myPresentation.addSlide(slide);*/
         return myPresentation;
     }
 
