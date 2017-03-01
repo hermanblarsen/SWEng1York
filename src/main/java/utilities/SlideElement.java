@@ -11,4 +11,5 @@ public interface SlideElement  {
     void renderElement();
     Node getCoreNode();
     void setSlideCanvas(Pane slideCanvas);
+    int getLayer();
 }

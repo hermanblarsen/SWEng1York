@@ -62,6 +62,7 @@ public class GraphicElement implements SlideElement  {
         gc.strokeOval(50, 60, 30, 30);
         gc.setStroke(Color.INDIANRED);
         gc.strokeOval(70, 60, 30, 30);
+        // BIG BOOTY BITCHES
     }
 
     @Override
@@ -73,7 +74,17 @@ public class GraphicElement implements SlideElement  {
     public void setSlideCanvas(Pane slideCanvas) {
         this.slideCanvas = slideCanvas;
 
-        //Canvas is the corenode
-        slideCanvas.getChildren().add(wrapperCanvas);
+        //Add WrapperCanvas Element to the Pane
+        if(wrapperCanvas == null){
+            logger.error("Tried to set slide internalCanvas before GraphicElement constructor was called!");
+        } else {
+            //Canvas is the corenode
+            slideCanvas.getChildren().add(wrapperCanvas);
+        }
+    }
+
+    @Override
+    public int getLayer() {
+        return layer;
     }
 }

@@ -38,7 +38,6 @@ public class TextElement implements SlideElement {
     Logger logger = LoggerFactory.getLogger(TextElement.class);
     protected Pane slideCanvas;
     protected final WebView browser;
-    Node coreNode = null;
     protected final WebEngine webEngine;
 
     public TextElement() {
@@ -141,6 +140,7 @@ public class TextElement implements SlideElement {
 
     public void setyPosition(float yPosition) {
         this.yPosition = yPosition;
+        getCoreNode().setTranslateY(xPosition);
     }
 
     public float getxSize() {
@@ -237,6 +237,7 @@ public class TextElement implements SlideElement {
 
     public void setxPosition(float xPosition) {
         this.xPosition = xPosition;
+        getCoreNode().setTranslateX(xPosition);
     }
 
     @Override

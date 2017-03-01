@@ -32,10 +32,13 @@ import javafx.util.Duration;
 
 import org.kordamp.bootstrapfx.scene.layout.Panel;
 import utilities.GraphicElement;
+import utilities.Slide;
 import utilities.SlideElement;
 import utilities.TextElement;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 /**
  * Created by amriksadhra on 24/01/2017.
@@ -161,6 +164,8 @@ public class Dashboard extends Application {
         StackPane stack = new StackPane();
 
 
+        Slide slide1 = new Slide();
+
         //------ Testing Code!--------
         ArrayList<SlideElement> slideElements = new ArrayList<>();
 
@@ -173,13 +178,20 @@ public class Dashboard extends Application {
         myGraphicElement.setSlideCanvas(stack);
         slideElements.add(myGraphicElement);
 
+        //Sort by Layer
+        Collections.sort(slideElements, (o1, o2) -> {
+            if(o1.getLayer() == o2.getLayer())
+                return 0;
+            return o1.getLayer() < o2.getLayer() ? -1 : 1;
+        });
+
         //Render Loop
         for(SlideElement slideElement : slideElements){
             slideElement.renderElement();
         }
 
         //Test a simple animation
-        animationTest(slideElements.get(1).getCoreNode());
+        //animationTest(slideElements.get(1).getCoreNode());
 
         return stack;
     }
