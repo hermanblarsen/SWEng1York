@@ -4,16 +4,21 @@ import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Application;
+import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.DoubleProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.control.Button;
-import javafx.scene.control.ScrollPane;
+import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
@@ -180,6 +185,7 @@ public class Dashboard extends Application {
 
         //Test a simple animation
         animationTest(slideElements.get(1).getCoreNode());
+//        addMediaPlayerElement(stack);
 
         return stack;
     }
@@ -258,40 +264,115 @@ public class Dashboard extends Application {
     }
 
     private void addMediaPlayerElement(Pane stackPane) {
-        String MEDIA_URL = "http://download.oracle.com/otndocs/products/javafx/oow2010-2.flv";
+        String MEDIA_URL =
+                "http://download.oracle.com/otndocs/products/javafx/oow2010-2.flv";
 
         Media media = new Media(MEDIA_URL);
         MediaPlayer mediaPlayer = new MediaPlayer(media);
         mediaPlayer.setAutoPlay(true);
 
         MediaView mv = new MediaView(mediaPlayer);
-        DoubleProperty mvw = mv.fitWidthProperty();
-        DoubleProperty mvh = mv.fitHeightProperty();
-        mvw.bind(Bindings.selectDouble(mv.sceneProperty(), "width"));
-        mvh.bind(Bindings.selectDouble(mv.sceneProperty(), "height"));
+//        DoubleProperty mvw = mv.fitWidthProperty();
+//        DoubleProperty mvh = mv.fitHeightProperty();
+//        mvw.bind(Bindings.selectDouble(mv.sceneProperty(), "width"));
+//        mvh.bind(Bindings.selectDouble(mv.sceneProperty(), "height"));
         mv.setPreserveRatio(true);
 
-        HBox control = mediaControl();
+        HBox control = mediaControl(mediaPlayer);
 
-        GridPane mediaPane = new GridPane();
-        GridPane.setConstraints(mv, 0, 0);
-        GridPane.setConstraints(control, 0, 1);
-        mediaPane.getChildren().addAll(mv, control);
-        mediaPane.setStyle("-fx-background-color: whitesmoke;");
+        BorderPane mediaPane = new BorderPane();
+        //GridPane.setConstraints(mv, 0, 0);
+        //GridPane.setConstraints(control, 0, 1);
+        mediaPane.setCenter(mv);
+        mediaPane.setBottom(control);
+        mediaPane.setStyle("-fx-background-color: black;");
 
 
         stackPane.getChildren().add(mediaPane);
 
     }
 
-    private HBox mediaControl() {
+    private HBox mediaControl(MediaPlayer mp) {
+
+        Duration currentTime = mp.getCurrentTime();
+
         HBox mediaBar = new HBox();
+        mediaBar.setStyle("-fx-background-color: whitesmoke");
         mediaBar.setAlignment(Pos.CENTER);
         mediaBar.setPadding(new Insets(5, 10, 5, 10));
         BorderPane.setAlignment(mediaBar, Pos.CENTER);
 
-        final Button playButton = new Button(">");
-        mediaBar.getChildren().add(playButton);
+
+        //Control Buttons
+        if(mp.isAutoPlay() == false) {
+            final Button playButton = new Button(">");
+            playButton.setOnAction(new EventHandler<ActionEvent>() {
+                @Override
+                public void handle(ActionEvent event) {
+                    if(mp.getStatus() != MediaPlayer.Status.PLAYING) {
+                        playButton.setText("||");
+                        mp.play();
+                    }else {
+                        playButton.setText(">");
+                        mp.pause();
+                    }
+                }
+            });
+            mediaBar.getChildren().add(playButton);
+        }else{
+            final Button pauseButton = new Button("||");
+            pauseButton.setOnAction(new EventHandler<ActionEvent>() {
+                @Override
+                public void handle(ActionEvent event) {
+                    if(mp.getStatus() == MediaPlayer.Status.PLAYING) {
+                        pauseButton.setText(">");
+                        mp.pause();
+                    }else {
+                        pauseButton.setText("||");
+                        mp.play();
+                    }
+                }
+            });
+            mediaBar.getChildren().add(pauseButton);
+        }
+
+
+
+        final Button stopButton = new Button("STOP");
+        stopButton.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                mp.stop();
+
+            }
+        });
+
+
+        mediaBar.getChildren().add(stopButton);
+
+        //Seek Control
+        ProgressBar videoTime = new ProgressBar(0);
+        videoTime.setMaxWidth(Double.MAX_VALUE);
+        ChangeListener progressChangeListener = new ChangeListener<Duration>() {
+            @Override public void changed(ObservableValue<? extends Duration> observableValue, Duration oldValue, Duration newValue) {
+                videoTime.setProgress(1.0 * mp.getCurrentTime().toMillis() / mp.getTotalDuration().toMillis());
+            }
+        };
+        mp.currentTimeProperty().addListener(progressChangeListener);
+        mediaBar.getChildren().add(videoTime);
+
+        //Remaining Time
+        Label playTime = new Label();
+        //playTime.setText(mp.getCurrentTime()+"/"+mp.getTotalDuration());
+        mediaBar.getChildren().add(playTime);
+
+        //Volume Label
+        Label volume = new Label("  Volume: ");
+        mediaBar.getChildren().add(volume);
+
+        //Volume Slider
+        Slider volumeSlider = new Slider();
+        mediaBar.getChildren().add(volumeSlider);
 
         return mediaBar;
     }
