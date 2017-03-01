@@ -26,4 +26,9 @@ public class ImageElement extends ImageHandler implements SlideElement {
     public void setSlideCanvas(Pane slideCanvas) {
 
     }
+
+    @Override
+    public int getLayer() {
+        return 0;
+    }
 }

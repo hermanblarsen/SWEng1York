@@ -119,4 +119,16 @@ public class Presentation {
     public void setDescription(String description) {
         this.description = description;
     }
+
+    /**
+     * Start the animation sequence for Presentation
+     * @author Amrik Sadhra
+     */
+    public void start() {
+        for(Slide slide : slideList){
+            slide.start();
+            //Probably not a good idea to spinlock on a bool, will come up with better solution later
+            while(!slide.isDone());
+        }
+    }
 }

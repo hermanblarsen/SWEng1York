@@ -31,10 +31,7 @@ import javafx.util.Duration;
 
 
 import org.kordamp.bootstrapfx.scene.layout.Panel;
-import utilities.GraphicElement;
-import utilities.Slide;
-import utilities.SlideElement;
-import utilities.TextElement;
+import utilities.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -163,12 +160,10 @@ public class Dashboard extends Application {
     public StackPane addPresentationElement() {
         StackPane stack = new StackPane();
 
-
-        Slide slide1 = new Slide();
-
-        //------ Testing Code!--------
+        //Create some test Slide Elements
         ArrayList<SlideElement> slideElements = new ArrayList<>();
 
+        //Create a test Text element, add some text and pop it onto our stack pane. This code will all be driven from XML parser
         TextElement myTextElement = new TextElement();
         myTextElement.setTextContent("<h1 style='background : rgba(0,0,0,0);'><b><font color=\"red\">IILP </font><font color=\"blue\">HTML</font> <font color=\"green\">Support Test</font></b></h1>");
         myTextElement.setSlideCanvas(stack);
@@ -178,17 +173,19 @@ public class Dashboard extends Application {
         myGraphicElement.setSlideCanvas(stack);
         slideElements.add(myGraphicElement);
 
-        //Sort by Layer
-        Collections.sort(slideElements, (o1, o2) -> {
-            if(o1.getLayer() == o2.getLayer())
-                return 0;
-            return o1.getLayer() < o2.getLayer() ? -1 : 1;
-        });
+        ArrayList<Slide> slides = new ArrayList<>();
 
-        //Render Loop
-        for(SlideElement slideElement : slideElements){
-            slideElement.renderElement();
-        }
+        Slide slide1 = new Slide();
+        slide1.setSlideID(1);
+        slide1.setSlideElementList(slideElements);
+        slides.add(slide1);
+
+        Presentation myPresentation = new Presentation();
+        myPresentation.setSlideList(slides);
+        myPresentation.start();
+
+        //------ Testing Code!--------
+
 
         //Test a simple animation
         //animationTest(slideElements.get(1).getCoreNode());
