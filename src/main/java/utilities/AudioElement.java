@@ -6,14 +6,15 @@ import javafx.scene.layout.Pane;
 /**
  * Created by habl on 25/02/2017.
  */
-public class AudioElement extends AudioHandler implements SlideElement {
+public
+class AudioElement extends AudioHandler implements SlideElement {
     protected int elementID;
     protected int startSequence;
     protected int endSequence;
     protected float durationSequence;
 
     @Override
-    public void renderElement() {
+    public void renderElement(int animationType) {
 
     }
 
@@ -29,6 +30,11 @@ public class AudioElement extends AudioHandler implements SlideElement {
 
     @Override
     public int getLayer() {
+        return 0;
+    }
+
+    @Override
+    public int getStartSequence() {
         return 0;
     }
 }

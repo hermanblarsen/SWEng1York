@@ -173,11 +173,13 @@ public class Dashboard extends Application {
 
         //Create a test Text element, add some text and pop it onto our stack pane. This code will all be driven from XML parser
         TextElement myTextElement = new TextElement();
+        myTextElement.setStartSequence(0);
         myTextElement.setTextContent("<h1 style='background : rgba(0,0,0,0);'><b><font color=\"red\">IILP </font><font color=\"blue\">HTML</font> <font color=\"green\">Support Test</font></b></h1>");
         myTextElement.setSlideCanvas(slide1);
         slideElements.add(myTextElement);
 
         GraphicElement myGraphicElement = new GraphicElement();
+        myGraphicElement.setStartSequence(1);
         myGraphicElement.setSlideCanvas(slide1);
         slideElements.add(myGraphicElement);
 
@@ -186,6 +188,7 @@ public class Dashboard extends Application {
         Presentation myPresentation = new Presentation();
         myPresentation.setSlideList(slides);
         myPresentation.start();
+
 
 
         //------ Testing Code!--------

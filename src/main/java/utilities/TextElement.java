@@ -34,6 +34,9 @@ public class TextElement implements SlideElement {
     protected boolean aspectRatioLock;
     protected float elementAspectRatio;
 
+    protected Animation startAnimation, endAnimation;
+
+
 
     Logger logger = LoggerFactory.getLogger(TextElement.class);
     protected Pane slideCanvas;
@@ -84,6 +87,7 @@ public class TextElement implements SlideElement {
 
     public void setVisibility(boolean visibility) {
         this.visibility = visibility;
+        getCoreNode().setVisible(visibility);
     }
 
     public int getStartSequence() {
@@ -241,8 +245,18 @@ public class TextElement implements SlideElement {
     }
 
     @Override
-    public void renderElement(){
-        webEngine.loadContent(textContent);
+    public void renderElement(int animationType){
+        switch(animationType){
+            case 0: //No animation (click)
+                webEngine.loadContent(textContent);
+                break;
+            case 1: //Entry Animation (playback)
+                startAnimation.play();
+                break;
+            case 2: //Exit Animation (playback)
+                endAnimation.play();
+                break;
+        }
     }
 
     @Override

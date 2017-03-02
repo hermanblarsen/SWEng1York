@@ -8,8 +8,9 @@ import javafx.scene.layout.Pane;
  */
 public interface SlideElement  {
     //Empty interface for tagging our actual slide elements
-    void renderElement();
+    void renderElement(int animationType);
     Node getCoreNode();
     void setSlideCanvas(Pane slideCanvas);
     int getLayer();
+    int getStartSequence();
 }

@@ -13,7 +13,7 @@ public class ImageElement extends ImageHandler implements SlideElement {
     protected float durationSequence;
 
     @Override
-    public void renderElement() {
+    public void renderElement(int animationType) {
 
     }
 
@@ -29,6 +29,11 @@ public class ImageElement extends ImageHandler implements SlideElement {
 
     @Override
     public int getLayer() {
+        return 0;
+    }
+
+    @Override
+    public int getStartSequence() {
         return 0;
     }
 }

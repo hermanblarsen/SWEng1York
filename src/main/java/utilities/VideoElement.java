@@ -28,7 +28,7 @@ public class VideoElement implements SlideElement{
     protected int endTime;
 
     @Override
-    public void renderElement() {
+    public void renderElement(int animationType) {
 
     }
 
@@ -44,6 +44,11 @@ public class VideoElement implements SlideElement{
 
     @Override
     public int getLayer() {
+        return 0;
+    }
+
+    @Override
+    public int getStartSequence() {
         return 0;
     }
 }

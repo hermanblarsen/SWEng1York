@@ -15,6 +15,15 @@ public class GraphicElement implements SlideElement  {
     protected int elementID;
     protected int layer;
     protected boolean visibility;
+
+    public int getStartSequence() {
+        return startSequence;
+    }
+
+    public void setStartSequence(int startSequence) {
+        this.startSequence = startSequence;
+    }
+
     protected int startSequence;
     protected int endSequence;
     protected float duration;
@@ -43,12 +52,12 @@ public class GraphicElement implements SlideElement  {
         internalCanvas.widthProperty().bind(wrapperCanvas.widthProperty());
         internalCanvas.heightProperty().bind(wrapperCanvas.heightProperty());
         // redraw when resized
-        internalCanvas.widthProperty().addListener(event -> renderElement());
-        internalCanvas.heightProperty().addListener(event -> renderElement());
+        internalCanvas.widthProperty().addListener(event -> renderElement(0));
+        internalCanvas.heightProperty().addListener(event -> renderElement(0));
     }
 
     @Override
-    public void renderElement() {
+    public void renderElement(int animationType) {
         //Draw Polygons in here
         final GraphicsContext gc = internalCanvas.getGraphicsContext2D();
         gc.clearRect(0, 0, internalCanvas.getWidth(), internalCanvas.getHeight());

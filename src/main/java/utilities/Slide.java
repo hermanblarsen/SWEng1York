@@ -19,14 +19,14 @@ public class Slide extends StackPane {
 
 
     public Slide () {
-        logger.debug("Creating new slide object");
         slideElementList = new ArrayList<SlideElement>();
     }
 
     public void addElement(int elementIndex, SlideElement newElement) {
-        logger.debug("Adding new element to SlideID: %d at Element Index: %d", slideID, elementIndex);
         this.slideElementList.add(elementIndex, newElement);
     }
+
+
     public void addElement(SlideElement newElement) {
         logger.debug("Adding new element to SlideID: %d, slideID");
         this.slideElementList.add(this.slideElementList.size(), newElement);
@@ -66,14 +66,24 @@ public class Slide extends StackPane {
 
     public void start(){
         logger.debug("Beginning animation sequence for SlideID: %d", slideID);
-        //TODO: Sort by Sequence?
+        //Sort by Sequence
+        sortElementsBySequence();
         //Sort by Layer
-        sortElementsByLayer();
-        //Render Loop
+        //sortElementsByLayer();
+        //Render Sequence Loop
         for(SlideElement slideElement : slideElementList){
-            slideElement.renderElement();
+            slideElement.renderElement(0);
         }
         setSlideDone();
+    }
+
+    private void sortElementsBySequence() {
+        //Sort by Layer
+        Collections.sort(slideElementList, (o1, o2) -> {
+            if(o1.getStartSequence() == o2.getStartSequence())
+                return 0;
+            return o1.getStartSequence() < o2.getStartSequence() ? -1 : 1;
+        });
     }
 
     private void setSlideDone() {
