@@ -29,6 +29,7 @@ public class Presentation {
     public void addSlide(int slideIndex, Slide newSlide) {
         this.slideList.add(slideIndex, newSlide);
     }
+
     public void addSlide(Slide newSlide) {
         this.slideList.add(this.slideList.size(), newSlide);
     }

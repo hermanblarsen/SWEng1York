@@ -1,5 +1,6 @@
 package utilities;
 
+import javafx.scene.layout.StackPane;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -10,7 +11,7 @@ import java.util.List;
 /**
  * Created by habl on 23/02/2017.
  */
-public class Slide {
+public class Slide extends StackPane {
     Logger logger = LoggerFactory.getLogger(Slide.class);
     protected List<SlideElement> slideElementList;
     protected int slideID;

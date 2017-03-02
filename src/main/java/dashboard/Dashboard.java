@@ -161,7 +161,12 @@ public class Dashboard extends Application {
     }
 
     public StackPane addPresentationElement() {
-        StackPane stack = new StackPane();
+        ArrayList<Slide> slides = new ArrayList<>();
+
+        Slide slide1 = new Slide();
+        slide1.setSlideID(1);
+        slides.add(slide1);
+
 
         //Create some test Slide Elements
         ArrayList<SlideElement> slideElements = new ArrayList<>();
@@ -169,23 +174,19 @@ public class Dashboard extends Application {
         //Create a test Text element, add some text and pop it onto our stack pane. This code will all be driven from XML parser
         TextElement myTextElement = new TextElement();
         myTextElement.setTextContent("<h1 style='background : rgba(0,0,0,0);'><b><font color=\"red\">IILP </font><font color=\"blue\">HTML</font> <font color=\"green\">Support Test</font></b></h1>");
-        myTextElement.setSlideCanvas(stack);
+        myTextElement.setSlideCanvas(slide1);
         slideElements.add(myTextElement);
 
         GraphicElement myGraphicElement = new GraphicElement();
-        myGraphicElement.setSlideCanvas(stack);
+        myGraphicElement.setSlideCanvas(slide1);
         slideElements.add(myGraphicElement);
 
-        ArrayList<Slide> slides = new ArrayList<>();
-
-        Slide slide1 = new Slide();
-        slide1.setSlideID(1);
         slide1.setSlideElementList(slideElements);
-        slides.add(slide1);
 
         Presentation myPresentation = new Presentation();
         myPresentation.setSlideList(slides);
         myPresentation.start();
+
 
         //------ Testing Code!--------
 
@@ -193,7 +194,7 @@ public class Dashboard extends Application {
         //Test a simple animation
         //animationTest(slideElements.get(1).getCoreNode());
 
-        return stack;
+        return slide1;
     }
 
     private void animationTest(Node toAnimate) {
