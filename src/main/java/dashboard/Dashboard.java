@@ -12,6 +12,7 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
@@ -23,6 +24,7 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
@@ -288,7 +290,7 @@ public class Dashboard extends Application {
 //        mvh.bind(Bindings.selectDouble(mv.sceneProperty(), "height"));
         mv.setPreserveRatio(true);
 
-        HBox control = mediaControl(mediaPlayer);
+        HBox control = mediaControl(mediaPlayer, mv);
 
         BorderPane mediaPane = new BorderPane();
         //GridPane.setConstraints(mv, 0, 0);
@@ -302,9 +304,7 @@ public class Dashboard extends Application {
 
     }
 
-    private HBox mediaControl(MediaPlayer mp) {
-
-        Duration currentTime = mp.getCurrentTime();
+    private HBox mediaControl(MediaPlayer mp, MediaView mv) {
 
         HBox mediaBar = new HBox();
         mediaBar.setStyle("-fx-background-color: whitesmoke");
@@ -312,79 +312,101 @@ public class Dashboard extends Application {
         mediaBar.setPadding(new Insets(5, 10, 5, 10));
         BorderPane.setAlignment(mediaBar, Pos.CENTER);
 
-
-        //Control Buttons
-        if(mp.isAutoPlay() == false) {
-            final Button playButton = new Button(">");
-            playButton.setOnAction(new EventHandler<ActionEvent>() {
-                @Override
-                public void handle(ActionEvent event) {
-                    if(mp.getStatus() != MediaPlayer.Status.PLAYING) {
-                        playButton.setText("||");
-                        mp.play();
-                    }else {
-                        playButton.setText(">");
-                        mp.pause();
-                    }
-                }
-            });
-            mediaBar.getChildren().add(playButton);
-        }else{
-            final Button pauseButton = new Button("||");
-            pauseButton.setOnAction(new EventHandler<ActionEvent>() {
-                @Override
-                public void handle(ActionEvent event) {
-                    if(mp.getStatus() == MediaPlayer.Status.PLAYING) {
-                        pauseButton.setText(">");
-                        mp.pause();
-                    }else {
-                        pauseButton.setText("||");
-                        mp.play();
-                    }
-                }
-            });
-            mediaBar.getChildren().add(pauseButton);
+        //Play/Pause Button
+        final Button playPauseButton = new Button(">");
+        if(mp.isAutoPlay()){
+            playPauseButton.setText("||");
         }
-
-
-
-        final Button stopButton = new Button("STOP");
-        stopButton.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                mp.stop();
-
+        playPauseButton.setOnAction((event) -> {
+            if(mp.getStatus() != MediaPlayer.Status.PLAYING) {
+                playPauseButton.setText("||");
+                mp.play();
+            }else {
+                playPauseButton.setText(">");
+                mp.pause();
             }
         });
+        mediaBar.getChildren().add(playPauseButton);
 
-
+        //Stop Button
+        final Button stopButton = new Button("STOP");
+        stopButton.setOnAction((event) -> {
+            mp.stop();
+            playPauseButton.setText(">");
+        });
         mediaBar.getChildren().add(stopButton);
 
-        //Seek Control
-        ProgressBar videoTime = new ProgressBar(0);
-        videoTime.setMaxWidth(Double.MAX_VALUE);
-        ChangeListener progressChangeListener = new ChangeListener<Duration>() {
-            @Override public void changed(ObservableValue<? extends Duration> observableValue, Duration oldValue, Duration newValue) {
-                videoTime.setProgress(1.0 * mp.getCurrentTime().toMillis() / mp.getTotalDuration().toMillis());
+        // Seek Control
+        final Slider videoTime = new Slider(0.0d, 0, 0);
+        mp.statusProperty().addListener((observableValue,  oldValue,  newValue)-> {
+            if(newValue == MediaPlayer.Status.READY) {
+                videoTime.setMax(mp.getTotalDuration().toMillis());
             }
-        };
-        mp.currentTimeProperty().addListener(progressChangeListener);
+        });
+        //Update the time bar to match the current playback time.
+        final Holder<Boolean> isProgrammaticChange = new Holder<>(false);
+        mp.currentTimeProperty().addListener((observableValue) -> {
+                   isProgrammaticChange.setValue(true);
+                    videoTime.setValue(mp.getCurrentTime().toMillis());
+                   isProgrammaticChange.setValue(false);
+        });
+        //Handle any seeking as dictated by the scroll bar
+        videoTime.valueProperty().addListener((observable, oldValue, newValue) -> {
+            if (!isProgrammaticChange.getValue())
+                mp.seek(new Duration(videoTime.getValue()));
+        });
         mediaBar.getChildren().add(videoTime);
 
         //Remaining Time
         Label playTime = new Label();
-        //playTime.setText(mp.getCurrentTime()+"/"+mp.getTotalDuration());
+        mp.currentTimeProperty().addListener((observableValue, oldValue, newValue) -> {
+            double currentTime = mp.getCurrentTime().toSeconds();
+            double totalDuration = mp.getTotalDuration().toSeconds();
+            playTime.setText(String.format("%02.0f:%02.0f/%02.0f:%02.0f",
+                        Math.floor(currentTime/60),
+                        Math.floor(currentTime%60),
+                        Math.floor(totalDuration/60),
+                        Math.floor(totalDuration%60)));
+        });
         mediaBar.getChildren().add(playTime);
 
         //Volume Label
-        Label volume = new Label("  Volume: ");
+        final Label volume = new Label("  Volume: ");
         mediaBar.getChildren().add(volume);
-
         //Volume Slider
-        Slider volumeSlider = new Slider();
+        final Slider volumeSlider = new Slider(0, 1, 0.5);
+        volumeSlider.valueProperty().addListener((observable) -> {
+            mp.setVolume(volumeSlider.getValue());
+        });
         mediaBar.getChildren().add(volumeSlider);
 
+        //Fullscreen Button
+        final ToggleButton fullscreenButton = new ToggleButton("Fullscreen");
+        final Rectangle2D initialBounds = new Rectangle2D(mv.getFitWidth(), mv.getFitWidth(), mv.getFitHeight(), mv.getFitWidth());
+        fullscreenButton.setOnAction((event) -> {
+            // TODO: Implement this properly
+            if(fullscreenButton.isSelected()) {
+                mv.setFitHeight(Screen.getPrimary().getBounds().getHeight());
+                mv.setFitWidth(Screen.getPrimary().getBounds().getWidth());
+            } else {
+                mv.setFitHeight(initialBounds.getHeight());
+                mv.setFitWidth(initialBounds.getWidth());
+            }
+        });
+        mediaBar.getChildren().add(fullscreenButton);
+
         return mediaBar;
+    }
+
+    private class Holder<T>
+    {
+        private T value;
+
+        private Holder(T value){this.value = value;}
+
+        private T getValue(){return value;}
+
+        private void setValue(T value){this.value = value;}
     }
 }
 
