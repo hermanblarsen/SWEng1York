@@ -185,6 +185,13 @@ public class Dashboard extends Application {
         myGraphicElement.setSlideCanvas(slide1);
         slideElements.add(myGraphicElement);
 
+        VideoElement myVideoElement = new VideoElement();
+        myVideoElement.setMediaPath("http://download.oracle.com/otndocs/products/javafx/oow2010-2.flv");
+        myVideoElement.setAutoPlay(true);
+        myVideoElement.setMediaControl(true);
+        myVideoElement.setLoop(true);
+        myVideoElement.setSlideCanvas(slide1);
+        slideElements.add(myVideoElement);
         slide1.setSlideElementList(slideElements);
 
         Presentation myPresentation = new Presentation();
@@ -275,139 +282,9 @@ public class Dashboard extends Application {
         return hbox;
     }
 
-    private void addMediaPlayerElement(Pane stackPane) {
-        String MEDIA_URL =
-                "http://download.oracle.com/otndocs/products/javafx/oow2010-2.flv";
-
-        Media media = new Media(MEDIA_URL);
-        MediaPlayer mediaPlayer = new MediaPlayer(media);
-        mediaPlayer.setAutoPlay(true);
-
-        MediaView mv = new MediaView(mediaPlayer);
-//        DoubleProperty mvw = mv.fitWidthProperty();
-//        DoubleProperty mvh = mv.fitHeightProperty();
-//        mvw.bind(Bindings.selectDouble(mv.sceneProperty(), "width"));
-//        mvh.bind(Bindings.selectDouble(mv.sceneProperty(), "height"));
-        mv.setPreserveRatio(true);
-
-        HBox control = mediaControl(mediaPlayer, mv);
-
-        BorderPane mediaPane = new BorderPane();
-        //GridPane.setConstraints(mv, 0, 0);
-        //GridPane.setConstraints(control, 0, 1);
-        mediaPane.setCenter(mv);
-        mediaPane.setBottom(control);
-        mediaPane.setStyle("-fx-background-color: black;");
 
 
-        stackPane.getChildren().add(mediaPane);
 
-    }
-
-    private HBox mediaControl(MediaPlayer mp, MediaView mv) {
-
-        HBox mediaBar = new HBox();
-        mediaBar.setStyle("-fx-background-color: whitesmoke");
-        mediaBar.setAlignment(Pos.CENTER);
-        mediaBar.setPadding(new Insets(5, 10, 5, 10));
-        BorderPane.setAlignment(mediaBar, Pos.CENTER);
-
-        //Play/Pause Button
-        final Button playPauseButton = new Button(">");
-        if(mp.isAutoPlay()){
-            playPauseButton.setText("||");
-        }
-        playPauseButton.setOnAction((event) -> {
-            if(mp.getStatus() != MediaPlayer.Status.PLAYING) {
-                playPauseButton.setText("||");
-                mp.play();
-            }else {
-                playPauseButton.setText(">");
-                mp.pause();
-            }
-        });
-        mediaBar.getChildren().add(playPauseButton);
-
-        //Stop Button
-        final Button stopButton = new Button("STOP");
-        stopButton.setOnAction((event) -> {
-            mp.stop();
-            playPauseButton.setText(">");
-        });
-        mediaBar.getChildren().add(stopButton);
-
-        // Seek Control
-        final Slider videoTime = new Slider(0.0d, 0, 0);
-        mp.statusProperty().addListener((observableValue,  oldValue,  newValue)-> {
-            if(newValue == MediaPlayer.Status.READY) {
-                videoTime.setMax(mp.getTotalDuration().toMillis());
-            }
-        });
-        //Update the time bar to match the current playback time.
-        final Holder<Boolean> isProgrammaticChange = new Holder<>(false);
-        mp.currentTimeProperty().addListener((observableValue) -> {
-                   isProgrammaticChange.setValue(true);
-                    videoTime.setValue(mp.getCurrentTime().toMillis());
-                   isProgrammaticChange.setValue(false);
-        });
-        //Handle any seeking as dictated by the scroll bar
-        videoTime.valueProperty().addListener((observable, oldValue, newValue) -> {
-            if (!isProgrammaticChange.getValue())
-                mp.seek(new Duration(videoTime.getValue()));
-        });
-        mediaBar.getChildren().add(videoTime);
-
-        //Remaining Time
-        Label playTime = new Label();
-        mp.currentTimeProperty().addListener((observableValue, oldValue, newValue) -> {
-            double currentTime = mp.getCurrentTime().toSeconds();
-            double totalDuration = mp.getTotalDuration().toSeconds();
-            playTime.setText(String.format("%02.0f:%02.0f/%02.0f:%02.0f",
-                        Math.floor(currentTime/60),
-                        Math.floor(currentTime%60),
-                        Math.floor(totalDuration/60),
-                        Math.floor(totalDuration%60)));
-        });
-        mediaBar.getChildren().add(playTime);
-
-        //Volume Label
-        final Label volume = new Label("  Volume: ");
-        mediaBar.getChildren().add(volume);
-        //Volume Slider
-        final Slider volumeSlider = new Slider(0, 1, 0.5);
-        volumeSlider.valueProperty().addListener((observable) -> {
-            mp.setVolume(volumeSlider.getValue());
-        });
-        mediaBar.getChildren().add(volumeSlider);
-
-        //Fullscreen Button
-        final ToggleButton fullscreenButton = new ToggleButton("Fullscreen");
-        final Rectangle2D initialBounds = new Rectangle2D(mv.getFitWidth(), mv.getFitWidth(), mv.getFitHeight(), mv.getFitWidth());
-        fullscreenButton.setOnAction((event) -> {
-            // TODO: Implement this properly
-            if(fullscreenButton.isSelected()) {
-                mv.setFitHeight(Screen.getPrimary().getBounds().getHeight());
-                mv.setFitWidth(Screen.getPrimary().getBounds().getWidth());
-            } else {
-                mv.setFitHeight(initialBounds.getHeight());
-                mv.setFitWidth(initialBounds.getWidth());
-            }
-        });
-        mediaBar.getChildren().add(fullscreenButton);
-
-        return mediaBar;
-    }
-
-    private class Holder<T>
-    {
-        private T value;
-
-        private Holder(T value){this.value = value;}
-
-        private T getValue(){return value;}
-
-        private void setValue(T value){this.value = value;}
-    }
 }
 
 
