@@ -36,4 +36,14 @@ public class ImageElement extends ImageHandler implements SlideElement {
     public int getStartSequence() {
         return 0;
     }
+
+    @Override
+    public int getEndSequence() {
+        return endSequence;
+    }
+
+    @Override
+    public void setVisibility(boolean visibility) {
+
+    }
 }

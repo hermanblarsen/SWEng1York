@@ -13,4 +13,6 @@ public interface SlideElement  {
     void setSlideCanvas(Pane slideCanvas);
     int getLayer();
     int getStartSequence();
+    int getEndSequence();
+    void setVisibility(boolean visibility);
 }

@@ -7,7 +7,10 @@ import javax.xml.soap.Node;
  */
 public class Animation {
     //Animation Types
-    final static int STAR_WIPE = 0;
+    final static int NO_ANIMATION = 0;
+    final static int ENTRY_ANIMATION = 1;
+    final static int EXIT_ANIMATION = 2;
+
     Node coreNodeToAnimate;
     //[VARIABLES TO STORE ANIMATION PATH/DETAILS NEEDED HERE]
 

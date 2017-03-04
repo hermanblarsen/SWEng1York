@@ -4,20 +4,13 @@ import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Application;
-import javafx.beans.binding.Bindings;
-import javafx.beans.property.DoubleProperty;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
@@ -39,8 +32,6 @@ import org.kordamp.bootstrapfx.scene.layout.Panel;
 import utilities.*;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 
 /**
  * Created by amriksadhra on 24/01/2017.
@@ -52,6 +43,7 @@ public class Dashboard extends Application {
 
     @Override
     public void start(Stage primaryStage) {
+        //Initialise UI
         primaryStage.setTitle("I^2LP");
 
         BorderPane border = new BorderPane();
@@ -62,13 +54,22 @@ public class Dashboard extends Application {
         border.setTop(addHBox(primaryStage));
         border.setLeft(addVBox());
 
-        Pane myPresentationElement = addPresentationElement();
-        border.setCenter(myPresentationElement);
-        border.setRight(addFlowPane());
-        border.setBottom(addStatBar(myPresentationElement));
 
+        border.setCenter(new StackPane());
+        border.setRight(addFlowPane());
 
         primaryStage.show();
+
+
+        loadPresentation(border);
+    }
+
+    private void loadPresentation(BorderPane mainUI){
+        Pane myPresentationElement = addPresentationElement();
+
+
+        mainUI.setBottom(addStatBar(myPresentationElement));
+        mainUI.setCenter(myPresentationElement);
     }
 
     public HBox addHBox(Stage primaryStage) {
@@ -169,7 +170,6 @@ public class Dashboard extends Application {
         slide1.setSlideID(1);
         slides.add(slide1);
 
-
         //Create some test Slide Elements
         ArrayList<SlideElement> slideElements = new ArrayList<>();
 
@@ -178,33 +178,36 @@ public class Dashboard extends Application {
         myTextElement.setStartSequence(0);
         myTextElement.setTextContent("<h1 style='background : rgba(0,0,0,0);'><b><font color=\"red\">IILP </font><font color=\"blue\">HTML</font> <font color=\"green\">Support Test</font></b></h1>");
         myTextElement.setSlideCanvas(slide1);
+        myTextElement.setVisibility(true);
         slideElements.add(myTextElement);
 
         GraphicElement myGraphicElement = new GraphicElement();
         myGraphicElement.setStartSequence(1);
         myGraphicElement.setSlideCanvas(slide1);
+        myGraphicElement.setVisibility(true);
         slideElements.add(myGraphicElement);
 
-        VideoElement myVideoElement = new VideoElement();
+        /*aVideoElement myVideoElement = new VideoElement();
         myVideoElement.setMediaPath("http://download.oracle.com/otndocs/products/javafx/oow2010-2.flv");
         myVideoElement.setAutoPlay(true);
         myVideoElement.setMediaControl(true);
         myVideoElement.setLoop(true);
         myVideoElement.setSlideCanvas(slide1);
-        slideElements.add(myVideoElement);
+        slideElements.add(myVideoElement);*/
+
+        //Create a test Text element, add some text and pop it onto our stack pane. This code will all be driven from XML parser
+        TextElement myTextElement1 = new TextElement();
+        myTextElement1.setStartSequence(2);
+        myTextElement1.setTextContent("<b>Poop</b>");
+        myTextElement1.setSlideCanvas(slide1);
+        myTextElement1.setVisibility(true);
+        slideElements.add(myTextElement1);
+
         slide1.setSlideElementList(slideElements);
 
         Presentation myPresentation = new Presentation();
         myPresentation.setSlideList(slides);
         myPresentation.start();
-
-
-
-        //------ Testing Code!--------
-
-
-        //Test a simple animation
-        //animationTest(slideElements.get(1).getCoreNode());
 
         return slide1;
     }
@@ -282,9 +285,139 @@ public class Dashboard extends Application {
         return hbox;
     }
 
+    private void addMediaPlayerElement(Pane stackPane) {
+        String MEDIA_URL =
+                "http://download.oracle.com/otndocs/products/javafx/oow2010-2.flv";
+
+        Media media = new Media(MEDIA_URL);
+        MediaPlayer mediaPlayer = new MediaPlayer(media);
+        mediaPlayer.setAutoPlay(true);
+
+        MediaView mv = new MediaView(mediaPlayer);
+//        DoubleProperty mvw = mv.fitWidthProperty();
+//        DoubleProperty mvh = mv.fitHeightProperty();
+//        mvw.bind(Bindings.selectDouble(mv.sceneProperty(), "width"));
+//        mvh.bind(Bindings.selectDouble(mv.sceneProperty(), "height"));
+        mv.setPreserveRatio(true);
+
+        HBox control = mediaControl(mediaPlayer, mv);
+
+        BorderPane mediaPane = new BorderPane();
+        //GridPane.setConstraints(mv, 0, 0);
+        //GridPane.setConstraints(control, 0, 1);
+        mediaPane.setCenter(mv);
+        mediaPane.setBottom(control);
+        mediaPane.setStyle("-fx-background-color: black;");
 
 
+        stackPane.getChildren().add(mediaPane);
 
+    }
+
+    private HBox mediaControl(MediaPlayer mp, MediaView mv) {
+
+        HBox mediaBar = new HBox();
+        mediaBar.setStyle("-fx-background-color: whitesmoke");
+        mediaBar.setAlignment(Pos.CENTER);
+        mediaBar.setPadding(new Insets(5, 10, 5, 10));
+        BorderPane.setAlignment(mediaBar, Pos.CENTER);
+
+        //Play/Pause Button
+        final Button playPauseButton = new Button(">");
+        if(mp.isAutoPlay()){
+            playPauseButton.setText("||");
+        }
+        playPauseButton.setOnAction((event) -> {
+            if(mp.getStatus() != MediaPlayer.Status.PLAYING) {
+                playPauseButton.setText("||");
+                mp.play();
+            }else {
+                playPauseButton.setText(">");
+                mp.pause();
+            }
+        });
+        mediaBar.getChildren().add(playPauseButton);
+
+        //Stop Button
+        final Button stopButton = new Button("STOP");
+        stopButton.setOnAction((event) -> {
+            mp.stop();
+            playPauseButton.setText(">");
+        });
+        mediaBar.getChildren().add(stopButton);
+
+        // Seek Control
+        final Slider videoTime = new Slider(0.0d, 0, 0);
+        mp.statusProperty().addListener((observableValue,  oldValue,  newValue)-> {
+            if(newValue == MediaPlayer.Status.READY) {
+                videoTime.setMax(mp.getTotalDuration().toMillis());
+            }
+        });
+        //Update the time bar to match the current playback time.
+        final Holder<Boolean> isProgrammaticChange = new Holder<>(false);
+        mp.currentTimeProperty().addListener((observableValue) -> {
+                   isProgrammaticChange.setValue(true);
+                    videoTime.setValue(mp.getCurrentTime().toMillis());
+                   isProgrammaticChange.setValue(false);
+        });
+        //Handle any seeking as dictated by the scroll bar
+        videoTime.valueProperty().addListener((observable, oldValue, newValue) -> {
+            if (!isProgrammaticChange.getValue())
+                mp.seek(new Duration(videoTime.getValue()));
+        });
+        mediaBar.getChildren().add(videoTime);
+
+        //Remaining Time
+        Label playTime = new Label();
+        mp.currentTimeProperty().addListener((observableValue, oldValue, newValue) -> {
+            double currentTime = mp.getCurrentTime().toSeconds();
+            double totalDuration = mp.getTotalDuration().toSeconds();
+            playTime.setText(String.format("%02.0f:%02.0f/%02.0f:%02.0f",
+                        Math.floor(currentTime/60),
+                        Math.floor(currentTime%60),
+                        Math.floor(totalDuration/60),
+                        Math.floor(totalDuration%60)));
+        });
+        mediaBar.getChildren().add(playTime);
+
+        //Volume Label
+        final Label volume = new Label("  Volume: ");
+        mediaBar.getChildren().add(volume);
+        //Volume Slider
+        final Slider volumeSlider = new Slider(0, 1, 0.5);
+        volumeSlider.valueProperty().addListener((observable) -> {
+            mp.setVolume(volumeSlider.getValue());
+        });
+        mediaBar.getChildren().add(volumeSlider);
+
+        //Fullscreen Button
+        final ToggleButton fullscreenButton = new ToggleButton("Fullscreen");
+        final Rectangle2D initialBounds = new Rectangle2D(mv.getFitWidth(), mv.getFitWidth(), mv.getFitHeight(), mv.getFitWidth());
+        fullscreenButton.setOnAction((event) -> {
+            // TODO: Implement this properly
+            if(fullscreenButton.isSelected()) {
+                mv.setFitHeight(Screen.getPrimary().getBounds().getHeight());
+                mv.setFitWidth(Screen.getPrimary().getBounds().getWidth());
+            } else {
+                mv.setFitHeight(initialBounds.getHeight());
+                mv.setFitWidth(initialBounds.getWidth());
+            }
+        });
+        mediaBar.getChildren().add(fullscreenButton);
+
+        return mediaBar;
+    }
+
+    private class Holder<T>
+    {
+        private T value;
+
+        private Holder(T value){this.value = value;}
+
+        private T getValue(){return value;}
+
+        private void setValue(T value){this.value = value;}
+    }
 }
 
 

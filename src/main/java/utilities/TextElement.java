@@ -37,13 +37,14 @@ public class TextElement implements SlideElement {
     protected Animation startAnimation, endAnimation;
 
 
-
     Logger logger = LoggerFactory.getLogger(TextElement.class);
     protected Pane slideCanvas;
-    protected final WebView browser;
-    protected final WebEngine webEngine;
+    protected WebView browser;
+    protected WebEngine webEngine;
 
     public TextElement() {
+        //We need to just do this once, had to move this out of the TextElement constructor because of
+        //Hermans JUnit XML Test, cant instantiate Nodes without a JavaFX Scene being present.
         browser = new WebView();
         webEngine = browser.getEngine();
         webEngine.documentProperty().addListener(new WebDocumentListener(webEngine));
@@ -56,9 +57,8 @@ public class TextElement implements SlideElement {
 
     public void setSlideCanvas(Pane slideCanvas) {
         this.slideCanvas = slideCanvas;
-
         //Add WebBrowser Element to the Pane
-        if(browser == null){
+        if (browser == null) {
             logger.error("Tried to set slide internalCanvas before TextElement constructor was called!");
         } else {
             slideCanvas.getChildren().add(browser);
@@ -87,7 +87,6 @@ public class TextElement implements SlideElement {
 
     public void setVisibility(boolean visibility) {
         this.visibility = visibility;
-        getCoreNode().setVisible(visibility);
     }
 
     public int getStartSequence() {
@@ -120,6 +119,7 @@ public class TextElement implements SlideElement {
 
     public void setTextContent(String textContent) {
         this.textContent = textContent;
+        webEngine.loadContent(textContent);
     }
 
     public String getTextFilepath() {
@@ -245,16 +245,21 @@ public class TextElement implements SlideElement {
     }
 
     @Override
-    public void renderElement(int animationType){
-        switch(animationType){
-            case 0: //No animation (click)
-                webEngine.loadContent(textContent);
+    public void renderElement(int animationType) {
+        //Trigger some kind of redraw on browser
+        browser.requestLayout();
+
+        switch (animationType) {
+            case Animation.NO_ANIMATION: //No animation (click)
+                logger.info("No animation");
                 break;
-            case 1: //Entry Animation (playback)
+            case Animation.ENTRY_ANIMATION: //Entry Animation (playback)
                 startAnimation.play();
+                logger.info("Entry animation playing");
                 break;
-            case 2: //Exit Animation (playback)
+            case Animation.EXIT_ANIMATION: //Exit Animation (playback)
                 endAnimation.play();
+                logger.info("Exit animation playing");
                 break;
         }
     }

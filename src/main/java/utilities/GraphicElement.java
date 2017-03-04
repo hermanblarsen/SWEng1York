@@ -11,19 +11,10 @@ import org.slf4j.LoggerFactory;
 /**
  * Created by habl on 26/02/2017.
  */
-public class GraphicElement implements SlideElement  {
+public class GraphicElement implements SlideElement {
     protected int elementID;
     protected int layer;
     protected boolean visibility;
-
-    public int getStartSequence() {
-        return startSequence;
-    }
-
-    public void setStartSequence(int startSequence) {
-        this.startSequence = startSequence;
-    }
-
     protected int startSequence;
     protected int endSequence;
     protected float duration;
@@ -41,7 +32,26 @@ public class GraphicElement implements SlideElement  {
     Pane wrapperCanvas;//There is a need to wrap the canvas that we draw to
     Canvas internalCanvas; //What we actually draw to
 
-    public GraphicElement(){
+    public int getStartSequence() {
+        return startSequence;
+    }
+
+    @Override
+    public int getEndSequence() {
+        return endSequence;
+    }
+
+    @Override
+    public void setVisibility(boolean visibility) {
+        this.visibility = visibility;
+    }
+
+    public void setStartSequence(int startSequence) {
+        this.startSequence = startSequence;
+    }
+
+
+    public GraphicElement() {
         // Create a wrapper Pane first
         wrapperCanvas = new Pane();
 
@@ -58,6 +68,9 @@ public class GraphicElement implements SlideElement  {
 
     @Override
     public void renderElement(int animationType) {
+        //TODO: Trigger redraw of Canvas. Unsure if this achieves this.
+        wrapperCanvas.requestLayout();
+
         //Draw Polygons in here
         final GraphicsContext gc = internalCanvas.getGraphicsContext2D();
         gc.clearRect(0, 0, internalCanvas.getWidth(), internalCanvas.getHeight());
@@ -84,7 +97,7 @@ public class GraphicElement implements SlideElement  {
         this.slideCanvas = slideCanvas;
 
         //Add WrapperCanvas Element to the Pane
-        if(wrapperCanvas == null){
+        if (wrapperCanvas == null) {
             logger.error("Tried to set slide internalCanvas before GraphicElement constructor was called!");
         } else {
             //Canvas is the corenode

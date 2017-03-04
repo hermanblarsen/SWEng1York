@@ -1,12 +1,14 @@
 package utilities;
 
+import javafx.scene.layout.Pane;
+
 import java.util.List;
 import java.util.ArrayList;
 
 /**
  * Created by habl on 23/02/2017.
  */
-public class Presentation {
+public class Presentation extends Pane {
     private String documentID;
     private String author;
     private Float version;
@@ -127,9 +129,7 @@ public class Presentation {
      */
     public void start() {
         for(Slide slide : slideList){
-            slide.start();
-            //Probably not a good idea to spinlock on a bool, will come up with better solution later
-            while(!slide.isDone());
+            slide.advance();
         }
     }
 }
