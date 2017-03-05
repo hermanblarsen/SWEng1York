@@ -13,21 +13,22 @@ package utilities;
 
 public class ParserXMLTest {
 
+    private static final double ERROR_MARGIN = 0.01;
     private ParserXML myParser;
     private Presentation myPresentation;
     private Theme myTheme;
-    private ArrayList<Slide> mySlideArray;
-    private ArrayList<SlideElement> mySlideElementArray1;
-    private ArrayList<SlideElement> mySlideElementArray2;
-    private ArrayList<SlideElement> mySlideElementArray3;
-    private ArrayList<SlideElement> mySlideElementArray4;
+    private ArrayList<Slide>  mySlideArray;
+    private ArrayList mySlideElementArray1;
+    private ArrayList mySlideElementArray2;
+    private ArrayList mySlideElementArray3;
+    private ArrayList mySlideElementArray4;
 
     @Before
     public void setUp() throws Exception {
         myParser = new ParserXML("externalResources/sampleXml.xml");
         myPresentation = myParser.parsePresentation();
         myTheme = myPresentation.getTheme();
-        mySlideArray = (ArrayList) myPresentation.getSlideList();
+        mySlideArray = (ArrayList<Slide>) myPresentation.getSlideList();
         mySlideElementArray1 = (ArrayList) myPresentation.getSlideList().get(0).getSlideElementList();
         mySlideElementArray2 = (ArrayList) myPresentation.getSlideList().get(1).getSlideElementList();
         mySlideElementArray3 = (ArrayList) myPresentation.getSlideList().get(2).getSlideElementList();
@@ -48,11 +49,11 @@ public class ParserXMLTest {
     @Test
     public void verifySpecificDocumentDetails () {
         assertEquals("Joe Bloggs", myPresentation.getAuthor());
-        assertEquals(1.0, myPresentation.getVersion(), 0.01);
-        assertEquals( 1.78, myPresentation.getDocumentAspectRatio(),0.01);
+        assertEquals(1.0, myPresentation.getVersion(), ERROR_MARGIN);
+        assertEquals( 1.78, myPresentation.getDocumentAspectRatio(), ERROR_MARGIN);
         assertEquals("Sample XML input", myPresentation.getDescription());
         assertEquals("sample,xml,input" ,myPresentation.getTags());
-        assertEquals(2, myPresentation.getGroupFormat(), 0.01);
+        assertEquals(2, myPresentation.getGroupFormat(), ERROR_MARGIN);
     }
 
     @Test
@@ -60,7 +61,7 @@ public class ParserXMLTest {
         assertNotNull(myTheme);
         assertEquals("#FF2304", myTheme.getBackgroundColour());
         assertEquals("Arial", myTheme.getFont());
-        assertEquals(12, myTheme.getFontSize(), 0);
+        assertEquals(12, myTheme.getFontSize(), ERROR_MARGIN);
         assertEquals("#F00D33FF", myTheme.getFontColour() );
         assertEquals("#F40D33FF", myTheme.getGraphicsColour());
         assertEquals(true, myPresentation.isAutoplayMedia());
@@ -71,7 +72,7 @@ public class ParserXMLTest {
         assertNotNull(myPresentation.getSlideList());
 
         for (int i = 0; i < mySlideArray.size(); i++) {
-            assertEquals((i+1), mySlideArray.get(i).getSlideID(), 0);
+            assertEquals((i+1), mySlideArray.get(i).getSlideID(), ERROR_MARGIN);
         }
     }
 
@@ -82,15 +83,25 @@ public class ParserXMLTest {
         assertNotNull(mySlideElementArray3);
         assertNotNull(mySlideElementArray4);
 
-        assertEquals(2, mySlideElementArray1.size(), 0 );
-        assertEquals(3, mySlideElementArray2.size(), 0 );
-        assertEquals(2, mySlideElementArray3.size(), 0 );
-        assertEquals(1, mySlideElementArray4.size(), 0 );
+        assertEquals(2, mySlideElementArray1.size(), ERROR_MARGIN );
+        assertEquals(3, mySlideElementArray2.size(), ERROR_MARGIN );
+        assertEquals(2, mySlideElementArray3.size(), ERROR_MARGIN );
+        assertEquals(1, mySlideElementArray4.size(), ERROR_MARGIN );
     }
 
     @Test
     public void verifyElementContent () {
         //TODO this needs to downcast the objects somehow from SlideElement to its actual element for us to use specific methods
+        assertNotNull(mySlideElementArray1.get(0));
+        assert(mySlideElementArray1.get(0) instanceof TextElement);
+        assertEquals(1, ((TextElement) mySlideElementArray1.get(0)).getElementID(), ERROR_MARGIN);
+        assertEquals("#EEEEEEFF", ((TextElement) mySlideElementArray1.get(0)).getFontColour());
+        assertEquals(1.2, ((TextElement) mySlideElementArray1.get(0)).getElementAspectRatio(), ERROR_MARGIN);
+
+        assertNotNull(mySlideElementArray2.get(1));
+        assert(mySlideElementArray2.get(1) instanceof GraphicElement);
+//        System.out.println(mySlideElementArray2.get(0).getClass().toString());
+//        System.out.println(((AudioElement)mySlideElementArray2.get(0)).getElementID());
     }
 
 
