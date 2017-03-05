@@ -43,11 +43,23 @@ public class TextElement implements SlideElement {
     protected WebEngine webEngine;
 
     public TextElement() {
+
+    }
+
+    public void setUpTextElement() {
         //We need to just do this once, had to move this out of the TextElement constructor because of
         //Hermans JUnit XML Test, cant instantiate Nodes without a JavaFX Scene being present.
+
+        //I moved this to a separate method that can be called whenever it is instantiated/Updated.
+        //  Maybe surround this with try-catch statements as well as it has potential to go bad if we are not careful. - Herman
+        //TODO @amrik find a suitable place for this method, and/or split it up and put it where it belongs. No setters can have methods referring to the rendered element
         browser = new WebView();
         webEngine = browser.getEngine();
         webEngine.documentProperty().addListener(new WebDocumentListener(webEngine));
+
+        webEngine.loadContent(textContent);
+        getCoreNode().setTranslateY(xPosition);
+        getCoreNode().setTranslateX(xPosition);
     }
 
 
@@ -119,7 +131,6 @@ public class TextElement implements SlideElement {
 
     public void setTextContent(String textContent) {
         this.textContent = textContent;
-        webEngine.loadContent(textContent);
     }
 
     public String getTextFilepath() {
@@ -138,13 +149,20 @@ public class TextElement implements SlideElement {
         this.textContentReference = textContentReference;
     }
 
+    public float getxPosition() {
+        return xPosition;
+    }
+
+    public void setxPosition(float xPosition) {
+        this.xPosition = xPosition;
+    }
+
     public float getyPosition() {
         return yPosition;
     }
 
     public void setyPosition(float yPosition) {
         this.yPosition = yPosition;
-        getCoreNode().setTranslateY(xPosition);
     }
 
     public float getxSize() {
@@ -233,15 +251,6 @@ public class TextElement implements SlideElement {
 
     public void setElementAspectRatio(float elementAspectRatio) {
         this.elementAspectRatio = elementAspectRatio;
-    }
-
-    public float getxPosition() {
-        return xPosition;
-    }
-
-    public void setxPosition(float xPosition) {
-        this.xPosition = xPosition;
-        getCoreNode().setTranslateX(xPosition);
     }
 
     @Override
