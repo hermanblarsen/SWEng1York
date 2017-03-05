@@ -24,13 +24,39 @@ public class GraphicElement implements SlideElement {
     protected float elementAspectRatio;
     protected String lineColour;
     protected String fillColour;
+
+    protected boolean isPolygon;
+
+    //Polygon
     protected Polygon polygon;
+
+    //Oval
     protected Oval oval;
+
 
     Logger logger = LoggerFactory.getLogger(GraphicElement.class);
     Pane slideCanvas;//The ParentPane of this element
     Pane wrapperCanvas;//There is a need to wrap the canvas that we draw to
     Canvas internalCanvas; //What we actually draw to
+
+    public GraphicElement() {
+
+    }
+
+    public void displayElement() { //TODO moved from constructor, so is no longer called intrinsically
+        // Create a wrapper Pane first
+        wrapperCanvas = new Pane();
+
+        internalCanvas = new Canvas(wrapperCanvas.getWidth(), wrapperCanvas.getHeight());
+        wrapperCanvas.getChildren().add(internalCanvas);
+
+        // Bind the width/height property to the wrapper Pane
+        internalCanvas.widthProperty().bind(wrapperCanvas.widthProperty());
+        internalCanvas.heightProperty().bind(wrapperCanvas.heightProperty());
+        // redraw when resized
+        internalCanvas.widthProperty().addListener(event -> renderElement(0));
+        internalCanvas.heightProperty().addListener(event -> renderElement(0));
+    }
 
     public int getStartSequence() {
         return startSequence;
@@ -48,22 +74,6 @@ public class GraphicElement implements SlideElement {
 
     public void setStartSequence(int startSequence) {
         this.startSequence = startSequence;
-    }
-
-
-    public GraphicElement() {
-        // Create a wrapper Pane first
-        wrapperCanvas = new Pane();
-
-        internalCanvas = new Canvas(wrapperCanvas.getWidth(), wrapperCanvas.getHeight());
-        wrapperCanvas.getChildren().add(internalCanvas);
-
-        // Bind the width/height property to the wrapper Pane
-        internalCanvas.widthProperty().bind(wrapperCanvas.widthProperty());
-        internalCanvas.heightProperty().bind(wrapperCanvas.heightProperty());
-        // redraw when resized
-        internalCanvas.widthProperty().addListener(event -> renderElement(0));
-        internalCanvas.heightProperty().addListener(event -> renderElement(0));
     }
 
     @Override
@@ -108,5 +118,105 @@ public class GraphicElement implements SlideElement {
     @Override
     public int getLayer() {
         return layer;
+    }
+
+    public int getElementID() {
+        return elementID;
+    }
+
+    public void setElementID(int elementID) {
+        this.elementID = elementID;
+    }
+
+    public void setLayer(int layer) {
+        this.layer = layer;
+    }
+
+    public boolean isVisibility() {
+        return visibility;
+    }
+
+    public void setEndSequence(int endSequence) {
+        this.endSequence = endSequence;
+    }
+
+    public float getDuration() {
+        return duration;
+    }
+
+    public void setDuration(float duration) {
+        this.duration = duration;
+    }
+
+    public String getOnClickAction() {
+        return onClickAction;
+    }
+
+    public void setOnClickAction(String onClickAction) {
+        this.onClickAction = onClickAction;
+    }
+
+    public String getOnClickInfo() {
+        return onClickInfo;
+    }
+
+    public void setOnClickInfo(String onClickInfo) {
+        this.onClickInfo = onClickInfo;
+    }
+
+    public boolean isAspectRatioLock() {
+        return aspectRatioLock;
+    }
+
+    public void setAspectRatioLock(boolean aspectRatioLock) {
+        this.aspectRatioLock = aspectRatioLock;
+    }
+
+    public float getElementAspectRatio() {
+        return elementAspectRatio;
+    }
+
+    public void setElementAspectRatio(float elementAspectRatio) {
+        this.elementAspectRatio = elementAspectRatio;
+    }
+
+    public String getLineColour() {
+        return lineColour;
+    }
+
+    public void setLineColour(String lineColour) {
+        this.lineColour = lineColour;
+    }
+
+    public String getFillColour() {
+        return fillColour;
+    }
+
+    public void setFillColour(String fillColour) {
+        this.fillColour = fillColour;
+    }
+
+    public Polygon getPolygon() {
+        return polygon;
+    }
+
+    public void setPolygon(Polygon polygon) {
+        this.polygon = polygon;
+    }
+
+    public Oval getOval() {
+        return oval;
+    }
+
+    public void setOval(Oval oval) {
+        this.oval = oval;
+    }
+
+    public boolean isPolygon() {
+        return isPolygon;
+    }
+
+    public void setPolygon(boolean polygon) {
+        isPolygon = polygon;
     }
 }

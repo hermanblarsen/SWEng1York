@@ -15,13 +15,23 @@ public class ParserXMLTest {
 
     private ParserXML myParser;
     private Presentation myPresentation;
+    private Theme myTheme;
     private ArrayList<Slide> mySlideArray;
-    private ArrayList<SlideElement> mySlideElementArray;
+    private ArrayList<SlideElement> mySlideElementArray1;
+    private ArrayList<SlideElement> mySlideElementArray2;
+    private ArrayList<SlideElement> mySlideElementArray3;
+    private ArrayList<SlideElement> mySlideElementArray4;
 
     @Before
     public void setUp() throws Exception {
         myParser = new ParserXML("externalResources/sampleXml.xml");
         myPresentation = myParser.parsePresentation();
+        myTheme = myPresentation.getTheme();
+        mySlideArray = (ArrayList) myPresentation.getSlideList();
+        mySlideElementArray1 = (ArrayList) myPresentation.getSlideList().get(0).getSlideElementList();
+        mySlideElementArray2 = (ArrayList) myPresentation.getSlideList().get(1).getSlideElementList();
+        mySlideElementArray3 = (ArrayList) myPresentation.getSlideList().get(2).getSlideElementList();
+        mySlideElementArray4 = (ArrayList) myPresentation.getSlideList().get(3).getSlideElementList();
     }
 
     @Test
@@ -32,47 +42,61 @@ public class ParserXMLTest {
 
     @Test
     public void verifyDocumentID () {
-        assertEquals(myPresentation.getDocumentID(), "sampleinput");
+        assertEquals("sampleinput", myPresentation.getDocumentID());
     }
 
     @Test
-    public void verifyDocumentDetails () {
-        assertEquals(myPresentation.getAuthor(), "Joe Bloggs");
-        assertEquals(myPresentation.getVersion(), 1.0, 0.01);
-        assertEquals(myPresentation.getDocumentAspectRatio(), 1.78, 0.01);
-        assertEquals(myPresentation.getDescription(), "Sample XML input");
-        assertEquals(myPresentation.getTags(), "sample,xml,input");
-        assertEquals(myPresentation.getGroupFormat(), 2, 0.01);
+    public void verifySpecificDocumentDetails () {
+        assertEquals("Joe Bloggs", myPresentation.getAuthor());
+        assertEquals(1.0, myPresentation.getVersion(), 0.01);
+        assertEquals( 1.78, myPresentation.getDocumentAspectRatio(),0.01);
+        assertEquals("Sample XML input", myPresentation.getDescription());
+        assertEquals("sample,xml,input" ,myPresentation.getTags());
+        assertEquals(2, myPresentation.getGroupFormat(), 0.01);
     }
 
     @Test
     public void verifySlideshowDefaults () {
-        assertNotNull(myPresentation.getTheme());
-        assertEquals(myPresentation.getTheme().getBackgroundColour(), "#FF2304");
-        assertEquals(myPresentation.getTheme().getFont(), "Arial");
-        assertEquals(myPresentation.getTheme().getFontSize(),12, 0);
-        assertEquals(myPresentation.getTheme().getFontColour(), "#F00D33FF");
-        assertEquals(myPresentation.getTheme().getGraphicsColour(), "#F40D33FF");
-        assertEquals(myPresentation.isAutoplayMedia(), true);
+        assertNotNull(myTheme);
+        assertEquals("#FF2304", myTheme.getBackgroundColour());
+        assertEquals("Arial", myTheme.getFont());
+        assertEquals(12, myTheme.getFontSize(), 0);
+        assertEquals("#F00D33FF", myTheme.getFontColour() );
+        assertEquals("#F40D33FF", myTheme.getGraphicsColour());
+        assertEquals(true, myPresentation.isAutoplayMedia());
     }
 
     @Test
-    public void verifySlideArray () {
+    public void verifySlideArrayAndId () {
         assertNotNull(myPresentation.getSlideList());
-        for (int i = 0; i < 3; i++) {
-            assertEquals(myPresentation.getSlideList().get(i).getSlideID(), (i+1), 0);
+
+        for (int i = 0; i < mySlideArray.size(); i++) {
+            assertEquals((i+1), mySlideArray.get(i).getSlideID(), 0);
         }
     }
 
     @Test
-    public void verifyElementArray () {
-        assertNotNull(myPresentation.getSlideList().get(0).getSlideElementList());
-        //assertEquals(myPresentation.getSlideList().get(0).getSlideElementList().size(), 2, 0 );
+    public void verifyElementArraysAndSize () {
+        assertNotNull(mySlideElementArray1);
+        assertNotNull(mySlideElementArray2);
+        assertNotNull(mySlideElementArray3);
+        assertNotNull(mySlideElementArray4);
+
+        assertEquals(2, mySlideElementArray1.size(), 0 );
+        assertEquals(3, mySlideElementArray2.size(), 0 );
+        assertEquals(2, mySlideElementArray3.size(), 0 );
+        assertEquals(1, mySlideElementArray4.size(), 0 );
+    }
+
+    @Test
+    public void verifyElementContent () {
+        //TODO this needs to downcast the objects somehow from SlideElement to its actual element for us to use specific methods
     }
 
 
     @After
     public void tearDown() throws Exception {
-        //Do nothing
+        System.out.println(""); //Space out log
+        // Do nothing
     }
 }

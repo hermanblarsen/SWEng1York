@@ -12,6 +12,24 @@ public class Polygon {
 
     }
 
+    /*public void setPolygonFromParent (GraphicElement graphicElement) {
+        //TODO is there a better way of doing this?? -Herman
+        this.elementID = graphicElement.getElementID();
+        this.layer = graphicElement.getLayer();
+        this.visibility = graphicElement.isVisibility();
+        this.startSequence = graphicElement.getStartSequence();
+        this.endSequence = graphicElement.getEndSequence();
+        this.duration = graphicElement.getDuration();
+        this.onClickAction = graphicElement.getOnClickAction();
+        this.onClickInfo = graphicElement.getOnClickInfo();
+        this.aspectRatioLock = graphicElement.isAspectRatioLock();
+        this.elementAspectRatio = graphicElement.getElementAspectRatio();
+        this.lineColour = graphicElement.getLineColour();
+        this.fillColour = graphicElement.getFillColour();
+    }*/
+
+
+    //TODO don't think this one is needed
     public Polygon(float[] xPositions, float[] yPositions, boolean isClosed){
         this.xPositions = xPositions;
         this.yPositions = yPositions;

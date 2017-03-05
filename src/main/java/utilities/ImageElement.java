@@ -12,6 +12,8 @@ public class ImageElement extends ImageHandler implements SlideElement {
     protected int endSequence;
     protected float durationSequence;
 
+
+
     @Override
     public void renderElement(int animationType) {
 
@@ -45,5 +47,29 @@ public class ImageElement extends ImageHandler implements SlideElement {
     @Override
     public void setVisibility(boolean visibility) {
 
+    }
+
+    public int getElementID() {
+        return elementID;
+    }
+
+    public void setElementID(int elementID) {
+        this.elementID = elementID;
+    }
+
+    public void setStartSequence(int startSequence) {
+        this.startSequence = startSequence;
+    }
+
+    public void setEndSequence(int endSequence) {
+        this.endSequence = endSequence;
+    }
+
+    public float getDurationSequence() {
+        return durationSequence;
+    }
+
+    public void setDurationSequence(float durationSequence) {
+        this.durationSequence = durationSequence;
     }
 }

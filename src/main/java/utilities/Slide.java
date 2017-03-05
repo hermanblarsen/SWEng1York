@@ -1,15 +1,12 @@
 package utilities;
 
-import javafx.event.EventHandler;
 import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.StackPane;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -17,9 +14,9 @@ import java.util.List;
  */
 public class Slide extends StackPane {
     Logger logger = LoggerFactory.getLogger(Slide.class);
-    protected List<SlideElement> slideElementList;
-    protected List<SlideElement> visibleSet;
 
+    protected List<SlideElement> slideElementList;
+    protected List<SlideElement> visibleSlideElementsList;
     protected int slideID;
 
     //Current Sequence number on slide
@@ -28,7 +25,8 @@ public class Slide extends StackPane {
 
     public Slide() {
         slideElementList = new ArrayList<>();
-        visibleSet = new ArrayList<>();
+        visibleSlideElementsList = new ArrayList<>();
+
         this.setOnKeyPressed(ke -> {
             if (ke.getCode().equals(KeyCode.ENTER)) {
                 this.advance();
@@ -80,22 +78,25 @@ public class Slide extends StackPane {
 
     public void advance() {
         if (currentSequence != maxSequenceNumber) {
-            visibleSet.add(slideElementList.get(currentSequence));
+            visibleSlideElementsList.add(slideElementList.get(currentSequence));
 
             //Sort by Layer
-            sortElementsByLayer(visibleSet);
+            sortElementsByLayer(visibleSlideElementsList);
 
             currentSequence++;
             logger.info("Current Sequence is " + currentSequence);
 
             //Fire animations
-            for (SlideElement toAnimate : visibleSet) {
-                if (toAnimate.getStartSequence() == currentSequence) {
-                    toAnimate.renderElement(Animation.ENTRY_ANIMATION); //Entry Sequence
-                } else if (toAnimate.getEndSequence() == currentSequence) {
-                    toAnimate.renderElement(Animation.EXIT_ANIMATION); //Exit Sequence
+            for (SlideElement elementToAnimate : visibleSlideElementsList) {
+
+                //TODO can we make this independent of the interface, or else we have to implement things in audio which is not needed.
+                //TODO might be worth looking into reflectance, although this will make it more resource hungry..
+                if (elementToAnimate.getStartSequence() == currentSequence) {
+                    elementToAnimate.renderElement(Animation.ENTRY_ANIMATION); //Entry Sequence
+                } else if (elementToAnimate.getEndSequence() == currentSequence) {
+                    elementToAnimate.renderElement(Animation.EXIT_ANIMATION); //Exit Sequence
                 } else {
-                    toAnimate.renderElement(Animation.NO_ANIMATION); //No animation, just render
+                    elementToAnimate.renderElement(Animation.NO_ANIMATION); //No animation, just render
                 }
             }
         } else {
@@ -103,21 +104,21 @@ public class Slide extends StackPane {
         }
     }
 
-    private void sortElementsByStartSequence(List<SlideElement> toSort) {
+    private void sortElementsByStartSequence(List<SlideElement> slideElementListToSort) {
         //Sort by Layer
-        Collections.sort(toSort, (o1, o2) -> {
-            if (o1.getStartSequence() == o2.getStartSequence())
+        Collections.sort(slideElementListToSort, (element1, element2) -> {
+            if (element1.getStartSequence() == element2.getStartSequence())
                 return 0;
-            return o1.getStartSequence() < o2.getStartSequence() ? -1 : 1;
+            return element1.getStartSequence() < element2.getStartSequence() ? -1 : 1;
         });
     }
 
-    private void sortElementsByLayer(List<SlideElement> toSort) {
+    private void sortElementsByLayer(List<SlideElement> slideElementListToSort) {
         //Sort by Layer
-        Collections.sort(toSort, (o1, o2) -> {
-            if (o1.getLayer() == o2.getLayer())
+        Collections.sort(slideElementListToSort, (element1, element2) -> {
+            if (element1.getLayer() == element2.getLayer())
                 return 0;
-            return o1.getLayer() < o2.getLayer() ? -1 : 1;
+            return element1.getLayer() < element2.getLayer() ? -1 : 1;
         });
     }
 

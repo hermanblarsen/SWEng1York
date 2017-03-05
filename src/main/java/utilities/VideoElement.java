@@ -16,8 +16,8 @@ import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaView;
 import javafx.stage.Screen;
+import javafx.util.Duration;
 
-import java.time.Duration;
 
 /**
  * Created by habl on 26/02/2017.
@@ -41,8 +41,8 @@ public class VideoElement implements SlideElement{
     protected boolean aspectRatioLock;
     protected float elementAspectRatio;
     protected boolean autoplay;
-    protected javafx.util.Duration startTime;
-    protected javafx.util.Duration endTime;
+    protected Duration startTime;
+    protected Duration endTime;
     protected Animation startAnimation, endAnimation;
     protected Pane slideCanvas;
     protected MediaView mv;
@@ -52,10 +52,24 @@ public class VideoElement implements SlideElement{
 
 //todo: 1) Add Error Handling
 //todo: 2) Commenting
-
+//TODO 3) move all testing out of this class and into a proper test class - Herman
     public VideoElement() {
+        //Leaver this empty of testing and canvas things: testing should be done in separate testclass
+    }
+
+    public void testVideoELement() {
         mv = new MediaView();
         mediaPane = new BorderPane();
+
+        mv.setVisible(true);
+
+        mp.setStartTime(new Duration(0));
+        mp.setStartTime(new Duration(2));
+        //TODO rearrange and whatever, but cannot be in setter and getter. Maybe in an update method.
+        getCoreNode().setTranslateX(xPosition);
+        getCoreNode().setTranslateX(yPosition);
+        mv.setPreserveRatio(aspectRatioLock);
+
     }
 
     @Override
@@ -129,35 +143,31 @@ public class VideoElement implements SlideElement{
 
     public void setVisibility(boolean visibility) {
         this.visibility = visibility;
-        mv.setVisible(visibility);
     }
 
     public boolean getVisibility() {return visibility;}
 
-    public void setStartTime(javafx.util.Duration startTime) {
+    public void setStartTime(Duration startTime) {
         this.startTime = startTime;
-        mp.setStartTime(startTime);
     }
-    public javafx.util.Duration getStartTime(){return startTime;}
+    public Duration getStartTime(){return startTime;}
 
-    public void setEndTime(javafx.util.Duration endTime) {
+    public void setEndTime(Duration endTime) {
         this.startTime = endTime;
-        mp.setStartTime(endTime);
+
     }
-    public javafx.util.Duration getEndTime(){return endTime;}
+    public Duration getEndTime(){return endTime;}
 
     public void setDuration(float duration) {this.duration = duration;}
     public float getDuration() {return duration;}
 
     public void setxPosition(float xPosition){
         this.xPosition = xPosition;
-        getCoreNode().setTranslateX(xPosition);
     }
     public float getxPosition(){return xPosition;}
 
     public void setyPosition(float yPosition){
         this.yPosition = yPosition;
-        getCoreNode().setTranslateX(yPosition);
     }
     public float getyPosition(){return yPosition;}
 
@@ -197,7 +207,6 @@ public class VideoElement implements SlideElement{
 
     public void setAspectRatioLock(boolean aspectRatioLock) {
         this.aspectRatioLock = aspectRatioLock;
-        mv.setPreserveRatio(aspectRatioLock);
     }
 
     public float getElementAspectRatio() {
@@ -265,7 +274,7 @@ public class VideoElement implements SlideElement{
         //Handle any seeking as dictated by the scroll bar
         videoTime.valueProperty().addListener((observable, oldValue, newValue) -> {
             if (!isProgrammaticChange.getValue())
-                mp.seek(new javafx.util.Duration(videoTime.getValue()));
+                mp.seek(new Duration(videoTime.getValue()));
         });
         mediaBar.getChildren().add(videoTime);
 
@@ -319,5 +328,25 @@ public class VideoElement implements SlideElement{
         private T getValue(){return value;}
 
         private void setValue(T value){this.value = value;}
+    }
+
+    public boolean isVisibility() {
+        return visibility;
+    }
+
+    public String getPath() {
+        return path;
+    }
+
+    public void setPath(String path) {
+        this.path = path;
+    }
+
+    public boolean isAutoplay() {
+        return autoplay;
+    }
+
+    public void setAutoplay(boolean autoplay) {
+        this.autoplay = autoplay;
     }
 }

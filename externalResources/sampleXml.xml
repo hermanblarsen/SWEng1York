@@ -62,8 +62,8 @@
 				<linecolour>#EEEEEEFF</linecolour>
 				<fillcolour>#000000FF</fillcolour>
 				<polygon>
-					<xposition>[0.12, 0.02, 0.02]</xposition>
-					<yposition>[0.3, 0.1, 0.04]</yposition>
+					<xpositions>0.12, 0.02, 0.02</xpositions>
+					<ypositions>0.3, 0.1, 0.04</ypositions>
 					<isclosed>true</isclosed>					
 				</polygon>
 			</graphic>

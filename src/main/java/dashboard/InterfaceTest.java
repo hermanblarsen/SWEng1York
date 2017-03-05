@@ -6,6 +6,6 @@ package dashboard;
 public interface InterfaceTest {
     void setElementId(int id);
 
-    //God damnit amrik, this is supposed to be in the test source - Herman
+
     void setPoop(boolean isPoop);
 }
