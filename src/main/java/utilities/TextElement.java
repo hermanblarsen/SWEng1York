@@ -60,6 +60,14 @@ public class TextElement implements SlideElement {
         webEngine.loadContent(textContent);
         getCoreNode().setTranslateY(xPosition);
         getCoreNode().setTranslateX(xPosition);
+
+        //TODO: Create Animations here, but move to setAnimation setter when XML implemented
+        startAnimation = new Animation();
+        startAnimation.setCoreNodeToAnimate(getCoreNode());
+        startAnimation.setAnimationType(Animation.SIMPLE_APPEAR);
+        endAnimation = new Animation();
+        endAnimation.setCoreNodeToAnimate(getCoreNode());
+        endAnimation.setAnimationType(Animation.SIMPLE_DISAPPEAR);
     }
 
 
@@ -68,6 +76,7 @@ public class TextElement implements SlideElement {
     }
 
     public void setSlideCanvas(Pane slideCanvas) {
+        setUpTextElement();
         this.slideCanvas = slideCanvas;
         //Add WebBrowser Element to the Pane
         if (browser == null) {
@@ -263,12 +272,16 @@ public class TextElement implements SlideElement {
                 logger.info("No animation");
                 break;
             case Animation.ENTRY_ANIMATION: //Entry Animation (playback)
-                startAnimation.play();
-                logger.info("Entry animation playing");
+                if (startAnimation != null) {//Animation Exists as StartSequence Present
+                    startAnimation.play();
+                    logger.info("Entry animation playing");
+                }
                 break;
             case Animation.EXIT_ANIMATION: //Exit Animation (playback)
-                endAnimation.play();
-                logger.info("Exit animation playing");
+                if (endAnimation != null) {//Animation Exists as EndSequence Present
+                    endAnimation.play();
+                    logger.info("Exit animation playing");
+                }
                 break;
         }
     }
