@@ -67,9 +67,9 @@ public class VideoElement extends SlideElement{
 //
 //    }
 
-    public void setUpVideoElement() {
+    public void setUpVideoElement(BorderPane mediaPane) {
         mv = new MediaView();
-        mediaPane = new BorderPane();
+
         media = new Media(path);
         mp = new MediaPlayer(media);
         mv.setMediaPlayer(mp);
@@ -92,7 +92,7 @@ public class VideoElement extends SlideElement{
     public void renderElement(int animationType) {
         switch(animationType){
             case 0: //No animation (click)
-                setUpVideoElement();
+
                 break;
             case 1: //Entry Animation (playback)
                 startAnimation.play();
@@ -118,7 +118,8 @@ public class VideoElement extends SlideElement{
     @Override
     public void setSlideCanvas(Pane slideCanvas) {
         this.slideCanvas = slideCanvas;
-        //BorderPane mediaPane = new BorderPane();
+        BorderPane mediaPane = new BorderPane();
+        setUpVideoElement(mediaPane);
         mediaPane.setCenter(mv);
         slideCanvas.getChildren().add(mediaPane);
     }
