@@ -22,14 +22,9 @@ import javafx.util.Duration;
 /**
  * Created by habl on 26/02/2017.
  */
-public class VideoElement extends SlideElement {
-    protected int elementID;
-    protected int layer;
-    protected boolean visibility;
+public class VideoElement extends SlideElement{
     protected boolean mediaControl;
-    protected int startSequence;
-    protected int endSequence;
-    protected float duration;
+
     protected float xPosition;
     protected float yPosition;
     protected float xSize;
@@ -43,7 +38,7 @@ public class VideoElement extends SlideElement {
     protected boolean autoplay;
     protected Duration startTime;
     protected Duration endTime;
-    protected Animation startAnimation, endAnimation;
+    //protected Animation startAnimation, endAnimation;
     protected Pane slideCanvas;
     protected MediaView mv;
     protected MediaPlayer mp;
@@ -57,18 +52,39 @@ public class VideoElement extends SlideElement {
         //Leaver this empty of testing and canvas things: testing should be done in separate testclass
     }
 
-    public void testVideoELement() {
+//    public void testVideoELement() {
+//        mv = new MediaView();
+//        mediaPane = new BorderPane();
+//
+//        mv.setVisible(true);
+//
+//        mp.setStartTime(new Duration(0));
+//        mp.setStartTime(new Duration(2));
+//        //TODO rearrange and whatever, but cannot be in setter and getter. Maybe in an update method.
+//        getCoreNode().setTranslateX(xPosition);
+//        getCoreNode().setTranslateX(yPosition);
+//        mv.setPreserveRatio(aspectRatioLock);
+//
+//    }
+
+    public void setUpVideoElement() {
         mv = new MediaView();
         mediaPane = new BorderPane();
+        media = new Media(path);
+        mp = new MediaPlayer(media);
+        mv.setMediaPlayer(mp);
 
-        mv.setVisible(true);
+        if(mediaControl == true) {
+            mediaPane.setBottom(mediaControl());
+        }
+        if(loop == true){
+            mp.setCycleCount(MediaPlayer.INDEFINITE);
+        }
+        mp.setAutoPlay(autoplay);
+    }
 
-        mp.setStartTime(new Duration(0));
-        mp.setStartTime(new Duration(2));
-        //TODO rearrange and whatever, but cannot be in setter and getter. Maybe in an update method.
-        getCoreNode().setTranslateX(xPosition);
-        getCoreNode().setTranslateX(yPosition);
-        mv.setPreserveRatio(aspectRatioLock);
+    @Override
+    void doClassSpecificRender() {
 
     }
 
@@ -76,19 +92,7 @@ public class VideoElement extends SlideElement {
     public void renderElement(int animationType) {
         switch(animationType){
             case 0: //No animation (click)
-                media = new Media(path);
-                mp = new MediaPlayer(media);
-                mv.setMediaPlayer(mp);
-
-                if(mediaControl == true) {
-                    mediaPane.setBottom(mediaControl());
-                }
-                if(loop == true){
-                    mp.setCycleCount(MediaPlayer.INDEFINITE);
-                }
-                mp.setAutoPlay(autoplay);
-                //getSlideCanvas().getChildren().add(mediaControl());
-                //mp.play();
+                setUpVideoElement();
                 break;
             case 1: //Entry Animation (playback)
                 startAnimation.play();
@@ -112,18 +116,13 @@ public class VideoElement extends SlideElement {
     public MediaPlayer getMediaPlayer() {return mp;}
 
     @Override
-    public void doClassSpecificRender(){
-
-    }
-
-    @Override
     public void setSlideCanvas(Pane slideCanvas) {
         this.slideCanvas = slideCanvas;
         //BorderPane mediaPane = new BorderPane();
-
         mediaPane.setCenter(mv);
         slideCanvas.getChildren().add(mediaPane);
     }
+
 
     public void setMediaPath(String mediaPath) {
         this.path = mediaPath;
@@ -135,28 +134,14 @@ public class VideoElement extends SlideElement {
     }
     public boolean getAutoPlay() {return autoplay;}
 
-    public void setElementID(int ID) {this.elementID = ID;}
-    public int getElementID() {return elementID;}
-
-    public void setVisibility(boolean visibility) {
-        this.visibility = visibility;
-    }
-
-    public boolean getVisibility() {return visibility;}
-
     public void setStartTime(Duration startTime) {
         this.startTime = startTime;
     }
     public Duration getStartTime(){return startTime;}
 
-    public void setEndTime(Duration endTime) {
-        this.startTime = endTime;
-
-    }
+    public void setEndTime(Duration endTime) {this.startTime = endTime;}
     public Duration getEndTime(){return endTime;}
 
-    public void setDuration(float duration) {this.duration = duration;}
-    public float getDuration() {return duration;}
 
     public void setxPosition(float xPosition){
         this.xPosition = xPosition;
@@ -173,6 +158,22 @@ public class VideoElement extends SlideElement {
 
     public void setySize(float ySize){this.ySize = ySize;}
     public float getySize() {return ySize;}
+
+    public String getOnClickAction() {
+        return onClickAction;
+    }
+
+    public void setOnClickAction(String onClickAction) {
+        this.onClickAction = onClickAction;
+    }
+
+    public String getOnClickInfo() {
+        return onClickInfo;
+    }
+
+    public void setOnClickInfo(String onClickInfo) {
+        this.onClickInfo = onClickInfo;
+    }
 
     public boolean isLoop() {
         return loop;
@@ -310,6 +311,7 @@ public class VideoElement extends SlideElement {
 
         private void setValue(T value){this.value = value;}
     }
+
 
     public String getPath() {
         return path;

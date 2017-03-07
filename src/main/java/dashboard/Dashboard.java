@@ -189,13 +189,13 @@ public class Dashboard extends Application {
         myGraphicElement.setSlideCanvas(slide1);
         slideElements.add(myGraphicElement);
 
-        /*VideoElement myVideoElement = new VideoElement();
-        myVideoElement.setMediaPath("http://download.oracle.com/otndocs/products/javafx/oow2010-2.flv");
-        myVideoElement.setAutoPlay(true);
-        myVideoElement.setMediaControl(true);
-        myVideoElement.setLoop(true);
-        myVideoElement.setSlideCanvas(slide1);
-        slideElements.add(myVideoElement);*/
+//        VideoElement myVideoElement = new VideoElement();
+//        myVideoElement.setMediaPath("http://download.oracle.com/otndocs/products/javafx/oow2010-2.flv");
+//        myVideoElement.setAutoPlay(true);
+//        myVideoElement.setMediaControl(true);
+//        myVideoElement.setLoop(true);
+//        myVideoElement.setSlideCanvas(slide1);
+//        slideElements.add(myVideoElement);
 
         //Create a test Text element, add some text and pop it onto our stack pane. This code will all be driven from XML parser
         TextElement myTextElement1 = new TextElement();
