@@ -13,6 +13,7 @@ public class AudioElement extends SlideElement {
     protected boolean autoplay;
     protected int startTime;
     protected int endTime;
+    private float durationSequence;
 
     public String getPath() {
         return path;
@@ -56,7 +57,21 @@ public class AudioElement extends SlideElement {
 
 
     @Override
+    void doClassSpecificRender() {
+
+    }
+
+    @Override
     public Node getCoreNode() {
         return null;
+    }
+
+    @Override
+    void setupElement() {
+
+    }
+
+    public void setDurationSequence(float durationSequence){
+        this.durationSequence = durationSequence;
     }
 }

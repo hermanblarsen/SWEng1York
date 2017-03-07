@@ -10,35 +10,25 @@ import org.slf4j.LoggerFactory;
 /**
  * Created by habl on 26/02/2017.
  */
-public class TextElement implements SlideElement {
-    protected int elementID;
-    protected int layer;
-    protected boolean visibility;
-    protected int startSequence;
-    protected int endSequence;
-    protected float duration;
+public class TextElement extends SlideElement {
     protected String textContent;
     protected String textFilepath;
     protected String textContentReference;
-    protected float xPosition;
-    protected float yPosition;
-    protected float xSize;
-    protected float ySize;
     protected String font;
     protected int fontSize;
     protected String fontColour;
     protected String bgColour;
     protected String borderColour;
-    protected String onClickAction;
-    protected String onClickInfo;
+
+    protected float xPosition;
+    protected float yPosition;
+    protected float xSize;
+    protected float ySize;
+
     protected boolean aspectRatioLock;
     protected float elementAspectRatio;
 
-    protected Animation startAnimation, endAnimation;
 
-
-    Logger logger = LoggerFactory.getLogger(TextElement.class);
-    protected Pane slideCanvas;
     protected WebView browser;
     protected WebEngine webEngine;
 
@@ -46,7 +36,8 @@ public class TextElement implements SlideElement {
 
     }
 
-    public void setUpTextElement() {
+    @Override
+    void setupElement() {
         //We need to just do this once, had to move this out of the TextElement constructor because of
         //Hermans JUnit XML Test, cant instantiate Nodes without a JavaFX Scene being present.
 
@@ -70,68 +61,14 @@ public class TextElement implements SlideElement {
         endAnimation.setAnimationType(Animation.SIMPLE_DISAPPEAR);
     }
 
+    @Override
+    void doClassSpecificRender() {
+        //Refresh Browser
+        browser.requestLayout();
+    }
 
     public Pane getSlideCanvas() {
         return slideCanvas;
-    }
-
-    public void setSlideCanvas(Pane slideCanvas) {
-        setUpTextElement();
-        this.slideCanvas = slideCanvas;
-        //Add WebBrowser Element to the Pane
-        if (browser == null) {
-            logger.error("Tried to set slide internalCanvas before TextElement constructor was called!");
-        } else {
-            slideCanvas.getChildren().add(browser);
-        }
-    }
-
-    public int getElementID() {
-        return elementID;
-    }
-
-    public void setElementID(int elementID) {
-        this.elementID = elementID;
-    }
-
-    public int getLayer() {
-        return layer;
-    }
-
-    public void setLayer(int layer) {
-        this.layer = layer;
-    }
-
-    public boolean isVisibility() {
-        return visibility;
-    }
-
-    public void setVisibility(boolean visibility) {
-        this.visibility = visibility;
-    }
-
-    public int getStartSequence() {
-        return startSequence;
-    }
-
-    public void setStartSequence(int startSequence) {
-        this.startSequence = startSequence;
-    }
-
-    public int getEndSequence() {
-        return endSequence;
-    }
-
-    public void setEndSequence(int endSequence) {
-        this.endSequence = endSequence;
-    }
-
-    public float getDuration() {
-        return duration;
-    }
-
-    public void setDuration(float duration) {
-        this.duration = duration;
     }
 
     public String getTextContent() {
@@ -230,22 +167,6 @@ public class TextElement implements SlideElement {
         this.borderColour = borderColour;
     }
 
-    public String getOnClickAction() {
-        return onClickAction;
-    }
-
-    public void setOnClickAction(String onClickAction) {
-        this.onClickAction = onClickAction;
-    }
-
-    public String getOnClickInfo() {
-        return onClickInfo;
-    }
-
-    public void setOnClickInfo(String onClickInfo) {
-        this.onClickInfo = onClickInfo;
-    }
-
     public boolean isAspectRatioLock() {
         return aspectRatioLock;
     }
@@ -262,29 +183,6 @@ public class TextElement implements SlideElement {
         this.elementAspectRatio = elementAspectRatio;
     }
 
-    @Override
-    public void renderElement(int animationType) {
-        //Trigger some kind of redraw on browser
-        browser.requestLayout();
-
-        switch (animationType) {
-            case Animation.NO_ANIMATION: //No animation (click)
-                logger.info("No animation");
-                break;
-            case Animation.ENTRY_ANIMATION: //Entry Animation (playback)
-                if (startAnimation != null) {//Animation Exists as StartSequence Present
-                    startAnimation.play();
-                    logger.info("Entry animation playing");
-                }
-                break;
-            case Animation.EXIT_ANIMATION: //Exit Animation (playback)
-                if (endAnimation != null) {//Animation Exists as EndSequence Present
-                    endAnimation.play();
-                    logger.info("Exit animation playing");
-                }
-                break;
-        }
-    }
 
     @Override
     public Node getCoreNode() {

@@ -11,15 +11,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Created by habl on 26/02/2017.
  */
-public class GraphicElement implements SlideElement {
-    protected int elementID;
-    protected int layer;
-    protected boolean visibility;
-    protected int startSequence;
-    protected int endSequence;
-    protected float duration;
-    protected String onClickAction;
-    protected String onClickInfo;
+public class GraphicElement extends SlideElement {
     protected boolean aspectRatioLock;
     protected float elementAspectRatio;
     protected String lineColour;
@@ -33,8 +25,6 @@ public class GraphicElement implements SlideElement {
     //Oval
     protected Oval oval;
 
-    protected Animation startAnimation, endAnimation;
-
     Logger logger = LoggerFactory.getLogger(GraphicElement.class);
     Pane slideCanvas;//The ParentPane of this element
     Pane wrapperCanvas;//There is a need to wrap the canvas that we draw to
@@ -44,7 +34,8 @@ public class GraphicElement implements SlideElement {
 
     }
 
-    public void setupGraphicElement() { //TODO moved from constructor, so is no longer called intrinsically
+    @Override
+    void setupElement() {
         // Create a wrapper Pane first
         wrapperCanvas = new Pane();
 
@@ -67,22 +58,10 @@ public class GraphicElement implements SlideElement {
         endAnimation.setAnimationType(Animation.MOVEMENT_TEST);
     }
 
-    public int getStartSequence() {
-        return startSequence;
-    }
-
     @Override
-    public int getEndSequence() {
-        return endSequence;
-    }
-
-    @Override
-    public void setVisibility(boolean visibility) {
-        this.visibility = visibility;
-    }
-
-    public void setStartSequence(int startSequence) {
-        this.startSequence = startSequence;
+    void doClassSpecificRender() {
+        //TODO: Refresh canvas. Unsure if this deos this.
+        wrapperCanvas.requestLayout();
     }
 
     @Override
@@ -104,93 +83,11 @@ public class GraphicElement implements SlideElement {
         gc.setStroke(Color.INDIANRED);
         gc.strokeOval(70, 60, 30, 30);
         // BIG BOOTY BITCHES
-
-        //TODO: REfactor to avoid duplicated code.
-        switch (animationType) {
-            case Animation.NO_ANIMATION: //No animation (click)
-                logger.info("No animation");
-                break;
-            case Animation.ENTRY_ANIMATION: //Entry Animation (playback)
-                if (startAnimation != null) {//Animation Exists as StartSequence Present
-                    startAnimation.play();
-                    logger.info("Entry animation playing");
-                }
-                break;
-            case Animation.EXIT_ANIMATION: //Exit Animation (playback)
-                if (endAnimation != null) {//Animation Exists as EndSequence Present
-                    endAnimation.play();
-                    logger.info("Exit animation playing");
-                }
-                break;
-        }
     }
 
     @Override
     public Node getCoreNode() {
         return wrapperCanvas;
-    }
-
-    @Override
-    public void setSlideCanvas(Pane slideCanvas) {
-        setupGraphicElement();
-        this.slideCanvas = slideCanvas;
-
-        //Add WrapperCanvas Element to the Pane
-        if (wrapperCanvas == null) {
-            logger.error("Tried to set slide internalCanvas before GraphicElement constructor was called!");
-        } else {
-            //Canvas is the corenode
-            slideCanvas.getChildren().add(wrapperCanvas);
-        }
-    }
-
-    @Override
-    public int getLayer() {
-        return layer;
-    }
-
-    public int getElementID() {
-        return elementID;
-    }
-
-    public void setElementID(int elementID) {
-        this.elementID = elementID;
-    }
-
-    public void setLayer(int layer) {
-        this.layer = layer;
-    }
-
-    public boolean isVisibility() {
-        return visibility;
-    }
-
-    public void setEndSequence(int endSequence) {
-        this.endSequence = endSequence;
-    }
-
-    public float getDuration() {
-        return duration;
-    }
-
-    public void setDuration(float duration) {
-        this.duration = duration;
-    }
-
-    public String getOnClickAction() {
-        return onClickAction;
-    }
-
-    public void setOnClickAction(String onClickAction) {
-        this.onClickAction = onClickAction;
-    }
-
-    public String getOnClickInfo() {
-        return onClickInfo;
-    }
-
-    public void setOnClickInfo(String onClickInfo) {
-        this.onClickInfo = onClickInfo;
     }
 
     public boolean isAspectRatioLock() {
@@ -248,4 +145,6 @@ public class GraphicElement implements SlideElement {
     public void setPolygon(boolean polygon) {
         isPolygon = polygon;
     }
+
+
 }

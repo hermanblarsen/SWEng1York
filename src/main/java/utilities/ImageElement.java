@@ -17,6 +17,7 @@ public class ImageElement extends SlideElement {
     protected float opacity;
     protected boolean aspectRatioLock;
     protected float elementAspectRatio;
+    private float durationSequence;
 
     public float getxPosition() {
         return xPosition;
@@ -84,6 +85,11 @@ public class ImageElement extends SlideElement {
 
 
     @Override
+    void doClassSpecificRender() {
+
+    }
+
+    @Override
     public void renderElement(int animationType) {
 
     }
@@ -91,5 +97,14 @@ public class ImageElement extends SlideElement {
     @Override
     public Node getCoreNode() {
         return null;
+    }
+
+    @Override
+    void setupElement() {
+
+    }
+
+    public void setDurationSequence(float durationSequence){
+        this.durationSequence = durationSequence;
     }
 }

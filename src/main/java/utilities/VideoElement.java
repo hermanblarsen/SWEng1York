@@ -22,7 +22,7 @@ import javafx.util.Duration;
 /**
  * Created by habl on 26/02/2017.
  */
-public class VideoElement implements SlideElement{
+public class VideoElement extends SlideElement {
     protected int elementID;
     protected int layer;
     protected boolean visibility;
@@ -103,30 +103,27 @@ public class VideoElement implements SlideElement{
     public Node getCoreNode() {
         return mv;
     }
+
+    @Override
+    void setupElement() {
+
+    }
+
     public MediaPlayer getMediaPlayer() {return mp;}
+
+    @Override
+    public void doClassSpecificRender(){
+
+    }
 
     @Override
     public void setSlideCanvas(Pane slideCanvas) {
         this.slideCanvas = slideCanvas;
         //BorderPane mediaPane = new BorderPane();
+
         mediaPane.setCenter(mv);
         slideCanvas.getChildren().add(mediaPane);
     }
-    public Pane getSlideCanvas() {return slideCanvas;}
-
-
-    public void setLayer(int layer) {this.layer = layer;}
-    public int getLayer() {
-        return this.layer;
-    }
-
-    public void setStartSequence(int startSequence) {this.startSequence = startSequence;}
-    public int getStartSequence() {
-        return startSequence;
-    }
-
-    public void setEndSequence(int endSequence) {this.endSequence = endSequence;}
-    public int getEndSequence() {return endSequence;}
 
     public void setMediaPath(String mediaPath) {
         this.path = mediaPath;
@@ -176,22 +173,6 @@ public class VideoElement implements SlideElement{
 
     public void setySize(float ySize){this.ySize = ySize;}
     public float getySize() {return ySize;}
-
-    public String getOnClickAction() {
-        return onClickAction;
-    }
-
-    public void setOnClickAction(String onClickAction) {
-        this.onClickAction = onClickAction;
-    }
-
-    public String getOnClickInfo() {
-        return onClickInfo;
-    }
-
-    public void setOnClickInfo(String onClickInfo) {
-        this.onClickInfo = onClickInfo;
-    }
 
     public boolean isLoop() {
         return loop;
@@ -328,10 +309,6 @@ public class VideoElement implements SlideElement{
         private T getValue(){return value;}
 
         private void setValue(T value){this.value = value;}
-    }
-
-    public boolean isVisibility() {
-        return visibility;
     }
 
     public String getPath() {
