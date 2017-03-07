@@ -6,68 +6,57 @@ import javafx.scene.layout.Pane;
 /**
  * Created by habl on 25/02/2017.
  */
-public class AudioElement extends AudioHandler implements SlideElement {
-    protected int elementID;
-    protected int startSequence;
-    protected int endSequence;
-    protected float durationSequence;
+public class AudioElement extends SlideElement {
+    //Dummy class for parsing
+    protected String path;
+    protected boolean loop;
+    protected boolean autoplay;
+    protected int startTime;
+    protected int endTime;
 
-    @Override
-    public void renderElement(int animationType) {
-
+    public String getPath() {
+        return path;
     }
+
+    public void setPath(String path) {
+        this.path = path;
+    }
+
+    public boolean isLoop() {
+        return loop;
+    }
+
+    public void setLoop(boolean loop) {
+        this.loop = loop;
+    }
+
+    public boolean isAutoplay() {
+        return autoplay;
+    }
+
+    public void setAutoplay(boolean autoplay) {
+        this.autoplay = autoplay;
+    }
+
+    public int getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(int startTime) {
+        this.startTime = startTime;
+    }
+
+    public int getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(int endTime) {
+        this.endTime = endTime;
+    }
+
 
     @Override
     public Node getCoreNode() {
         return null;
-    }
-
-    @Override
-    public void setSlideCanvas(Pane slideCanvas) {
-
-    }
-
-    @Override
-    public int getLayer() {
-        return 0;
-    }
-
-    @Override
-    public int getStartSequence() {
-        return 0;
-    }
-
-    @Override
-    public int getEndSequence() {
-        return endSequence;
-    }
-
-    @Override
-    public void setVisibility(boolean visibility) {
-
-    }
-
-    public int getElementID() {
-        return elementID;
-    }
-
-    public void setElementID(int elementID) {
-        this.elementID = elementID;
-    }
-
-    public void setStartSequence(int startSequence) {
-        this.startSequence = startSequence;
-    }
-
-    public void setEndSequence(int endSequence) {
-        this.endSequence = endSequence;
-    }
-
-    public float getDurationSequence() {
-        return durationSequence;
-    }
-
-    public void setDurationSequence(float durationSequence) {
-        this.durationSequence = durationSequence;
     }
 }
