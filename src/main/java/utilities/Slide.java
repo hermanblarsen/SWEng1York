@@ -16,23 +16,29 @@ public class Slide extends StackPane {
     Logger logger = LoggerFactory.getLogger(Slide.class);
 
     protected List<SlideElement> slideElementList;
-    protected List<SlideElement> visibleSlideElementsList;
+    protected List<SlideElement> visibleSlideElementList;
+
+    public static final int SLIDE_FORWARD = 0;
+    public static final int SLIDE_BACKWARD = 1;
     protected int slideID;
 
     //Current Sequence number on slide
     int currentSequence = 0;
-    int maxSequenceNumber = 4;
+    int maxSequenceNumber = 3;
 
     public Slide() {
         slideElementList = new ArrayList<>();
-        visibleSlideElementsList = new ArrayList<>();
-
+        visibleSlideElementList = new ArrayList<>();
         this.setOnKeyPressed(ke -> {
-            if (ke.getCode().equals(KeyCode.ENTER)) {
-                this.advance();
+            if (ke.getCode().equals(KeyCode.RIGHT)) {
+                this.advance(SLIDE_FORWARD);
+            } else if (ke.getCode().equals(KeyCode.LEFT)){
+                this.advance(SLIDE_BACKWARD);
             }
         });
     }
+
+
 
     public void addElement(int elementIndex, SlideElement newElement) {
         this.slideElementList.add(elementIndex, newElement);
@@ -65,7 +71,7 @@ public class Slide extends StackPane {
         this.slideElementList = slideElementList;
         //Sort by Sequence
         sortElementsByStartSequence(slideElementList);
-       //Set Max Sequence number
+        //Set Max Sequence number
     }
 
     public int getSlideID() {
@@ -76,19 +82,27 @@ public class Slide extends StackPane {
         this.slideID = slideID;
     }
 
-    public void advance() {
+    public void advance(int direction) {
         if (currentSequence != maxSequenceNumber) {
-            visibleSlideElementsList.add(slideElementList.get(currentSequence));
+            if(direction == SLIDE_FORWARD){
+                //TODO: Stop adding once at end of Element list
+                if (slideElementList.get(currentSequence) != null) {
+                    visibleSlideElementList.add(slideElementList.get(currentSequence));
+                    currentSequence++;
+                }
+            } else if(direction == SLIDE_BACKWARD){
+                //TODO: Stop adding once at end of Element list
+                if (slideElementList.get(currentSequence) != null) {
+                    visibleSlideElementList.remove(slideElementList.get(currentSequence));
+                    currentSequence--;
+                }
+            }
 
             //Sort by Layer
-            sortElementsByLayer(visibleSlideElementsList);
-
-            currentSequence++;
+            sortElementsByLayer(visibleSlideElementList);
             logger.info("Current Sequence is " + currentSequence);
-
             //Fire animations
-            for (SlideElement elementToAnimate : visibleSlideElementsList) {
-
+            for (SlideElement elementToAnimate : visibleSlideElementList) {
                 //TODO can we make this independent of the interface, or else we have to implement things in audio which is not needed.
                 //TODO might be worth looking into reflectance, although this will make it more resource hungry..
                 if (elementToAnimate.getStartSequence() == currentSequence) {

@@ -129,7 +129,7 @@ public class Presentation extends Pane {
      */
     public void start() {
         for(Slide slide : slideList){
-            slide.advance();
+
         }
     }
 }

@@ -33,6 +33,7 @@ public class GraphicElement implements SlideElement {
     //Oval
     protected Oval oval;
 
+    protected Animation startAnimation, endAnimation;
 
     Logger logger = LoggerFactory.getLogger(GraphicElement.class);
     Pane slideCanvas;//The ParentPane of this element
@@ -43,7 +44,7 @@ public class GraphicElement implements SlideElement {
 
     }
 
-    public void displayElement() { //TODO moved from constructor, so is no longer called intrinsically
+    public void setupGraphicElement() { //TODO moved from constructor, so is no longer called intrinsically
         // Create a wrapper Pane first
         wrapperCanvas = new Pane();
 
@@ -56,6 +57,14 @@ public class GraphicElement implements SlideElement {
         // redraw when resized
         internalCanvas.widthProperty().addListener(event -> renderElement(0));
         internalCanvas.heightProperty().addListener(event -> renderElement(0));
+
+        //TODO: Create Animations here, but move to setAnimation setter when XML implemented
+        startAnimation = new Animation();
+        startAnimation.setCoreNodeToAnimate(getCoreNode());
+        startAnimation.setAnimationType(Animation.SIMPLE_APPEAR);
+        endAnimation = new Animation();
+        endAnimation.setCoreNodeToAnimate(getCoreNode());
+        endAnimation.setAnimationType(Animation.MOVEMENT_TEST);
     }
 
     public int getStartSequence() {
@@ -95,6 +104,25 @@ public class GraphicElement implements SlideElement {
         gc.setStroke(Color.INDIANRED);
         gc.strokeOval(70, 60, 30, 30);
         // BIG BOOTY BITCHES
+
+        //TODO: REfactor to avoid duplicated code.
+        switch (animationType) {
+            case Animation.NO_ANIMATION: //No animation (click)
+                logger.info("No animation");
+                break;
+            case Animation.ENTRY_ANIMATION: //Entry Animation (playback)
+                if (startAnimation != null) {//Animation Exists as StartSequence Present
+                    startAnimation.play();
+                    logger.info("Entry animation playing");
+                }
+                break;
+            case Animation.EXIT_ANIMATION: //Exit Animation (playback)
+                if (endAnimation != null) {//Animation Exists as EndSequence Present
+                    endAnimation.play();
+                    logger.info("Exit animation playing");
+                }
+                break;
+        }
     }
 
     @Override
@@ -104,6 +132,7 @@ public class GraphicElement implements SlideElement {
 
     @Override
     public void setSlideCanvas(Pane slideCanvas) {
+        setupGraphicElement();
         this.slideCanvas = slideCanvas;
 
         //Add WrapperCanvas Element to the Pane
