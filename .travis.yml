@@ -3,4 +3,6 @@ jdk: oraclejdk8
 sudo: false
 notifications:
   slack: sweng1york:Y7YjvRoRjnoxHAgu2i86hdqj
+deploy:
+  	skip_cleanup: true
 script: "./build.sh"
