@@ -104,6 +104,10 @@ public class Slide extends StackPane {
         this.slideID = slideID;
     }
 
+    public void retard(){
+        System.out.println("Lol");
+    }
+
     public void advance() {
         SlideElement checkInVisibleSet;
         //If we're going forwards and still elements left. If we're going backwards but not at element 0
