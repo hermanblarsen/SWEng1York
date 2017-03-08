@@ -69,7 +69,7 @@ public class Dashboard extends Application {
 
 
         //Keyboard listener for moving through presentation
-        scene.setOnKeyPressed(ke -> {
+        scene.setOnKeyPressed(key -> {
             int presentationStatus = 0;
             if (ke.getCode().equals(KeyCode.RIGHT)) {
                 controlPresentation(Slide.SLIDE_FORWARD);
