@@ -2,43 +2,21 @@ package utilities;
 
 //JAXP APIs used by DOMecho
 import com.sun.org.apache.xerces.internal.parsers.DOMParser;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 
 //exceptions that can be thrown when parsing
 import javafx.util.Duration;
 import org.w3c.dom.*;
-import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
-import org.xml.sax.SAXParseException;
-import org.xml.sax.helpers.*;
+
 import java.io.IOException;
 
 //read the sample XML file and manage output:
-import java.io.File;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
 
 //Finally, import the W3C definitions for a DOM, DOM exceptions, entities and nodes:
 //---
 
 
-import org.w3c.dom.Document;
 import java.util.ArrayList;
-import java.util.List;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 
 /**
  * Created by hermanblarsen on 23/02/2017.
@@ -226,6 +204,7 @@ public class ParserXML {
 
             if (slideNode.getAttributes().getLength() != 0) {
                 String attributeName = slideNode.getAttributes().item(0).getNodeName();
+                //TODO: Should this be a proper string comparison using .equals("slideid")? - Amrik
                 if (attributeName == "slideid") {
                     String attrContent = slideNode.getAttributes().item(0).getNodeValue();
                     int attrSlideID = Integer.valueOf(attrContent);

@@ -5,8 +5,8 @@ import javafx.scene.layout.Pane;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by habl on 23/02/2017.
@@ -28,8 +28,11 @@ public class Presentation extends Pane {
 
     private int groupFormat;
     Logger logger = LoggerFactory.getLogger(Presentation.class);
-    private static final int PRESENTATION_FINISH = 0;
-    private static final int PRESENTATION_START = 0;
+    public static final int PRESENTATION_START = 0;
+    public static final int PRESENTATION_FINISH = 1;
+    public static final int SLIDE_CHANGE = 2;
+    public static final int SAME_SLIDE = 3;
+
     private List<Slide> slideList;
 
 
@@ -141,26 +144,47 @@ public class Presentation extends Pane {
     }
 
     public int advance(int direction) {
+        //Initialise this with something more appropriate
+        int presentationStatus = SAME_SLIDE;
+
         if (direction == Slide.SLIDE_FORWARD) {
             //If we're not at end of presentation
             if (currentSlideNumber < maxSlideNumber) {
                 //If slide tells you to move forward to next slide, do it by changing to next slide in slide list.
                 if (currentSlide.advance(direction) == direction) {
                     currentSlideNumber++;
+
+                    if (currentSlideNumber >= maxSlideNumber - 1) {
+                        logger.info("Reached final slide: " + maxSlideNumber);
+                        currentSlideNumber = maxSlideNumber - 1; //Wrap to this slide as maximum
+                        presentationStatus = PRESENTATION_FINISH;
+                    } else {
+                        presentationStatus = SLIDE_CHANGE;
+                    }
+
                     currentSlide = slideList.get(currentSlideNumber);
                 }
             }
         } else if (direction == Slide.SLIDE_BACKWARD) {
-            boolean isStart = false;
             //If we're not at start of presentation
             if (currentSlideNumber >= 0) {
                 //If slide tells you to move backward to prev slide, do it by changing to prev slide in slide list.
+                //Allow slideElements to play on slide though.
                 if (currentSlide.advance(direction) == direction) {
                     currentSlideNumber--;
+
+                    if (currentSlideNumber < 0) {
+                        logger.info("Reached Min slide number. Presentation back at start.");
+                        currentSlideNumber = 0;//Wrap to this slide as minimum
+                        presentationStatus = PRESENTATION_START;
+                    } else {
+                        presentationStatus = SLIDE_CHANGE;
+                    }
+
                     currentSlide = slideList.get(currentSlideNumber);
                 }
             }
         }
-        return 0;
+        return presentationStatus;
     }
 }

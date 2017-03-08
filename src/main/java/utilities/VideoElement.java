@@ -1,6 +1,5 @@
 package utilities;
 
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
@@ -22,7 +21,8 @@ import javafx.util.Duration;
 /**
  * Created by habl on 26/02/2017.
  */
-public class VideoElement extends SlideElement{
+@SuppressWarnings({"WeakerAccess", "unused"})
+public class VideoElement extends SlideElement {
     protected boolean mediaControl;
 
     protected float xPosition;
@@ -45,27 +45,12 @@ public class VideoElement extends SlideElement{
     protected Media media;
     protected BorderPane mediaPane;
 
-//todo: 1) Add Error Handling
-//todo: 2) Commenting
-//TODO 3) move all testing out of this class and into a proper test class - Herman
+    //TODO: 1) Add Error Handling
+    //TODO: 2) Commenting
+    //TODO  3) Move all testing out of this class and into a proper test class - Herman
     public VideoElement() {
         //Leaver this empty of testing and canvas things: testing should be done in separate testclass
     }
-
-//    public void testVideoELement() {
-//        mv = new MediaView();
-//        mediaPane = new BorderPane();
-//
-//        mv.setVisible(true);
-//
-//        mp.setStartTime(new Duration(0));
-//        mp.setStartTime(new Duration(2));
-//        //TODO rearrange and whatever, but cannot be in setter and getter. Maybe in an update method.
-//        getCoreNode().setTranslateX(xPosition);
-//        getCoreNode().setTranslateX(yPosition);
-//        mv.setPreserveRatio(aspectRatioLock);
-//
-//    }
 
     public void setUpVideoElement(BorderPane mediaPane) {
         mv = new MediaView();
@@ -74,33 +59,26 @@ public class VideoElement extends SlideElement{
         mp = new MediaPlayer(media);
         mv.setMediaPlayer(mp);
 
-        if(mediaControl == true) {
+        if (mediaControl) {
             mediaPane.setBottom(mediaControl());
         }
-        if(loop == true){
+        if (loop) {
             mp.setCycleCount(MediaPlayer.INDEFINITE);
         }
         mp.setAutoPlay(autoplay);
+
+        //TODO: Create Animations here, but move to setAnimation setter when XML implemented
+        startAnimation = new Animation();
+        startAnimation.setCoreNodeToAnimate(getCoreNode());
+        startAnimation.setAnimationType(Animation.SIMPLE_APPEAR);
+        endAnimation = new Animation();
+        endAnimation.setCoreNodeToAnimate(getCoreNode());
+        endAnimation.setAnimationType(Animation.SIMPLE_DISAPPEAR);
     }
 
     @Override
     void doClassSpecificRender() {
 
-    }
-
-    @Override
-    public void renderElement(int animationType) {
-        switch(animationType){
-            case 0: //No animation (click)
-
-                break;
-            case 1: //Entry Animation (playback)
-                startAnimation.play();
-                break;
-            case 2: //Exit Animation (playback)
-                endAnimation.play();
-                break;
-        }
     }
 
     @Override
@@ -113,7 +91,9 @@ public class VideoElement extends SlideElement{
 
     }
 
-    public MediaPlayer getMediaPlayer() {return mp;}
+    public MediaPlayer getMediaPlayer() {
+        return mp;
+    }
 
     @Override
     public void setSlideCanvas(Pane slideCanvas) {
@@ -124,41 +104,70 @@ public class VideoElement extends SlideElement{
         slideCanvas.getChildren().add(mediaPane);
     }
 
-
     public void setMediaPath(String mediaPath) {
         this.path = mediaPath;
     }
-    public String getMediaPath() {return path;}
 
-    public void setAutoPlay(boolean isAutoPlay){
+    public String getMediaPath() {
+        return path;
+    }
+
+    public void setAutoPlay(boolean isAutoPlay) {
         this.autoplay = isAutoPlay;
     }
-    public boolean getAutoPlay() {return autoplay;}
+
+    public boolean getAutoPlay() {
+        return autoplay;
+    }
 
     public void setStartTime(Duration startTime) {
         this.startTime = startTime;
     }
-    public Duration getStartTime(){return startTime;}
 
-    public void setEndTime(Duration endTime) {this.startTime = endTime;}
-    public Duration getEndTime(){return endTime;}
+    public Duration getStartTime() {
+        return startTime;
+    }
+
+    public void setEndTime(Duration endTime) {
+        this.startTime = endTime;
+    }
+
+    public Duration getEndTime() {
+        return endTime;
+    }
 
 
-    public void setxPosition(float xPosition){
+    public void setxPosition(float xPosition) {
         this.xPosition = xPosition;
     }
-    public float getxPosition(){return xPosition;}
 
-    public void setyPosition(float yPosition){
+    public float getxPosition() {
+        return xPosition;
+    }
+
+    public void setyPosition(float yPosition) {
         this.yPosition = yPosition;
     }
-    public float getyPosition(){return yPosition;}
 
-    public void setxSize(float xSize){this.xSize = xSize;}
-    public float getxSize() {return xSize;}
+    public float getyPosition() {
+        return yPosition;
+    }
 
-    public void setySize(float ySize){this.ySize = ySize;}
-    public float getySize() {return ySize;}
+    public void setxSize(float xSize) {
+        this.xSize = xSize;
+    }
+
+    public float getxSize() {
+        return xSize;
+    }
+
+    public void setySize(float ySize) {
+        this.ySize = ySize;
+    }
+
+    public float getySize() {
+        return ySize;
+    }
 
     public String getOnClickAction() {
         return onClickAction;
@@ -218,14 +227,14 @@ public class VideoElement extends SlideElement{
 
         //Play/Pause Button
         final Button playPauseButton = new Button(">");
-        if(autoplay == true){
+        if (autoplay) {
             playPauseButton.setText("||");
         }
         playPauseButton.setOnAction((event) -> {
-            if(mp.getStatus() != MediaPlayer.Status.PLAYING) {
+            if (mp.getStatus() != MediaPlayer.Status.PLAYING) {
                 playPauseButton.setText("||");
                 mp.play();
-            }else {
+            } else {
                 playPauseButton.setText(">");
                 mp.pause();
             }
@@ -242,8 +251,8 @@ public class VideoElement extends SlideElement{
 
         // Seek Control
         final Slider videoTime = new Slider(0.0d, 0, 0);
-        mp.statusProperty().addListener((observableValue,  oldValue,  newValue)-> {
-            if(newValue == MediaPlayer.Status.READY) {
+        mp.statusProperty().addListener((observableValue, oldValue, newValue) -> {
+            if (newValue == MediaPlayer.Status.READY) {
                 videoTime.setMax(mp.getTotalDuration().toMillis());
             }
         });
@@ -267,10 +276,10 @@ public class VideoElement extends SlideElement{
             double currentTime = mp.getCurrentTime().toSeconds();
             double totalDuration = mp.getTotalDuration().toSeconds();
             playTime.setText(String.format("%02.0f:%02.0f/%02.0f:%02.0f",
-                    Math.floor(currentTime/60),
-                    Math.floor(currentTime%60),
-                    Math.floor(totalDuration/60),
-                    Math.floor(totalDuration%60)));
+                    Math.floor(currentTime / 60),
+                    Math.floor(currentTime % 60),
+                    Math.floor(totalDuration / 60),
+                    Math.floor(totalDuration % 60)));
         });
         mediaBar.getChildren().add(playTime);
 
@@ -279,9 +288,7 @@ public class VideoElement extends SlideElement{
         mediaBar.getChildren().add(volume);
         //Volume Slider
         final Slider volumeSlider = new Slider(0, 1, 0.5);
-        volumeSlider.valueProperty().addListener((observable) -> {
-            mp.setVolume(volumeSlider.getValue());
-        });
+        volumeSlider.valueProperty().addListener((observable) -> mp.setVolume(volumeSlider.getValue()));
         mediaBar.getChildren().add(volumeSlider);
 
         //Fullscreen Button
@@ -289,7 +296,7 @@ public class VideoElement extends SlideElement{
         final Rectangle2D initialBounds = new Rectangle2D(mv.getFitWidth(), mv.getFitWidth(), mv.getFitHeight(), mv.getFitWidth());
         fullscreenButton.setOnAction((event) -> {
             // TODO: Implement this properly
-            if(fullscreenButton.isSelected()) {
+            if (fullscreenButton.isSelected()) {
                 mv.setFitHeight(Screen.getPrimary().getBounds().getHeight());
                 mv.setFitWidth(Screen.getPrimary().getBounds().getWidth());
             } else {
@@ -302,15 +309,20 @@ public class VideoElement extends SlideElement{
         return mediaBar;
     }
 
-    private class Holder<T>
-    {
+    private class Holder<T> {
         private T value;
 
-        private Holder(T value){this.value = value;}
+        private Holder(T value) {
+            this.value = value;
+        }
 
-        private T getValue(){return value;}
+        private T getValue() {
+            return value;
+        }
 
-        private void setValue(T value){this.value = value;}
+        private void setValue(T value) {
+            this.value = value;
+        }
     }
 
 

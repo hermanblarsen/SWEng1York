@@ -23,9 +23,11 @@ public class Slide extends StackPane {
     protected List<VideoElement> videoElementList = new ArrayList<>();
     protected List<AudioElement> audioElementList = new ArrayList<>();
 
+    //Parameters for searchForSequenceElement method. Is this good practice? - Amrik
     private static final int START_SEARCH = 0;
     private static final int END_SEARCH = 1;
 
+    //Passed back up to Presentation layer, to alert on whether sequence has changed the current slide or not
     public static final int SLIDE_NO_MOVE = 0;
     public static final int SLIDE_FORWARD = 1;
     public static final int SLIDE_BACKWARD = 2;
@@ -70,6 +72,7 @@ public class Slide extends StackPane {
 
     public void setSlideElementList(List<SlideElement> slideElementList) {
         this.slideElementList = slideElementList;
+
         //Set Max Sequence number
         maxSequenceNumber = getMaxSequenceNumber(slideElementList);
 
@@ -87,13 +90,13 @@ public class Slide extends StackPane {
     private int getMaxSequenceNumber(List<SlideElement> slideElementList) {
         int max = 0;
 
-        for (int i = 1; i < slideElementList.size(); i++) {
-            if (slideElementList.get(i).getStartSequence() > max) {
-                max = slideElementList.get(i).getStartSequence();
+        for (SlideElement slideElement : slideElementList) {
+            if (slideElement.getStartSequence() > max) {
+                max = slideElement.getStartSequence();
             }
 
-            if (slideElementList.get(i).getEndSequence() > max) {
-                max = slideElementList.get(i).getEndSequence();
+            if (slideElement.getEndSequence() > max) {
+                max = slideElement.getEndSequence();
             }
         }
 

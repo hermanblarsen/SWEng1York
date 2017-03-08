@@ -1,11 +1,11 @@
 package utilities;
 
 import javafx.scene.Node;
-import javafx.scene.layout.Pane;
 
 /**
  * Created by habl on 25/02/2017.
  */
+@SuppressWarnings({"WeakerAccess", "unused"})
 public class AudioElement extends SlideElement {
     //Dummy class for parsing
     protected String path;

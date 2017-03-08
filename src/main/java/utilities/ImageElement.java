@@ -1,7 +1,6 @@
 package utilities;
 
 import javafx.scene.Node;
-import javafx.scene.layout.Pane;
 
 /**
  * Created by habl on 25/02/2017.

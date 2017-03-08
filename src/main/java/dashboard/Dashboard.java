@@ -14,8 +14,11 @@ import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.kordamp.bootstrapfx.scene.layout.Panel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import utilities.*;
 
+import java.io.File;
 import java.util.ArrayList;
 
 /**
@@ -24,6 +27,8 @@ import java.util.ArrayList;
 @SuppressWarnings({"WeakerAccess", "unused"})
 public class Dashboard extends Application {
     Scene scene;
+    BorderPane border;
+    Logger logger = LoggerFactory.getLogger(Dashboard.class);
 
     public static void main(String[] args) {
         launch(args);
@@ -34,7 +39,7 @@ public class Dashboard extends Application {
         //Initialise UI
         primaryStage.setTitle("I^2LP");
 
-        BorderPane border = new BorderPane();
+        border = new BorderPane();
         scene = new Scene(border, 1000, 600);
         scene.getStylesheets().add("bootstrapfx.css");
         primaryStage.setScene(scene);
@@ -48,24 +53,36 @@ public class Dashboard extends Application {
 
         primaryStage.show();
 
-
-        loadPresentation(border);
+        //TEST
+        loadPresentation(border, "shit");
     }
 
-    private void loadPresentation(BorderPane mainUI){
-        Presentation myPresentationElement = addPresentationElement();
+    private void loadPresentation(BorderPane mainUI, String path) {
+        //ParserXML readPresentationParser = new ParserXML(path);
+
+        //TEST
+        Presentation myPresentationElement = generateTestPresentation();
+        mainUI.setCenter(myPresentationElement.getCurrentSlide());
+
+        //Presentation myPresentationElement = readPresentationParser.parsePresentation();
 
         //Keyboard listener for moving through presentation
         scene.setOnKeyPressed(ke -> {
+            int presentationStatus = 0;
             if (ke.getCode().equals(KeyCode.RIGHT)) {
-                myPresentationElement.advance(Slide.SLIDE_FORWARD);
-            } else if (ke.getCode().equals(KeyCode.LEFT)){
-                myPresentationElement.advance(Slide.SLIDE_BACKWARD);
+                presentationStatus = myPresentationElement.advance(Slide.SLIDE_FORWARD);
+            } else if (ke.getCode().equals(KeyCode.LEFT)) {
+                presentationStatus = myPresentationElement.advance(Slide.SLIDE_BACKWARD);
             }
-            mainUI.setCenter(myPresentationElement.getCurrentSlide());
+            //If Presentation handler told us that slide is changing, update the Slide present on Main screen
+            //Can do specific things when presentation reached end, or start.
+            if ((presentationStatus == Presentation.SLIDE_CHANGE) || (presentationStatus == Presentation.PRESENTATION_FINISH) || (presentationStatus == Presentation.PRESENTATION_START)) {
+                logger.info("Changing Slides");
+                mainUI.setCenter(myPresentationElement.getCurrentSlide());
+            }
         });
 
-        //mainUI.setBottom(addStatBar(myPresentationElement));
+        mainUI.setBottom(addStatBar(myPresentationElement));
     }
 
     public HBox addHBox(Stage primaryStage) {
@@ -77,12 +94,17 @@ public class Dashboard extends Application {
         Button createPresButton = new Button("Create Presentation");
         createPresButton.getStyleClass().setAll("btn", "btn-success");
 
+
+        final FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Open Resource File");
+
         Button loadPresButton = new Button("Load Presentation");
         loadPresButton.getStyleClass().setAll("btn", "btn-default");
         loadPresButton.setOnAction(event -> {
-            FileChooser fileChooser = new FileChooser();
-            fileChooser.setTitle("Open Resource File");
-            fileChooser.showOpenDialog(primaryStage);
+            File file = fileChooser.showOpenDialog(primaryStage);
+            if (file != null) {
+                loadPresentation(border, file.getPath());
+            }
         });
 
         Text platformTitle = new Text("     Integrated Interactive Learning Platform");
@@ -159,7 +181,7 @@ public class Dashboard extends Application {
         return vbox;
     }
 
-    public Presentation addPresentationElement() {
+    public Presentation generateTestPresentation() {
         ArrayList<Slide> slides = new ArrayList<>();
 
         Slide slide1 = new Slide();
@@ -167,7 +189,7 @@ public class Dashboard extends Application {
         slides.add(slide1);
 
         //Create some test Slide Elements
-        ArrayList<SlideElement> slideElements = new ArrayList<>();
+        ArrayList<SlideElement> slideElementsSlide1 = new ArrayList<>();
 
         //Create a test Text element, add some text and pop it onto our stack pane. This code will all be driven from XML parser
         TextElement myTextElement = new TextElement();
@@ -176,33 +198,54 @@ public class Dashboard extends Application {
         myTextElement.setEndSequence(2);
         myTextElement.setTextContent("<h1 style='background : rgba(0,0,0,0);'><b><font color=\"red\">IILP </font><font color=\"blue\">HTML</font> <font color=\"green\">Support Test</font></b></h1>");
         myTextElement.setSlideCanvas(slide1);
-        slideElements.add(myTextElement);
+        slideElementsSlide1.add(myTextElement);
 
         GraphicElement myGraphicElement = new GraphicElement();
         myGraphicElement.setLayer(1);
         myGraphicElement.setStartSequence(3);
         myGraphicElement.setEndSequence(4);
         myGraphicElement.setSlideCanvas(slide1);
-        slideElements.add(myGraphicElement);
+        slideElementsSlide1.add(myGraphicElement);
 
-//        VideoElement myVideoElement = new VideoElement();
-//        myVideoElement.setMediaPath("http://download.oracle.com/otndocs/products/javafx/oow2010-2.flv");
-//        myVideoElement.setAutoPlay(true);
-//        myVideoElement.setMediaControl(true);
-//        myVideoElement.setLoop(true);
-//        myVideoElement.setSlideCanvas(slide1);
-//        slideElements.add(myVideoElement);
+       /* VideoElement myVideoElement = new VideoElement();
+        myVideoElement.setMediaPath("http://download.oracle.com/otndocs/products/javafx/oow2010-2.flv");
+        myVideoElement.setAutoPlay(true);
+        myVideoElement.setMediaControl(true);
+        myVideoElement.setLoop(true);
+        myVideoElement.setLayer(2);
+        myVideoElement.setStartSequence(5);
+        myVideoElement.setEndSequence(6);
+        myVideoElement.setSlideCanvas(slide1);
+        slideElementsSlide1.add(myVideoElement);*/
 
         //Create a test Text element, add some text and pop it onto our stack pane. This code will all be driven from XML parser
         TextElement myTextElement1 = new TextElement();
-        myTextElement1.setLayer(2);
-        myTextElement1.setStartSequence(5);
-        myTextElement1.setEndSequence(6);
+        myTextElement1.setLayer(3);
+        myTextElement1.setStartSequence(7);
+        myTextElement1.setEndSequence(8);
         myTextElement1.setTextContent("<b>Poop</b>");
         myTextElement1.setSlideCanvas(slide1);
-        slideElements.add(myTextElement1);
+        slideElementsSlide1.add(myTextElement1);
 
-        slide1.setSlideElementList(slideElements);
+        slide1.setSlideElementList(slideElementsSlide1);
+
+        Slide slide2 = new Slide();
+        slide1.setSlideID(2);
+        slides.add(slide2);
+
+        //Create some test Slide Elements
+        ArrayList<SlideElement> slideElementsSlide2 = new ArrayList<>();
+
+        //Create a test Text element, add some text and pop it onto our stack pane. This code will all be driven from XML parser
+        TextElement myTextElementNewSlide = new TextElement();
+        myTextElementNewSlide.setLayer(1);
+        myTextElementNewSlide.setStartSequence(1);
+        myTextElementNewSlide.setEndSequence(2);
+        myTextElementNewSlide.setTextContent("<b>Slide2</b>");
+        myTextElementNewSlide.setSlideCanvas(slide2);
+        slideElementsSlide2.add(myTextElementNewSlide);
+
+        slide2.setSlideElementList(slideElementsSlide2);
 
         Presentation myPresentation = new Presentation();
         myPresentation.setSlideList(slides);

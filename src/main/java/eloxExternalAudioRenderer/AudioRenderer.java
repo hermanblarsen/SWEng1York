@@ -2,8 +2,6 @@ package eloxExternalAudioRenderer;
 import com.elox.Parser.Audio.Audio;
 
 import javafx.event.EventHandler;
-import javafx.scene.Group;
-import javafx.scene.Scene;
 import javafx.scene.media.*;
 import javafx.util.Duration;
 

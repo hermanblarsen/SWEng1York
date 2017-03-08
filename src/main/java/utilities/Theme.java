@@ -1,7 +1,5 @@
 package utilities;
 
-import javafx.scene.text.Font;
-
 /**
  * Created by habl on 24/02/2017.
  */
