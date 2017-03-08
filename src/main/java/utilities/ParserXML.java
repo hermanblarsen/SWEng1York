@@ -31,6 +31,7 @@ public class ParserXML {
         if (this.validatePath(presentationXmlPath))
         {
             this.presentationXmlPath = presentationXmlPath; //Set the path if valid
+            System.out.println("Path valid; XML loaded");
         } else {
             System.out.println("Path not valid, default XML loaded");
         }
@@ -38,7 +39,7 @@ public class ParserXML {
         //Create a DOMParser, try parsing XML
         xmlParser = new DOMParser(); //Equivalent to DocumentBuilder when not writing to XML
         try {
-            xmlParser.parse(presentationXmlPath);
+            xmlParser.parse(this.presentationXmlPath);
         } catch (SAXException e) {
             //TODO Auto-generated catch block
             e.printStackTrace();
@@ -252,7 +253,7 @@ public class ParserXML {
             slideArray.add(mySlide);
         }
         myPresentation.setSlideList(slideArray);
-
+        System.out.println("Parsing complete..."); //TODO remove
         return myPresentation;
     }
 
@@ -855,7 +856,9 @@ public class ParserXML {
     }*/
 
     public Boolean validatePath(String path) {
-        //TODO validate path somehow (and maybe filetype?)
-        return true;
+        //TODO validate path somehow ?
+        Boolean validated = false;
+        if (path.contains(".xml")) validated= true;
+        return validated;
     }
 }

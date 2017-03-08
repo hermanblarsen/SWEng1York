@@ -77,7 +77,6 @@ public class GraphicElement extends SlideElement {
         gc.strokeOval(50, 60, 30, 30);
         gc.setStroke(Color.INDIANRED);
         gc.strokeOval(70, 60, 30, 30);
-        // BIG BOOTY BITCHES
     }
 
     @Override

@@ -78,7 +78,7 @@ public class VideoElementTest {
 
     @After
     public void tearDown() throws Exception {
-        System.out.println("Done");
+
     }
 
 }

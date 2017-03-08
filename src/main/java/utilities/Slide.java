@@ -125,8 +125,9 @@ public class Slide extends StackPane {
                     visibleSlideElementList.add(checkInVisibleSet);
                 }
             } catch (SequenceNotFoundException e) {
-                logger.error("Failed to find Element with Sequence number of " + currentSequence + " in slideElementList. XML invalid.");
-                return SLIDE_NO_MOVE;
+                logger.error("Failed to find Element with Sequence number of " + currentSequence + " in slideElementList. XML invalid?");
+//                return SLIDE_NO_MOVE;
+                return SLIDE_FORWARD; //TODO for testing, remove Slide forward when done testing
             }
         } else if ((currentSequence > 0) && (direction == SLIDE_BACKWARD)) {  //If we're going backwards and still elements left
             currentSequence--;

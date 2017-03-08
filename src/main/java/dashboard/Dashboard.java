@@ -56,35 +56,35 @@ public class Dashboard extends Application {
         primaryStage.show();
 
         //TEST
-        loadPresentation(border, "shit");
+//        loadPresentation(border, "shit");
     }
 
     private void loadPresentation(BorderPane mainUI, String path) {
-        //ParserXML readPresentationParser = new ParserXML(path);
+        ParserXML parserXML = new ParserXML(path);
 
-        //TEST
-        Presentation myPresentationElement = generateTestPresentation();
-        mainUI.setCenter(myPresentationElement.getCurrentSlide());
+//        //TEST
+//        Presentation myPresentation = generateTestPresentation();
+//        mainUI.setCenter(myPresentation.getCurrentSlide());
 
-        //Presentation myPresentationElement = readPresentationParser.parsePresentation();
+        Presentation myPresentation = parserXML.parsePresentation();
 
         //Keyboard listener for moving through presentation
-        scene.setOnKeyPressed(ke -> {
+        scene.setOnKeyPressed(key -> {
             int presentationStatus = 0;
-            if (ke.getCode().equals(KeyCode.RIGHT)) {
-                presentationStatus = myPresentationElement.advance(Slide.SLIDE_FORWARD);
-            } else if (ke.getCode().equals(KeyCode.LEFT)) {
-                presentationStatus = myPresentationElement.advance(Slide.SLIDE_BACKWARD);
+            if (key.getCode().equals(KeyCode.RIGHT)) {
+                presentationStatus = myPresentation.advance(Slide.SLIDE_FORWARD);
+            } else if (key.getCode().equals(KeyCode.LEFT)) {
+                presentationStatus = myPresentation.advance(Slide.SLIDE_BACKWARD);
             }
             //If Presentation handler told us that slide is changing, update the Slide present on Main screen
             //Can do specific things when presentation reached end, or start.
             if ((presentationStatus == Presentation.SLIDE_CHANGE) || (presentationStatus == Presentation.PRESENTATION_FINISH) || (presentationStatus == Presentation.PRESENTATION_START)) {
-                logger.info("Changing Slides");
-                mainUI.setCenter(myPresentationElement.getCurrentSlide());
+                logger.info("Changing Slide to: " + myPresentation.getCurrentSlide().getSlideID());
+                mainUI.setCenter(myPresentation.getCurrentSlide());
             }
         });
 
-        mainUI.setBottom(addStatBar(myPresentationElement));
+        mainUI.setBottom(addStatBar(myPresentation));
     }
 
     public HBox addHBox(Stage primaryStage) {
