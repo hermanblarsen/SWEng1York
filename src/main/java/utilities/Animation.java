@@ -56,7 +56,7 @@ public class Animation {
                 Timeline timeline = new Timeline(new KeyFrame(
                         Duration.millis(250),
                         ae -> getCoreNodeToAnimate().setTranslateY(getCoreNodeToAnimate().getTranslateY() + 1)));
-                timeline.setCycleCount(javafx.animation.Animation.INDEFINITE);
+                timeline.setCycleCount(30);
                 timeline.play();
                 break;
         }

@@ -99,7 +99,7 @@ public class ParserXMLTest {
         assertEquals(1.2, ((TextElement) mySlideElementArray1.get(0)).getElementAspectRatio(), ERROR_MARGIN);
 
         assertNotNull(mySlideElementArray2.get(1));
-        assert(mySlideElementArray2.get(1) instanceof GraphicElement);
+        assert(mySlideElementArray2.get(1) instanceof AudioElement);
 //        System.out.println(mySlideElementArray2.get(0).getClass().toString());
 //        System.out.println(((AudioElement)mySlideElementArray2.get(0)).getElementID());
     }

@@ -1,15 +1,10 @@
 package dashboard;
 
-import javafx.animation.Animation;
-import javafx.animation.KeyFrame;
-import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
-import javafx.geometry.Rectangle2D;
-import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
@@ -17,17 +12,7 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
-import javafx.stage.Screen;
 import javafx.stage.Stage;
-import javafx.scene.media.Media;
-import javafx.scene.media.MediaPlayer;
-import javafx.scene.media.MediaView;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
-import javafx.util.Duration;
-
-
 import org.kordamp.bootstrapfx.scene.layout.Panel;
 import utilities.*;
 
@@ -37,6 +22,8 @@ import java.util.ArrayList;
  * Created by amriksadhra on 24/01/2017.
  */
 public class Dashboard extends Application {
+    Scene scene;
+
     public static void main(String[] args) {
         launch(args);
     }
@@ -47,7 +34,7 @@ public class Dashboard extends Application {
         primaryStage.setTitle("I^2LP");
 
         BorderPane border = new BorderPane();
-        Scene scene = new Scene(border, 1000, 600);
+        scene = new Scene(border, 1000, 600);
         scene.getStylesheets().add("bootstrapfx.css");
         primaryStage.setScene(scene);
 
@@ -65,11 +52,16 @@ public class Dashboard extends Application {
     }
 
     private void loadPresentation(BorderPane mainUI){
-        Pane myPresentationElement = addPresentationElement();
-
-
-        mainUI.setBottom(addStatBar(myPresentationElement));
-        mainUI.setCenter(myPresentationElement);
+        Presentation myPresentationElement = addPresentationElement();
+        scene.setOnKeyPressed(ke -> {
+            if (ke.getCode().equals(KeyCode.RIGHT)) {
+                myPresentationElement.getCurrentSlide().advance();
+            } else if (ke.getCode().equals(KeyCode.LEFT)){
+                myPresentationElement .getCurrentSlide().retard();
+            }
+        });
+        //mainUI.setBottom(addStatBar(myPresentationElement));
+        mainUI.setCenter(myPresentationElement.getCurrentSlide());
     }
 
     public HBox addHBox(Stage primaryStage) {
@@ -163,7 +155,7 @@ public class Dashboard extends Application {
         return vbox;
     }
 
-    public StackPane addPresentationElement() {
+    public Presentation addPresentationElement() {
         ArrayList<Slide> slides = new ArrayList<>();
 
         Slide slide1 = new Slide();
@@ -176,16 +168,16 @@ public class Dashboard extends Application {
         //Create a test Text element, add some text and pop it onto our stack pane. This code will all be driven from XML parser
         TextElement myTextElement = new TextElement();
         myTextElement.setLayer(0);
-        myTextElement.setStartSequence(0);
-        myTextElement.setEndSequence(1);
+        myTextElement.setStartSequence(1);
+        myTextElement.setEndSequence(2);
         myTextElement.setTextContent("<h1 style='background : rgba(0,0,0,0);'><b><font color=\"red\">IILP </font><font color=\"blue\">HTML</font> <font color=\"green\">Support Test</font></b></h1>");
         myTextElement.setSlideCanvas(slide1);
         slideElements.add(myTextElement);
 
         GraphicElement myGraphicElement = new GraphicElement();
         myGraphicElement.setLayer(1);
-        myGraphicElement.setStartSequence(1);
-        myGraphicElement.setEndSequence(2);
+        myGraphicElement.setStartSequence(3);
+        myGraphicElement.setEndSequence(4);
         myGraphicElement.setSlideCanvas(slide1);
         slideElements.add(myGraphicElement);
 
@@ -200,8 +192,8 @@ public class Dashboard extends Application {
         //Create a test Text element, add some text and pop it onto our stack pane. This code will all be driven from XML parser
         TextElement myTextElement1 = new TextElement();
         myTextElement1.setLayer(2);
-        myTextElement1.setStartSequence(2);
-        myTextElement1.setStartSequence(3);
+        myTextElement1.setStartSequence(5);
+        myTextElement1.setEndSequence(6);
         myTextElement1.setTextContent("<b>Poop</b>");
         myTextElement1.setSlideCanvas(slide1);
         slideElements.add(myTextElement1);
@@ -210,9 +202,8 @@ public class Dashboard extends Application {
 
         Presentation myPresentation = new Presentation();
         myPresentation.setSlideList(slides);
-        myPresentation.start();
 
-        return slide1;
+        return myPresentation;
     }
 
 

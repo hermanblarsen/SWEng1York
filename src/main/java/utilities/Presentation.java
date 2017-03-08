@@ -1,6 +1,9 @@
 package utilities;
 
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.Pane;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -16,16 +19,21 @@ public class Presentation extends Pane {
     private String description;
     private String tags;
     private Theme theme;
+
+    private int currentSlideNumber = 0;
+    private int maxSlideNumber;
+    private Slide currentSlide;
     private boolean autoplayMedia;
 
     private int groupFormat;
+    Logger logger = LoggerFactory.getLogger(Presentation.class);
 
     private List<Slide> slideList;
 
 
-    public Presentation () {
+    public Presentation() {
         slideList = new ArrayList<Slide>();
-        this.theme = new Theme ();
+        this.theme = new Theme();
     }
 
     public void addSlide(int slideIndex, Slide newSlide) {
@@ -39,6 +47,7 @@ public class Presentation extends Pane {
     public void deleteSlideIndex(int slideIndex) {
 
     }
+
     public void deleteSlideID(int slideID) {
 
     }
@@ -113,6 +122,8 @@ public class Presentation extends Pane {
 
     public void setSlideList(List<Slide> slideList) {
         this.slideList = slideList;
+        maxSlideNumber = slideList.size();
+        if(slideList.size() > 0) currentSlide = slideList.get(0); //Set First Slide
     }
 
     public String getDescription() {
@@ -123,13 +134,26 @@ public class Presentation extends Pane {
         this.description = description;
     }
 
+    public Slide getCurrentSlide() {
+        return slideList.get(currentSlideNumber);
+    }
+
     /**
      * Start the animation sequence for Presentation
+     *
      * @author Amrik Sadhra
      */
     public void start() {
-        for(Slide slide : slideList){
 
+    }
+
+    public Slide advance() {
+        if (currentSlideNumber != maxSlideNumber) {
+            currentSlideNumber++;
+        } else {
+            logger.info("Reached end of Presentation. No more Slides in Presentation ArrayList");
         }
+
+        return currentSlide = slideList.get(currentSlideNumber);
     }
 }

@@ -62,12 +62,6 @@ public class GraphicElement extends SlideElement {
     void doClassSpecificRender() {
         //TODO: Refresh canvas. Unsure if this deos this.
         wrapperCanvas.requestLayout();
-    }
-
-    @Override
-    public void renderElement(int animationType) {
-        //TODO: Trigger redraw of Canvas. Unsure if this achieves this.
-        wrapperCanvas.requestLayout();
 
         //Draw Polygons in here
         final GraphicsContext gc = internalCanvas.getGraphicsContext2D();

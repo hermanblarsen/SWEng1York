@@ -28,7 +28,6 @@ public class TextElement extends SlideElement {
     protected boolean aspectRatioLock;
     protected float elementAspectRatio;
 
-
     protected WebView browser;
     protected WebEngine webEngine;
 

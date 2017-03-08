@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
  * Created by habl on 23/02/2017.
  */
 public abstract class SlideElement {
-    Logger logger = LoggerFactory.getLogger(SlideElement.class);
+    Logger logger = LoggerFactory.getLogger(getClass());
 
     protected float duration;
     protected int elementID;
@@ -23,10 +23,26 @@ public abstract class SlideElement {
     protected Pane slideCanvas;
     Animation startAnimation, endAnimation;
 
+    boolean onCanvas = false;
+
     abstract void doClassSpecificRender();
 
     //Empty interface for tagging our actual slide elements
     void renderElement(int animationType) {
+        //Added to the canvas at render time, as otherwise negates use of VisibleSet
+        //If we bind to canvas, the element is always visible. Ignoring the sequencing and anims.
+        //Add CoreNode to the Pane
+        if (getCoreNode() == null) {
+            logger.error("Tried to set slide internalCanvas before Element constructor was called!");
+        } else {
+            //Ensure we only add an element to the Canvas once.
+            if(!onCanvas) {
+                onCanvas = true;
+                //Elements should all be invisible by default
+                slideCanvas.getChildren().add(getCoreNode());
+            }
+        }
+
         doClassSpecificRender();
 
         if (!(this instanceof AudioElement)) {
@@ -58,13 +74,6 @@ public abstract class SlideElement {
     public void setSlideCanvas(Pane slideCanvas) {
         this.slideCanvas = slideCanvas;
         setupElement();
-
-        //Add CoreNode to the Pane
-        if (getCoreNode() == null) {
-            logger.error("Tried to set slide internalCanvas before Element constructor was called!");
-        } else {
-            slideCanvas.getChildren().add(getCoreNode());
-        }
     }
 
     public float getDuration() {
@@ -87,6 +96,10 @@ public abstract class SlideElement {
         return endSequence;
     }
 
+    public void removeElement(){
+        getCoreNode().setVisible(false);
+    }
+
     public void setEndSequence(int endSequence) {
         this.endSequence = endSequence;
     }
@@ -97,6 +110,8 @@ public abstract class SlideElement {
 
     public void setVisibility(boolean visibility) {
         this.visibility = visibility;
+        /*if(visibility) getCoreNode().setOpacity(0);
+        else getCoreNode().setOpacity(1);*/
     }
 
     public int getLayer() {
