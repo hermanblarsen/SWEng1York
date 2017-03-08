@@ -10,27 +10,27 @@ import static org.junit.Assert.*;
  */
 public class AudioRendererTest {
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
 
     }
 
     @Test
-    public void pause() throws Exception {
+    public void pause()  {
 
     }
 
     @Test
-    public void stop() throws Exception {
+    public void stop(){
 
     }
 
     @Test
-    public void togglePlaying() throws Exception {
+    public void togglePlaying() {
 
     }
 
     @Test
-    public void goToStart() throws Exception {
+    public void goToStart() {
 
     }
 

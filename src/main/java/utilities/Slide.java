@@ -20,9 +20,11 @@ public class Slide extends StackPane {
 
     protected List<SlideElement> slideElementList;
     protected List<SlideElement> visibleSlideElementList;
-    protected List<TextElement> textElementList = new ArrayList<>();
-    protected List<GraphicElement> graphicElementList = new ArrayList<>();
-    protected List<VideoElement> videoElementList = new ArrayList<>();
+    protected List<TextElement> textElementList = new ArrayList<TextElement>();
+    protected List<GraphicElement> graphicElementList = new ArrayList<GraphicElement>();
+    protected List<ImageElement> imageElementList = new ArrayList<ImageElement>();
+    protected List<VideoElement> videoElementList = new ArrayList<VideoElement>();
+    protected List<AudioElement> audioElementList = new ArrayList<AudioElement>();
 
     private static final int START_SEARCH = 0;
     private static final int END_SEARCH = 1;
@@ -30,7 +32,7 @@ public class Slide extends StackPane {
     protected int slideID;
 
     //Current Sequence number on slide
-    int currentSequence = 0;
+    int currentSequence = 0; //TODO is this something that should be in slide or in a presentation manager? -Herman
     int maxSequenceNumber;
 
     public Slide() {
@@ -67,17 +69,23 @@ public class Slide extends StackPane {
 
     public void setSlideElementList(List<SlideElement> slideElementList) {
         this.slideElementList = slideElementList;
+
+        //Add slideElements to specific arraylists
+        for (SlideElement slideElement : slideElementList) {
+            if (slideElement instanceof TextElement) textElementList.add((TextElement) slideElement);
+            if (slideElement instanceof GraphicElement) graphicElementList.add((GraphicElement) slideElement);
+            if (slideElement instanceof ImageElement) imageElementList.add((ImageElement) slideElement);
+            if (slideElement instanceof VideoElement) videoElementList.add((VideoElement) slideElement);
+            if (slideElement instanceof AudioElement) audioElementList.add((AudioElement) slideElement);
+        }
+        //sortSlideElementsBySequence();
+    }
+
+    private void sortSlideElementsBySequence() {
         //Sort by Sequence
         sortElementsByStartSequence(slideElementList);
         //Set Max Sequence number
         maxSequenceNumber = getMaxSequenceNumber(slideElementList);
-
-        //Create specific arraylists
-        for (SlideElement slideElement : slideElementList) {
-            if (slideElement instanceof TextElement) textElementList.add((TextElement) slideElement);
-            if (slideElement instanceof GraphicElement) graphicElementList.add((GraphicElement) slideElement);
-            if (slideElement instanceof VideoElement) videoElementList.add((VideoElement) slideElement);
-        }
     }
 
     private int getMaxSequenceNumber(List<SlideElement> slideElementList) {
@@ -109,17 +117,17 @@ public class Slide extends StackPane {
     }
 
     public void advance() {
-        SlideElement checkInVisibleSet;
+        SlideElement visibleElement;
         //If we're going forwards and still elements left. If we're going backwards but not at element 0
         if (currentSequence < maxSequenceNumber) {
             currentSequence++;
             //Search for element with matching start sequence or end sequence in visible set. If they're not in there, add them.
             try {
-                if (!(visibleSlideElementList.contains(checkInVisibleSet = searchForSequenceElement(slideElementList, currentSequence, START_SEARCH)))) {
-                    visibleSlideElementList.add(checkInVisibleSet);
+                if (!(visibleSlideElementList.contains(visibleElement = searchForSequenceElement(slideElementList, currentSequence, START_SEARCH)))) {
+                    visibleSlideElementList.add(visibleElement);
                 }
-                if (!(visibleSlideElementList.contains(checkInVisibleSet = searchForSequenceElement(slideElementList, currentSequence, END_SEARCH)))) {
-                    visibleSlideElementList.add(checkInVisibleSet);
+                if (!(visibleSlideElementList.contains(visibleElement = searchForSequenceElement(slideElementList, currentSequence, END_SEARCH)))) {
+                    visibleSlideElementList.add(visibleElement);
                 }
             } catch (SequenceNotFoundException e) {
                 logger.error("Failed to find Element with Sequence number of " + currentSequence + " in slideElementList. XML invalid.");
@@ -204,5 +212,45 @@ public class Slide extends StackPane {
 
         //We should never hit this. Satisfy JVM.
         return null;
+    }
+
+    public List<TextElement> getTextElementList() {
+        return textElementList;
+    }
+
+    public void setTextElementList(List<TextElement> textElementList) {
+        this.textElementList = textElementList;
+    }
+
+    public List<GraphicElement> getGraphicElementList() {
+        return graphicElementList;
+    }
+
+    public void setGraphicElementList(List<GraphicElement> graphicElementList) {
+        this.graphicElementList = graphicElementList;
+    }
+
+    public List<ImageElement> getImageElementList() {
+        return imageElementList;
+    }
+
+    public void setImageElementList(List<ImageElement> imageElementList) {
+        this.imageElementList = imageElementList;
+    }
+
+    public List<VideoElement> getVideoElementList() {
+        return videoElementList;
+    }
+
+    public void setVideoElementList(List<VideoElement> videoElementList) {
+        this.videoElementList = videoElementList;
+    }
+
+    public List<AudioElement> getAudioElementList() {
+        return audioElementList;
+    }
+
+    public void setAudioElementList(List<AudioElement> audioElementList) {
+        this.audioElementList = audioElementList;
     }
 }
