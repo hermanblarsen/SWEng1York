@@ -7,12 +7,14 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.*;
+import javafx.scene.media.MediaPlayer;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 import org.kordamp.bootstrapfx.scene.layout.Panel;
 import utilities.*;
 
@@ -185,13 +187,22 @@ public class Dashboard extends Application {
         myGraphicElement.setSlideCanvas(slide1);
         slideElements.add(myGraphicElement);
 
-//        VideoElement myVideoElement = new VideoElement();
-//        myVideoElement.setMediaPath("http://download.oracle.com/otndocs/products/javafx/oow2010-2.flv");
-//        myVideoElement.setAutoPlay(true);
-//        myVideoElement.setMediaControl(true);
-//        myVideoElement.setLoop(true);
-//        myVideoElement.setSlideCanvas(slide1);
-//        slideElements.add(myVideoElement);
+        VideoElement myVideoElement = new VideoElement();
+        myVideoElement.setMediaPath("http://download.oracle.com/otndocs/products/javafx/oow2010-2.flv");
+        myVideoElement.setAutoPlay(true);
+        myVideoElement.setMediaControl(true);
+        myVideoElement.setLoop(false);
+        myVideoElement.setVideoStartTime(Duration.seconds(5));
+        myVideoElement.setVideoEndTime(Duration.seconds(7));
+        myVideoElement.setAspectRatioLock(true);
+        myVideoElement.setxPosition(200);
+        myVideoElement.setyPosition(200);
+        myVideoElement.setxSize(2000);
+        myVideoElement.setySize(2000);
+        myVideoElement.setSlideCanvas(slide1);
+        slideElements.add(myVideoElement);
+
+
 
         //Create a test Text element, add some text and pop it onto our stack pane. This code will all be driven from XML parser
         TextElement myTextElement1 = new TextElement();

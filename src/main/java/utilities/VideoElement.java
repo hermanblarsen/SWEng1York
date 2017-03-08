@@ -74,6 +74,17 @@ public class VideoElement extends SlideElement{
         mp = new MediaPlayer(media);
         mv.setMediaPlayer(mp);
 
+        mp.setStartTime(startTime);
+        mp.setStopTime(endTime);
+        mv.setPreserveRatio(aspectRatioLock);
+        mv.setTranslateX(xPosition);
+        mv.setTranslateY(yPosition);
+        mv.setFitHeight(ySize);
+        mv.setFitWidth(xSize);
+
+
+
+
         if(mediaControl == true) {
             mediaPane.setBottom(mediaControl());
         }
@@ -135,14 +146,33 @@ public class VideoElement extends SlideElement{
     }
     public boolean getAutoPlay() {return autoplay;}
 
+    public void setVideoStartTime(Duration startTime) {
+        this.startTime = startTime;
+
+    }
+    public Duration getVideoStartTime(){return startTime;}
+
+    public void setVideoEndTime(Duration endTime) {
+        this.endTime = endTime;
+
+    }
+    public Duration getVideoEndTime(){return endTime;}
+
+    public Duration getStartTime() {
+        return startTime;
+    }
+
     public void setStartTime(Duration startTime) {
         this.startTime = startTime;
     }
-    public Duration getStartTime(){return startTime;}
 
-    public void setEndTime(Duration endTime) {this.startTime = endTime;}
-    public Duration getEndTime(){return endTime;}
+    public Duration getEndTime() {
+        return endTime;
+    }
 
+    public void setEndTime(Duration endTime) {
+        this.endTime = endTime;
+    }
 
     public void setxPosition(float xPosition){
         this.xPosition = xPosition;
@@ -159,22 +189,6 @@ public class VideoElement extends SlideElement{
 
     public void setySize(float ySize){this.ySize = ySize;}
     public float getySize() {return ySize;}
-
-    public String getOnClickAction() {
-        return onClickAction;
-    }
-
-    public void setOnClickAction(String onClickAction) {
-        this.onClickAction = onClickAction;
-    }
-
-    public String getOnClickInfo() {
-        return onClickInfo;
-    }
-
-    public void setOnClickInfo(String onClickInfo) {
-        this.onClickInfo = onClickInfo;
-    }
 
     public boolean isLoop() {
         return loop;
@@ -198,7 +212,7 @@ public class VideoElement extends SlideElement{
 
     public void setElementAspectRatio(float elementAspectRatio) {
         this.elementAspectRatio = elementAspectRatio;
-    }
+    }//TODO: MAKE THIS DO SOMETHING
 
     public boolean isMediaControl() {
         return mediaControl;
@@ -206,6 +220,38 @@ public class VideoElement extends SlideElement{
 
     public void setMediaControl(boolean mediaControl) {
         this.mediaControl = mediaControl;
+    }
+
+    public String getPath() {
+        return path;
+    }
+
+    public void setPath(String path) {
+        this.path = path;
+    }
+
+    public boolean isAutoplay() {
+        return autoplay;
+    }
+
+    public void setAutoplay(boolean autoplay) {
+        this.autoplay = autoplay;
+    }
+
+    public MediaPlayer.Status getVideoStatus(){
+        return mp.getStatus();
+    }
+
+    public void playVideo(){
+        mp.play();
+    }
+
+    public void pauseVideo(){
+        mp.pause();
+    }
+
+    public void stopVideo(){
+        mp.stop();
     }
 
     private HBox mediaControl() {
@@ -314,19 +360,5 @@ public class VideoElement extends SlideElement{
     }
 
 
-    public String getPath() {
-        return path;
-    }
 
-    public void setPath(String path) {
-        this.path = path;
-    }
-
-    public boolean isAutoplay() {
-        return autoplay;
-    }
-
-    public void setAutoplay(boolean autoplay) {
-        this.autoplay = autoplay;
-    }
 }
