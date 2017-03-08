@@ -9,6 +9,6 @@ import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
 @SuiteClasses({ utilities.ParserXMLTest.class})
-public class AllTest {
+public class AllTests {
 
 }
