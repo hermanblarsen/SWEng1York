@@ -74,6 +74,7 @@ public abstract class SlideElement {
 
     public void setSlideCanvas(Pane slideCanvas) {
         this.slideCanvas = slideCanvas;
+        setupElement();
     }
 
     public float getDuration() {

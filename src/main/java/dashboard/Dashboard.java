@@ -56,15 +56,14 @@ public class Dashboard extends Application {
         primaryStage.show();
 
         //TEST
-        //loadPresentation(border, "shit");
+        loadPresentation(border, "shit");
     }
 
     private void loadPresentation(BorderPane mainUI, String path) {
-        ParserXML readPresentationParser = new ParserXML(path);
+        //ParserXML readPresentationParser = new ParserXML(path);
 
-
-        //myPresentationElement = generateTestPresentation();     //TEST
-        myPresentationElement = readPresentationParser.parsePresentation();
+        myPresentationElement = generateTestPresentation();     //TEST
+        //myPresentationElement = readPresentationParser.parsePresentation();
         mainUI.setCenter(myPresentationElement.getCurrentSlide());
         mainUI.setBottom(addStatBar(myPresentationElement.getCurrentSlide()));
 
