@@ -143,9 +143,6 @@ public class VideoElement extends SlideElement {
     }
     public Duration getVideoEndTime(){return endTime;}
 
-    public Duration getStartTime() {
-        return startTime;
-    }
 
     public void setStartTime(Duration startTime) {
         this.startTime = startTime;
@@ -153,10 +150,6 @@ public class VideoElement extends SlideElement {
 
     public Duration getStartTime() {
         return startTime;
-    }
-
-    public void setEndTime(Duration endTime) {
-        this.startTime = endTime;
     }
 
     public Duration getEndTime() {

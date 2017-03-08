@@ -20,6 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import utilities.*;
 
+import java.io.File;
 import java.util.ArrayList;
 
 /**
@@ -208,7 +209,7 @@ public class Dashboard extends Application {
         myGraphicElement.setSlideCanvas(slide1);
         slideElementsSlide1.add(myGraphicElement);
 
-        VideoElement myVideoElement = new VideoElement();
+        /*VideoElement myVideoElement = new VideoElement();
         myVideoElement.setMediaPath("http://download.oracle.com/otndocs/products/javafx/oow2010-2.flv");
         myVideoElement.setAutoPlay(true);
         myVideoElement.setMediaControl(true);
@@ -220,11 +221,12 @@ public class Dashboard extends Application {
         myVideoElement.setyPosition(200);
         myVideoElement.setxSize(2000);
         myVideoElement.setySize(2000);
+        myVideoElement.setLayer(2);
+        myVideoElement.setStartSequence(5);
+        myVideoElement.setEndSequence(6);
         myVideoElement.setSlideCanvas(slide1);
-        slideElementsSlide1.add(myVideoElement);
-
-
-        //Create a test Text element, add some text and pop it onto our stack pane. This code will all be driven from XML parser
+        slideElementsSlide1.add(myVideoElement);*/
+        
         TextElement myTextElement1 = new TextElement();
         myTextElement1.setLayer(3);
         myTextElement1.setStartSequence(7);
