@@ -30,6 +30,7 @@ import java.util.ArrayList;
 public class Dashboard extends Application {
     Scene scene;
     BorderPane border;
+    Presentation myPresentationElement;
     Logger logger = LoggerFactory.getLogger(Dashboard.class);
 
     public static void main(String[] args) {
@@ -49,42 +50,47 @@ public class Dashboard extends Application {
         border.setTop(addHBox(primaryStage));
         border.setLeft(addVBox());
 
-
         border.setCenter(new StackPane());
         border.setRight(addFlowPane());
 
         primaryStage.show();
 
         //TEST
-        loadPresentation(border, "shit");
+        //loadPresentation(border, "shit");
     }
 
     private void loadPresentation(BorderPane mainUI, String path) {
-        //ParserXML readPresentationParser = new ParserXML(path);
+        ParserXML readPresentationParser = new ParserXML(path);
 
-        //TEST
-        Presentation myPresentationElement = generateTestPresentation();
+
+        //myPresentationElement = generateTestPresentation();     //TEST
+        myPresentationElement = readPresentationParser.parsePresentation();
         mainUI.setCenter(myPresentationElement.getCurrentSlide());
+        mainUI.setBottom(addStatBar(myPresentationElement.getCurrentSlide()));
 
-        //Presentation myPresentationElement = readPresentationParser.parsePresentation();
 
         //Keyboard listener for moving through presentation
         scene.setOnKeyPressed(ke -> {
             int presentationStatus = 0;
             if (ke.getCode().equals(KeyCode.RIGHT)) {
-                presentationStatus = myPresentationElement.advance(Slide.SLIDE_FORWARD);
+                controlPresentation(Slide.SLIDE_FORWARD);
             } else if (ke.getCode().equals(KeyCode.LEFT)) {
-                presentationStatus = myPresentationElement.advance(Slide.SLIDE_BACKWARD);
-            }
-            //If Presentation handler told us that slide is changing, update the Slide present on Main screen
-            //Can do specific things when presentation reached end, or start.
-            if ((presentationStatus == Presentation.SLIDE_CHANGE) || (presentationStatus == Presentation.PRESENTATION_FINISH) || (presentationStatus == Presentation.PRESENTATION_START)) {
-                logger.info("Changing Slides");
-                mainUI.setCenter(myPresentationElement.getCurrentSlide());
+                controlPresentation(Slide.SLIDE_BACKWARD);
             }
         });
+    }
 
-        mainUI.setBottom(addStatBar(myPresentationElement));
+    private void controlPresentation(int direction) {
+        int presentationStatus = myPresentationElement.advance(direction);
+
+        //If Presentation handler told us that slide is changing, update the Slide present on Main screen
+        //Can do specific things when presentation reached end, or start.
+        if ((presentationStatus == Presentation.SLIDE_CHANGE) || (presentationStatus == Presentation.PRESENTATION_FINISH) || (presentationStatus == Presentation.PRESENTATION_START)) {
+            logger.info("Changing Slides");
+            //Update MainUI panes when changing slides to account for new Slide root pane.
+            border.setCenter(myPresentationElement.getCurrentSlide());
+            border.setBottom(addStatBar(myPresentationElement.getCurrentSlide()));
+        }
     }
 
     public HBox addHBox(Stage primaryStage) {
@@ -124,61 +130,42 @@ public class Dashboard extends Application {
         vbox.setSpacing(8);
 
         //Generate flexible flowplane to store shape buttons
-        FlowPane shapesPane = new FlowPane();
-        shapesPane.setPadding(new Insets(5, 0, 5, 0));
-        shapesPane.setVgap(4);
-        shapesPane.setHgap(4);
-        shapesPane.setPrefWrapLength(180); // preferred width allows for two columns
-        shapesPane.setStyle("-fx-background-color: #ffffff;");
+        FlowPane controlsPane = new FlowPane();
+        controlsPane.setPadding(new Insets(5, 0, 5, 0));
+        controlsPane.setVgap(4);
+        controlsPane.setHgap(4);
+        controlsPane.setPrefWrapLength(180); // preferred width allows for two columns
+        controlsPane.setStyle("-fx-background-color: #ffffff;");
 
         //Buttons for shapePane
-        Button triButton = new Button("Triangle");
-        triButton.getStyleClass().setAll("btn", "btn-success");
-        shapesPane.getChildren().add(triButton);
-        Button squareButton = new Button("Square");
-        squareButton.getStyleClass().setAll("btn", "btn-warning");
-        shapesPane.getChildren().add(squareButton);
-        Button circButton = new Button("Circle");
-        circButton.getStyleClass().setAll("btn", "btn-info");
-        shapesPane.getChildren().add(circButton);
-        Button starButton = new Button("Star");
-        starButton.getStyleClass().setAll("btn", "btn-danger");
-        shapesPane.getChildren().add(starButton);
+        Button backButton = new Button("Back");
+        backButton.getStyleClass().setAll("btn", "btn-success");
+        backButton.setOnAction(event ->{
+            //TODO: Lock these so they only function once presentation loaded
+            controlPresentation(Slide.SLIDE_FORWARD);
+        });
+        controlsPane.getChildren().add(backButton);
+        Button forwardsButton = new Button("Forwards");
+        forwardsButton.getStyleClass().setAll("btn", "btn-warning");
+        forwardsButton.setOnAction(event ->{
+            //TODO: Lock these so they only function once presentation loaded
+            controlPresentation(Slide.SLIDE_BACKWARD);
+        });
+        controlsPane.getChildren().add(forwardsButton);
+        Button fillButton1 = new Button("Filler");
+        fillButton1.getStyleClass().setAll("btn", "btn-info");
+        controlsPane.getChildren().add(fillButton1);
+        Button fillButton2 = new Button("Filler");
+        fillButton2.getStyleClass().setAll("btn", "btn-danger");
+        controlsPane.getChildren().add(fillButton2);
 
         //Create Panel for shapes
-        Panel shapes = new Panel();
-        shapes.setText("Shapes");
-        shapes.getStyleClass().add("panel-primary");
-        shapes.setBody(shapesPane);
-        VBox.setMargin(shapes, new Insets(0, 0, 0, 0));
-        vbox.getChildren().add(shapes);
-
-        //Generate flexible flowplane to store text buttons
-        FlowPane textPane = new FlowPane();
-        textPane.setPadding(new Insets(5, 0, 5, 0));
-        textPane.setVgap(4);
-        textPane.setHgap(4);
-        textPane.setPrefWrapLength(180); // preferred width allows for two columns
-        textPane.setStyle("-fx-background-color: #ffffff;");
-
-        //Buttons for textPane
-        Button boldButton = new Button("Bold");
-        boldButton.getStyleClass().setAll("btn", "btn-default");
-        textPane.getChildren().add(boldButton);
-        Button italButton = new Button("Itallic");
-        italButton.getStyleClass().setAll("btn", "btn-default");
-        textPane.getChildren().add(italButton);
-        Button underButton = new Button("Underline");
-        underButton.getStyleClass().setAll("btn", "btn-default");
-        textPane.getChildren().add(underButton);
-
-        //Create panel for text controls
-        Panel text = new Panel();
-        text.setText("Text");
-        text.getStyleClass().add("panel-default");
-        text.setBody(textPane);
-        VBox.setMargin(text, new Insets(0, 0, 0, 0));
-        vbox.getChildren().add(text);
+        Panel slideControls = new Panel();
+        slideControls.setText("Slide Controls");
+        slideControls.getStyleClass().add("panel-primary");
+        slideControls.setBody(controlsPane);
+        VBox.setMargin(slideControls, new Insets(0, 0, 0, 0));
+        vbox.getChildren().add(slideControls);
 
         return vbox;
     }
@@ -226,7 +213,7 @@ public class Dashboard extends Application {
         myVideoElement.setEndSequence(6);
         myVideoElement.setSlideCanvas(slide1);
         slideElementsSlide1.add(myVideoElement);*/
-        
+
         TextElement myTextElement1 = new TextElement();
         myTextElement1.setLayer(3);
         myTextElement1.setStartSequence(7);
@@ -238,7 +225,7 @@ public class Dashboard extends Application {
         slide1.setSlideElementList(slideElementsSlide1);
 
         Slide slide2 = new Slide();
-        slide1.setSlideID(2);
+        slide2.setSlideID(2);
         slides.add(slide2);
 
         //Create some test Slide Elements
@@ -291,7 +278,7 @@ public class Dashboard extends Application {
         return scroll;
     }
 
-    public HBox addStatBar(Pane presentationElement) {
+    public HBox addStatBar(Slide presentationElement) {
         HBox hbox = new HBox();
         hbox.setPadding(new Insets(0, 12, 0, 12));
         hbox.setSpacing(2);
@@ -313,12 +300,13 @@ public class Dashboard extends Application {
 
         border.setRight(coordTextBar);
 
+        //TODO: This stops working when WebView enters Slide
         presentationElement.setOnMouseMoved(event -> coordTextBar.setText(
-                "(x: " + event.getX() + ", y: " + event.getY() + ") -- " +
+                "Slide Number: " + presentationElement.getSlideID() + " (x: " + event.getX() + ", y: " + event.getY() + ") -- " +
                         "(sceneX: " + event.getSceneX() + ", sceneY: " + event.getSceneY() + ") -- " +
                         "(screenX: " + event.getScreenX() + ", screenY: " + event.getScreenY() + ")"));
 
-        presentationElement.setOnMouseExited(event -> coordTextBar.setText("Mouse Exited"));
+        presentationElement.setOnMouseExited(event -> coordTextBar.setText("Slide Number: " + presentationElement.getSlideID() + " Mouse Exited"));
 
         hbox.getChildren().addAll(border);
 

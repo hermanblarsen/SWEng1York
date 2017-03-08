@@ -204,7 +204,7 @@ public class ParserXML {
 
             if (slideNode.getAttributes().getLength() != 0) {
                 String attributeName = slideNode.getAttributes().item(0).getNodeName();
-                //TODO: Should this be a proper string comparison using .equals("slideid")? - Amrik
+                //TODO: Should this be a proper string comparison using .equals("s
                 if (attributeName == "slideid") {
                     String attrContent = slideNode.getAttributes().item(0).getNodeValue();
                     int attrSlideID = Integer.valueOf(attrContent);

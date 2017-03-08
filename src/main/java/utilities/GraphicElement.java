@@ -36,30 +36,6 @@ public class GraphicElement extends SlideElement {
     }
 
     @Override
-    void setupElement() {
-        // Create a wrapper Pane first
-        wrapperCanvas = new Pane();
-
-        internalCanvas = new Canvas(wrapperCanvas.getWidth(), wrapperCanvas.getHeight());
-        wrapperCanvas.getChildren().add(internalCanvas);
-
-        // Bind the width/height property to the wrapper Pane
-        internalCanvas.widthProperty().bind(wrapperCanvas.widthProperty());
-        internalCanvas.heightProperty().bind(wrapperCanvas.heightProperty());
-        // redraw when resized
-        internalCanvas.widthProperty().addListener(event -> renderElement(0));
-        internalCanvas.heightProperty().addListener(event -> renderElement(0));
-
-        //TODO: Create Animations here, but move to setAnimation setter when XML implemented
-        startAnimation = new Animation();
-        startAnimation.setCoreNodeToAnimate(getCoreNode());
-        startAnimation.setAnimationType(Animation.SIMPLE_APPEAR);
-        endAnimation = new Animation();
-        endAnimation.setCoreNodeToAnimate(getCoreNode());
-        endAnimation.setAnimationType(Animation.SIMPLE_DISAPPEAR);
-    }
-
-    @Override
     void doClassSpecificRender() {
         //TODO: Refresh canvas. Unsure if this deos this.
         wrapperCanvas.requestLayout();
@@ -83,6 +59,30 @@ public class GraphicElement extends SlideElement {
     @Override
     public Node getCoreNode() {
         return wrapperCanvas;
+    }
+
+    @Override
+    void setupElement() {
+        // Create a wrapper Pane first
+        wrapperCanvas = new Pane();
+
+        internalCanvas = new Canvas(wrapperCanvas.getWidth(), wrapperCanvas.getHeight());
+        wrapperCanvas.getChildren().add(internalCanvas);
+
+        // Bind the width/height property to the wrapper Pane
+        internalCanvas.widthProperty().bind(wrapperCanvas.widthProperty());
+        internalCanvas.heightProperty().bind(wrapperCanvas.heightProperty());
+        // redraw when resized
+        internalCanvas.widthProperty().addListener(event -> renderElement(0));
+        internalCanvas.heightProperty().addListener(event -> renderElement(0));
+
+        //TODO: Create Animations here, but move to setAnimation setter when XML implemented
+        startAnimation = new Animation();
+        startAnimation.setCoreNodeToAnimate(getCoreNode());
+        startAnimation.setAnimationType(Animation.SIMPLE_APPEAR);
+        endAnimation = new Animation();
+        endAnimation.setCoreNodeToAnimate(getCoreNode());
+        endAnimation.setAnimationType(Animation.SIMPLE_DISAPPEAR);
     }
 
     public boolean isAspectRatioLock() {

@@ -1,0 +1,40 @@
+<document documentid="sampleinput">
+    <documentdetails>
+        <author>Joe Bloggs</author>
+        <version>1.0</version>
+        <documentaspectratio>1.78</documentaspectratio>
+        <description>Sample XML input</description>
+        <tags>sample,xml,input</tags>
+        <groupformat>2</groupformat>
+    </documentdetails>
+    <slideshow>
+        <defaults>
+            <bgcolour>#FF2304</bgcolour>
+            <font>Arial</font>
+            <fontsize>12</fontsize>
+            <fontcolour>#F00D33FF</fontcolour>
+            <graphicscolour>#F40D33FF</graphicscolour>
+            <autoplaymedia>true</autoplaymedia>
+        </defaults>
+        <slide slideid="1">
+            <text elementid ="1" layer="1" visibility="true" startsequence="1" endsequence="2" duration="20.5">
+                <textcontent>
+                    <html><h1 style='background : rgba(0,0,0,0);'><b><font color="red">IILP </font><font color="blue">HTML</font> <font color="green">Support Test</font></b></h1></html>
+                </textcontent>
+                <xposition>0.12</xposition>
+                <yposition>0.3</yposition>
+                <xsize>0.05</xsize>
+                <ysize>0.6</ysize>
+                <font>Comic Sans</font>
+                <fontsize>12</fontsize>
+                <fontcolour>#EEEEEEFF</fontcolour>
+                <bgcolour>#000000FF</bgcolour>
+                <bordercolour>#ABCDEFFF</bordercolour>
+                <onclickaction>openwebsite</onclickaction>
+                <onclickinfo>https://www.google.no/</onclickinfo>
+                <aspectratiolock>false</aspectratiolock>
+                <elementaspectratio>1.2</elementaspectratio>
+            </text>
+        </slide>
+    </slideshow>
+</document>
