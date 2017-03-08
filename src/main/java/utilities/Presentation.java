@@ -1,6 +1,6 @@
 package utilities;
 
-import javafx.scene.input.KeyCode;
+
 import javafx.scene.layout.Pane;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,6 +11,7 @@ import java.util.ArrayList;
 /**
  * Created by habl on 23/02/2017.
  */
+@SuppressWarnings({"WeakerAccess", "unused"})
 public class Presentation extends Pane {
     private String documentID;
     private String author;
@@ -27,12 +28,13 @@ public class Presentation extends Pane {
 
     private int groupFormat;
     Logger logger = LoggerFactory.getLogger(Presentation.class);
-
+    private static final int PRESENTATION_FINISH = 0;
+    private static final int PRESENTATION_START = 0;
     private List<Slide> slideList;
 
 
     public Presentation() {
-        slideList = new ArrayList<Slide>();
+        slideList = new ArrayList<>();
         this.theme = new Theme();
     }
 
@@ -123,7 +125,7 @@ public class Presentation extends Pane {
     public void setSlideList(List<Slide> slideList) {
         this.slideList = slideList;
         maxSlideNumber = slideList.size();
-        if(slideList.size() > 0) currentSlide = slideList.get(0); //Set First Slide
+        if (slideList.size() > 0) currentSlide = slideList.get(0); //Set First Slide
     }
 
     public String getDescription() {
@@ -138,22 +140,27 @@ public class Presentation extends Pane {
         return slideList.get(currentSlideNumber);
     }
 
-    /**
-     * Start the animation sequence for Presentation
-     *
-     * @author Amrik Sadhra
-     */
-    public void start() {
-
-    }
-
-    public Slide advance() {
-        if (currentSlideNumber != maxSlideNumber) {
-            currentSlideNumber++;
-        } else {
-            logger.info("Reached end of Presentation. No more Slides in Presentation ArrayList");
+    public int advance(int direction) {
+        if (direction == Slide.SLIDE_FORWARD) {
+            //If we're not at end of presentation
+            if (currentSlideNumber < maxSlideNumber) {
+                //If slide tells you to move forward to next slide, do it by changing to next slide in slide list.
+                if (currentSlide.advance(direction) == direction) {
+                    currentSlideNumber++;
+                    currentSlide = slideList.get(currentSlideNumber);
+                }
+            }
+        } else if (direction == Slide.SLIDE_BACKWARD) {
+            boolean isStart = false;
+            //If we're not at start of presentation
+            if (currentSlideNumber >= 0) {
+                //If slide tells you to move backward to prev slide, do it by changing to prev slide in slide list.
+                if (currentSlide.advance(direction) == direction) {
+                    currentSlideNumber--;
+                    currentSlide = slideList.get(currentSlideNumber);
+                }
+            }
         }
-
-        return currentSlide = slideList.get(currentSlideNumber);
+        return 0;
     }
 }

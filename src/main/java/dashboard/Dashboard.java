@@ -21,6 +21,7 @@ import java.util.ArrayList;
 /**
  * Created by amriksadhra on 24/01/2017.
  */
+@SuppressWarnings({"WeakerAccess", "unused"})
 public class Dashboard extends Application {
     Scene scene;
 
@@ -53,15 +54,18 @@ public class Dashboard extends Application {
 
     private void loadPresentation(BorderPane mainUI){
         Presentation myPresentationElement = addPresentationElement();
+
+        //Keyboard listener for moving through presentation
         scene.setOnKeyPressed(ke -> {
             if (ke.getCode().equals(KeyCode.RIGHT)) {
-                myPresentationElement.getCurrentSlide().advance();
+                myPresentationElement.advance(Slide.SLIDE_FORWARD);
             } else if (ke.getCode().equals(KeyCode.LEFT)){
-                myPresentationElement .getCurrentSlide().retard();
+                myPresentationElement.advance(Slide.SLIDE_BACKWARD);
             }
+            mainUI.setCenter(myPresentationElement.getCurrentSlide());
         });
+
         //mainUI.setBottom(addStatBar(myPresentationElement));
-        mainUI.setCenter(myPresentationElement.getCurrentSlide());
     }
 
     public HBox addHBox(Stage primaryStage) {

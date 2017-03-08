@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Created by habl on 23/02/2017.
  */
+@SuppressWarnings({"WeakerAccess", "unused"})
 public abstract class SlideElement {
     Logger logger = LoggerFactory.getLogger(getClass());
 

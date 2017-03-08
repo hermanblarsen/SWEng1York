@@ -4,12 +4,11 @@ import javafx.scene.Node;
 import javafx.scene.layout.Pane;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Created by habl on 26/02/2017.
  */
+@SuppressWarnings({"WeakerAccess", "unused"})
 public class TextElement extends SlideElement {
     protected String textContent;
     protected String textFilepath;

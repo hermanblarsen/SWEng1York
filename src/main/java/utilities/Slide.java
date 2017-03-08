@@ -1,33 +1,34 @@
 package utilities;
 
 import exceptions.SequenceNotFoundException;
-import javafx.scene.Node;
 import javafx.scene.layout.StackPane;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.xml.soap.Text;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 /**
  * Created by habl on 23/02/2017.
  */
+@SuppressWarnings({"WeakerAccess", "unused"})
 public class Slide extends StackPane {
     Logger logger = LoggerFactory.getLogger(Slide.class);
 
     protected List<SlideElement> slideElementList;
     protected List<SlideElement> visibleSlideElementList;
-    protected List<TextElement> textElementList = new ArrayList<TextElement>();
-    protected List<GraphicElement> graphicElementList = new ArrayList<GraphicElement>();
-    protected List<ImageElement> imageElementList = new ArrayList<ImageElement>();
-    protected List<VideoElement> videoElementList = new ArrayList<VideoElement>();
-    protected List<AudioElement> audioElementList = new ArrayList<AudioElement>();
+    protected List<TextElement> textElementList = new ArrayList<>();
+    protected List<GraphicElement> graphicElementList = new ArrayList<>();
+    protected List<ImageElement> imageElementList = new ArrayList<>();
+    protected List<VideoElement> videoElementList = new ArrayList<>();
+    protected List<AudioElement> audioElementList = new ArrayList<>();
 
     private static final int START_SEARCH = 0;
     private static final int END_SEARCH = 1;
+
+    public static final int SLIDE_NO_MOVE = 0;
+    public static final int SLIDE_FORWARD = 1;
+    public static final int SLIDE_BACKWARD = 2;
 
     protected int slideID;
 
@@ -69,6 +70,8 @@ public class Slide extends StackPane {
 
     public void setSlideElementList(List<SlideElement> slideElementList) {
         this.slideElementList = slideElementList;
+        //Set Max Sequence number
+        maxSequenceNumber = getMaxSequenceNumber(slideElementList);
 
         //Add slideElements to specific arraylists
         for (SlideElement slideElement : slideElementList) {
@@ -79,13 +82,6 @@ public class Slide extends StackPane {
             if (slideElement instanceof AudioElement) audioElementList.add((AudioElement) slideElement);
         }
         //sortSlideElementsBySequence();
-    }
-
-    private void sortSlideElementsBySequence() {
-        //Sort by Sequence
-        sortElementsByStartSequence(slideElementList);
-        //Set Max Sequence number
-        maxSequenceNumber = getMaxSequenceNumber(slideElementList);
     }
 
     private int getMaxSequenceNumber(List<SlideElement> slideElementList) {
@@ -112,57 +108,53 @@ public class Slide extends StackPane {
         this.slideID = slideID;
     }
 
-    public void retard(){
-        System.out.println("Lol");
-    }
-
-    public void advance() {
-        SlideElement visibleElement;
-        //If we're going forwards and still elements left. If we're going backwards but not at element 0
-        if (currentSequence < maxSequenceNumber) {
+    public int advance(int direction) {
+        //If we're going forwards and not through all sequences in slide set
+        if ((currentSequence < maxSequenceNumber) && (direction == SLIDE_FORWARD)) {
             currentSequence++;
             //Search for element with matching start sequence or end sequence in visible set. If they're not in there, add them.
             try {
-                if (!(visibleSlideElementList.contains(visibleElement = searchForSequenceElement(slideElementList, currentSequence, START_SEARCH)))) {
-                    visibleSlideElementList.add(visibleElement);
+                SlideElement checkInVisibleSet;
+                if (!(visibleSlideElementList.contains(checkInVisibleSet = searchForSequenceElement(slideElementList, currentSequence, START_SEARCH)))) {
+                    visibleSlideElementList.add(checkInVisibleSet);
                 }
-                if (!(visibleSlideElementList.contains(visibleElement = searchForSequenceElement(slideElementList, currentSequence, END_SEARCH)))) {
-                    visibleSlideElementList.add(visibleElement);
+                if (!(visibleSlideElementList.contains(checkInVisibleSet = searchForSequenceElement(slideElementList, currentSequence, END_SEARCH)))) {
+                    visibleSlideElementList.add(checkInVisibleSet);
                 }
             } catch (SequenceNotFoundException e) {
                 logger.error("Failed to find Element with Sequence number of " + currentSequence + " in slideElementList. XML invalid.");
-                return;
+                return SLIDE_NO_MOVE;
             }
-
-            //Sort by Layer
-            sortElementsByLayer(visibleSlideElementList);
-            logger.info("Current Sequence is " + currentSequence);
-
-            //Fire animations
-            for (SlideElement elementToAnimate : visibleSlideElementList) {
-                if (elementToAnimate.getStartSequence() == currentSequence) {
-                    elementToAnimate.renderElement(Animation.ENTRY_ANIMATION); //Entry Sequence
-                } else if (elementToAnimate.getEndSequence() == currentSequence) {
-                    elementToAnimate.renderElement(Animation.EXIT_ANIMATION); //Exit Sequence
-                }
-            }
+        } else if ((currentSequence > 0) && (direction == SLIDE_BACKWARD)) {  //If we're going backwards and still elements left
+            currentSequence--;
         } else {
-            //Do something to tell the class above us that we're done and to go next slide/Previous
+            //If we're at limit of sequence number, alert calling method that we need to move to next/previous slide dependent on direction
+            switch (direction) {
+                case SLIDE_FORWARD:
+                    return SLIDE_FORWARD;
+                case SLIDE_BACKWARD:
+                    return SLIDE_BACKWARD;
+            }
         }
-    }
 
-    private void sortElementsByStartSequence(List<SlideElement> slideElementListToSort) {
         //Sort by Layer
-        Collections.sort(slideElementListToSort, (element1, element2) -> {
-            if (element1.getStartSequence() == element2.getStartSequence())
-                return 0;
-            return element1.getStartSequence() < element2.getStartSequence() ? -1 : 1;
-        });
+        sortElementsByLayer(visibleSlideElementList);
+        logger.info("Current Sequence is " + currentSequence);
+        //Fire animations
+        for (SlideElement elementToAnimate : visibleSlideElementList) {
+            if (elementToAnimate.getStartSequence() == currentSequence) {
+                elementToAnimate.renderElement(Animation.ENTRY_ANIMATION); //Entry Sequence
+            } else if (elementToAnimate.getEndSequence() == currentSequence) {
+                elementToAnimate.renderElement(Animation.EXIT_ANIMATION); //Exit Sequence
+            }
+        }
+
+        return SLIDE_NO_MOVE;
     }
 
     private void sortElementsByLayer(List<SlideElement> slideElementListToSort) {
         //Sort by Layer
-        Collections.sort(slideElementListToSort, (element1, element2) -> {
+        slideElementListToSort.sort((element1, element2) -> {
             if (element1.getLayer() == element2.getLayer())
                 return 0;
             return element1.getLayer() < element2.getLayer() ? -1 : 1;
@@ -173,8 +165,9 @@ public class Slide extends StackPane {
     /**
      * Searches for currentSequence number in either start sequence or end sequence field. Used to determine whether to add an element to the visible
      * set. Throws not found exception if cant find a start or end sequence that matches.
-     * @param toSearch List of Slide elements to search
-     * @param sequence Sequence number to search for in list (start or end)
+     *
+     * @param toSearch   List of Slide elements to search
+     * @param sequence   Sequence number to search for in list (start or end)
      * @param startOrEnd Specifies whether to search for start sequence or end sequence
      * @return Returns slideElement corresponding to element with desired sequence number and type
      * @throws SequenceNotFoundException If a sequence number cant be found, there is most likely an error
@@ -202,11 +195,11 @@ public class Slide extends StackPane {
         //If we can return element with startSequence, do it. Else return endSequence. Avoids checking for null return;
         switch (startOrEnd) {
             case START_SEARCH:
-                if(toReturnStart == null) return toReturnEnd;
+                if (toReturnStart == null) return toReturnEnd;
                 else return toReturnStart;
 
             case END_SEARCH:
-                if(toReturnEnd == null) return toReturnStart;
+                if (toReturnEnd == null) return toReturnStart;
                 else return toReturnEnd;
         }
 

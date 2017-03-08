@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Created by habl on 26/02/2017.
  */
+@SuppressWarnings({"WeakerAccess", "unused"})
 public class GraphicElement extends SlideElement {
     protected boolean aspectRatioLock;
     protected float elementAspectRatio;
@@ -55,7 +56,7 @@ public class GraphicElement extends SlideElement {
         startAnimation.setAnimationType(Animation.SIMPLE_APPEAR);
         endAnimation = new Animation();
         endAnimation.setCoreNodeToAnimate(getCoreNode());
-        endAnimation.setAnimationType(Animation.MOVEMENT_TEST);
+        endAnimation.setAnimationType(Animation.SIMPLE_DISAPPEAR);
     }
 
     @Override
