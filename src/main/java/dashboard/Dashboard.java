@@ -60,12 +60,19 @@ public class Dashboard extends Application {
     }
 
     private void loadPresentation(BorderPane mainUI, String path) {
-        //ParserXML readPresentationParser = new ParserXML(path);
+        ParserXML readPresentationParser = new ParserXML(path);
 
         myPresentationElement = generateTestPresentation();     //TEST
-        //myPresentationElement = readPresentationParser.parsePresentation();
+//        myPresentationElement = readPresentationParser.parsePresentation();
+
         mainUI.setCenter(myPresentationElement.getCurrentSlide());
         mainUI.setBottom(addStatBar(myPresentationElement.getCurrentSlide()));
+
+//        for (Slide currentSlide : myPresentationElement.getSlideList()) {
+//            for (SlideElement element : currentSlide.getSlideElementList()) {
+//                element.setSlideCanvas(currentSlide);
+//            }
+//        }
 
 
         //Keyboard listener for moving through presentation

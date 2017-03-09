@@ -49,7 +49,7 @@ public class VideoElement extends SlideElement {
     //TODO: 2) Commenting
     //TODO  3) Move all testing out of this class and into a proper test class - Herman
     public VideoElement() {
-        //Leaver this empty of testing and canvas things: testing should be done in separate testclass
+        //Leave this empty of testing and canvas things: testing should be done in separate testclass
     }
 
     public void setUpVideoElement(BorderPane mediaPane) {
