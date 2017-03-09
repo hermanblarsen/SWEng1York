@@ -28,6 +28,13 @@ public abstract class SlideElement {
 
     abstract void doClassSpecificRender();
 
+    public void removeElement(){
+        if(onCanvas){
+            slideCanvas.getChildren().remove(getCoreNode());
+            onCanvas = false;
+        }
+    }
+
     //Empty interface for tagging our actual slide elements
     void renderElement(int animationType) {
         //Added to the canvas at render time, as otherwise negates use of VisibleSet
@@ -39,7 +46,6 @@ public abstract class SlideElement {
             //Ensure we only add an element to the Canvas once.
             if(!onCanvas) {
                 onCanvas = true;
-                //Elements should all be invisible by default
                 slideCanvas.getChildren().add(getCoreNode());
             }
         }
@@ -97,10 +103,6 @@ public abstract class SlideElement {
         return endSequence;
     }
 
-    public void removeElement(){
-        getCoreNode().setVisible(false);
-    }
-
     public void setEndSequence(int endSequence) {
         this.endSequence = endSequence;
     }
@@ -111,8 +113,6 @@ public abstract class SlideElement {
 
     public void setVisibility(boolean visibility) {
         this.visibility = visibility;
-        /*if(visibility) getCoreNode().setOpacity(0);
-        else getCoreNode().setOpacity(1);*/
     }
 
     public int getLayer() {

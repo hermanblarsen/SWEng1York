@@ -148,14 +148,14 @@ public class Dashboard extends Application {
         backButton.getStyleClass().setAll("btn", "btn-success");
         backButton.setOnAction(event ->{
             //TODO: Lock these so they only function once presentation loaded
-            controlPresentation(Slide.SLIDE_FORWARD);
+            controlPresentation(Slide.SLIDE_BACKWARD);
         });
         controlsPane.getChildren().add(backButton);
         Button forwardsButton = new Button("Forwards");
         forwardsButton.getStyleClass().setAll("btn", "btn-warning");
         forwardsButton.setOnAction(event ->{
             //TODO: Lock these so they only function once presentation loaded
-            controlPresentation(Slide.SLIDE_BACKWARD);
+            controlPresentation(Slide.SLIDE_FORWARD);
         });
         controlsPane.getChildren().add(forwardsButton);
         Button fillButton1 = new Button("Filler");
@@ -190,14 +190,14 @@ public class Dashboard extends Application {
         TextElement myTextElement = new TextElement();
         myTextElement.setLayer(0);
         myTextElement.setStartSequence(1);
-        myTextElement.setEndSequence(2);
+        myTextElement.setEndSequence(3);
         myTextElement.setTextContent("<h1 style='background : rgba(0,0,0,0);'><b><font color=\"red\">IILP </font><font color=\"blue\">HTML</font> <font color=\"green\">Support Test</font></b></h1>");
         myTextElement.setSlideCanvas(slide1);
         slideElementsSlide1.add(myTextElement);
 
         GraphicElement myGraphicElement = new GraphicElement();
         myGraphicElement.setLayer(1);
-        myGraphicElement.setStartSequence(3);
+        myGraphicElement.setStartSequence(2);
         myGraphicElement.setEndSequence(4);
         myGraphicElement.setSlideCanvas(slide1);
         slideElementsSlide1.add(myGraphicElement);
@@ -222,8 +222,8 @@ public class Dashboard extends Application {
 
         TextElement myTextElement1 = new TextElement();
         myTextElement1.setLayer(3);
-        myTextElement1.setStartSequence(7);
-        myTextElement1.setEndSequence(8);
+        myTextElement1.setStartSequence(3);
+        myTextElement1.setEndSequence(4);
         myTextElement1.setTextContent("<b>Poop</b>");
         myTextElement1.setSlideCanvas(slide1);
         slideElementsSlide1.add(myTextElement1);
@@ -311,8 +311,6 @@ public class Dashboard extends Application {
                 "Slide Number: " + presentationElement.getSlideID() + " (x: " + event.getX() + ", y: " + event.getY() + ") -- " +
                         "(sceneX: " + event.getSceneX() + ", sceneY: " + event.getSceneY() + ") -- " +
                         "(screenX: " + event.getScreenX() + ", screenY: " + event.getScreenY() + ")"));
-
-        presentationElement.setOnMouseExited(event -> coordTextBar.setText("Slide Number: " + presentationElement.getSlideID() + " Mouse Exited"));
 
         hbox.getChildren().addAll(border);
 

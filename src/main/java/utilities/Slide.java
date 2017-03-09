@@ -112,12 +112,12 @@ public class Slide extends StackPane {
     }
 
     public int advance(int direction) {
+        SlideElement checkInVisibleSet;
         //If we're going forwards and not through all sequences in slide set
         if ((currentSequence < maxSequenceNumber) && (direction == SLIDE_FORWARD)) {
             currentSequence++;
             //Search for element with matching start sequence or end sequence in visible set. If they're not in there, add them.
             try {
-                SlideElement checkInVisibleSet;
                 if (!(visibleSlideElementList.contains(checkInVisibleSet = searchForSequenceElement(slideElementList, currentSequence, START_SEARCH)))) {
                     visibleSlideElementList.add(checkInVisibleSet);
                 }
@@ -126,10 +126,19 @@ public class Slide extends StackPane {
                 }
             } catch (SequenceNotFoundException e) {
                 logger.error("Failed to find Element with Sequence number of " + currentSequence + " in slideElementList. XML invalid?");
-//                return SLIDE_NO_MOVE;
-                return SLIDE_FORWARD; //TODO for testing, remove Slide forward when done testing
+                return SLIDE_NO_MOVE;
+                //return SLIDE_FORWARD; //TODO for testing, remove Slide forward when done testing
             }
         } else if ((currentSequence > 0) && (direction == SLIDE_BACKWARD)) {  //If we're going backwards and still elements left
+            try {
+                if (visibleSlideElementList.contains(checkInVisibleSet = searchForSequenceElement(slideElementList, currentSequence, START_SEARCH))) {
+                    checkInVisibleSet.removeElement();
+                }
+            } catch (SequenceNotFoundException e) {
+                logger.error("Failed to find Element with Sequence number of " + currentSequence + " in slideElementList. XML invalid?");
+                return SLIDE_NO_MOVE;
+                //return SLIDE_BACKWARD; //TODO for testing, remove Slide forward when done testing
+            }
             currentSequence--;
         } else {
             //If we're at limit of sequence number, alert calling method that we need to move to next/previous slide dependent on direction
