@@ -19,7 +19,7 @@
 		<slide slideid="1">
 			<text elementid ="1" layer="1" visibility="true" startsequence="2" endsequence="4" duration="20.5">
 				<textcontent>
-					<html>Example HTML text input. This is a list: <ul><li><i>italic</i></li><li><b>bold</b></li></ul></html>
+					<html><h1 style='background : rgba(0,0,0,0);'><b><font color="red">IILP </font><font color="blue">HTML</font> <font color="green">Support Test</font></b></h1></html>
 				</textcontent>
 				<xposition>0.12</xposition>
 				<yposition>0.3</yposition>

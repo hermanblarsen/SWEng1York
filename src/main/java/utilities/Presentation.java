@@ -21,8 +21,9 @@ public class Presentation extends Pane {
     private String tags;
     private Theme theme;
 
+
     private int currentSlideNumber = 0;
-    private int maxSlideNumber;
+    private int maxSlideNumber = 0;
     private Slide currentSlide;
     private boolean autoplayMedia;
 
@@ -35,6 +36,9 @@ public class Presentation extends Pane {
 
     private List<Slide> slideList;
 
+    public int getCurrentSlideNumber() {
+        return currentSlideNumber;
+    }
 
     public Presentation() {
         slideList = new ArrayList<>();

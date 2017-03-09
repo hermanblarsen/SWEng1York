@@ -68,8 +68,6 @@ public class VideoElement extends SlideElement {
         mv.setFitWidth(xSize);
 
 
-
-
         if(mediaControl) {
             mediaPane.setBottom(mediaControl());
         }
@@ -363,7 +361,4 @@ public class VideoElement extends SlideElement {
             this.value = value;
         }
     }
-
-
-
 }
