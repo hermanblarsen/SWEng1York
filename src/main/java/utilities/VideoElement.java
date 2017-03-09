@@ -287,10 +287,10 @@ public class VideoElement extends SlideElement {
         mediaBar.getChildren().add(stopButton);
 
         // Seek Control
-        final Slider videoTime = new Slider(0.0d, 0, 0);
+        final Slider videoTime = new Slider(startTime.toMillis(), 0, 0);
         mp.statusProperty().addListener((observableValue, oldValue, newValue) -> {
             if (newValue == MediaPlayer.Status.READY) {
-                videoTime.setMax(mp.getTotalDuration().toMillis());
+                videoTime.setMax(mp.getCycleDuration().toMillis() + startTime.toMillis());
             }
         });
         //Update the time bar to match the current playback time.
@@ -311,7 +311,7 @@ public class VideoElement extends SlideElement {
         Label playTime = new Label();
         mp.currentTimeProperty().addListener((observableValue, oldValue, newValue) -> {
             double currentTime = mp.getCurrentTime().toSeconds();
-            double totalDuration = mp.getTotalDuration().toSeconds();
+            double totalDuration = mp.getCycleDuration().toSeconds() + startTime.toSeconds();
             playTime.setText(String.format("%02.0f:%02.0f/%02.0f:%02.0f",
                     Math.floor(currentTime / 60),
                     Math.floor(currentTime % 60),
