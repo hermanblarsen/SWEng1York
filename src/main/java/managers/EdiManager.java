@@ -43,10 +43,6 @@ public class EdiManager extends Application {
         loginDialog.start(loginStage);
     }
 
-    @Override
-    public void stop() throws Exception {
-        super.stop();
-    }
 
     public void loginSucceded(boolean isTeacher) {
         logger.info("Login succeeded");
