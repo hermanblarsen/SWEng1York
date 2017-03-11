@@ -18,8 +18,6 @@ import org.slf4j.LoggerFactory;
  * Created by habl on 11/03/2017.
  */
 public class EdiManager extends Application {
-    //TODO overall manager of program, to make login and open appropriate dashboard when login is accepted
-    private boolean applicationRunning;
     Logger logger = LoggerFactory.getLogger(EdiManager.class);
     private Login loginDialog;
 
@@ -32,8 +30,6 @@ public class EdiManager extends Application {
     //No stages or scenes in this method.
     @Override
     public void init() throws Exception {
-        logger.info("Edi is initialising");
-        this.applicationRunning  = true;
         super.init();
     }
 
@@ -52,25 +48,18 @@ public class EdiManager extends Application {
         super.stop();
     }
 
-    public boolean isApplicationRunning() {
-        return applicationRunning;
-    }
-
-    public void setApplicationRunning(boolean applicationRunning) {
-        this.applicationRunning = applicationRunning;
-    }
-
-
     public void loginSucceded(boolean isTeacher) {
         logger.info("Login succeeded");
         Stage dashboardStage = new Stage();
 
         //Additional login stuff
         if (isTeacher) {
+            logger.info("Teacher Dashboard Opened");
             TeacherDashboard teacherDashboard = new TeacherDashboard();
             teacherDashboard.setEdiManager(this);
             teacherDashboard.start(dashboardStage);
         } else {
+            logger.info("Student Dashboard Opened");
             StudentDashboard studentDashboard = new StudentDashboard();
             studentDashboard.setEdiManager(this);
             studentDashboard.start(dashboardStage);
