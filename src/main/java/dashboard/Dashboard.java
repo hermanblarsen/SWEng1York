@@ -140,10 +140,12 @@ public abstract class Dashboard extends Application {
     }
 
     private MenuBar addMenuBar() {
-        MenuBar menuBar = new MenuBar(new Menu("File"),
-                                    new Menu("Edit"),
-                                    new Menu("Dogs"),
-                                    new Menu("Spinach"));
+        MenuBar menuBar = new MenuBar();
+
+        menuBar.getMenus().addAll(new Menu("File"),
+                                new Menu("Edit"),
+                                new Menu("Dogs"),
+                                new Menu("Spinach"));
 
         menuBar.setUseSystemMenuBar(true);
 
@@ -327,6 +329,7 @@ public abstract class Dashboard extends Application {
             slides[i].setBody(new Text("Slide panel preview here."));
             slides[i].setPrefWidth(170);//Dynamic resizing of panel width possible?
             flow.getChildren().add(slides[i]);
+
             flow.setMargin(slides[i], new Insets(0, 20, 0, 5));
         }
 
