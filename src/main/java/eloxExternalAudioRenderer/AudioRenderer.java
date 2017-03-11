@@ -93,20 +93,17 @@ public class AudioRenderer extends Application{ //TODO TEST remove before handov
 
     public void playTo(Duration endTime) {
         setEndTime(endTime);
-        updateAudioPlayer();
         audioPlayer.play();
     }
 
     public void playFrom(Duration startTime) {
         setStartTime(startTime);
-        updateAudioPlayer();
         play();
     }
 
     public void playFromTo(Duration startTime, Duration endTime) {
         setStartTime(startTime);
         setEndTime(endTime);
-        updateAudioPlayer();
         play();
     }
 
@@ -154,7 +151,9 @@ public class AudioRenderer extends Application{ //TODO TEST remove before handov
     }
 
     public void setPlaying(boolean playing) {
-        this.playing = playing;
+        if(this.playing != playing){
+            togglePlaying();
+        }
     }
 
     public float getVolume() {
@@ -173,7 +172,7 @@ public class AudioRenderer extends Application{ //TODO TEST remove before handov
 
     public void setCurrentTime(Duration currentTime) {
         this.currentTime = checkDurationRange(currentTime, DURATION_LOWER_RANGE, DURATION_UPPER_RANGE);
-        audioPlayer.seek(currentTime);
+        updateAudioPlayer();
     }
 
     public Duration getStartTime() {
@@ -199,7 +198,6 @@ public class AudioRenderer extends Application{ //TODO TEST remove before handov
     }
 
     public void setPlaybackSpeed(float playbackSpeed) {
-
         this.playbackSpeed = verifyFloatRange(playbackSpeed, PLAYBACK_LOWER_RANGE, PLAYBACK_UPPER_RANGE);
         updateAudioPlayer();
     }
@@ -225,6 +223,7 @@ public class AudioRenderer extends Application{ //TODO TEST remove before handov
         audioPlayer.setStartTime(startTime);
         audioPlayer.setStopTime(endTime);
         audioPlayer.setVolume(volume);
+        audioPlayer.seek(currentTime);
     }
 
     private void updateCurrentTime(){
