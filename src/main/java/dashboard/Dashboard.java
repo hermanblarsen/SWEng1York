@@ -15,6 +15,7 @@ import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import managers.EdiManager;
 import org.kordamp.bootstrapfx.scene.layout.Panel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,11 +28,12 @@ import java.util.ArrayList;
  * Created by amriksadhra on 24/01/2017.
  */
 @SuppressWarnings({"WeakerAccess", "unused"})
-public class Dashboard extends Application {
-    Scene scene;
-    BorderPane border;
-    Presentation myPresentationElement;
-    Logger logger = LoggerFactory.getLogger(Dashboard.class);
+public abstract class Dashboard extends Application {
+    protected Scene scene;
+    protected BorderPane border;
+    protected Presentation myPresentationElement;
+    protected Logger logger = LoggerFactory.getLogger(Dashboard.class);
+    private EdiManager ediManager;
 
     public static void main(String[] args) {
         launch(args);
@@ -41,6 +43,7 @@ public class Dashboard extends Application {
     public void start(Stage primaryStage) {
         //Initialise UI
         primaryStage.setTitle("I^2LP");
+        logger.info("Dashboard logger");
 
         border = new BorderPane();
         scene = new Scene(border, 1000, 600);
@@ -315,6 +318,10 @@ public class Dashboard extends Application {
         hbox.getChildren().addAll(border);
 
         return hbox;
+    }
+
+    public void setEdiManager(EdiManager ediManager) {
+        this.ediManager = ediManager;
     }
 }
 

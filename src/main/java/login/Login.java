@@ -2,6 +2,7 @@ package login;
 
 import dashboard.Dashboard;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -14,9 +15,15 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import managers.EdiManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class Login extends Application {
+    private EdiManager ediManager;
+    Logger logger = LoggerFactory.getLogger(Login.class);
+
     public static void main(String[] args) {
         launch(args);
     }
@@ -56,11 +63,31 @@ public class Login extends Application {
         loginButton.getStyleClass().setAll("btn","btn-danger");
         grid.add(loginButton, 1, 3, 1, 1);
         loginButton.setOnAction(event ->{
-           Dashboard myDashboard = new Dashboard();
-            myDashboard.start(primaryStage);
+            boolean loginSucceded = this.verifyLogin();
+            if (loginSucceded) {
+                ediManager.loginSucceded(loginSucceded);
+                try {
+                    this.stop();
+                    primaryStage.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    logger.error("Closing of Login Dialog unsuccessfull!");
+                }
+            } else {
+                logger.info("Login unsuccessfull");
+                //TODO add colour events and stuff here to notify user of unsuccessfull login.
+            }
         });
 
         primaryStage.show();
+    }
 
+    public boolean verifyLogin () {
+        //TODO if (server.verifyCredentials(username, password)) {return true }
+        return true;
+    }
+
+    public void setEdiManager(EdiManager ediManager) {
+        this.ediManager = ediManager;
     }
 }

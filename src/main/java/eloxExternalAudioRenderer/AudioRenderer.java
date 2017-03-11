@@ -1,33 +1,42 @@
 package eloxExternalAudioRenderer;
 import com.elox.Parser.Audio.Audio;
 
+import javafx.application.Application;
 import javafx.event.EventHandler;
+import javafx.scene.Scene;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.media.*;
+import javafx.stage.Stage;
 import javafx.util.Duration;
 
 /**
  * Created by habl on 05/03/2017.
+ * TODO Rename package: externalAudioRenderer before handover
  */
-public class AudioRenderer {
-    private static final float VOLUME_LOWER_RANGE = (float) 0;
-    private static final float VOLUME_UPPER_RANGE = (float) 0.5;
+public class AudioRenderer extends Application{ //TODO TEST remove before handover
+
+    private static final float VOLUME_LOWER_RANGE = 0f;
+    private static final float VOLUME_UPPER_RANGE = 0.5f;
     private static final Duration DURATION_LOWER_RANGE = Duration.ZERO;
     private static final Duration DURATION_UPPER_RANGE = Duration.INDEFINITE;
-    private static final float PLAYBACK_LOWER_RANGE = Float.MIN_VALUE;
-    private static final float PLAYBACK_UPPER_RANGE = (float) 10;
-    private static final Duration INTERVAL_LOWER_RANGE = new Duration(Double.MIN_VALUE);
+    private static final float PLAYBACK_LOWER_RANGE = 0f;
+    private static final float PLAYBACK_UPPER_RANGE = 10f;
+    private static final Duration INTERVAL_LOWER_RANGE = new Duration(0);
     private static final Duration INTERVAL_UPPER_RANGE = Duration.INDEFINITE;
 
     protected boolean playing = false;
-    protected float volume = (float) 0.5;
+    protected float volume = 0.5f;
     protected Duration duration = new Duration(0);
     protected Duration currentTime = new Duration(0);
     protected Duration startTime = new Duration(0);
     protected Duration endTime = new Duration(0);
-    protected float playbackSpeed = (float) 1.0;
+    protected float playbackSpeed = 1.0f;
     protected Duration mediaMarkerTimeInterval = new Duration(1000);
     protected EventHandler<MediaMarkerEvent> mediaMarkerEventEventHandler = null;
     protected MediaPlayer audioPlayer = null;
+
+    public static void main(String[] args){launch(args);}
 
     public AudioRenderer (Audio audioXmlData) {
         duration = new Duration(audioXmlData.getDuration());
@@ -35,13 +44,46 @@ public class AudioRenderer {
         endTime = new Duration(audioXmlData.getEndTime());
 
         //Create audio media object
-        Media audio = new Media(audioXmlData.getPath());
+        Media audioMedia = new Media(audioXmlData.getPath());
 
         //Create media player
-        audioPlayer = new MediaPlayer(audio);
+        audioPlayer = new MediaPlayer(audioMedia);
         audioPlayer.setAutoPlay(audioXmlData.isAutoplayOn());
         playing = audioXmlData.isAutoplayOn();
         updateAudioPlayer();
+
+
+    }
+
+
+    Scene scene;
+    BorderPane border;
+    Stage primaryStage;
+    Audio xmlAudioElement;
+    @Override
+    public void start(Stage primaryStage){
+        primaryStage.setTitle("Test");
+
+        border = new BorderPane();
+        scene = new Scene(border, 600, 600);
+//        scene.getStylesheets().add("bootstrapfx.css");
+        primaryStage.setScene(scene);
+        border.setCenter(new StackPane());
+
+        primaryStage.show();
+        play();
+    }
+
+    public void setupEloxTestAudio () {
+        xmlAudioElement.setId(1);
+        xmlAudioElement.setStartSequence(1);
+        xmlAudioElement.setEndSequence(2);
+        xmlAudioElement.setDuration(1);
+        xmlAudioElement.setPath("externalResources/NorwegianPimsleur.mp3");
+        xmlAudioElement.setLooped(Boolean.TRUE);
+        xmlAudioElement.setAutoplayOn(Boolean.TRUE);
+        xmlAudioElement.setStartTime(0);
+        xmlAudioElement.setEndTime(10);
     }
 
     public void play() {
@@ -120,7 +162,7 @@ public class AudioRenderer {
     }
 
     public void setVolume(float volume) {
-        this.volume = checkFloatRange(volume, VOLUME_LOWER_RANGE, VOLUME_UPPER_RANGE);
+        this.volume = verifyFloatRange(volume, VOLUME_LOWER_RANGE, VOLUME_UPPER_RANGE);
         updateAudioPlayer();
     }
 
@@ -158,7 +200,7 @@ public class AudioRenderer {
 
     public void setPlaybackSpeed(float playbackSpeed) {
 
-        this.playbackSpeed = checkFloatRange(playbackSpeed, PLAYBACK_LOWER_RANGE, PLAYBACK_UPPER_RANGE);
+        this.playbackSpeed = verifyFloatRange(playbackSpeed, PLAYBACK_LOWER_RANGE, PLAYBACK_UPPER_RANGE);
         updateAudioPlayer();
     }
 
@@ -201,7 +243,7 @@ public class AudioRenderer {
         }
     }
 
-    private static Float checkFloatRange(Float value, Float lowerRange, Float upperRange){
+    private static Float verifyFloatRange(Float value, Float lowerRange, Float upperRange){
         if(value > upperRange){
             return upperRange;
         }

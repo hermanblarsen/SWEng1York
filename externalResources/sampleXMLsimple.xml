@@ -1,19 +1,19 @@
 <document documentid="sampleinput">
     <documentdetails>
-        <author>Joe Bloggs</author>
+        <author>Herman Larsen</author>
         <version>1.0</version>
-        <documentaspectratio>1.78</documentaspectratio>
-        <description>Sample XML input</description>
-        <tags>sample,xml,input</tags>
+        <documentaspectratio>1.5</documentaspectratio>
+        <description>I2LP Sample XML input</description>
+        <tags>sample,xml,input,I2LP</tags>
         <groupformat>2</groupformat>
     </documentdetails>
     <slideshow>
         <defaults>
-            <bgcolour>#FF2304</bgcolour>
+            <bgcolour>#111111FF</bgcolour>
             <font>Arial</font>
             <fontsize>12</fontsize>
-            <fontcolour>#F00D33FF</fontcolour>
-            <graphicscolour>#F40D33FF</graphicscolour>
+            <fontcolour>#FFFFFFFF</fontcolour>
+            <graphicscolour>#00000FFFF</graphicscolour>
             <autoplaymedia>true</autoplaymedia>
         </defaults>
         <slide slideid="1">
