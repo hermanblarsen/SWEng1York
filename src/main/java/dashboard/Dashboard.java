@@ -91,7 +91,7 @@ public class Dashboard extends Application {
 
         //If Presentation handler told us that slide is changing, update the Slide present on Main screen
         //Can do specific things when presentation reached end, or start.
-        if ((presentationStatus == Presentation.SLIDE_CHANGE) || (presentationStatus == Presentation.PRESENTATION_FINISH) || (presentationStatus == Presentation.PRESENTATION_START)) {
+        if (presentationStatus == Presentation.SLIDE_CHANGE || presentationStatus == Presentation.PRESENTATION_FINISH || presentationStatus == Presentation.PRESENTATION_START) {
             logger.info("Changing Slides");
             //Update MainUI panes when changing slides to account for new Slide root pane.
             border.setCenter(myPresentationElement.getCurrentSlide());
@@ -107,7 +107,6 @@ public class Dashboard extends Application {
 
         Button createPresButton = new Button("Create Presentation");
         createPresButton.getStyleClass().setAll("btn", "btn-success");
-
 
         final FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Open Resource File");
