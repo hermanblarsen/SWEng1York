@@ -41,7 +41,6 @@ public abstract class Dashboard extends Application {
     public void start(Stage primaryStage) {
         //Initialise UI
         primaryStage.setTitle("I^2LP");
-        logger.info("Dashboard logger");
 
         border = new BorderPane();
         scene = new Scene(border, 1000, 600);
@@ -329,7 +328,6 @@ public abstract class Dashboard extends Application {
             slides[i].setBody(new Text("Slide panel preview here."));
             slides[i].setPrefWidth(170);//Dynamic resizing of panel width possible?
             flow.getChildren().add(slides[i]);
-
             flow.setMargin(slides[i], new Insets(0, 20, 0, 5));
         }
 
