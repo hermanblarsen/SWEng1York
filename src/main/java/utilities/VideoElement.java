@@ -17,6 +17,9 @@ import javafx.scene.media.MediaView;
 import javafx.stage.Screen;
 import javafx.util.Duration;
 
+import java.io.File;
+import java.net.URL;
+
 
 /**
  * Created by habl on 26/02/2017.
@@ -55,12 +58,27 @@ public class VideoElement extends SlideElement {
     public void setUpVideoElement(BorderPane mediaPane) {
         mv = new MediaView();
 
-        media = new Media(path);
+        if(path.contains("http://")){
+            media = new Media(path);
+        }else {
+            File file = new File(path);
+            String mediaPath = file.toURI().toString();
+            media = new Media(mediaPath);
+        }
         mp = new MediaPlayer(media);
         mv.setMediaPlayer(mp);
 
-        mp.setStartTime(startTime);
-        mp.setStopTime(endTime);
+        if(startTime != null) {
+            mp.setStartTime(startTime);
+        } else{
+            mp.setStartTime(Duration.ZERO);
+        }
+        if(endTime != null) {
+            mp.setStopTime(endTime);
+        }else{
+            mp.setStopTime(media.getDuration());
+        }
+
         mv.setPreserveRatio(aspectRatioLock);
         mv.setTranslateX(xPosition);
         mv.setTranslateY(yPosition);

@@ -69,7 +69,7 @@ public abstract class Dashboard extends Application {
         mainUI.setCenter(myPresentationElement.getCurrentSlide());
         mainUI.setBottom(addStatBar(myPresentationElement.getCurrentSlide()));
 
-//        for (Slide currentSlide : myPresentationElement.getSlideList()) {
+//       for (Slide currentSlide : myPresentationElement.getSlideList()) {
 //            for (SlideElement element : currentSlide.getSlideElementList()) {
 //                element.setSlideCanvas(currentSlide);
 //            }
@@ -277,7 +277,7 @@ public abstract class Dashboard extends Application {
         myTextElement1.setLayer(3);
         myTextElement1.setStartSequence(3);
         myTextElement1.setEndSequence(4);
-        myTextElement1.setTextContent("<b>Poop</b>");
+        myTextElement1.setTextContent("<b>This is some sample text for Adar to be impressed by</b>");
         myTextElement1.setSlideCanvas(slide1);
         slideElementsSlide1.add(myTextElement1);
 
