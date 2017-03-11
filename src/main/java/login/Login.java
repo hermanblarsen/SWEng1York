@@ -18,7 +18,7 @@ import org.slf4j.LoggerFactory;
 
 
 public class Login extends Application {
-    private EdiManager ediManager;
+    private EdiManager ediManager = new EdiManager();
     Logger logger = LoggerFactory.getLogger(Login.class);
 
     public static void main(String[] args) {
