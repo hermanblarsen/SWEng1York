@@ -14,7 +14,7 @@ import javafx.util.Duration;
  * Created by habl on 05/03/2017.
  * TODO Rename package: externalAudioRenderer before handover
  */
-public class AudioRenderer extends Application{ //TODO TEST remove before handover
+public class AudioRenderer {
 
     private static final float VOLUME_LOWER_RANGE = 0f;
     private static final float VOLUME_UPPER_RANGE = 0.5f;
@@ -36,8 +36,6 @@ public class AudioRenderer extends Application{ //TODO TEST remove before handov
     protected EventHandler<MediaMarkerEvent> mediaMarkerEventEventHandler = null;
     protected MediaPlayer audioPlayer = null;
 
-    public static void main(String[] args){launch(args);}
-
     public AudioRenderer (Audio audioXmlData) {
         duration = new Duration(audioXmlData.getDuration());
         startTime = new Duration(audioXmlData.getStartTime());
@@ -51,39 +49,6 @@ public class AudioRenderer extends Application{ //TODO TEST remove before handov
         audioPlayer.setAutoPlay(audioXmlData.isAutoplayOn());
         playing = audioXmlData.isAutoplayOn();
         updateAudioPlayer();
-
-
-    }
-
-
-    Scene scene;
-    BorderPane border;
-    Stage primaryStage;
-    Audio xmlAudioElement;
-    @Override
-    public void start(Stage primaryStage){
-        primaryStage.setTitle("Test");
-
-        border = new BorderPane();
-        scene = new Scene(border, 600, 600);
-//        scene.getStylesheets().add("bootstrapfx.css");
-        primaryStage.setScene(scene);
-        border.setCenter(new StackPane());
-
-        primaryStage.show();
-        play();
-    }
-
-    public void setupEloxTestAudio () {
-        xmlAudioElement.setId(1);
-        xmlAudioElement.setStartSequence(1);
-        xmlAudioElement.setEndSequence(2);
-        xmlAudioElement.setDuration(1);
-        xmlAudioElement.setPath("externalResources/NorwegianPimsleur.mp3");
-        xmlAudioElement.setLooped(Boolean.TRUE);
-        xmlAudioElement.setAutoplayOn(Boolean.TRUE);
-        xmlAudioElement.setStartTime(0);
-        xmlAudioElement.setEndTime(10);
     }
 
     public void play() {
