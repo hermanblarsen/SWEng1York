@@ -21,9 +21,7 @@ public class Login extends Application {
     private EdiManager ediManager;
     private Logger logger = LoggerFactory.getLogger(Login.class);
 
-    public static void main(String[] args) {
-        launch(args);
-    }
+
 
     @Override
     public void start(Stage primaryStage) {

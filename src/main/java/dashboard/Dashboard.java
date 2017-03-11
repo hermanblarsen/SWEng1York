@@ -36,9 +36,6 @@ public abstract class Dashboard extends Application {
     protected Logger logger = LoggerFactory.getLogger(Dashboard.class);
     private EdiManager ediManager;
 
-    public static void main(String[] args) {
-        launch(args);
-    }
 
     @Override
     public void start(Stage primaryStage) {
@@ -144,9 +141,9 @@ public abstract class Dashboard extends Application {
 
     private MenuBar addMenuBar() {
         MenuBar menuBar = new MenuBar(new Menu("File"),
-                new Menu("Edit"),
-                new Menu("Dogs"),
-                new Menu("Spinach"));
+                                    new Menu("Edit"),
+                                    new Menu("Dogs"),
+                                    new Menu("Spinach"));
 
         menuBar.setUseSystemMenuBar(true);
 
