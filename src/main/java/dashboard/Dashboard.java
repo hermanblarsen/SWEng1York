@@ -140,7 +140,7 @@ public abstract class Dashboard extends Application {
 
     private MenuBar addMenuBar() {
         MenuBar menuBar = new MenuBar();
-
+        //Due to travis fails, this couldn't be done in the constructor:
         menuBar.getMenus().addAll(new Menu("File"),
                                 new Menu("Edit"),
                                 new Menu("Dogs"),

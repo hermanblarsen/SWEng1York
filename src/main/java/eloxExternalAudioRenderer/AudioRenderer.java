@@ -2,6 +2,8 @@ package eloxExternalAudioRenderer;
 import com.elox.Parser.Audio.Audio;
 
 import javafx.application.Application;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
@@ -10,6 +12,8 @@ import javafx.scene.media.*;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
+import java.io.File;
+
 /**
  * Created by habl on 05/03/2017.
  * TODO Rename package: externalAudioRenderer before handover
@@ -17,7 +21,7 @@ import javafx.util.Duration;
 public class AudioRenderer {
 
     private static final float VOLUME_LOWER_RANGE = 0f;
-    private static final float VOLUME_UPPER_RANGE = 0.5f;
+    private static final float VOLUME_UPPER_RANGE = 1f;
     private static final Duration DURATION_LOWER_RANGE = Duration.ZERO;
     private static final Duration DURATION_UPPER_RANGE = Duration.INDEFINITE;
     private static final float PLAYBACK_LOWER_RANGE = 0f;
@@ -35,19 +39,51 @@ public class AudioRenderer {
     protected Duration mediaMarkerTimeInterval = new Duration(1000);
     protected EventHandler<MediaMarkerEvent> mediaMarkerEventEventHandler = null;
     protected MediaPlayer audioPlayer = null;
+    private Audio audioXmlData;
 
     public AudioRenderer (Audio audioXmlData) {
+        this.audioXmlData = audioXmlData;
         duration = new Duration(audioXmlData.getDuration());
         startTime = new Duration(audioXmlData.getStartTime());
         endTime = new Duration(audioXmlData.getEndTime());
+        playing = audioXmlData.isAutoplayOn();
+
+        Media audioMedia;
+        String path = audioXmlData.getPath();
+        boolean pathFromURL= false;
 
         //Create audio media object
-        Media audioMedia = new Media(audioXmlData.getPath());
+        if(path.contains("http://")){
+            audioMedia = new Media(path);
+            pathFromURL = true;
+        }else {
+            File file = new File(path);
+            String mediaPath = file.toURI().toString();
+            audioMedia = new Media(mediaPath);
+        }
 
         //Create media player
         audioPlayer = new MediaPlayer(audioMedia);
         audioPlayer.setAutoPlay(audioXmlData.isAutoplayOn());
-        playing = audioXmlData.isAutoplayOn();
+
+        if (playing) play();
+
+        audioPlayer.onEndOfMediaProperty().addListener(new ChangeListener<Runnable>() {
+            @Override
+            public void changed(ObservableValue<? extends Runnable> observable, Runnable oldValue, Runnable newValue) {
+                if (audioXmlData.isAutoplayOn()){
+                    pause();
+                    goToStart();
+                    audioPlayer.play();
+                } else {
+                    audioPlayer.stop();
+                    audioPlayer.dispose();
+                }
+            }
+        });
+
+
+
         updateAudioPlayer();
     }
 
@@ -218,5 +254,9 @@ public class AudioRenderer {
         else{
             return value;
         }
+    }
+
+    public MediaPlayer getAudioPlayer() {
+        return audioPlayer;
     }
 }
