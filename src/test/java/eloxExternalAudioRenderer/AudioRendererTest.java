@@ -1,6 +1,10 @@
 package eloxExternalAudioRenderer;
 
 import com.elox.Parser.Audio.Audio;
+
+import javafx.scene.media.MediaPlayer;
+
+import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -10,14 +14,16 @@ import org.junit.Test;
 public class AudioRendererTest {
 
     Audio xmlAudioElement;
-    AudioRenderer audioRenderer;
+    AudioRendererManualTest audioRendererManualTest;
+    AudioRenderer audioRendererUnderTest;
 
     @Before
     public void setUp() {
         xmlAudioElement = new Audio();
         setupEloxTestAudio();
-        audioRenderer = new AudioRenderer(xmlAudioElement);
+        audioRendererUnderTest = new AudioRenderer(xmlAudioElement);
 
+        audioRendererManualTest = new AudioRendererManualTest();
     }
 
     public void setupEloxTestAudio () {
@@ -34,7 +40,12 @@ public class AudioRendererTest {
 
     @Test
     public void verifyMediaPlayer()  {
+        assertNotNull(audioRendererUnderTest.getAudioPlayer());
+    }
 
+    @Test
+    public void verifyStatus() {
+        assertEquals(MediaPlayer.Status.PLAYING, audioRendererUnderTest.getAudioPlayer().getStatus().toString());
     }
 
     @Test

@@ -2,19 +2,20 @@ package dashboard;
 
 import javafx.application.Application;
 import javafx.geometry.Insets;
+import javafx.geometry.Orientation;
+import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.ScrollPane;
+import javafx.scene.control.*;
+import javafx.scene.control.ScrollPane.ScrollBarPolicy;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.*;
-import javafx.scene.media.MediaPlayer;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import javafx.util.Duration;
+import javafx.stage.Window;
 import managers.EdiManager;
 import org.kordamp.bootstrapfx.scene.layout.Panel;
 import org.slf4j.Logger;
@@ -27,7 +28,7 @@ import java.util.ArrayList;
 /**
  * Created by amriksadhra on 24/01/2017.
  */
-@SuppressWarnings({"WeakerAccess", "unused"})
+@SuppressWarnings({"WeakerAccess", "unused", "Duplicates"})
 public abstract class Dashboard extends Application {
     protected Scene scene;
     protected BorderPane border;
@@ -35,31 +36,28 @@ public abstract class Dashboard extends Application {
     protected Logger logger = LoggerFactory.getLogger(Dashboard.class);
     private EdiManager ediManager;
 
-    public static void main(String[] args) {
-        launch(args);
-    }
 
     @Override
     public void start(Stage primaryStage) {
         //Initialise UI
         primaryStage.setTitle("I^2LP");
-        logger.info("Dashboard logger");
 
         border = new BorderPane();
         scene = new Scene(border, 1000, 600);
         scene.getStylesheets().add("bootstrapfx.css");
         primaryStage.setScene(scene);
 
-        border.setTop(addHBox(primaryStage));
+
+        border.setTop(addBorderTop());
         border.setLeft(addVBox());
 
-        border.setCenter(new StackPane());
+        border.setCenter(addCenter());
         border.setRight(addFlowPane());
 
         primaryStage.show();
 
         //TEST
-        loadPresentation(border, "shit");
+        //loadPresentation(border, "shit");
     }
 
     private void loadPresentation(BorderPane mainUI, String path) {
@@ -71,12 +69,11 @@ public abstract class Dashboard extends Application {
         mainUI.setCenter(myPresentationElement.getCurrentSlide());
         mainUI.setBottom(addStatBar(myPresentationElement.getCurrentSlide()));
 
-//        for (Slide currentSlide : myPresentationElement.getSlideList()) {
+//       for (Slide currentSlide : myPresentationElement.getSlideList()) {
 //            for (SlideElement element : currentSlide.getSlideElementList()) {
 //                element.setSlideCanvas(currentSlide);
 //            }
 //        }
-
 
         //Keyboard listener for moving through presentation
         scene.setOnKeyPressed(key -> {
@@ -102,11 +99,63 @@ public abstract class Dashboard extends Application {
         }
     }
 
-    public HBox addHBox(Stage primaryStage) {
-        HBox hbox = new HBox();
-        hbox.setPadding(new Insets(15, 12, 15, 12));
-        hbox.setSpacing(10);
-        hbox.setStyle("-fx-background-color: #34495e;");
+    private ScrollPane addCenter() {
+
+        FlowPane presentationsFlowPane = new FlowPane(Orientation.HORIZONTAL);
+
+        presentationsFlowPane.setPadding(new Insets(5, 0, 5, 0));
+        presentationsFlowPane.setVgap(4);
+        presentationsFlowPane.setHgap(4);
+        presentationsFlowPane.setStyle("-fx-background-color: #ffffff;");
+
+        int arraySize = 20;
+        Panel[] presentationPanelList = new Panel[arraySize];
+
+        for(int i=0; i<arraySize; i++) {
+            Panel presentationPanel = new Panel(String.format("Presentation Title %d", i));
+
+            presentationPanel.getStyleClass().add("panel-primary");
+            presentationPanel.setBody(new Text("Presentation preview"));
+
+            presentationPanelList[i] = presentationPanel;
+        }
+
+        for(int i=0; i<presentationPanelList.length; i++) presentationsFlowPane.getChildren().add(presentationPanelList[i]);
+
+        ScrollPane centerPane = new ScrollPane();
+        centerPane.setContent(presentationsFlowPane);
+        centerPane.setHbarPolicy(ScrollBarPolicy.NEVER);
+        centerPane.setFitToWidth(true);
+
+        return centerPane;
+    }
+
+    private BorderPane addBorderTop() {
+        BorderPane toolBarAndTopPanel = new BorderPane();
+        toolBarAndTopPanel.setTop(addMenuBar());
+        toolBarAndTopPanel.setBottom(addTopPanel());
+
+        return toolBarAndTopPanel;
+    }
+
+    private MenuBar addMenuBar() {
+        MenuBar menuBar = new MenuBar();
+        //Due to travis fails, this couldn't be done in the constructor:
+        menuBar.getMenus().addAll(new Menu("File"),
+                                new Menu("Edit"),
+                                new Menu("Dogs"),
+                                new Menu("Spinach"));
+
+        menuBar.setUseSystemMenuBar(true);
+
+        return  menuBar;
+    }
+
+    private HBox addTopPanel() {
+        HBox topPanel = new HBox();
+        topPanel.setPadding(new Insets(15, 12, 15, 12));
+        topPanel.setSpacing(10);
+        topPanel.setStyle("-fx-background-color: #34495e;");
 
         Button createPresButton = new Button("Create Presentation");
         createPresButton.getStyleClass().setAll("btn", "btn-success");
@@ -117,7 +166,9 @@ public abstract class Dashboard extends Application {
         Button loadPresButton = new Button("Load Presentation");
         loadPresButton.getStyleClass().setAll("btn", "btn-default");
         loadPresButton.setOnAction(event -> {
-            File file = fileChooser.showOpenDialog(primaryStage);
+            Node source = (Node) event.getSource();
+            Window stage = source.getScene().getWindow();
+            File file = fileChooser.showOpenDialog(stage);
             if (file != null) {
                 loadPresentation(border, file.getPath());
             }
@@ -127,12 +178,12 @@ public abstract class Dashboard extends Application {
         platformTitle.getStyleClass().setAll("h3");
         platformTitle.setFill(Color.WHITESMOKE);
 
-        hbox.getChildren().addAll(createPresButton, loadPresButton, platformTitle);
+        topPanel.getChildren().addAll(createPresButton, loadPresButton, platformTitle);
 
-        return hbox;
+        return topPanel;
     }
 
-    public VBox addVBox() {
+    private VBox addVBox() {
         VBox vbox = new VBox();
         vbox.setPadding(new Insets(10));
         vbox.setSpacing(8);
@@ -226,7 +277,7 @@ public abstract class Dashboard extends Application {
         myTextElement1.setLayer(3);
         myTextElement1.setStartSequence(3);
         myTextElement1.setEndSequence(4);
-        myTextElement1.setTextContent("<b>Poop</b>");
+        myTextElement1.setTextContent("<b>This is some sample text for Adar to be impressed by</b>");
         myTextElement1.setSlideCanvas(slide1);
         slideElementsSlide1.add(myTextElement1);
 
@@ -253,13 +304,12 @@ public abstract class Dashboard extends Application {
         Presentation myPresentation = new Presentation();
         myPresentation.setSlideList(slides);
 
+
         return myPresentation;
     }
 
-
-    public ScrollPane addFlowPane() {
+    private ScrollPane addFlowPane() {
         ScrollPane scroll = new ScrollPane();
-        scroll.setFitToWidth(true);
 
         FlowPane flow = new FlowPane();
         flow.setPadding(new Insets(5, 0, 5, 0));
@@ -286,7 +336,7 @@ public abstract class Dashboard extends Application {
         return scroll;
     }
 
-    public HBox addStatBar(Slide presentationElement) {
+    private HBox addStatBar(Slide presentationElement) {
         HBox hbox = new HBox();
         hbox.setPadding(new Insets(0, 12, 0, 12));
         hbox.setSpacing(2);

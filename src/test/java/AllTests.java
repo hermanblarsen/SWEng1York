@@ -8,7 +8,9 @@ import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
-@SuiteClasses({ utilities.ParserXMLTest.class, utilities.VideoElementTest.class})
+@SuiteClasses({ utilities.ParserXMLTest.class,
+                utilities.VideoElementTest.class})
+
 public class AllTests {
 
 }
