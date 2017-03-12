@@ -2,6 +2,7 @@ package eloxExternalAudioRenderer;
 import com.elox.Parser.Audio.Audio;
 
 import javafx.beans.value.ObservableValue;
+import javafx.collections.ObservableMap;
 import javafx.event.EventHandler;
 import javafx.scene.media.*;
 import javafx.util.Duration;
@@ -33,7 +34,7 @@ public class AudioRenderer {
     protected Duration mediaMarkerTimeInterval = new Duration(1000);
     protected EventHandler<MediaMarkerEvent> mediaMarkerEventEventHandler = null;
     protected MediaPlayer audioPlayer = null;
-
+    private Media audioMedia;
     private Audio audioXmlData;
 
     public AudioRenderer (Audio audioXmlData) {
@@ -43,7 +44,6 @@ public class AudioRenderer {
         this.endTime = new Duration(audioXmlData.getEndTime());
         this.playing = audioXmlData.isAutoplayOn();
 
-        Media audioMedia;
         String path = audioXmlData.getPath();
 
         boolean pathFromURL= false; //TODO migh not be needed
@@ -57,10 +57,7 @@ public class AudioRenderer {
             audioMedia = new Media(mediaPath);
         }
 
-        //Create media player
-        audioPlayer = new MediaPlayer(audioMedia);
-        audioPlayer.setAutoPlay(audioXmlData.isAutoplayOn());
-        updateAudioPlayer();
+        createMediaPlayer();
 
         if (playing) play();
 
@@ -73,6 +70,12 @@ public class AudioRenderer {
                 //TODO do we want it to be playable after initial thing or not? I assume so..
             }
         });
+    }
+
+    private void createMediaPlayer(){
+        audioPlayer = new MediaPlayer(audioMedia);
+        audioPlayer.setAutoPlay(audioXmlData.isAutoplayOn());
+        updateAudioPlayer();
     }
 
     private void updateAudioPlayer(){
@@ -138,7 +141,11 @@ public class AudioRenderer {
     }
 
     public void updateMediaMarkers(Duration newMediaMarkerTimeInterval) {
+        ObservableMap<String,Duration> markers = audioMedia.getMarkers();
 
+        for(int i = 1; i <= endTime.toMillis(); i++){
+            markers.put("Test " + Integer.toString(i), newMediaMarkerTimeInterval.multiply(i));
+        }
     }
 
     public boolean isPlaying() {
@@ -147,9 +154,9 @@ public class AudioRenderer {
 
     public void setPlaying(boolean playing) {
         this.playing = playing;
-        if(this.playing != playing){ //TODO contact Rhys and ask why they want a setter..
-            togglePlaying();
-        }
+//        if(this.playing != playing){ //TODO contact Rhys and ask why they want a setter..
+//            togglePlaying();
+//        }
     }
 
     public float getVolume() {

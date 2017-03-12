@@ -128,6 +128,7 @@ public class AudioRendererManualTest extends Application {
     @Override
     public void stop() throws Exception {
         super.stop();
+        myTimer.cancel();
         Platform.exit();
     }
 }
