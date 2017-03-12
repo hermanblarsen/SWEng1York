@@ -29,6 +29,7 @@ public class AudioRendererManualTest extends Application {
     protected MediaPlayer audioPlayer;
     protected GridPane gridPane;
     protected Timer myTimer;
+    protected EventHandler<MediaMarkerEvent> eventHandler;
 
     public static void main(String[] args) {
         launch(args);
@@ -199,6 +200,13 @@ public class AudioRendererManualTest extends Application {
 
         audioRendererUnderTest = new AudioRenderer(xmlAudioElement);
         audioPlayer = audioRendererUnderTest.getAudioPlayer();
+
+//       eventHandler = audioRendererUnderTest.getMediaMarkerEventEventHandler();
+
+       // eventHandler = event -> System.out.println("Testing media markers! " + audioRendererUnderTest.getCurrentTime());
+        //audioRendererUnderTest.setMediaMarkerEventEventHandler(eventHandler);
+//        audioRendererUnderTest.updateMediaMarkers(new Duration(1000));
+
     }
 
     private void setupAudioMarkerHandler() {

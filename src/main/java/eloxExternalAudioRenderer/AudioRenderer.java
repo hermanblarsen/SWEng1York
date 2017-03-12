@@ -332,6 +332,7 @@ public class AudioRenderer {
         for(int i = 0; i < numberOfMediaMarkers; i++){
             this.mediaMarkers.put("Marker: " + Integer.toString(i) + " of " + numberOfMediaMarkers, newMediaMarkerTimeInterval.multiply(i));
         }
+        audioPlayer.setOnMarker(mediaMarkerEventEventHandler);
     }
 
     private Duration verifyDurationRange(Duration value, Duration lowerRange, Duration upperRange){
