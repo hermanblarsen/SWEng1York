@@ -14,12 +14,12 @@ import java.io.File;
  */
 public class AudioRenderer {
 
-    private static final float VOLUME_LOWER_RANGE = 0f;
-    private static final float VOLUME_UPPER_RANGE = 1f;
+    private static final float VOLUME_LOWER_RANGE = 0.0f;
+    private static final float VOLUME_UPPER_RANGE = 1.0f;
     private static final Duration DURATION_LOWER_RANGE = Duration.ZERO;
     private static final Duration DURATION_UPPER_RANGE = Duration.INDEFINITE;
     private static final float PLAYBACK_LOWER_RANGE = Float.MIN_VALUE; //Specified as non-zero in Contract
-    private static final float PLAYBACK_UPPER_RANGE = 10f;
+    private static final float PLAYBACK_UPPER_RANGE = 10.0f;
     private static final Duration INTERVAL_LOWER_RANGE = Duration.ZERO;
     private static final Duration INTERVAL_UPPER_RANGE = Duration.INDEFINITE;
 
@@ -33,19 +33,25 @@ public class AudioRenderer {
     protected Duration mediaMarkerTimeInterval = new Duration(1000);
     protected EventHandler<MediaMarkerEvent> mediaMarkerEventEventHandler = null;
     protected MediaPlayer audioPlayer = null;
+
     private Media audioMedia;
     private Audio audioXmlData;
+    private ObservableMap<String,Duration> mediaMarkers;
 
+    /**
+     *
+     * @param audioXmlData
+     */
     public AudioRenderer (Audio audioXmlData) {
         this.audioXmlData = audioXmlData;
         this.duration = new Duration(audioXmlData.getDuration());
         this.startTime = new Duration(audioXmlData.getStartTime());
         this.endTime = new Duration(audioXmlData.getEndTime());
-        this.playing = audioXmlData.isAutoplayOn();
+        this.playing = false;
 
         String path = audioXmlData.getPath();
 
-        boolean pathFromURL = false; //TODO migh not be needed
+        boolean pathFromURL = false; //TODO might not be needed
         //Create audio media object
         if (path.contains("http://")) {
             audioMedia = new Media(path);
@@ -58,18 +64,16 @@ public class AudioRenderer {
 
         createMediaPlayer();
         setupEventListeners();
+        updateMediaMarkers(mediaMarkerTimeInterval);
 
-        if (playing) play();
+        if (audioXmlData.isAutoplayOn()) play();
     }
 
     private void createMediaPlayer(){
         audioPlayer = new MediaPlayer(audioMedia);
         audioPlayer.setAutoPlay(audioXmlData.isAutoplayOn());
         if (audioXmlData.isLooped()) audioPlayer.setCycleCount(MediaPlayer.INDEFINITE);
-        updateAudioPlayer();
-    }
 
-    private void updateAudioPlayer(){
         this.audioPlayer.setRate(playbackSpeed);
         this.audioPlayer.setStartTime(startTime);
         this.audioPlayer.setStopTime(endTime);
@@ -83,22 +87,38 @@ public class AudioRenderer {
         });
     }
 
+    /**
+     *
+     */
     public void play() {
         playing = true;
         audioPlayer.play();
     }
 
+    /**
+     *
+     * @param endTime
+     */
     public void playTo(Duration endTime) {
         setEndTime(endTime);
         audioPlayer.play();
     }
 
+    /**
+     *
+     * @param startTime
+     */
     public void playFrom(Duration startTime) {
         setStartTime(startTime);
         setCurrentTime(startTime);
         play();
     }
 
+    /**
+     *
+     * @param startTime
+     * @param endTime
+     */
     public void playFromTo(Duration startTime, Duration endTime) {
         setStartTime(startTime);
         setEndTime(endTime);
@@ -106,16 +126,25 @@ public class AudioRenderer {
         play();
     }
 
+    /**
+     *
+     */
     public void pause() {
         playing = false;
         audioPlayer.pause();
     }
 
+    /**
+     *
+     */
     public void stop() {
-        pause();
-        goToStart();
+        audioPlayer.stop();
     }
 
+    /**
+     *
+     * @return
+     */
     public boolean togglePlaying() {
         playing = !playing;
         if(playing) play();
@@ -124,119 +153,200 @@ public class AudioRenderer {
         return playing;
     }
 
+    /**
+     *
+     * @param duration
+     * @return
+     */
     public Duration skip(Duration duration) {
         setCurrentTime(audioPlayer.getCurrentTime().add(duration));
         return currentTime;
     }
 
+    /**
+     *
+     */
     public void goToStart() {
         setCurrentTime(startTime);
     }
 
+    /**
+     *
+     */
    public void replay() {
         goToStart();
         play();
     }
 
+    /**
+     *
+     * @return
+     */
     public boolean isPlaying() {
         return playing;
     }
 
+    //TODO contact Rhys and ask why they want a setter..
+
+    /**
+     *
+     * @param playing
+     */
     public void setPlaying(boolean playing) {
         this.playing = playing;
-//        if(this.playing != playing){ //TODO contact Rhys and ask why they want a setter..
+//        if(this.playing != playing){
 //            togglePlaying();
 //        }
     }
 
+    /**
+     *
+     * @return
+     */
     public float getVolume() {
         return volume;
     }
 
+    /**
+     *
+     * @param volume
+     */
     public void setVolume(float volume) {
         this.volume = verifyFloatRange(volume, VOLUME_LOWER_RANGE, VOLUME_UPPER_RANGE);
-        updateAudioPlayer();
+        this.audioPlayer.setVolume(this.volume);
     }
 
+    /**
+     *
+     * @return
+     */
     public Duration getCurrentTime() {
         currentTime = audioPlayer.getCurrentTime();
         return currentTime;
     }
 
+    /**
+     *
+     * @param currentTime
+     */
     public void setCurrentTime(Duration currentTime) {
         this.currentTime = verifyDurationRange(currentTime, DURATION_LOWER_RANGE, DURATION_UPPER_RANGE);
-        audioPlayer.seek(this.currentTime);
+        this.audioPlayer.seek(this.currentTime);
     }
 
+    /**
+     *
+     * @return
+     */
     public Duration getStartTime() {
         return startTime;
     }
 
+    /**
+     *
+     * @param startTime
+     */
     public void setStartTime(Duration startTime) {
         this.startTime = verifyDurationRange(startTime, DURATION_LOWER_RANGE, DURATION_UPPER_RANGE);
-        updateAudioPlayer();
+        this.audioPlayer.setStartTime(this.startTime);
     }
 
+    /**
+     *
+     * @return
+     */
     public Duration getEndTime() {
         return endTime;
     }
 
+    /**
+     *
+     * @param endTime
+     */
     public void setEndTime(Duration endTime) {
         this.endTime = verifyDurationRange(endTime, DURATION_LOWER_RANGE, DURATION_UPPER_RANGE);
-        updateAudioPlayer();
+        this.audioPlayer.setStopTime(this.endTime);
     }
 
+    /**
+     *
+     * @return
+     */
     public float getPlaybackSpeed() {
         return playbackSpeed;
     }
 
+    /**
+     *
+     * @param playbackSpeed
+     */
     public void setPlaybackSpeed(float playbackSpeed) {
         this.playbackSpeed = verifyFloatRange(playbackSpeed, PLAYBACK_LOWER_RANGE, PLAYBACK_UPPER_RANGE);
-        updateAudioPlayer();
+        this.audioPlayer.setRate(this.playbackSpeed);
     }
 
+    /**
+     *
+     * @return
+     */
     public Duration getMediaMarkerTimeInterval() {
-        return mediaMarkerTimeInterval;
+        return this.mediaMarkerTimeInterval;
     }
 
+    /**
+     *
+     * @param mediaMarkerTimeInterval
+     */
     public void setMediaMarkerTimeInterval(Duration mediaMarkerTimeInterval) {
         this.mediaMarkerTimeInterval = verifyDurationRange(mediaMarkerTimeInterval, INTERVAL_LOWER_RANGE, INTERVAL_UPPER_RANGE);
+        //TODO update something or just set the interval?? Or just remove the "Update and have everything within the setter?"
     }
 
+    /**
+     *
+     * @return
+     */
     public EventHandler<MediaMarkerEvent> getMediaMarkerEventEventHandler() {
-        return mediaMarkerEventEventHandler;
+        this.mediaMarkerEventEventHandler = audioPlayer.getOnMarker();
+        return this.mediaMarkerEventEventHandler;
     }
 
+    /**
+     *
+     * @param mediaMarkerEventEventHandler
+     */
     public void setMediaMarkerEventEventHandler(EventHandler<MediaMarkerEvent> mediaMarkerEventEventHandler) {
         this.mediaMarkerEventEventHandler = mediaMarkerEventEventHandler;
+        this.audioPlayer.setOnMarker(mediaMarkerEventEventHandler);
     }
 
+    /**
+     *
+     * @param newMediaMarkerTimeInterval
+     */
     public void updateMediaMarkers(Duration newMediaMarkerTimeInterval) {
-        ObservableMap<String,Duration> markers = audioMedia.getMarkers();
+        int numberOfMediaMarkers = (int)(this.audioPlayer.getCycleDuration().toMillis()/newMediaMarkerTimeInterval.toMillis());
 
-        for(int i = 1; i <= endTime.toMillis(); i++){
-            markers.put("Test " + Integer.toString(i), newMediaMarkerTimeInterval.multiply(i));
+        this.mediaMarkers = this.audioMedia.getMarkers();
+        this.mediaMarkers.clear(); //Clear if any old markers are present
+        for(int i = 0; i < numberOfMediaMarkers; i++){
+            this.mediaMarkers.put("Marker: " + Integer.toString(i) + " of " + numberOfMediaMarkers, newMediaMarkerTimeInterval.multiply(i));
         }
     }
 
-    private void updateCurrentTime(){
-        currentTime = audioPlayer.getCurrentTime();
-    }
-
     private Duration verifyDurationRange(Duration value, Duration lowerRange, Duration upperRange){
-        if(value.greaterThan(upperRange)) return upperRange;
-        else if(value.lessThan(lowerRange)) return lowerRange;
+        if(value.greaterThanOrEqualTo(upperRange)) return upperRange;
+        else if(value.lessThanOrEqualTo(lowerRange)) return lowerRange;
         else return value;
     }
-
 
     private Float verifyFloatRange(Float value, Float lowerRange, Float upperRange){
-        if(value > upperRange) return upperRange;
-        else if(value < lowerRange) return lowerRange;
+        if(value >= upperRange) return upperRange;
+        else if(value <= lowerRange) return lowerRange;
         else return value;
     }
 
-    public MediaPlayer getAudioPlayer() {
+    protected MediaPlayer getAudioPlayer() {
         return audioPlayer;
     }
 }

@@ -21,9 +21,8 @@ public class AudioRendererTest {
     public void setUp() {
         xmlAudioElement = new Audio();
         setupEloxTestAudio();
-        audioRendererUnderTest = new AudioRenderer(xmlAudioElement);
 
-        audioRendererManualTest = new AudioRendererManualTest();
+        audioRendererUnderTest = new AudioRenderer(xmlAudioElement);
     }
 
     public void setupEloxTestAudio () {
