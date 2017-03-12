@@ -5,12 +5,15 @@ import com.elox.Parser.Audio.Audio;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.layout.GridPane;
+import javafx.scene.media.MediaMarkerEvent;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -25,6 +28,7 @@ public class AudioRendererManualTest extends Application {
     protected MediaPlayer audioPlayer;
     protected GridPane gridPane;
     protected Timer myTimer;
+    protected EventHandler<MediaMarkerEvent> eventHandler;
 
     public static void main(String[] args) {
         launch(args);
@@ -123,6 +127,13 @@ public class AudioRendererManualTest extends Application {
 
         audioRendererUnderTest = new AudioRenderer(xmlAudioElement);
         audioPlayer = audioRendererUnderTest.getAudioPlayer();
+
+//       eventHandler = audioRendererUnderTest.getMediaMarkerEventEventHandler();
+
+       // eventHandler = event -> System.out.println("Testing media markers! " + audioRendererUnderTest.getCurrentTime());
+        //audioRendererUnderTest.setMediaMarkerEventEventHandler(eventHandler);
+//        audioRendererUnderTest.updateMediaMarkers(new Duration(1000));
+
     }
 
     @Override

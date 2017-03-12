@@ -45,7 +45,7 @@ public class AudioRenderer {
 
         String path = audioXmlData.getPath();
 
-        boolean pathFromURL = false; //TODO migh not be needed
+        boolean pathFromURL= false; //TODO might not be needed
         //Create audio media object
         if (path.contains("http://")) {
             audioMedia = new Media(path);
@@ -217,6 +217,7 @@ public class AudioRenderer {
         for(int i = 1; i <= endTime.toMillis(); i++){
             markers.put("Test " + Integer.toString(i), newMediaMarkerTimeInterval.multiply(i));
         }
+        audioPlayer.setOnMarker(mediaMarkerEventEventHandler);
     }
 
     private void updateCurrentTime(){
