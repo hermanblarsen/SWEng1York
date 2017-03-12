@@ -1,7 +1,6 @@
 package eloxExternalAudioRenderer;
 import com.elox.Parser.Audio.Audio;
 
-import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableMap;
 import javafx.event.EventHandler;
 import javafx.scene.media.*;
@@ -46,35 +45,27 @@ public class AudioRenderer {
 
         String path = audioXmlData.getPath();
 
-        boolean pathFromURL= false; //TODO migh not be needed
+        boolean pathFromURL = false; //TODO migh not be needed
         //Create audio media object
-        if(path.contains("http://")){
+        if (path.contains("http://")) {
             audioMedia = new Media(path);
             pathFromURL = true;
-        }else {
+        } else {
             File file = new File(path);
             String mediaPath = file.toURI().toString();
             audioMedia = new Media(mediaPath);
         }
 
         createMediaPlayer();
+        setupEventListeners();
 
         if (playing) play();
-
-        audioPlayer.onEndOfMediaProperty().addListener((ObservableValue<? extends Runnable> observable, Runnable oldValue, Runnable newValue) -> {
-//            if (oldValue.toString() == )
-            if (audioXmlData.isAutoplayOn()){
-                replay();
-            } else {
-                stop();
-                //TODO do we want it to be playable after initial thing or not? I assume so..
-            }
-        });
     }
 
     private void createMediaPlayer(){
         audioPlayer = new MediaPlayer(audioMedia);
         audioPlayer.setAutoPlay(audioXmlData.isAutoplayOn());
+        if (audioXmlData.isLooped()) audioPlayer.setCycleCount(MediaPlayer.INDEFINITE);
         updateAudioPlayer();
     }
 
@@ -83,6 +74,13 @@ public class AudioRenderer {
         this.audioPlayer.setStartTime(startTime);
         this.audioPlayer.setStopTime(endTime);
         this.audioPlayer.setVolume(volume);
+    }
+
+    private void setupEventListeners() {
+        audioPlayer.setOnEndOfMedia(() -> {
+            if (audioXmlData.isLooped()) replay();
+            else stop();
+        });
     }
 
     public void play() {
@@ -138,14 +136,6 @@ public class AudioRenderer {
    public void replay() {
         goToStart();
         play();
-    }
-
-    public void updateMediaMarkers(Duration newMediaMarkerTimeInterval) {
-        ObservableMap<String,Duration> markers = audioMedia.getMarkers();
-
-        for(int i = 1; i <= endTime.toMillis(); i++){
-            markers.put("Test " + Integer.toString(i), newMediaMarkerTimeInterval.multiply(i));
-        }
     }
 
     public boolean isPlaying() {
@@ -219,6 +209,14 @@ public class AudioRenderer {
 
     public void setMediaMarkerEventEventHandler(EventHandler<MediaMarkerEvent> mediaMarkerEventEventHandler) {
         this.mediaMarkerEventEventHandler = mediaMarkerEventEventHandler;
+    }
+
+    public void updateMediaMarkers(Duration newMediaMarkerTimeInterval) {
+        ObservableMap<String,Duration> markers = audioMedia.getMarkers();
+
+        for(int i = 1; i <= endTime.toMillis(); i++){
+            markers.put("Test " + Integer.toString(i), newMediaMarkerTimeInterval.multiply(i));
+        }
     }
 
     private void updateCurrentTime(){

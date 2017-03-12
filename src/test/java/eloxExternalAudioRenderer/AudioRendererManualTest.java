@@ -99,14 +99,14 @@ public class AudioRendererManualTest extends Application {
 
 
         Text statusText = new Text("Status: " + audioStatus);
-        gridPane.add(statusText, 15, 0, 10, 5);
+        gridPane.add(statusText, 15, 0, 5, 10);
         TimerTask updateStatusField = new TimerTask() {
             @Override
             public void run() {
                 audioStatus = audioPlayer.getStatus().toString();
                 statusText.setText("Status: " + audioStatus + System.getProperty("line.separator")
-                        + ", Volume: " + String.format("%.2f", audioPlayer.getVolume()) + System.getProperty("line.separator")
-                        + ", CurrentTime: " + audioPlayer.getCurrentTime().toString());
+                        + "Volume: " + String.format("%.2f", audioPlayer.getVolume()) + System.getProperty("line.separator")
+                        + "CurrentTime: " + audioPlayer.getCurrentTime().toString());
             }
         };
         myTimer.schedule(updateStatusField, 0, 200);
@@ -119,7 +119,7 @@ public class AudioRendererManualTest extends Application {
         xmlAudioElement.setLooped(Boolean.TRUE);
         xmlAudioElement.setAutoplayOn(Boolean.TRUE);
         xmlAudioElement.setStartTime(5000);
-        xmlAudioElement.setEndTime(15000);
+        xmlAudioElement.setEndTime(40000);
 
         audioRendererUnderTest = new AudioRenderer(xmlAudioElement);
         audioPlayer = audioRendererUnderTest.getAudioPlayer();
