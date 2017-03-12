@@ -18,7 +18,7 @@ import java.util.TimerTask;
 /**
  * Created by habl on 11/03/2017.
  */
-public class AudioRendererManualTest extends Application{
+public class AudioRendererManualTest extends Application {
     protected Audio xmlAudioElement;
     protected AudioRenderer audioRendererUnderTest;
     protected String audioStatus;
@@ -31,7 +31,7 @@ public class AudioRendererManualTest extends Application{
     }
 
     @Override
-    public void start(Stage primaryStage){
+    public void start(Stage primaryStage) {
         setupUUT();
         myTimer = new Timer();
         primaryStage.setTitle("Elox Audio Test");
@@ -51,76 +51,75 @@ public class AudioRendererManualTest extends Application{
     private void addButtons() {
         int i = 0;
         Button playAudioButton = new Button("Play");
-        playAudioButton.setOnAction((ActionEvent event)->{
+        playAudioButton.setOnAction((ActionEvent event) -> {
             audioRendererUnderTest.play();
         });
-        gridPane.add(playAudioButton,i,1);
+        gridPane.add(playAudioButton, i, 1);
 
         i++;
         Button toggleAudioButton = new Button("Toggle");
-        toggleAudioButton.setOnAction((ActionEvent event)->{
+        toggleAudioButton.setOnAction((ActionEvent event) -> {
             audioRendererUnderTest.togglePlaying();
             audioStatus = audioRendererUnderTest.getAudioPlayer().getStatus().toString();
         });
-        gridPane.add(toggleAudioButton, i,1);
+        gridPane.add(toggleAudioButton, i, 1);
 
         i++;
         Button pauseAudioButton = new Button("Pause");
-        pauseAudioButton.setOnAction((ActionEvent event)->{
+        pauseAudioButton.setOnAction((ActionEvent event) -> {
             audioRendererUnderTest.pause();
         });
-        gridPane.add(pauseAudioButton, i,1);
+        gridPane.add(pauseAudioButton, i, 1);
 
         i++;
         Button stopAudioButton = new Button("Stop");
-        stopAudioButton.setOnAction((ActionEvent event)->{
+        stopAudioButton.setOnAction((ActionEvent event) -> {
             audioRendererUnderTest.stop();
         });
-        gridPane.add(stopAudioButton, i,1);
+        gridPane.add(stopAudioButton, i, 1);
 
         i++;
         Button volumeUpButton = new Button("VolumeUp");
-        volumeUpButton.setOnAction((ActionEvent event)->{
-            audioRendererUnderTest.setVolume(audioRendererUnderTest.getVolume()+0.1f);
+        volumeUpButton.setOnAction((ActionEvent event) -> {
+            audioRendererUnderTest.setVolume(audioRendererUnderTest.getVolume() + 0.1f);
         });
-        gridPane.add(volumeUpButton, i,1);
+        gridPane.add(volumeUpButton, i, 1);
 
         i++;
         Button volumeDownButton = new Button("VolumeDown");
-        volumeDownButton.setOnAction((ActionEvent event)->{
-            audioRendererUnderTest.setVolume(audioRendererUnderTest.getVolume()-0.1f);
+        volumeDownButton.setOnAction((ActionEvent event) -> {
+            audioRendererUnderTest.setVolume(audioRendererUnderTest.getVolume() - 0.1f);
         });
-        gridPane.add(volumeDownButton, i,1);
+        gridPane.add(volumeDownButton, i, 1);
     }
 
     private void addText() {
         Text testText = new Text("Test for Elox Audio Module");
-        gridPane.add(testText,0,0,5,1);
+        gridPane.add(testText, 0, 0, 5, 1);
 
 
         Text statusText = new Text("Status: " + audioStatus);
-        gridPane.add(statusText,20,0);
+        gridPane.add(statusText, 15, 0, 10, 5);
         TimerTask updateStatusField = new TimerTask() {
             @Override
             public void run() {
                 audioStatus = audioPlayer.getStatus().toString();
-                statusText.setText("Status: " + audioStatus + ", Volume: " + audioPlayer.getVolume() + ", CurrentTime: " + audioPlayer.getCurrentTime().toString());
+                statusText.setText("Status: " + audioStatus + System.getProperty("line.separator")
+                        + ", Volume: " + String.format("%.2f", audioPlayer.getVolume()) + System.getProperty("line.separator")
+                        + ", CurrentTime: " + audioPlayer.getCurrentTime().toString());
             }
         };
-        myTimer.schedule(updateStatusField, 0 , 200);
+        myTimer.schedule(updateStatusField, 0, 200);
     }
 
     public void setupUUT() {
         xmlAudioElement = new Audio();
         xmlAudioElement.setId(1);
-        xmlAudioElement.setStartSequence(1);
-        xmlAudioElement.setEndSequence(2);
-        xmlAudioElement.setDuration(1);
-        xmlAudioElement.setPath("externalResources/NorwegianPimsleur.mp3");
+        xmlAudioElement.setPath("externalResources/example.mp3");
         xmlAudioElement.setLooped(Boolean.TRUE);
         xmlAudioElement.setAutoplayOn(Boolean.TRUE);
-        xmlAudioElement.setStartTime(1);
-        xmlAudioElement.setEndTime(8000);
+        xmlAudioElement.setStartTime(5000);
+        xmlAudioElement.setEndTime(15000);
 
         audioRendererUnderTest = new AudioRenderer(xmlAudioElement);
         audioPlayer = audioRendererUnderTest.getAudioPlayer();
@@ -129,8 +128,6 @@ public class AudioRendererManualTest extends Application{
     @Override
     public void stop() throws Exception {
         super.stop();
-        audioPlayer.stop();
-        audioPlayer.dispose();
         Platform.exit();
     }
 }
