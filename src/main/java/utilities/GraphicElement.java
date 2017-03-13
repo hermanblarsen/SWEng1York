@@ -1,35 +1,30 @@
 package utilities;
 
+import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import javafx.scene.shape.Shape;
+
 
 /**
  * Created by habl on 26/02/2017.
+ * Modified by Zain 11/03/2017.
  */
 @SuppressWarnings({"WeakerAccess", "unused"})
 public class GraphicElement extends SlideElement {
     protected boolean aspectRatioLock;
     protected float elementAspectRatio;
+
+    //Shape Properties:
     protected String lineColour;
     protected String fillColour;
+    private static final double LINE_THICKNESS = 3;
 
-    protected boolean isPolygon;
+    protected Shape graphicShape;
 
-    //Polygon
-    protected Polygon polygon;
-
-    //Oval
-    protected Oval oval;
-
-    Logger logger = LoggerFactory.getLogger(GraphicElement.class);
-    Pane slideCanvas;//The ParentPane of this element
-    Pane wrapperCanvas;//There is a need to wrap the canvas that we draw to
-    Canvas internalCanvas; //What we actually draw to
+    private Pane wrapperPane;//Wrap the graphics within its own pane so that absolute positioning works properly.
 
     public GraphicElement() {
 
@@ -37,43 +32,23 @@ public class GraphicElement extends SlideElement {
 
     @Override
     void doClassSpecificRender() {
-        //TODO: Refresh canvas. Unsure if this deos this.
-        wrapperCanvas.requestLayout();
 
-        //Draw Polygons in here
-        final GraphicsContext gc = internalCanvas.getGraphicsContext2D();
-        gc.clearRect(0, 0, internalCanvas.getWidth(), internalCanvas.getHeight());
-
-        gc.setFill(Color.BLACK);
-        gc.setLineWidth(5);
-
-        gc.setStroke(Color.BLUEVIOLET);
-        gc.strokeOval(30, 60, 30, 30);
-        gc.setStroke(Color.BLUE);
-        gc.strokeOval(50, 60, 30, 30);
-        gc.setStroke(Color.INDIANRED);
-        gc.strokeOval(70, 60, 30, 30);
     }
 
     @Override
     public Node getCoreNode() {
-        return wrapperCanvas;
+        return wrapperPane;
     }
 
     @Override
     void setupElement() {
-        // Create a wrapper Pane first
-        wrapperCanvas = new Pane();
+        wrapperPane = new Pane();
 
-        internalCanvas = new Canvas(wrapperCanvas.getWidth(), wrapperCanvas.getHeight());
-        wrapperCanvas.getChildren().add(internalCanvas);
+        graphicShape.setFill(parseRGBAString(fillColour));
+        graphicShape.setStroke(parseRGBAString(lineColour));
+        graphicShape.setStrokeWidth(LINE_THICKNESS);
 
-        // Bind the width/height property to the wrapper Pane
-        internalCanvas.widthProperty().bind(wrapperCanvas.widthProperty());
-        internalCanvas.heightProperty().bind(wrapperCanvas.heightProperty());
-        // redraw when resized
-        internalCanvas.widthProperty().addListener(event -> renderElement(0));
-        internalCanvas.heightProperty().addListener(event -> renderElement(0));
+        wrapperPane.getChildren().add(graphicShape);
 
         //TODO: Create Animations here, but move to setAnimation setter when XML implemented
         startAnimation = new Animation();
@@ -88,8 +63,9 @@ public class GraphicElement extends SlideElement {
         return aspectRatioLock;
     }
 
-    public void setAspectRatioLock(boolean aspectRatioLock) {
+    public GraphicElement setAspectRatioLock(boolean aspectRatioLock) {
         this.aspectRatioLock = aspectRatioLock;
+        return this;
     }
 
     public float getElementAspectRatio() {
@@ -104,41 +80,29 @@ public class GraphicElement extends SlideElement {
         return lineColour;
     }
 
-    public void setLineColour(String lineColour) {
+    public GraphicElement setLineColour(String lineColour) {
         this.lineColour = lineColour;
+        return this;
     }
 
     public String getFillColour() {
         return fillColour;
     }
 
-    public void setFillColour(String fillColour) {
+    public GraphicElement setFillColour(String fillColour) {
         this.fillColour = fillColour;
+        return this;
     }
 
-    public Polygon getPolygon() {
-        return polygon;
+    public GraphicElement setShape(Shape shape) {
+        this.graphicShape = shape;
+        return this;
     }
 
-    public void setPolygon(Polygon polygon) {
-        this.polygon = polygon;
+    public static Color parseRGBAString(String rgba){
+       String rgb = rgba.substring(0, 6);
+       String alphaString = rgba.substring(6);
+       double alpha = Integer.parseInt(alphaString, 16)/255;
+       return Color.web(rgb, alpha);
     }
-
-    public Oval getOval() {
-        return oval;
-    }
-
-    public void setOval(Oval oval) {
-        this.oval = oval;
-    }
-
-    public boolean isPolygon() {
-        return isPolygon;
-    }
-
-    public void setPolygon(boolean polygon) {
-        isPolygon = polygon;
-    }
-
-
 }
