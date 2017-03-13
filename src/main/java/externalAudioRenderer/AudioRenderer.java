@@ -41,7 +41,7 @@ public class AudioRenderer {
      * @param audioXmlData
      */
     public AudioRenderer (Audio audioXmlData) {
-        audioXmlData = audioXmlData;
+        this.audioXmlData = audioXmlData;
         startTime = new Duration(audioXmlData.getStartTime());
         endTime = new Duration(audioXmlData.getEndTime());
         playing = false;
