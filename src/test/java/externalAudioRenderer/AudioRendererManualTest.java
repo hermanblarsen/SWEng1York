@@ -1,4 +1,4 @@
-package eloxExternalAudioRenderer;
+package externalAudioRenderer;
 
 import com.elox.Parser.Audio.Audio;
 
@@ -151,22 +151,15 @@ public class AudioRendererManualTest extends Application {
 
         i=0;
         c++;
-        Button setNewMediaMarkerButton = new Button("New Interval 2s");
+        Button setNewMediaMarkerButton = new Button("Set Interval 2s");
         setNewMediaMarkerButton.setOnAction((ActionEvent event) -> {
             audioRendererUnderTest.setMediaMarkerTimeInterval(Duration.seconds(2));
         });
         gridPane.add(setNewMediaMarkerButton, i, c, 2, 1);
-
-        i+=2;
-        Button updateMediaMarkers = new Button("Update Interval 3s");
-        updateMediaMarkers.setOnAction((ActionEvent event) -> {
-            audioRendererUnderTest.updateMediaMarkers(Duration.seconds(3));
-        });
-        gridPane.add(updateMediaMarkers, i, c, 2, 1);
     }
 
     private void addText() {
-        Text testText = new Text("Test for Elox Audio Module");
+        Text testText = new Text("Test Suite for Elox Audio Module");
         gridPane.add(testText, 1, 0, 5, 1);
 
 
@@ -183,7 +176,7 @@ public class AudioRendererManualTest extends Application {
                         + "StartTime: " + audioRendererUnderTest.getStartTime().toMillis() + " ms " + System.getProperty("line.separator")
                         + "EndTime: " + audioRendererUnderTest.getEndTime().toMillis() + " ms " + System.getProperty("line.separator")
                         + "CurrentTime: " + audioRendererUnderTest.getCurrentTime().toMillis() + " ms" + System.getProperty("line.separator")
-                        + "MediaMarkerInterval: " + audioRendererUnderTest.getMediaMarkerTimeInterval().toMillis() + " ms");
+                        + "MediaMarkerInterval field: " + audioRendererUnderTest.getMediaMarkerTimeInterval().toMillis() + " ms");
             }
         };
         myTimer.schedule(updateStatusField, 0, 50);
@@ -191,22 +184,15 @@ public class AudioRendererManualTest extends Application {
 
     public void setupUUT() {
         xmlAudioElement = new Audio();
-        xmlAudioElement.setId(1);
-        xmlAudioElement.setPath("externalResources/example.mp3");
+        xmlAudioElement.setPath("externalResources/example.mp3"); //Local test file
+//        xmlAudioElement.setPath("https://archive.org/download/testmp3testfile/mpthreetest.mp3"); //Internet Test file
         xmlAudioElement.setLooped(Boolean.TRUE);
         xmlAudioElement.setAutoplayOn(Boolean.TRUE);
         xmlAudioElement.setStartTime(0);
-        xmlAudioElement.setEndTime(50000);
+        xmlAudioElement.setEndTime(35500);
 
         audioRendererUnderTest = new AudioRenderer(xmlAudioElement);
         audioPlayer = audioRendererUnderTest.getAudioPlayer();
-
-//       eventHandler = audioRendererUnderTest.getMediaMarkerEventEventHandler();
-
-       // eventHandler = event -> System.out.println("Testing media markers! " + audioRendererUnderTest.getCurrentTime());
-        //audioRendererUnderTest.setMediaMarkerEventEventHandler(eventHandler);
-//        audioRendererUnderTest.updateMediaMarkers(new Duration(1000));
-
     }
 
     private void setupAudioMarkerHandler() {
@@ -219,8 +205,7 @@ public class AudioRendererManualTest extends Application {
                 Platform.runLater(new Runnable() {
                     @Override
                     public void run() {
-                        markerText.setText("Marker Content: " + event.getMarker().getKey()
-                                + " at time " + event.getMarker().getValue());
+                        markerText.setText("Marker Content: " + event.getMarker().getKey());
                     }
                 });
             }
@@ -230,8 +215,8 @@ public class AudioRendererManualTest extends Application {
         boolean equalMarkers = false;
         if ( mediaMarkerEventHandler == audioRendererUnderTest.getMediaMarkerEventEventHandler()) equalMarkers = true;
 
-        Text markeszEqualText = new Text("Eventhandlers equal comparing with getEventHandler(): " + equalMarkers);
-        gridPane.add(markeszEqualText, 1, 2, 5, 1);
+        Text markerIsEqualText = new Text("Eventhandlers equal comparing with getEventHandler(): " + equalMarkers);
+        gridPane.add(markerIsEqualText, 1, 2, 5, 1);
     }
 
     @Override
