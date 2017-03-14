@@ -273,25 +273,25 @@ public class PresentationViewer extends Application {
                 ).build()
         );
         myGraphicElement3.setSlideCanvas(slide1);
-        slideElementsSlide1.add(myGraphicElement3)
+        slideElementsSlide1.add(myGraphicElement3);
 
-        VideoElement myVideoElement = new VideoElement();
-        myVideoElement.setMediaPath("externalResources/prometheus.mp4");
-        myVideoElement.setAutoPlay(true);
-        myVideoElement.setMediaControl(true);
-        myVideoElement.setLoop(false);
-        myVideoElement.setVideoStartTime(Duration.seconds(0));
-        //myVideoElement.setVideoEndTime(Duration.seconds(7));
-        myVideoElement.setAspectRatioLock(true);
-        //myVideoElement.setxPosition(200);
-       // myVideoElement.setyPosition(200);
-        myVideoElement.setxSize(2000);
-        myVideoElement.setySize(2000);
-        myVideoElement.setLayer(3);
-        myVideoElement.setStartSequence(6);
-        myVideoElement.setEndSequence(7);
-        myVideoElement.setSlideCanvas(slide1);
-        slideElementsSlide1.add(myVideoElement);
+//        VideoElement myVideoElement = new VideoElement();
+//        myVideoElement.setMediaPath("externalResources/prometheus.mp4");
+//        myVideoElement.setAutoPlay(true);
+//        myVideoElement.setMediaControl(true);
+//        myVideoElement.setLoop(false);
+//        myVideoElement.setVideoStartTime(Duration.seconds(0));
+//        //myVideoElement.setVideoEndTime(Duration.seconds(7));
+//        myVideoElement.setAspectRatioLock(true);
+//        //myVideoElement.setxPosition(200);
+//       // myVideoElement.setyPosition(200);
+//        myVideoElement.setxSize(2000);
+//        myVideoElement.setySize(2000);
+//        myVideoElement.setLayer(3);
+//        myVideoElement.setStartSequence(6);
+//        myVideoElement.setEndSequence(7);
+//        myVideoElement.setSlideCanvas(slide1);
+//        slideElementsSlide1.add(myVideoElement);
 
         TextElement myTextElement1 = new TextElement();
         myTextElement1.setLayer(5);
