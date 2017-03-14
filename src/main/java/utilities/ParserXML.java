@@ -447,8 +447,7 @@ public class ParserXML {
                         graphicElement.setFillColour(elementContent);
                         break;
                     case "polygon":
-                        graphicElement.setPolygon(true);
-                        Polygon polygon = new Polygon();
+                        PolygonBuilder polygon = new PolygonBuilder();
                         NodeList polygonNodeChildrenList = elementNode.getChildNodes();
 
                         for (int i = 0; i < polygonNodeChildrenList.getLength(); i++) {
@@ -485,12 +484,11 @@ public class ParserXML {
                                         break;
                                 }
                             }
-                            graphicElement.setPolygon(polygon);
                         }
+                        graphicElement.setShape(polygon.build());
                         break;
                     case "oval":
-                        graphicElement.setPolygon(false);
-                        Oval oval = new Oval();
+                        OvalBuilder oval = new OvalBuilder();
                         NodeList ovalNodeChildrenList = elementNode.getChildNodes();
 
                         for (int i = 0; i < ovalNodeChildrenList.getLength(); i++) {
@@ -521,9 +519,8 @@ public class ParserXML {
                                         break;
                                 }
                             }
-                            graphicElement.setOval(oval);
                         }
-
+                        graphicElement.setShape(oval.build());
                         break;
                     default:
                         System.out.println("Element Not Recognised! Name: " + elementName +

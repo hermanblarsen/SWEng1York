@@ -9,8 +9,8 @@ import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
 @SuiteClasses({ utilities.ParserXMLTest.class,
-                utilities.VideoElementTest.class})
-
+                utilities.VideoElementTest.class,
+                utilities.GraphicElementTest.class })
 public class AllTests {
 
 }

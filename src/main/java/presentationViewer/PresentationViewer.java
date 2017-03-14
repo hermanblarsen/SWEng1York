@@ -196,13 +196,13 @@ public class PresentationViewer extends Application {
     private void controlPresentation(int direction) {
         int presentationStatus = myPresentationElement.advance(direction);
 
-        //If Presentation handler told us that slide is changing, update the Slide present on Main screen
-        //Can do specific things when presentation reached end, or start.
+        // If Presentation handler told us that slide is changing, update the Slide present on Main screen
+        // Can do specific things when presentation reached end, or start.
         if ((presentationStatus == Presentation.SLIDE_CHANGE) || (presentationStatus == Presentation.PRESENTATION_FINISH) || (presentationStatus == Presentation.PRESENTATION_START)) {
-           // logger.info("Changing Slides");
-            //Update MainUI panes when changing slides to account for new Slide root pane.
+            // logger.info("Changing Slides");
+            // Update MainUI panes when changing slides to account for new Slide root pane.
             border.setCenter(myPresentationElement.getCurrentSlide());
-            //border.setBottom(addStatBar(myPresentationElement.getCurrentSlide()));
+            // border.setBottom(addStatBar(myPresentationElement.getCurrentSlide()));
         }
 
 
@@ -227,12 +227,53 @@ public class PresentationViewer extends Application {
         myTextElement.setSlideCanvas(slide1);
         slideElementsSlide1.add(myTextElement);
 
+        GraphicElement myGraphicElement2 = new GraphicElement();
+        myGraphicElement2.setLayer(1);
+        myGraphicElement2.setStartSequence(3);
+        myGraphicElement2.setEndSequence(5);
+        myGraphicElement2.setFillColour("00000000");
+        myGraphicElement2.setLineColour("00FF00FF");
+        myGraphicElement2.setShape(new PolygonBuilder(
+                        new float[]{100, 100, 200},
+                        new float[]{100, 200, 200},
+                        false
+                ).build()
+        );
+        myGraphicElement2.setSlideCanvas(slide1);
+        slideElementsSlide1.add(myGraphicElement2);
+
         GraphicElement myGraphicElement = new GraphicElement();
-        myGraphicElement.setLayer(1);
+        myGraphicElement.setLayer(2);
         myGraphicElement.setStartSequence(2);
-        myGraphicElement.setEndSequence(4);
+        myGraphicElement.setEndSequence(5);
+        myGraphicElement.setFillColour("00000000");
+        myGraphicElement.setLineColour("0000FFFF");
+        myGraphicElement.setShape(new OvalBuilder(
+                        500.0f,
+                        100.0f,
+                        30.0f,
+                        30.0f,
+                        0
+                ).build()
+        );
         myGraphicElement.setSlideCanvas(slide1);
         slideElementsSlide1.add(myGraphicElement);
+
+
+        GraphicElement myGraphicElement3 = new GraphicElement();
+        myGraphicElement3.setLayer(3);
+        myGraphicElement3.setStartSequence(4);
+        myGraphicElement3.setEndSequence(6);
+        myGraphicElement3.setFillColour("FF0000FF");
+        myGraphicElement3.setLineColour("0000FFFF");
+        myGraphicElement3.setShape( new PolygonBuilder(
+                        new float[]{500, 100, 200, 200},
+                        new float[]{100, 200, 200, 100},
+                        true
+                ).build()
+        );
+        myGraphicElement3.setSlideCanvas(slide1);
+        slideElementsSlide1.add(myGraphicElement3);
 
 //        VideoElement myVideoElement = new VideoElement();
 //        myVideoElement.setMediaPath("externalResources/prometheus.mp4");
@@ -246,16 +287,16 @@ public class PresentationViewer extends Application {
 //       // myVideoElement.setyPosition(200);
 //        myVideoElement.setxSize(2000);
 //        myVideoElement.setySize(2000);
-//        myVideoElement.setLayer(2);
-//        myVideoElement.setStartSequence(5);
-//        myVideoElement.setEndSequence(6);
+//        myVideoElement.setLayer(3);
+//        myVideoElement.setStartSequence(6);
+//        myVideoElement.setEndSequence(7);
 //        myVideoElement.setSlideCanvas(slide1);
 //        slideElementsSlide1.add(myVideoElement);
 
         TextElement myTextElement1 = new TextElement();
-        myTextElement1.setLayer(3);
-        myTextElement1.setStartSequence(3);
-        myTextElement1.setEndSequence(4);
+        myTextElement1.setLayer(5);
+        myTextElement1.setStartSequence(7);
+        myTextElement1.setEndSequence(8);
         myTextElement1.setTextContent("<b>This is some sample text for Adar to be impressed by</b>");
         myTextElement1.setSlideCanvas(slide1);
         slideElementsSlide1.add(myTextElement1);
