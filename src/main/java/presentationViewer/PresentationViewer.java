@@ -1,6 +1,9 @@
 package presentationViewer;
 
+import javafx.animation.*;
+import javafx.animation.Animation;
 import javafx.application.Application;
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -28,6 +31,7 @@ public class PresentationViewer extends Application {
     private Presentation myPresentationElement;
     private ProgressBar pb;
     private Label slideNumber;
+    private Boolean isFullscreen = false;
 
     public static void main(String[] args){launch(args);}
 
@@ -39,7 +43,6 @@ public class PresentationViewer extends Application {
         scene = new Scene(border, 1000, 600);
         scene.getStylesheets().add("bootstrapfx.css");
         primaryStage.setScene(scene);
-        border.setCenter(new StackPane());
         primaryStage.show();
         loadPresentation(border, "shit");
         pb = new ProgressBar(0);
@@ -65,7 +68,7 @@ public class PresentationViewer extends Application {
 
         //Keyboard listener for moving through presentation
         scene.setOnKeyPressed(key -> {
-            int presentationStatus = 0;
+
             if (key.getCode().equals(KeyCode.RIGHT)) {
                 controlPresentation(Slide.SLIDE_FORWARD);
                 slideProgress(myPresentationElement);
@@ -75,40 +78,45 @@ public class PresentationViewer extends Application {
             }
         });
 
+
     }
 
-    Boolean isFullscreen = false; //TODO Move this somewhere sensible
     public HBox addPresentationControls(Stage primaryStage){
-
         HBox presControls = new HBox();
         presControls.setStyle("-fx-background-color: #34495e;");
-
-
-        Image next = new Image("file:externalResources/Right_NEW.png");
+        presControls.setMinHeight(10);
+        Image next = new Image("file:externalResources/Right_NEW.png",30,30,true,true);
         ImageView nextButton = new ImageView(next);
         nextButton.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
+
                 controlPresentation(Slide.SLIDE_FORWARD);
                 slideProgress(myPresentationElement);
+
             }
         });
 
-        Image back = new Image("file:externalResources/Left_NEW.png");
+        Image back = new Image("file:externalResources/Left_NEW.png",30,30,true,true);
         ImageView backButton = new ImageView(back);
         backButton.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
+
                 controlPresentation(Slide.SLIDE_BACKWARD);
                 slideProgress(myPresentationElement);
+
             }
         });
 
-        Image fullScreen = new Image("file:externalResources/Fullscreen_NEW.png");
+        Image fullScreen = new Image("file:externalResources/Fullscreen_NEW.png", 30,30,true,true);
+
         ImageView fullScreenButton = new ImageView(fullScreen);
+
         fullScreenButton.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
+
                 if(isFullscreen == false) {
                     primaryStage.setFullScreen(true);
                     isFullscreen = true;
@@ -117,19 +125,62 @@ public class PresentationViewer extends Application {
                     primaryStage.setFullScreen(false);
                     isFullscreen = false;
                 }
-            }
-        });
 
+            }
+
+        });
 
         StackPane sp = new StackPane();
         sp.getChildren().addAll(pb,slideNumber);
 
+        presControls.addEventHandler(MouseEvent.MOUSE_ENTERED, evt ->{
 
+            presControls.getChildren().addAll(backButton,nextButton,fullScreenButton,sp);
 
-        presControls.getChildren().addAll(backButton,nextButton,fullScreenButton,sp);
+            FadeTransition ft = new FadeTransition(Duration.millis(300),backButton);
+            ft.setFromValue(0.0);
+            ft.setToValue(1.0);
+            ft.play();
+            FadeTransition ft2 = new FadeTransition(Duration.millis(300),nextButton);
+            ft2.setFromValue(0.0);
+            ft2.setToValue(1.0);
+            ft2.play();
+            FadeTransition ft3 = new FadeTransition(Duration.millis(300),fullScreenButton);
+            ft3.setFromValue(0.0);
+            ft3.setToValue(1.0);
+            ft3.play();
+            FadeTransition ft4 = new FadeTransition(Duration.millis(300),sp);
+            ft4.setFromValue(0.0);
+            ft4.setToValue(1.0);
+            ft4.play();
 
+        });
+        presControls.addEventHandler(MouseEvent.MOUSE_EXITED, evt->{
+            FadeTransition ft = new FadeTransition(Duration.millis(300),backButton);
+            ft.setFromValue(1.0);
+            ft.setToValue(0.0);
+            ft.play();
+            FadeTransition ft2 = new FadeTransition(Duration.millis(300),nextButton);
+            ft2.setFromValue(1.0);
+            ft2.setToValue(0.0);
+            ft2.play();
+            FadeTransition ft3 = new FadeTransition(Duration.millis(300),fullScreenButton);
+            ft3.setFromValue(1.0);
+            ft3.setToValue(0.0);
+            ft3.play();
+            FadeTransition ft4 = new FadeTransition(Duration.millis(300),sp);
+            ft4.setFromValue(1.0);
+            ft4.setToValue(0.0);
+            ft4.play();
 
+            ft4.setOnFinished(new EventHandler<ActionEvent>() {
+                @Override
+                public void handle(ActionEvent event) {
+                    presControls.getChildren().removeAll(backButton, nextButton, fullScreenButton, sp);
+                }
+            });
 
+        });
 
         return presControls;
     }
@@ -269,6 +320,24 @@ public class PresentationViewer extends Application {
         slideElementsSlide2.add(myTextElementNewSlide);
 
         slide2.setSlideElementList(slideElementsSlide2);
+
+        Slide slide3 = new Slide();
+        slide3.setSlideID(3);
+        slides.add(slide3);
+
+        //Create some test Slide Elements
+        ArrayList<SlideElement> slideElementsSlide3 = new ArrayList<>();
+
+        //Create a test Text element, add some text and pop it onto our stack pane. This code will all be driven from XML parser
+        TextElement myTextElementNewSlide2 = new TextElement();
+        myTextElementNewSlide2.setLayer(1);
+        myTextElementNewSlide2.setStartSequence(1);
+        myTextElementNewSlide2.setEndSequence(2);
+        myTextElementNewSlide2.setTextContent("<b>Slide3</b>");
+        myTextElementNewSlide2.setSlideCanvas(slide3);
+        slideElementsSlide3.add(myTextElementNewSlide2);
+
+        slide3.setSlideElementList(slideElementsSlide3);
 
         Presentation myPresentation = new Presentation();
         myPresentation.setSlideList(slides);

@@ -1,4 +1,4 @@
-package eloxExternalAudioRenderer;
+package externalAudioRenderer;
 
 import com.elox.Parser.Audio.Audio;
 
@@ -13,17 +13,17 @@ import org.junit.Test;
  */
 public class AudioRendererTest {
 
+    //TODO won't work without javaFX envionment to instantiate in. See Manual test suite.
+
     Audio xmlAudioElement;
-    AudioRendererManualTest audioRendererManualTest;
     AudioRenderer audioRendererUnderTest;
 
     @Before
     public void setUp() {
         xmlAudioElement = new Audio();
         setupEloxTestAudio();
-        audioRendererUnderTest = new AudioRenderer(xmlAudioElement);
 
-        audioRendererManualTest = new AudioRendererManualTest();
+        audioRendererUnderTest = new AudioRenderer(xmlAudioElement);
     }
 
     public void setupEloxTestAudio () {
