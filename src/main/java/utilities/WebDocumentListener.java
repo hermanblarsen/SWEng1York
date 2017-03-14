@@ -25,7 +25,8 @@ class WebDocumentListener implements ChangeListener<Document> {
             f.setAccessible(true);
             WebPage page = (WebPage) f.get(webEngine);
             // Set the background color of the page to be transparent.
-            page.setBackgroundColor((new java.awt.Color(0, 0, 0, 0)).getRGB());
+            //page.setBackgroundColor((new java.awt.Color(0, 0, 0, 0)).getRGB());
+            page.setBackgroundColor((new java.awt.Color(255, 255, 255, 0)).getRGB());
         } catch (Exception e) {
             System.out.println("Error: " + e);
         }
