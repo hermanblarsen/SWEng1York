@@ -49,10 +49,9 @@ public abstract class Dashboard extends Application {
 
 
         border.setTop(addBorderTop());
-        border.setLeft(addVBox());
-
-        border.setCenter(addCenter());
-        border.setRight(addFlowPane());
+        border.setLeft(addLeftPanel());
+        border.setCenter(addCenterPanel());
+        border.setRight(addRightPanel());
 
         primaryStage.show();
 
@@ -99,7 +98,7 @@ public abstract class Dashboard extends Application {
         }
     }
 
-    private ScrollPane addCenter() {
+    private ScrollPane addCenterPanel() {
 
         FlowPane presentationsFlowPane = new FlowPane(Orientation.HORIZONTAL);
 
@@ -183,12 +182,12 @@ public abstract class Dashboard extends Application {
         return topPanel;
     }
 
-    private VBox addVBox() {
+    private VBox addLeftPanel() {
         VBox vbox = new VBox();
         vbox.setPadding(new Insets(10));
         vbox.setSpacing(8);
 
-        //Generate flexible flowplane to store shape buttons
+        /*//Generate flexible flowplane to store shape buttons
         FlowPane controlsPane = new FlowPane();
         controlsPane.setPadding(new Insets(5, 0, 5, 0));
         controlsPane.setVgap(4);
@@ -216,17 +215,95 @@ public abstract class Dashboard extends Application {
         controlsPane.getChildren().add(fillButton1);
         Button fillButton2 = new Button("Filler");
         fillButton2.getStyleClass().setAll("btn", "btn-danger");
-        controlsPane.getChildren().add(fillButton2);
+        controlsPane.getChildren().add(fillButton2);*/
+
+        VBox controlsPane = new VBox();
+        controlsPane.setPadding(new Insets(3, 0, 3, 0));
+        controlsPane.setSpacing(3);
+        controlsPane.setStyle("-fx-background-color: #ffffff;");
+
+        Button subjectButton1 = new Button("Subject 1");
+        subjectButton1.getStyleClass().setAll("btn", "btn-success");
+        controlsPane.getChildren().add(subjectButton1);
+
+        Button subjectButton2 = new Button("Subject 3");
+        subjectButton2.getStyleClass().setAll("btn", "btn-success");
+        controlsPane.getChildren().add(subjectButton2);
+
+        Button subjectButton3 = new Button("Subject 3");
+        subjectButton3.getStyleClass().setAll("btn", "btn-success");
+        controlsPane.getChildren().add(subjectButton3);
 
         //Create Panel for shapes
         Panel slideControls = new Panel();
-        slideControls.setText("Slide Controls");
+        slideControls.setText("My subjects");
         slideControls.getStyleClass().add("panel-primary");
         slideControls.setBody(controlsPane);
         VBox.setMargin(slideControls, new Insets(0, 0, 0, 0));
         vbox.getChildren().add(slideControls);
 
         return vbox;
+    }
+
+    private ScrollPane addRightPanel() {
+        ScrollPane scroll = new ScrollPane();
+
+        FlowPane flow = new FlowPane();
+        flow.setPadding(new Insets(5, 0, 5, 0));
+        flow.setVgap(4);
+        flow.setHgap(4);
+        flow.setPrefWrapLength(170); // preferred width allows for two columns
+        flow.setStyle("-fx-background-color: #ffffff;");
+
+        int numSlides = 20;
+
+        Panel[] slides = new Panel[numSlides];
+
+        for (int i = 0; i < numSlides; i++) {
+            slides[i] = new Panel();
+            slides[i].getStyleClass().add("panel-primary");
+            slides[i].setBody(new Text("Slide panel preview here."));
+            slides[i].setPrefWidth(170);//Dynamic resizing of panel width possible?
+            flow.getChildren().add(slides[i]);
+            flow.setMargin(slides[i], new Insets(0, 20, 0, 5));
+        }
+
+        scroll.setContent(flow);
+
+        return scroll;
+    }
+
+    private HBox addStatBar(Slide presentationElement) {
+        HBox hbox = new HBox();
+        hbox.setPadding(new Insets(0, 12, 0, 12));
+        hbox.setSpacing(2);
+        hbox.setStyle("-fx-background-color: #34495e;");
+
+        BorderPane border = new BorderPane();
+
+        Text versionText = new Text("Version 0.0.1 Alpha");
+        versionText.setFont(Font.font("San Francisco", FontWeight.NORMAL, 12));
+        versionText.setFill(Color.WHITE);
+
+        border.setLeft(versionText);
+
+        border.setCenter(new Text("                                                     "));
+
+        Text coordTextBar = new Text("Mouse data not available!");
+        coordTextBar.setFont(Font.font("San Francisco", FontWeight.NORMAL, 12));
+        coordTextBar.setFill(Color.WHITE);
+
+        border.setRight(coordTextBar);
+
+        //TODO: This stops working when WebView enters Slide
+        presentationElement.setOnMouseMoved(event -> coordTextBar.setText(
+                "Slide Number: " + presentationElement.getSlideID() + " (x: " + event.getX() + ", y: " + event.getY() + ") -- " +
+                        "(sceneX: " + event.getSceneX() + ", sceneY: " + event.getSceneY() + ") -- " +
+                        "(screenX: " + event.getScreenX() + ", screenY: " + event.getScreenY() + ")"));
+
+        hbox.getChildren().addAll(border);
+
+        return hbox;
     }
 
     public Presentation generateTestPresentation() {
@@ -346,67 +423,6 @@ public abstract class Dashboard extends Application {
 
 
         return myPresentation;
-    }
-
-    private ScrollPane addFlowPane() {
-        ScrollPane scroll = new ScrollPane();
-
-        FlowPane flow = new FlowPane();
-        flow.setPadding(new Insets(5, 0, 5, 0));
-        flow.setVgap(4);
-        flow.setHgap(4);
-        flow.setPrefWrapLength(170); // preferred width allows for two columns
-        flow.setStyle("-fx-background-color: #ffffff;");
-
-        int numSlides = 20;
-
-        Panel[] slides = new Panel[numSlides];
-
-        for (int i = 0; i < numSlides; i++) {
-            slides[i] = new Panel();
-            slides[i].getStyleClass().add("panel-primary");
-            slides[i].setBody(new Text("Slide panel preview here."));
-            slides[i].setPrefWidth(170);//Dynamic resizing of panel width possible?
-            flow.getChildren().add(slides[i]);
-            flow.setMargin(slides[i], new Insets(0, 20, 0, 5));
-        }
-
-        scroll.setContent(flow);
-
-        return scroll;
-    }
-
-    private HBox addStatBar(Slide presentationElement) {
-        HBox hbox = new HBox();
-        hbox.setPadding(new Insets(0, 12, 0, 12));
-        hbox.setSpacing(2);
-        hbox.setStyle("-fx-background-color: #34495e;");
-
-        BorderPane border = new BorderPane();
-
-        Text versionText = new Text("Version 0.0.1 Alpha");
-        versionText.setFont(Font.font("San Francisco", FontWeight.NORMAL, 12));
-        versionText.setFill(Color.WHITE);
-
-        border.setLeft(versionText);
-
-        border.setCenter(new Text("                                                     "));
-
-        Text coordTextBar = new Text("Mouse data not available!");
-        coordTextBar.setFont(Font.font("San Francisco", FontWeight.NORMAL, 12));
-        coordTextBar.setFill(Color.WHITE);
-
-        border.setRight(coordTextBar);
-
-        //TODO: This stops working when WebView enters Slide
-        presentationElement.setOnMouseMoved(event -> coordTextBar.setText(
-                "Slide Number: " + presentationElement.getSlideID() + " (x: " + event.getX() + ", y: " + event.getY() + ") -- " +
-                        "(sceneX: " + event.getSceneX() + ", sceneY: " + event.getSceneY() + ") -- " +
-                        "(screenX: " + event.getScreenX() + ", screenY: " + event.getScreenY() + ")"));
-
-        hbox.getChildren().addAll(border);
-
-        return hbox;
     }
 
     public void setEdiManager(EdiManager ediManager) {
