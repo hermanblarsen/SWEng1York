@@ -30,8 +30,8 @@ public class VideoElement extends SlideElement {
 
     protected float xPosition;
     protected float yPosition;
-    protected float xSize;
-    protected float ySize;
+    protected float xSize = 0;
+    protected float ySize = 0;
     protected String path;
     protected String onClickAction;
     protected boolean loop;
@@ -42,7 +42,7 @@ public class VideoElement extends SlideElement {
     protected Duration startTime;
     protected Duration endTime;
     //protected Animation startAnimation, endAnimation;
-    protected Pane slideCanvas;
+    //protected Pane slideCanvas;
     protected MediaView mv;
     protected MediaPlayer mp;
     protected Media media;
@@ -58,7 +58,7 @@ public class VideoElement extends SlideElement {
     public void setUpVideoElement(BorderPane mediaPane) {
         mv = new MediaView();
 
-        if(path.contains("http://")){
+        if(path.contains("http")||path.contains("www.")){
             media = new Media(path);
         }else {
             File file = new File(path);
@@ -82,10 +82,13 @@ public class VideoElement extends SlideElement {
         mv.setPreserveRatio(aspectRatioLock);
         mv.setTranslateX(xPosition);
         mv.setTranslateY(yPosition);
-        mv.setFitHeight(ySize);
-        mv.setFitWidth(xSize);
-
-
+        if(xSize == 0 || ySize == 0){
+            mv.fitWidthProperty().bind(slideCanvas.widthProperty());
+            mv.fitHeightProperty().bind(slideCanvas.heightProperty());
+        }else {
+            mv.setFitHeight(ySize);
+            mv.setFitWidth(xSize);
+        }
         if(mediaControl) {
             mediaPane.setBottom(mediaControl());
         }
@@ -93,7 +96,7 @@ public class VideoElement extends SlideElement {
             mp.setCycleCount(MediaPlayer.INDEFINITE);
         }
         mp.setAutoPlay(autoplay);
-
+        //mediaPane.setVisible(visibility);
         //TODO: Create Animations here, but move to setAnimation setter when XML implemented
         startAnimation = new Animation();
         startAnimation.setCoreNodeToAnimate(getCoreNode());
@@ -115,6 +118,11 @@ public class VideoElement extends SlideElement {
 
     @Override
     void setupElement() {
+        BorderPane mediaPane = new BorderPane();
+        mediaPane.setVisible(true);
+        setUpVideoElement(mediaPane);
+        mediaPane.setCenter(mv);
+        slideCanvas.getChildren().add(mediaPane);
 
     }
 
@@ -122,14 +130,11 @@ public class VideoElement extends SlideElement {
         return mp;
     }
 
-    @Override
-    public void setSlideCanvas(Pane slideCanvas) {
-        this.slideCanvas = slideCanvas;
-        BorderPane mediaPane = new BorderPane();
-        setUpVideoElement(mediaPane);
-        mediaPane.setCenter(mv);
-        slideCanvas.getChildren().add(mediaPane);
-    }
+//    @Override
+//    public void setSlideCanvas(Pane slideCanvas) {
+//        this.slideCanvas = slideCanvas;
+//
+//    }
 
     public void setMediaPath(String mediaPath) {
         this.path = mediaPath;
@@ -271,6 +276,7 @@ public class VideoElement extends SlideElement {
     public void stopVideo(){
         mp.stop();
     }
+
 
     private HBox mediaControl() {
 
