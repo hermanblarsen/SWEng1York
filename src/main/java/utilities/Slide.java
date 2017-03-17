@@ -24,6 +24,7 @@ public class Slide extends StackPane {
     protected List<AudioElement> audioElementList = new ArrayList<>();
 
     //Parameters for searchForSequenceElement method. Is this good practice? - Amrik
+    //  I would say so, far more readable with this than the numbers themselves.. - Herman
     private static final int START_SEARCH = 0;
     private static final int END_SEARCH = 1;
 
@@ -84,7 +85,6 @@ public class Slide extends StackPane {
             if (slideElement instanceof VideoElement) videoElementList.add((VideoElement) slideElement);
             if (slideElement instanceof AudioElement) audioElementList.add((AudioElement) slideElement);
         }
-        //sortSlideElementsBySequence();
     }
 
     private int getMaxSequenceNumber(List<SlideElement> slideElementList) {
@@ -99,7 +99,6 @@ public class Slide extends StackPane {
                 max = slideElement.getEndSequence();
             }
         }
-
         return max;
     }
 

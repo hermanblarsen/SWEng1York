@@ -36,9 +36,9 @@ public class OvalBuilder {
         return shape;
     }
 
-    public OvalBuilder(float xPosition, float yPosistion, float rVertical, float rHorizontal, float rotation){
+    public OvalBuilder(float xPosition, float yPosition, float rVertical, float rHorizontal, float rotation){
         this.xPosition = xPosition;
-        this.yPosition = yPosistion;
+        this.yPosition = yPosition;
         this.rVertical = rVertical;
         this.rHorizontal = rHorizontal;
         this.rotation = rotation;

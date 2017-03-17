@@ -21,6 +21,8 @@ public class Presentation extends Pane {
     private String description;
     private String tags;
     private Theme theme;
+    private boolean isI2lpFormat;
+    private ArrayList<String> xmlFaults = null;
 
 
     private int currentSlideNumber = 0;
@@ -338,5 +340,21 @@ public class Presentation extends Pane {
         myPresentation.setSlideList(slides);
 
         return myPresentation;
+    }
+
+    public void setI2lpFormat(boolean i2lpFormat) {
+        isI2lpFormat = i2lpFormat;
+    }
+
+    public boolean isI2lpFormat() {
+        return isI2lpFormat;
+    }
+
+    public ArrayList<String> getXmlFaults() {
+        return xmlFaults;
+    }
+
+    public void setXmlFaults(ArrayList<String> xmlFaults) {
+        this.xmlFaults = xmlFaults;
     }
 }

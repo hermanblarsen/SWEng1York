@@ -23,6 +23,9 @@ public class GraphicElement extends SlideElement {
     private static final double LINE_THICKNESS = 3;
 
     protected Shape graphicShape;
+    protected OvalBuilder oval;
+    protected PolygonBuilder polygon;
+    protected boolean isPolygon;
 
     private Pane wrapperPane;//Wrap the graphics within its own pane so that absolute positioning works properly.
 
@@ -94,9 +97,25 @@ public class GraphicElement extends SlideElement {
         return this;
     }
 
-    public GraphicElement setShape(Shape shape) {
+    public GraphicElement setShape(Shape shape) { //TODO Why does this return the GraphicsElement? -Herman
         this.graphicShape = shape;
         return this;
+    }
+
+    public void setOval(OvalBuilder oval) {
+        this.oval = oval;
+        isPolygon = false;
+        setShape(oval.build());
+    }
+
+    public void setPolygon(PolygonBuilder polygon) {
+        this.polygon = polygon;
+        isPolygon = true;
+        setShape(polygon.build());
+    }
+
+    public Shape getGraphicShape() {
+        return graphicShape;
     }
 
     public static Color parseRGBAString(String rgba){
@@ -104,5 +123,13 @@ public class GraphicElement extends SlideElement {
        String alphaString = rgba.substring(6);
        double alpha = Integer.parseInt(alphaString, 16)/255;
        return Color.web(rgb, alpha);
+    }
+
+    public OvalBuilder getOval() {
+        return oval;
+    }
+
+    public PolygonBuilder getPolygon() {
+        return polygon;
     }
 }
