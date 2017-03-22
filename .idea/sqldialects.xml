@@ -3,5 +3,6 @@
   <component name="SqlDialectMappings">
     <file url="file://$PROJECT_DIR$/sqlSetupScripts/EDI_Trigger_create.sql" dialect="PostgreSQL" />
     <file url="file://$PROJECT_DIR$/sqlSetupScripts/Edi_Model_create.sql" dialect="PostgreSQL" />
+    <file url="file://$PROJECT_DIR$/src/main/java/server/socketClient.java" dialect="PostgreSQL" />
   </component>
 </project>
