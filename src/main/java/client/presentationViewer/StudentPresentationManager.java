@@ -1,6 +1,6 @@
-package presentationViewer;
+package client.presentationViewer;
 
-import managers.PresentationManager;
+import client.managers.PresentationManager;
 
 
 /**

@@ -1,4 +1,4 @@
-package utilities;
+package client.presentationElements;
 
 import javafx.scene.Node;
 import javafx.scene.layout.Pane;

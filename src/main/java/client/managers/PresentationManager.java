@@ -1,5 +1,8 @@
-package managers;
+package client.managers;
 
+import client.presentationElements.Presentation;
+import client.presentationElements.Slide;
+import client.utilities.ParserXML;
 import javafx.animation.FadeTransition;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
@@ -17,9 +20,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-import utilities.*;
 
-import java.util.ArrayList;
 
 /**
  * Created by kma517 on 16/03/2017.
