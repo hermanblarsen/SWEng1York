@@ -1,3 +1,3 @@
 Manifest-Version: 1.0
-Main-Class: login.Login
+Main-Class: client.login.Login
 
