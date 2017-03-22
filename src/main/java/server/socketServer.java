@@ -7,6 +7,8 @@ import com.corundumstudio.socketio.listener.DisconnectListener;
 import com.impossibl.postgres.api.jdbc.PGConnection;
 import com.impossibl.postgres.api.jdbc.PGNotificationListener;
 import com.impossibl.postgres.jdbc.PGDataSource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.Statement;
 import java.util.ArrayList;
@@ -17,7 +19,11 @@ import java.util.ArrayList;
  */
 @SuppressWarnings("Convert2Lambda")
 public class socketServer {
+    private Logger logger = LoggerFactory.getLogger(socketServer.class);
     private int serverPort;
+
+    //PostgreSQL database connection
+    PGDataSource dataSource;
 
     ArrayList<SocketIOClient> myClients = new ArrayList<>();
 
@@ -57,25 +63,50 @@ public class socketServer {
             }
         });
 
-        server.addEventListener("Foo", String.class, new DataListener<String>() {
+        server.addEventListener("AddUser", User.class, new DataListener<User>() {
             @Override
-            public void onData(final SocketIOClient client, String data, final AckRequest ackRequest) {
-                System.out.println("Got data from client: " + data);
-
+            public void onData(final SocketIOClient client, User data, final AckRequest ackRequest) {
                 // check if ack requested by client,
                 if (ackRequest.isAckRequested()) {
                     // send ack response with data to client
-                    ackRequest.sendAckData("client message was delivered to server!", "yeah!");
+                    ackRequest.sendAckData("Client request for user addition received.");
+                }
+
+                //AddUser code goes here
+                String passwordSalt = Crypto.bytetoString(Crypto.generateSalt());
+                String passwordHash = Crypto.calculateHash(data.getPassword(), passwordSalt);
+                boolean addSuccess = false;
+
+                //Attempt to add a user
+                try (PGConnection connection = (PGConnection) dataSource.getConnection()) {
+                    Statement statement = connection.createStatement();
+
+                    StringBuilder sb = new StringBuilder();
+
+                    sb.append("INSERT INTO public.users (login_name, first_name, second_name, password_hash, password_salt, is_teacher, classes_class_id) VALUES ('");
+                    sb.append(data.getLoginName()).append("', '");
+                    sb.append(data.getFirstName()).append("', '");
+                    sb.append(data.getSecondName()).append("', '");
+                    sb.append(passwordHash).append("', '");
+                    sb.append(passwordSalt).append("', ");
+                    sb.append(data.getTeacher()).append(", ");
+                    sb.append(1 + ");");
+
+                    logger.info("Adding user to database using SQL: " + sb.toString());
+                    addSuccess = statement.execute(sb.toString());
+
+                    statement.close();
+                } catch (Exception e) {
+                    System.err.println(e);
                 }
 
                 // send message back to client with ack callback WITH data
-                String nigga = "Lol";
-                client.sendEvent("ackevent2", new AckCallback<String>(String.class) {
+                client.sendEvent("UserAdded", new AckCallback<String>(String.class) {
                     @Override
                     public void onSuccess(String result) {
                         System.out.println("ack from client: " + client.getSessionId() + " data: " + result);
                     }
-                }, nigga);
+                }, addSuccess);
             }
         });
         server.start();
@@ -111,4 +142,5 @@ public class socketServer {
         });
         dbPoller.start();
     }
+
 }

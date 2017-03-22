@@ -1,5 +1,6 @@
 package server;
 
+import client.login.Login;
 import com.impossibl.postgres.api.jdbc.PGConnection;
 import com.impossibl.postgres.jdbc.PGDataSource;
 import io.socket.client.IO;
@@ -7,6 +8,8 @@ import io.socket.client.Socket;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.digest.DigestUtils;
 import client.utilities.Utils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.URISyntaxException;
 import java.security.MessageDigest;
@@ -15,17 +18,20 @@ import java.security.SecureRandom;
 import java.sql.ResultSet;
 import java.sql.Statement;
 
+import static server.Crypto.calculateHash;
+
 /**
  * Created by amriksadhra on 20/03/2017.
  */
 public class socketClient {
+    private Logger logger = LoggerFactory.getLogger(socketClient.class);
     Socket socket;
     private String serverIPAddress;
     private String serverIP;
     PGDataSource dataSource;
 
     public static void main(String[] args) {
-        new socketClient("127.0.0.1", 8080);
+        new socketClient("127.0.0.1", 8081);
     }
 
     public socketClient(String serverIP, int serverPort) {
@@ -35,7 +41,10 @@ public class socketClient {
         serverIPAddress = Utils.buildIPAddress(serverIP, serverPort);
 
         connectToRemoteDB();
-        //connectToRemoteSocket();
+        connectToRemoteSocket();
+
+        //Test server side add of user
+        addUser();
     }
 
     public void connectToRemoteSocket() {
@@ -89,8 +98,8 @@ public class socketClient {
         dataSource.setUser("postgres");
         dataSource.setPassword("password");
 
-        //addUser();
 
+        //Move all of this AUTH server side, send packet to confirm login
         try (PGConnection connection = (PGConnection) dataSource.getConnection()) {
             Statement statement = connection.createStatement();
 
@@ -116,55 +125,15 @@ public class socketClient {
         }
     }
 
-    public byte[] generateSalt() {
-        SecureRandom random = new SecureRandom();
-        byte bytes[] = new byte[20];
-        random.nextBytes(bytes);
-        return bytes;
-    }
 
-    public String bytetoString(byte[] input) {
-        return org.apache.commons.codec.binary.Base64.encodeBase64String(input);
-    }
 
+    //TODO: Move this Server Side
     public void addUser() {
-
-        String firstName = "Pooper";
-        String secondName = "Trooper";
-        String loginName = firstName+secondName;
-        String password = "testpw";
-        String passwordSalt = bytetoString(generateSalt());
-        String passwordHash = calculateHash(password, passwordSalt);
-        boolean isTeacher = false;
-
-        //Attempt to add a user
-        try (PGConnection connection = (PGConnection) dataSource.getConnection()) {
-            Statement statement = connection.createStatement();
-
-            StringBuilder sb = new StringBuilder();
-
-            sb.append("INSERT INTO public.users (login_name, first_name, second_name, password_hash, password_salt, is_teacher, classes_class_id) VALUES ('");
-            sb.append(loginName + "', '");
-            sb.append(firstName + "', '");
-            sb.append(secondName + "', '");
-            sb.append(passwordHash + "', '");
-            sb.append(passwordSalt + "', ");
-            sb.append(isTeacher + ", ");
-            sb.append(1 + ");");
-
-            System.out.println(sb.toString());
-
-            if(statement.execute(sb.toString())) System.out.println("Added user!");
-
-            statement.close();
-        } catch (Exception e) {
-            System.err.println(e);
-        }
+        User toAdd = new User("First", "Name", "LoginName", "password", false);
+        socket.emit("AddUser", toAdd);
     }
 
-    public static String calculateHash(String data, String salt) {
-        return DigestUtils.sha512Hex(data + salt);
-    }
+
 
     public void listUsers() {
             /*//List Users
