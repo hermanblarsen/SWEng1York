@@ -9,9 +9,14 @@ import com.impossibl.postgres.api.jdbc.PGNotificationListener;
 import com.impossibl.postgres.jdbc.PGDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import server.packets.User;
+import server.packets.UserAuth;
 
+import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
+
+import static server.Crypto.calculateHash;
 
 
 /**
@@ -74,12 +79,19 @@ public class socketServer {
 
                 //AddUser code goes here
                 String passwordSalt = Crypto.bytetoString(Crypto.generateSalt());
-                String passwordHash = Crypto.calculateHash(data.getPassword(), passwordSalt);
+                String passwordHash = calculateHash(data.getPassword(), passwordSalt);
                 boolean addSuccess = false;
 
                 //Attempt to add a user
                 try (PGConnection connection = (PGConnection) dataSource.getConnection()) {
                     Statement statement = connection.createStatement();
+
+                    ResultSet presentUser = statement.executeQuery("SELECT login_name FROM USERS where login_name like '" + data.getLoginName() + "';");
+                    if (presentUser.next()) {
+                        //TODO: Make sure we cant add usernames that are already in teh database. Return an error message to client if this occurs
+                        logger.error("Tried to add user that was already in database");
+                        return;
+                    }
 
                     StringBuilder sb = new StringBuilder();
 
@@ -100,6 +112,7 @@ public class socketServer {
                     System.err.println(e);
                 }
 
+                //TODO: Again, work out how callbacks work so I can tell client this was succesful. Everything is being confirmed server-side atm.
                 // send message back to client with ack callback WITH data
                 client.sendEvent("UserAdded", new AckCallback<String>(String.class) {
                     @Override
@@ -109,13 +122,48 @@ public class socketServer {
                 }, addSuccess);
             }
         });
+
+        server.addEventListener("AuthUser", UserAuth.class, new DataListener<UserAuth>() {
+            @Override
+            public void onData(final SocketIOClient client, UserAuth data, final AckRequest ackRequest) {
+                boolean authSuccess = false;
+
+                try (PGConnection connection = (PGConnection) dataSource.getConnection()) {
+                    Statement statement = connection.createStatement();
+
+                    String userToLogin = data.getUserToLogin();
+                    String enteredPassword = data.getPassword();
+
+                    //Auth Test
+                    ResultSet userList = statement.executeQuery("SELECT password_hash, password_salt  FROM USERS where login_name like '" + userToLogin + "';");
+                    while (userList.next()) {
+                        String password_hash = userList.getString("password_hash");
+                        String password_salt = userList.getString("password_salt");
+
+                        if (calculateHash(enteredPassword, password_salt).equals(password_hash.toLowerCase())) {
+                            authSuccess = true;
+                            logger.info("User " + userToLogin + " successfully logged in! Time to let the client know.");
+                        }
+                    }
+                    userList.close();
+                    statement.close();
+                } catch (Exception e) {
+                    System.err.println(e);
+                }
+
+               //TODO: This doesnt work yet. Work out how callbacks work and implement them so I can return data to client easily and with scope
+                //Alert client to whether their user auth was a success or fail
+                ackRequest.sendAckData(authSuccess);
+            }
+        });
+
         server.start();
     }
 
     public void connectToLocalDB() {
         Thread dbPoller = new Thread(() -> {
             //Connect to PostgreSQL Instance
-            PGDataSource dataSource = new PGDataSource();
+            dataSource = new PGDataSource();
             dataSource.setHost("localhost");
             dataSource.setPort(5432);
             dataSource.setDatabase("edi");

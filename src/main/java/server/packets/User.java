@@ -1,4 +1,4 @@
-package server;
+package server.packets;
 
 /**
  * Created by amriksadhra on 22/03/2017.
@@ -6,23 +6,23 @@ package server;
 public class User {
 
 
-    String firstName;
-    String secondName;
-    String loginName;
-    String password;
-    Boolean isTeacher;
+    public String firstName;
+    public String secondName;
+    public String loginName;
+    public String password;
+    public String teacherStatus;
 
     public User(){
 
     }
 
-    public User(String firstName, String secondName, String loginName, String password, boolean isTeacher) {
+    public User(String firstName, String secondName, String loginName, String password, boolean teacherStatus) {
         super();
         this.firstName = firstName;
         this.secondName = secondName;
         this.loginName = loginName;
         this.password = password;
-        this.isTeacher = isTeacher;
+        this.teacherStatus = String.valueOf(teacherStatus);
     }
 
     public String getFirstName() {
@@ -42,6 +42,6 @@ public class User {
     }
 
     public Boolean getTeacher() {
-        return isTeacher;
+        return Boolean.valueOf(teacherStatus);
     }
 }

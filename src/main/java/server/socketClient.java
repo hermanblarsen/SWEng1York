@@ -1,24 +1,18 @@
 package server;
 
-import client.login.Login;
-import com.impossibl.postgres.api.jdbc.PGConnection;
+import com.corundumstudio.socketio.AckCallback;
 import com.impossibl.postgres.jdbc.PGDataSource;
 import io.socket.client.IO;
 import io.socket.client.Socket;
-import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.codec.digest.DigestUtils;
 import client.utilities.Utils;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import server.packets.User;
+import server.packets.UserAuth;
 
 import java.net.URISyntaxException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
-import java.sql.ResultSet;
-import java.sql.Statement;
-
-import static server.Crypto.calculateHash;
 
 /**
  * Created by amriksadhra on 20/03/2017.
@@ -44,7 +38,11 @@ public class socketClient {
         connectToRemoteSocket();
 
         //Test server side add of user
-        addUser();
+        User toAdd = new User("First", "Name", "LoginName", "password", false);
+        userAdd(toAdd);
+
+        UserAuth toAuth = new UserAuth("LoginName", "password");
+        userAuth(toAuth);
     }
 
     public void connectToRemoteSocket() {
@@ -89,6 +87,33 @@ public class socketClient {
         }
     }
 
+
+    /**
+     * This function generates a JSON object that is passed using socket.IO to the server. It allows us to authenticate
+     * a user against the database to determine if they have the correct username/password
+     * @param toAuth User to add to the current users database located serverside
+     * @author Amrik Sadhra
+     */
+    public void userAuth(UserAuth toAuth){
+        //TODO: Register AckRequest so we can determine if we Auth'd okay or not. Throw UserName/password not found exception so user can be alerted
+        JSONObject obj = new JSONObject();
+        try {
+            obj.put("userToLogin", toAuth.getUserToLogin());
+            obj.put("password", toAuth.getPassword());
+            //TODO: Get Acknowledge, if failed, throw custom database exception
+            socket.emit("AuthUser", obj, new AckCallback<Boolean>(Boolean.class) {
+                @Override
+                public void onSuccess(Boolean result) {
+                    logger.info("Adding user was a " + result);
+                }
+            });
+        } catch (JSONException e) {
+            e.printStackTrace();
+            logger.error("Unable to generate JSON object for passing user authentication details");
+        }
+    }
+
+
     public void connectToRemoteDB() {
         //Connect to remote PostgreSQL Instance
         dataSource = new PGDataSource();
@@ -97,42 +122,31 @@ public class socketClient {
         dataSource.setDatabase("edi");
         dataSource.setUser("postgres");
         dataSource.setPassword("password");
+    }
 
 
-        //Move all of this AUTH server side, send packet to confirm login
-        try (PGConnection connection = (PGConnection) dataSource.getConnection()) {
-            Statement statement = connection.createStatement();
-
-            String userToLogin = "PooperTrooper";
-            String enteredPassword = "testpw";
-
-            //Auth Test
-            ResultSet userList = statement.executeQuery("SELECT password_hash, password_salt  FROM USERS where login_name like '" + userToLogin + "';");
-            while (userList.next()) {
-                String password_hash = userList.getString("password_hash");
-                String password_salt = userList.getString("password_salt");
-
-                if (calculateHash(enteredPassword, password_salt).equals(password_hash.toLowerCase())) {
-                    //Login was successful
-                    System.out.println("WE MADE IT IN");
-                }
-                ;
-            }
-            userList.close();
-            statement.close();
-        } catch (Exception e) {
-            System.err.println(e);
+    /**
+     * This function generates a JSON object that is passed using socket.IO to the server. It allows us to add users to
+     * the SQL Database
+     * @param toAdd User to add to the current users database located serverside
+     * @author Amrik Sadhra
+     */
+    public void userAdd(User toAdd) {
+        //When we send data as a custom class, we need to wrap it in JSON with fields named after the variables in our class
+        JSONObject obj = new JSONObject();
+        try {
+            obj.put("firstName", toAdd.getFirstName());
+            obj.put("secondName", toAdd.getSecondName());
+            obj.put("loginName", toAdd.getLoginName());
+            obj.put("password", toAdd.getPassword());
+            obj.put("teacherStatus", toAdd.teacherStatus);
+            //TODO: Get Acknowledge, if failed, throw custom database exception
+            socket.emit("AddUser", obj);
+        } catch (JSONException e) {
+            e.printStackTrace();
+            logger.error("Unable to generate JSON object for passing new user details");
         }
     }
-
-
-
-    //TODO: Move this Server Side
-    public void addUser() {
-        User toAdd = new User("First", "Name", "LoginName", "password", false);
-        socket.emit("AddUser", toAdd);
-    }
-
 
 
     public void listUsers() {
@@ -143,11 +157,11 @@ public class socketClient {
                 String first_name = userList.getString("first_name");
                 String second_name = userList.getString("second_name");
                 String password = userList.getString("password_hash");
-                boolean isTeacher = userList.getBoolean("is_teacher");
+                boolean teacherStatus = userList.getBoolean("is_teacher");
                 int class_id = userList.getInt("classes_class_id");
                 String login_name = userList.getString("login_name");
 
-                System.out.println("user_ID: " + user_id + " | login_name: " +" | fn: " + first_name + " | sn: " + second_name + " | pw: " + password + " | isTeacher: " + isTeacher + " | class_id: " + class_id);
+                System.out.println("user_ID: " + user_id + " | login_name: " +" | fn: " + first_name + " | sn: " + second_name + " | pw: " + password + " | teacherStatus: " + teacherStatus + " | class_id: " + class_id);
             }
             userList.close();
             statement.close();*/
