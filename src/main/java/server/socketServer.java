@@ -71,16 +71,9 @@ public class socketServer {
         server.addEventListener("AddUser", User.class, new DataListener<User>() {
             @Override
             public void onData(final SocketIOClient client, User data, final AckRequest ackRequest) {
-                // check if ack requested by client,
-                if (ackRequest.isAckRequested()) {
-                    // send ack response with data to client
-                    ackRequest.sendAckData("Client request for user addition received.");
-                }
-
                 //AddUser code goes here
                 String passwordSalt = Crypto.bytetoString(Crypto.generateSalt());
                 String passwordHash = calculateHash(data.getPassword(), passwordSalt);
-                boolean addSuccess = false;
 
                 //Attempt to add a user
                 try (PGConnection connection = (PGConnection) dataSource.getConnection()) {
@@ -90,6 +83,8 @@ public class socketServer {
                     if (presentUser.next()) {
                         //TODO: Make sure we cant add usernames that are already in teh database. Return an error message to client if this occurs
                         logger.error("Tried to add user that was already in database");
+                        //Let client know whether their operation was successful
+                        client.sendEvent("AddUser", false);
                         return;
                     }
 
@@ -105,21 +100,18 @@ public class socketServer {
                     sb.append(1 + ");");
 
                     logger.info("Adding user to database using SQL: " + sb.toString());
-                    addSuccess = statement.execute(sb.toString());
+                    /*TODO: This statement does return a boolean, but it seems to be false even if we've successfully added to db
+                        I set the success boolean to true anyway, but we may be losing some information here.  */
+                    statement.execute(sb.toString());
+                    //Let client know whether their operation was successful
+                    client.sendEvent("AddUser", true);
 
                     statement.close();
                 } catch (Exception e) {
                     System.err.println(e);
                 }
 
-                //TODO: Again, work out how callbacks work so I can tell client this was succesful. Everything is being confirmed server-side atm.
-                // send message back to client with ack callback WITH data
-                client.sendEvent("UserAdded", new AckCallback<String>(String.class) {
-                    @Override
-                    public void onSuccess(String result) {
-                        System.out.println("ack from client: " + client.getSessionId() + " data: " + result);
-                    }
-                }, addSuccess);
+
             }
         });
 
@@ -151,9 +143,8 @@ public class socketServer {
                     System.err.println(e);
                 }
 
-               //TODO: This doesnt work yet. Work out how callbacks work and implement them so I can return data to client easily and with scope
                 //Alert client to whether their user auth was a success or fail
-                ackRequest.sendAckData(authSuccess);
+                client.sendEvent("AuthUser", authSuccess);
             }
         });
 

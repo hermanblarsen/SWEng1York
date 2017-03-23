@@ -5,8 +5,8 @@ package server;
  */
 public class ServerClientRunner {
     public static void main(String[] args){
-        socketServer mySocketServer = new socketServer(8081);
+        socketServer mySocketServer = new socketServer(8080);
 
-        socketClient mySocketClient = new socketClient("127.0.0.1", 8081);
+        socketClient mySocketClient = new socketClient("127.0.0.1", 8080);
     }
 }

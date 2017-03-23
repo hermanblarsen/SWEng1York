@@ -1,10 +1,8 @@
 package server;
 
-import com.corundumstudio.socketio.AckCallback;
-import com.impossibl.postgres.jdbc.PGDataSource;
+import client.utilities.Utils;
 import io.socket.client.IO;
 import io.socket.client.Socket;
-import client.utilities.Utils;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -19,10 +17,10 @@ import java.net.URISyntaxException;
  */
 public class socketClient {
     private Logger logger = LoggerFactory.getLogger(socketClient.class);
-    Socket socket;
     private String serverIPAddress;
-    private String serverIP;
-    PGDataSource dataSource;
+
+    Socket socket;
+
 
     public static void main(String[] args) {
         new socketClient("127.0.0.1", 8081);
@@ -30,11 +28,8 @@ public class socketClient {
 
     public socketClient(String serverIP, int serverPort) {
         if (!Utils.validate(serverIP)) System.out.println("Invalid IP"); //TODO: Log error in IILP, throw exception
-        this.serverIP = serverIP;
-
         serverIPAddress = Utils.buildIPAddress(serverIP, serverPort);
 
-        connectToRemoteDB();
         connectToRemoteSocket();
 
         //Test server side add of user
@@ -74,14 +69,17 @@ public class socketClient {
         //SocketIO will pass a generic object. But we know its a string because that's what DB_notify returns from server side
         switch ((String) tableToUpdate) {
             case "users":
+                logger.info("Users database changed!");
                 //TODO: Update Local User information
                 break;
 
             case "presentation_library":
+                logger.info("Presentation library database changed!");
                 //TODO: Update local presentation Information
                 break;
 
             case "classes":
+                logger.info("Classes database changed!");
                 //TODO: Update class list
                 break;
         }
@@ -91,20 +89,22 @@ public class socketClient {
     /**
      * This function generates a JSON object that is passed using socket.IO to the server. It allows us to authenticate
      * a user against the database to determine if they have the correct username/password
+     *
      * @param toAuth User to add to the current users database located serverside
      * @author Amrik Sadhra
      */
-    public void userAuth(UserAuth toAuth){
-        //TODO: Register AckRequest so we can determine if we Auth'd okay or not. Throw UserName/password not found exception so user can be alerted
+    public void userAuth(UserAuth toAuth) {
         JSONObject obj = new JSONObject();
         try {
             obj.put("userToLogin", toAuth.getUserToLogin());
             obj.put("password", toAuth.getPassword());
-            //TODO: Get Acknowledge, if failed, throw custom database exception
-            socket.emit("AuthUser", obj, new AckCallback<Boolean>(Boolean.class) {
-                @Override
-                public void onSuccess(Boolean result) {
-                    logger.info("Adding user was a " + result);
+            socket.emit("AuthUser", obj);
+            socket.on("AuthUser", objects -> {
+                if((boolean) objects[0]){
+                    //TODO: Put meaningful login code here. If failed, throw exception?
+                    logger.info("User " + toAuth.getUserToLogin() + " has successfully logged in");
+                } else {
+                    logger.error("Incorrect username/password for login.");
                 }
             });
         } catch (JSONException e) {
@@ -113,21 +113,10 @@ public class socketClient {
         }
     }
 
-
-    public void connectToRemoteDB() {
-        //Connect to remote PostgreSQL Instance
-        dataSource = new PGDataSource();
-        dataSource.setHost(serverIP);
-        dataSource.setPort(5432);
-        dataSource.setDatabase("edi");
-        dataSource.setUser("postgres");
-        dataSource.setPassword("password");
-    }
-
-
     /**
      * This function generates a JSON object that is passed using socket.IO to the server. It allows us to add users to
      * the SQL Database
+     *
      * @param toAdd User to add to the current users database located serverside
      * @author Amrik Sadhra
      */
@@ -140,8 +129,15 @@ public class socketClient {
             obj.put("loginName", toAdd.getLoginName());
             obj.put("password", toAdd.getPassword());
             obj.put("teacherStatus", toAdd.teacherStatus);
-            //TODO: Get Acknowledge, if failed, throw custom database exception
+            //TODO: If failed, throw custom userAdd exception
             socket.emit("AddUser", obj);
+            socket.on("AddUser", objects -> {
+                if((boolean) objects[0]){
+                    logger.info("User " + toAdd.getLoginName() + " was successfully added to database.");
+                } else {
+                    logger.error("User already present in database. Could not be added");
+                }
+            });
         } catch (JSONException e) {
             e.printStackTrace();
             logger.error("Unable to generate JSON object for passing new user details");
