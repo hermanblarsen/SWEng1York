@@ -15,16 +15,25 @@ import client.managers.EdiManager;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import server.packets.UserAuth;
+import server.socketClient;
+import server.socketServer;
 
 
 public class Login extends Application {
     private EdiManager ediManager;
     private Logger logger = LoggerFactory.getLogger(Login.class);
+    socketClient mySocketClient;
 
+    //----------- IF YOU'RE NOT ON THE DATABASE TEAM, SET THIS VARIABLE TO FALSE TO BYPASS THE SERVER STUFF -----------------
+    private static final boolean AM_I_ON_DB_TEAM = true;
 
 
     @Override
     public void start(Stage primaryStage) {
+        //TODO: Mode switching code depending on online/offline functionality
+        serverConnect();
+
         primaryStage.setTitle("I^2LP");
 
         GridPane grid = new GridPane();
@@ -77,7 +86,8 @@ public class Login extends Application {
         loginButton.getStyleClass().setAll("btn","btn-danger");
         grid.add(loginButton, 1, 5, 1, 1);
         loginButton.setOnAction((ActionEvent event) ->{
-            boolean loginSuccessful = this.verifyLogin();
+            //TODO: Store this userauth object instead of keeping anonymous.
+            boolean loginSuccessful = this.verifyLogin(new UserAuth(userTextField.getCharacters().toString(), passwordField.getCharacters().toString()));
 
             //Run different dashboards based on userType button
             boolean isTeacher = false;
@@ -102,9 +112,19 @@ public class Login extends Application {
         primaryStage.show();
     }
 
-    public boolean verifyLogin () {
-        //TODO if (server.verifyCredentials(username, password)) {return true }
-        return true;
+    public void serverConnect(){
+        if(AM_I_ON_DB_TEAM) {
+            //TODO: For now, start server here. Should be compiled to separate JAR and run independently
+            socketServer mySocketServer = new socketServer(8080);
+            //Connect to server
+            mySocketClient = new socketClient("127.0.0.1", 8080);
+        }
+    }
+
+    public boolean verifyLogin (UserAuth userToAuth) {
+        if(AM_I_ON_DB_TEAM){
+            return mySocketClient.userAuth(userToAuth);
+        } else return true;
     }
 
     public void setEdiManager(EdiManager ediManager) {

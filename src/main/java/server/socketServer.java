@@ -45,7 +45,7 @@ public class socketServer {
 
     public void startSocket() {
         //Startup Socket.IO Server so can pump update events to clients
-        System.out.println("Attempting to startup server");
+        logger.info("Attempting to start up Socket.IO server on port " + serverPort);
 
         Configuration config = new Configuration();
         config.setHostname("localhost");
@@ -56,14 +56,14 @@ public class socketServer {
             @Override
             public void onConnect(SocketIOClient socketIOClient) {
                 myClients.add(socketIOClient);
-                System.out.println("Connection from client UUID: " + socketIOClient.getSessionId());
+                logger.info("Connection from client UUID: " + socketIOClient.getSessionId());
             }
         });
 
         server.addDisconnectListener(new DisconnectListener() {
             @Override
             public void onDisconnect(SocketIOClient socketIOClient) {
-                System.out.println("Disonnection from " + socketIOClient.getSessionId());
+                logger.info("Disonnection from " + socketIOClient.getSessionId());
                 myClients.remove(socketIOClient);
             }
         });
@@ -81,7 +81,6 @@ public class socketServer {
 
                     ResultSet presentUser = statement.executeQuery("SELECT login_name FROM USERS where login_name like '" + data.getLoginName() + "';");
                     if (presentUser.next()) {
-                        //TODO: Make sure we cant add usernames that are already in teh database. Return an error message to client if this occurs
                         logger.error("Tried to add user that was already in database");
                         //Let client know whether their operation was successful
                         client.sendEvent("AddUser", false);
@@ -108,7 +107,7 @@ public class socketServer {
 
                     statement.close();
                 } catch (Exception e) {
-                    System.err.println(e);
+                    logger.error("Unable to connect to PostgreSQL on port 5432. PJDBC dump:", e);
                 }
 
 
@@ -140,7 +139,7 @@ public class socketServer {
                     userList.close();
                     statement.close();
                 } catch (Exception e) {
-                    System.err.println(e);
+                    logger.error("Unable to connect to PostgreSQL on port 5432. PJDBC dump:", e);
                 }
 
                 //Alert client to whether their user auth was a success or fail
@@ -151,6 +150,12 @@ public class socketServer {
         server.start();
     }
 
+    /**
+     * Connects to Local PostgreSQL instance and registers the event listener that fires whenever the
+     * database is modified. Requires the connection to remain active, and so has an infinite while loop.
+     * It is threaded to account for this.
+     * @author Amrik Sadhra
+     */
     public void connectToLocalDB() {
         Thread dbPoller = new Thread(() -> {
             //Connect to PostgreSQL Instance
@@ -172,11 +177,11 @@ public class socketServer {
                 statement.execute("LISTEN db_update");
                 statement.close();
                 connection.addNotificationListener(listener);
-                System.out.println("Connected to DB");
+                logger.info("Successful connection to PostgreSQL database instance");
                 while (true) {
                 }
             } catch (Exception e) {
-                System.err.println(e);
+                logger.error("Unable to connect to PostgreSQL on port 5432. PJDBC dump:", e);
             }
         });
         dbPoller.start();
