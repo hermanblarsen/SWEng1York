@@ -33,14 +33,16 @@ public class socketServer {
     ArrayList<SocketIOClient> myClients = new ArrayList<>();
 
     public static void main(String[] args) {
-        new socketServer(8081);
+        new socketServer("db.amriksadhra.com",8080);
     }
 
-    public socketServer(int serverPort) {
+    public socketServer(String dbHostName, int serverPort) {
         this.serverPort = serverPort;
 
-        connectToLocalDB();
+        connectToLocalDB(dbHostName);
         startSocket();
+
+
     }
 
     public void startSocket() {
@@ -89,6 +91,7 @@ public class socketServer {
 
                     StringBuilder sb = new StringBuilder();
 
+                    //TODO: Create Stored Procedure on PostgreSQL
                     sb.append("INSERT INTO public.users (login_name, first_name, second_name, password_hash, password_salt, is_teacher, classes_class_id) VALUES ('");
                     sb.append(data.getLoginName()).append("', '");
                     sb.append(data.getFirstName()).append("', '");
@@ -127,6 +130,7 @@ public class socketServer {
 
                     //Auth Test
                     ResultSet userList = statement.executeQuery("SELECT password_hash, password_salt  FROM USERS where login_name like '" + userToLogin + "';");
+
                     while (userList.next()) {
                         String password_hash = userList.getString("password_hash");
                         String password_salt = userList.getString("password_salt");
@@ -156,15 +160,15 @@ public class socketServer {
      * It is threaded to account for this.
      * @author Amrik Sadhra
      */
-    public void connectToLocalDB() {
+    public void connectToLocalDB(String dbHostName) {
         Thread dbPoller = new Thread(() -> {
             //Connect to PostgreSQL Instance
             dataSource = new PGDataSource();
-            dataSource.setHost("localhost");
+            dataSource.setHost(dbHostName);
             dataSource.setPort(5432);
             dataSource.setDatabase("edi");
-            dataSource.setUser("postgres");
-            dataSource.setPassword("password");
+            dataSource.setUser("iilp");
+            dataSource.setPassword("group1SWENG");
 
             PGNotificationListener listener = (int processId, String channelName, String payload) -> {
                 for (SocketIOClient myClient : myClients) {

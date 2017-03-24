@@ -115,7 +115,7 @@ public class Login extends Application {
     public void serverConnect(){
         if(AM_I_ON_DB_TEAM) {
             //TODO: For now, start server here. Should be compiled to separate JAR and run independently
-            socketServer mySocketServer = new socketServer(8080);
+            socketServer mySocketServer = new socketServer("db.amriksadhra.com", 8080);
             //Connect to server
             mySocketClient = new socketClient("127.0.0.1", 8080);
         }

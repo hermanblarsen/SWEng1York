@@ -38,10 +38,10 @@ public class socketClient {
 
         connectToRemoteSocket();
 
-     /*   //Test server side add of user
+        //Test server side add of user
         User toAdd = new User("First", "Name", "LoginName", "password", false);
         userAdd(toAdd);
-
+/*
         UserAuth toAuth = new UserAuth("LoginName", "password");
         System.out.println(userAuth(toAuth));*/
     }

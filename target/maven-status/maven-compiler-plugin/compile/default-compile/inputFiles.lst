@@ -1,11 +1,14 @@
 /Users/amriksadhra/Development/Code/SWEng1York/src/main/java/client/dashboard/Dashboard.java
+/Users/amriksadhra/Development/Code/SWEng1York/src/main/java/client/utilities/FinalWrapper.java
 /Users/amriksadhra/Development/Code/SWEng1York/src/main/java/client/utilities/WebDocumentListener.java
 /Users/amriksadhra/Development/Code/SWEng1York/src/main/java/server/socketServer.java
 /Users/amriksadhra/Development/Code/SWEng1York/src/main/java/client/login/Login.java
+/Users/amriksadhra/Development/Code/SWEng1York/src/main/java/server/Crypto.java
 /Users/amriksadhra/Development/Code/SWEng1York/src/main/java/client/presentationElements/ImageElement.java
 /Users/amriksadhra/Development/Code/SWEng1York/src/main/java/client/presentationElements/Slide.java
 /Users/amriksadhra/Development/Code/SWEng1York/src/main/java/client/utilities/ParserXML.java
 /Users/amriksadhra/Development/Code/SWEng1York/src/main/java/client/utilities/PolygonBuilder.java
+/Users/amriksadhra/Development/Code/SWEng1York/src/main/java/server/packets/User.java
 /Users/amriksadhra/Development/Code/SWEng1York/src/main/java/client/presentationElements/SlideElement.java
 /Users/amriksadhra/Development/Code/SWEng1York/src/main/java/client/presentationElements/Animation.java
 /Users/amriksadhra/Development/Code/SWEng1York/src/main/java/server/socketClient.java
@@ -25,6 +28,7 @@
 /Users/amriksadhra/Development/Code/SWEng1York/src/main/java/client/utilities/OvalBuilder.java
 /Users/amriksadhra/Development/Code/SWEng1York/src/main/java/client/presentationElements/TextElement.java
 /Users/amriksadhra/Development/Code/SWEng1York/src/main/java/client/managers/PresentationManager.java
+/Users/amriksadhra/Development/Code/SWEng1York/src/main/java/server/packets/UserAuth.java
 /Users/amriksadhra/Development/Code/SWEng1York/src/main/java/client/dashboard/StudentDashboard.java
 /Users/amriksadhra/Development/Code/SWEng1York/src/main/java/client/presentationViewer/TeacherPresentationManager.java
 /Users/amriksadhra/Development/Code/SWEng1York/src/main/java/client/dashboard/InterfaceTest.java
