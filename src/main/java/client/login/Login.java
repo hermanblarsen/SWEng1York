@@ -118,6 +118,7 @@ public class Login extends Application {
             socketServer mySocketServer = new socketServer("db.amriksadhra.com", 8080);
             //Connect to server
             mySocketClient = new socketClient("127.0.0.1", 8080);
+
         }
     }
 

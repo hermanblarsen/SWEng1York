@@ -2,6 +2,8 @@ package server;
 
 import client.utilities.FinalWrapper;
 import client.utilities.Utils;
+import com.impossibl.postgres.api.jdbc.PGConnection;
+import com.impossibl.postgres.jdbc.PGDataSource;
 import io.socket.client.IO;
 import io.socket.client.Socket;
 import org.json.JSONException;
@@ -12,6 +14,8 @@ import server.packets.User;
 import server.packets.UserAuth;
 
 import java.net.URISyntaxException;
+import java.sql.ResultSet;
+import java.sql.Statement;
 import java.util.concurrent.*;
 
 /**
@@ -22,10 +26,17 @@ public class socketClient {
     private Logger logger = LoggerFactory.getLogger(socketClient.class);
     private String serverIPAddress;
 
+    //TODO: These will be filled by actual values, for now they are temp and meaningless
+    private int current_presentation_id = 1;;
+    private int current_question_id = 1;
+
+    //PostgreSQL database connection
+    PGDataSource dataSource;
+
     Socket socket;
 
     public static void main(String[] args) {
-        new socketClient("127.0.0.1", 8081);
+        new socketClient("127.0.0.1", 8080);
     }
 
     public socketClient(String serverIP, int serverPort) {
@@ -36,31 +47,64 @@ public class socketClient {
         }
         serverIPAddress = Utils.buildIPAddress(serverIP, serverPort);
 
-        connectToRemoteSocket();
+        //connectToRemoteSocket();
+        connectToRemoteDB();
+        //addResponse(1, 2, "lol");
+        updateResponses(1, 2);
+    }
 
-        //Test server side add of user
-        User toAdd = new User("First", "Name", "LoginName", "password", false);
-        userAdd(toAdd);
-/*
-        UserAuth toAuth = new UserAuth("LoginName", "password");
-        System.out.println(userAuth(toAuth));*/
+    public void connectToRemoteDB(){
+        //Connect to PostgreSQL Instance
+        dataSource = new PGDataSource();
+        dataSource.setHost("db.amriksadhra.com");
+        dataSource.setPort(5432);
+        dataSource.setDatabase("edi");
+        dataSource.setUser("iilp");
+        dataSource.setPassword("group1SWENG");
+
+        try (PGConnection connection = (PGConnection) dataSource.getConnection()) {
+            logger.info("Successful connection from client to PostgreSQL database instance");
+        } catch (Exception e) {
+            logger.error("Unable to connect to PostgreSQL on port 5432. PJDBC dump:", e);
+        }
+    }
+
+    public void addResponse(int presentation_id, int question_id, String data){
+        //Attempt to add a user
+        try (PGConnection connection = (PGConnection) dataSource.getConnection()) {
+            Statement statement = connection.createStatement();
+            StringBuilder sb = new StringBuilder();
+
+            //TODO: Create Stored Procedure on PostgreSQL
+            sb.append("INSERT INTO public.responses (presentation_id, question_id, data) VALUES ('");
+            sb.append(presentation_id).append("', '");
+            sb.append(question_id).append("', '");
+            sb.append(data + "');");
+
+            logger.info("Adding response to database using SQL: " + sb.toString());
+            statement.execute(sb.toString());
+            //Let client know whether their operation was successful
+            //TODO: Do what the comment above says
+            statement.close();
+        } catch (Exception e) {
+            logger.error("Unable to connect to PostgreSQL on port 5432. PJDBC dump:", e);
+        }
     }
 
     public void connectToRemoteSocket() {
         //Alert tester that connection is being attempted
-        System.out.println("Client: Attempting Connection to " + serverIPAddress);
+        logger.info("Client: Attempting Connection to " + serverIPAddress);
 
         try {
             socket = IO.socket(serverIPAddress);
         } catch (URISyntaxException e) {
-            System.out.println("Couldn't create client port");
+            logger.error("Couldn't create client port");
         }
 
         socket.on(Socket.EVENT_CONNECT, args -> {
-            System.out.println("Client connected! Spitting bars.");
-            socket.emit("Foo", "hi");
+            logger.info("Client connected! Spitting bars.");
         }).on("DB_Update", args -> {
-            System.out.println("Client knows DB has updated:  " + args[0]);
+            logger.info("Client knows DB has updated:  " + args[0]);
             updateLocalTables(args[0]);
             //Pull fresh table
         }).on(Socket.EVENT_DISCONNECT, args -> {
@@ -71,6 +115,12 @@ public class socketClient {
         socket.connect();
     }
 
+    /**
+     * The main controller for remote database updates. We can act appropriately based upon what has updated remotely.
+     * e.g. Live responses to the current presentation can be used to update current graph object on slide.
+     * @param tableToUpdate Table that has been updated on Server
+     * @author Amrik Sadhra
+     */
     public void updateLocalTables(Object tableToUpdate) {
         //SocketIO will pass a generic object. But we know its a string because that's what DB_notify returns from server side
         switch ((String) tableToUpdate) {
@@ -88,6 +138,31 @@ public class socketClient {
                 logger.info("Classes database changed!");
                 //TODO: Update class list
                 break;
+
+            case "responses":
+                logger.info("New responses to act upon registered on server!");
+                updateResponses(current_presentation_id, current_question_id);
+                break;
+        }
+    }
+
+    private void updateResponses(int presentation_id, int question_id) {
+        try (PGConnection connection = (PGConnection) dataSource.getConnection()) {
+            Statement statement = connection.createStatement();
+            StringBuilder sb = new StringBuilder();
+
+            //TODO: Create Stored Procedure on PostgreSQL
+            sb.append("SELECT * from public.responses where presentation_id = " + presentation_id + " and question_id = " + question_id + ";");
+            logger.info("Adding response to database using SQL: " + sb.toString());
+            ResultSet rs = statement.executeQuery(sb.toString());
+
+            while(rs.next()){
+                logger.info(rs.getString("data"));
+            }
+
+            statement.close();
+        } catch (Exception e) {
+            logger.error("Unable to execute update response procedure, PDJBC dump: ", e);
         }
     }
 
@@ -103,9 +178,8 @@ public class socketClient {
         Future<Boolean> future = executor.submit(new UserAuthTask(toAuth));
 
         try {
-            System.out.println("Started..");
+            logger.info("Attempting login of User: " + toAuth.getUserToLogin());
             Boolean result = future.get(LOGIN_TIMEOUT, TimeUnit.SECONDS);
-            System.out.println("Result was: " + result);
             return result;
         } catch (TimeoutException e) {
             future.cancel(true);
