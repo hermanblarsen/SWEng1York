@@ -47,6 +47,7 @@ public abstract class SlideElement {
             if(!onCanvas) {
                 onCanvas = true;
                 slideCanvas.getChildren().add(getCoreNode());
+                slideCanvas.setPickOnBounds(false);
             }
         }
 
