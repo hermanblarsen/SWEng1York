@@ -1,5 +1,6 @@
 package client.presentationElements;
 
+import javafx.animation.FadeTransition;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
@@ -8,15 +9,21 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
 import javafx.scene.control.ToggleButton;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaView;
+import javafx.scene.paint.Color;
 import javafx.stage.Screen;
 import javafx.util.Duration;
 
 import java.io.File;
+import java.util.Stack;
 
 
 /**
@@ -37,6 +44,7 @@ public class VideoElement extends SlideElement {
     protected boolean aspectRatioLock;
     protected float elementAspectRatio;
     protected boolean autoplay;
+    protected boolean isFullscreen = false;
     protected Duration startTime;
     protected Duration endTime;
     //protected Animation startAnimation, endAnimation;
@@ -44,7 +52,7 @@ public class VideoElement extends SlideElement {
     public MediaView mv;
     public MediaPlayer mp;
     protected Media media;
-    protected BorderPane mediaPane;
+    protected StackPane mediaPane;
 
     //TODO: 1) Add Error Handling
     //TODO: 2) Commenting
@@ -53,7 +61,7 @@ public class VideoElement extends SlideElement {
         //Leave this empty of testing and canvas things: testing should be done in separate testclass
     }
 
-    public void setUpVideoElement(BorderPane mediaPane) {
+    public void setUpVideoElement(StackPane mediaPane) {
         mv = new MediaView();
 
         if(path.contains("http")||path.contains("www.")){
@@ -87,9 +95,13 @@ public class VideoElement extends SlideElement {
             mv.setFitHeight(ySize);
             mv.setFitWidth(xSize);
         }
+        mediaPane.getChildren().add(mv);
+        mediaPane.setStyle("-fx-background-color: black");
         if(mediaControl) {
-            mediaPane.setBottom(mediaControl());
+            mp.setOnReady(() -> mediaPane.setMaxSize(mv.getFitWidth(),mv.getFitHeight()));
+            mediaPane.getChildren().add(mediaControl());
         }
+
         if(loop){
             mp.setCycleCount(MediaPlayer.INDEFINITE);
         }
@@ -116,23 +128,17 @@ public class VideoElement extends SlideElement {
 
     @Override
     void setupElement() {
-        BorderPane mediaPane = new BorderPane();
+        StackPane mediaPane = new StackPane();
         mediaPane.setVisible(true);
         setUpVideoElement(mediaPane);
-        mediaPane.setCenter(mv);
         slideCanvas.getChildren().add(mediaPane);
-
+        slideCanvas.setPickOnBounds(false);
     }
 
     public MediaPlayer getMediaPlayer() {
         return mp;
     }
 
-//    @Override
-//    public void setSlideCanvas(Pane slideCanvas) {
-//        this.slideCanvas = slideCanvas;
-//
-//    }
 
     public void setMediaPath(String mediaPath) {
         this.path = mediaPath;
@@ -279,34 +285,44 @@ public class VideoElement extends SlideElement {
     private HBox mediaControl() {
 
         HBox mediaBar = new HBox();
-        mediaBar.setStyle("-fx-background-color: whitesmoke");
-        mediaBar.setAlignment(Pos.CENTER);
+//        mediaBar.setMaxSize(media.getWidth(),media.getHeight());
+        mediaBar.setStyle("-fx-background-color: transparent");
+        mediaBar.setAlignment(Pos.BOTTOM_CENTER);
+//        if(xSize != 0 && ySize !=0) {
+//            mediaBar.setTranslateX(0);
+//            mediaBar.setTranslateY(ySize);
+//        }else{
+//            mediaBar.setAlignment(Pos.BOTTOM_CENTER);
+//        }
         mediaBar.setPadding(new Insets(5, 10, 5, 10));
-        BorderPane.setAlignment(mediaBar, Pos.CENTER);
+        //BorderPane.setAlignment(mediaBar, Pos.CENTER);
 
         //Play/Pause Button
-        final Button playPauseButton = new Button(">");
+        Image play = new Image("file:externalResources/PLAY_WHITE.png",20,20,true,true);
+        Image pause = new Image("file:externalResources/PAUSE_WHITE.png",20,20,true,true);
+        ImageView playPauseButton = new ImageView(play);
         if (autoplay) {
-            playPauseButton.setText("||");
+            playPauseButton.setImage(pause);
         }
-        playPauseButton.setOnAction((event) -> {
+        playPauseButton.addEventHandler(MouseEvent.MOUSE_CLICKED, evt->{
             if (mp.getStatus() != MediaPlayer.Status.PLAYING) {
-                playPauseButton.setText("||");
+                playPauseButton.setImage(pause);
                 mp.play();
             } else {
-                playPauseButton.setText(">");
+                playPauseButton.setImage(play);
                 mp.pause();
             }
         });
-        mediaBar.getChildren().add(playPauseButton);
+       // mediaBar.getChildren().add(playPauseButton);
 
         //Stop Button
-        final Button stopButton = new Button("STOP");
-        stopButton.setOnAction((event) -> {
+        Image stop = new Image("file:externalResources/STOP_WHITE.png",20,20,true,true);
+        ImageView stopButton = new ImageView(stop);
+        stopButton.addEventHandler(MouseEvent.MOUSE_CLICKED,evt -> {
             mp.stop();
-            playPauseButton.setText(">");
+            playPauseButton.setImage(play);
         });
-        mediaBar.getChildren().add(stopButton);
+       // mediaBar.getChildren().add(stopButton);
 
         // Seek Control
         final Slider videoTime = new Slider(startTime.toMillis(), 0, 0);
@@ -327,10 +343,11 @@ public class VideoElement extends SlideElement {
             if (!isProgrammaticChange.getValue())
                 mp.seek(new Duration(videoTime.getValue()));
         });
-        mediaBar.getChildren().add(videoTime);
+        //mediaBar.getChildren().add(videoTime);
 
         //Remaining Time
         Label playTime = new Label();
+        playTime.setTextFill(Color.web("#ffffff"));
         mp.currentTimeProperty().addListener((observableValue, oldValue, newValue) -> {
             double currentTime = mp.getCurrentTime().toSeconds();
             double totalDuration = mp.getCycleDuration().toSeconds() + startTime.toSeconds();
@@ -340,31 +357,51 @@ public class VideoElement extends SlideElement {
                     Math.floor(totalDuration / 60),
                     Math.floor(totalDuration % 60)));
         });
-        mediaBar.getChildren().add(playTime);
+        //mediaBar.getChildren().add(playTime);
 
         //Volume Label
         final Label volume = new Label("  Volume: ");
-        mediaBar.getChildren().add(volume);
+        volume.setTextFill(Color.web("#ffffff"));
+        //mediaBar.getChildren().add(volume);
         //Volume Slider
         final Slider volumeSlider = new Slider(0, 1, 0.5);
         volumeSlider.valueProperty().addListener((observable) -> mp.setVolume(volumeSlider.getValue()));
-        mediaBar.getChildren().add(volumeSlider);
+        //mediaBar.getChildren().add(volumeSlider);
 
         //Fullscreen Button
-        final ToggleButton fullscreenButton = new ToggleButton("Fullscreen");
+        //final ToggleButton fullscreenButton = new ToggleButton("Fullscreen");
+        Image fullscreen = new Image("file:externalResources/Fullscreen_NEW.png",20,20,true,true);
+        ImageView fullscreenButton = new ImageView(fullscreen);
         final Rectangle2D initialBounds = new Rectangle2D(mv.getFitWidth(), mv.getFitWidth(), mv.getFitHeight(), mv.getFitWidth());
-        fullscreenButton.setOnAction((event) -> {
+        fullscreenButton.addEventHandler(MouseEvent.MOUSE_CLICKED,(event) -> {
             // TODO: Implement this properly
-            if (fullscreenButton.isSelected()) {
-                mv.setFitHeight(Screen.getPrimary().getBounds().getHeight());
-                mv.setFitWidth(Screen.getPrimary().getBounds().getWidth());
+            if (!isFullscreen) {
+                mv.setFitHeight(slideCanvas.getHeight());
+                mv.setFitWidth(slideCanvas.getWidth());
+                isFullscreen = true;
             } else {
                 mv.setFitHeight(initialBounds.getHeight());
                 mv.setFitWidth(initialBounds.getWidth());
+                isFullscreen = false;
             }
         });
-        mediaBar.getChildren().add(fullscreenButton);
+        //mediaBar.getChildren().add(fullscreenButton);
+        mediaBar.getChildren().addAll(playPauseButton,stopButton,videoTime,playTime,volume,volumeSlider,fullscreenButton);
+        mediaBar.addEventHandler(MouseEvent.MOUSE_ENTERED, evt->{
 
+            FadeTransition ft = new FadeTransition(Duration.millis(500),mediaBar);
+            ft.setFromValue(0.0);
+            ft.setToValue(1.0);
+            ft.play();
+        });
+
+        mediaBar.addEventHandler(MouseEvent.MOUSE_EXITED, evt->{
+            FadeTransition ft = new FadeTransition(Duration.millis(500),mediaBar);
+            ft.setFromValue(1.0);
+            ft.setToValue(0.0);
+            ft.play();
+
+        });
         return mediaBar;
     }
 

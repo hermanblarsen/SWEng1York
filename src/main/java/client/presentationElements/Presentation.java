@@ -275,9 +275,7 @@ public class Presentation extends Pane {
         slideElementsSlide1.add(myTextElement1);
 
         slide1.setSlideElementList(slideElementsSlide1);
-        if(slide1.getVideoElementList().size()>0){
-            System.out.println(slide1.getVideoElementList().size());
-        }
+
 
         Slide slide2 = new Slide();
         slide2.setSlideID(2);
@@ -290,7 +288,7 @@ public class Presentation extends Pane {
         TextElement myTextElementNewSlide = new TextElement();
         myTextElementNewSlide.setLayer(1);
         myTextElementNewSlide.setStartSequence(1);
-        myTextElementNewSlide.setEndSequence(5);
+        myTextElementNewSlide.setEndSequence(4);
         myTextElementNewSlide.setTextContent("<b>Slide2</b>");
         myTextElementNewSlide.setSlideCanvas(slide2);
         slideElementsSlide2.add(myTextElementNewSlide);
@@ -305,8 +303,8 @@ public class Presentation extends Pane {
         myVideoElement.setAspectRatioLock(true);
         //myVideoElement.setxPosition(200);
         //myVideoElement.setyPosition(200);
-        myVideoElement.setxSize(200);
-        myVideoElement.setySize(200);
+        myVideoElement.setxSize(500);
+        myVideoElement.setySize(500);
         myVideoElement.setLayer(3);
         myVideoElement.setStartSequence(2);
         myVideoElement.setEndSequence(3);
@@ -314,9 +312,7 @@ public class Presentation extends Pane {
         slideElementsSlide2.add(myVideoElement);
 
         slide2.setSlideElementList(slideElementsSlide2);
-        if(slide2.getVideoElementList().size()>0){
-            System.out.println(slide2.getVideoElementList().size());
-        }
+
 
         Slide slide3 = new Slide();
         slide3.setSlideID(3);
@@ -335,9 +331,7 @@ public class Presentation extends Pane {
         slideElementsSlide3.add(myTextElementNewSlide2);
 
         slide3.setSlideElementList(slideElementsSlide3);
-        if(slide3.getVideoElementList().size()>0){
-            System.out.println(slide3.getVideoElementList().size());
-        }else{System.out.println("NO VIDEO");}
+
 
         Presentation myPresentation = new Presentation();
         myPresentation.setSlideList(slides);

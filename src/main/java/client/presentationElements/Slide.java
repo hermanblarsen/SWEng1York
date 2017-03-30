@@ -42,6 +42,7 @@ public class Slide extends StackPane {
     public Slide() {
         slideElementList = new ArrayList<>();
         visibleSlideElementList = new ArrayList<>();
+        this.setPickOnBounds(false);
     }
 
     public void addElement(int elementIndex, SlideElement newElement) {
