@@ -5,109 +5,103 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
-import javafx.scene.control.ToggleButton;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaView;
 import javafx.scene.paint.Color;
-import javafx.stage.Screen;
 import javafx.util.Duration;
 
 import java.io.File;
-import java.util.Stack;
 
 
 /**
- * Created by habl on 26/02/2017.
+ * Created by kma517 on 31/03/2017.
  */
-@SuppressWarnings({"WeakerAccess", "unused"})
-public class VideoElement extends SlideElement {
-    protected boolean mediaControl;
-
+public class VideoElement extends SlideElement{
+    protected boolean mediaControl = true;
     protected float xPosition;
     protected float yPosition;
     protected float xSize = 0;
     protected float ySize = 0;
     protected String path;
-    protected String onClickAction;
-    protected boolean loop;
-    protected String onClickInfo;
-    protected boolean aspectRatioLock;
+    protected boolean loop = false;
+    protected boolean aspectRatioLock = true;
     protected float elementAspectRatio;
-    protected boolean autoplay;
-    protected boolean isFullscreen = false;
+    protected boolean autoplay = false;
+    protected boolean fullscreen = false;
     protected Duration startTime;
     protected Duration endTime;
-    //protected Animation startAnimation, endAnimation;
-    //protected Pane slideCanvas;
-    public MediaView mv;
-    public MediaPlayer mp;
+    protected MediaView mv;
+    protected MediaPlayer mp;
     protected Media media;
-    protected StackPane mediaPane;
+    private StackPane mediaPane;
 
-    //TODO: 1) Add Error Handling
-    //TODO: 2) Commenting
-    //TODO  3) Move all testing out of this class and into a proper test class - Herman
-    public VideoElement() {
-        //Leave this empty of testing and canvas things: testing should be done in separate testclass
+    @Override
+    public void doClassSpecificRender() {
+        if(mv.getMediaPlayer() == null) {
+            if (path.contains("http") || path.contains("www.")) {
+                media = new Media(path);
+            } else {
+                File file = new File(path);
+                String mediaPath = file.toURI().toString();
+                media = new Media(mediaPath);
+            }
+            mp = new MediaPlayer(media);
+            StackPane mediaPane = new StackPane();
+
+            if (startTime != null) {
+                mp.setStartTime(startTime);
+            } else {
+                mp.setStartTime(javafx.util.Duration.ZERO);
+            }
+            if (endTime != null) {
+                mp.setStopTime(endTime);
+            } else {
+                mp.setStopTime(media.getDuration());
+            }
+            if (loop) {
+                mp.setCycleCount(MediaPlayer.INDEFINITE);
+            }
+            mp.setAutoPlay(autoplay);
+
+
+            mv.setMediaPlayer(mp);
+            mv.setPreserveRatio(aspectRatioLock);
+            mv.setTranslateX(xPosition);
+            mv.setTranslateY(yPosition);
+            if (xSize == 0 || ySize == 0) {
+                mv.fitWidthProperty().bind(slideCanvas.widthProperty());
+                mv.fitHeightProperty().bind(slideCanvas.heightProperty());
+            } else {
+                mv.setFitHeight(ySize);
+                mv.setFitWidth(xSize);
+            }
+            mediaPane.getChildren().add(mv);
+            mediaPane.setStyle("-fx-background-color: black");
+            if (mediaControl) {
+                mp.setOnReady(() -> mediaPane.setMaxSize(mv.getFitWidth(), mv.getFitHeight()));
+                mediaPane.getChildren().add(mediaControl());
+            }
+            slideCanvas.getChildren().add(mediaPane);
+            slideCanvas.setPickOnBounds(false);
+        }
     }
 
-    public void setUpVideoElement(StackPane mediaPane) {
+    @Override
+    public Node getCoreNode() {
+        return mv;
+    }
+
+    @Override
+    public void setupElement() {
         mv = new MediaView();
-
-        if(path.contains("http")||path.contains("www.")){
-            media = new Media(path);
-        }else {
-            File file = new File(path);
-            String mediaPath = file.toURI().toString();
-            media = new Media(mediaPath);
-        }
-        mp = new MediaPlayer(media);
-        mv.setMediaPlayer(mp);
-
-        if(startTime != null) {
-            mp.setStartTime(startTime);
-        } else{
-            mp.setStartTime(Duration.ZERO);
-        }
-        if(endTime != null) {
-            mp.setStopTime(endTime);
-        }else{
-            mp.setStopTime(media.getDuration());
-        }
-
-        mv.setPreserveRatio(aspectRatioLock);
-        mv.setTranslateX(xPosition);
-        mv.setTranslateY(yPosition);
-        if(xSize == 0 || ySize == 0){
-            mv.fitWidthProperty().bind(slideCanvas.widthProperty());
-            mv.fitHeightProperty().bind(slideCanvas.heightProperty());
-        }else {
-            mv.setFitHeight(ySize);
-            mv.setFitWidth(xSize);
-        }
-        mediaPane.getChildren().add(mv);
-        mediaPane.setStyle("-fx-background-color: black");
-        if(mediaControl) {
-            mp.setOnReady(() -> mediaPane.setMaxSize(mv.getFitWidth(),mv.getFitHeight()));
-            mediaPane.getChildren().add(mediaControl());
-        }
-
-        if(loop){
-            mp.setCycleCount(MediaPlayer.INDEFINITE);
-        }
-        mp.setAutoPlay(autoplay);
-        //mediaPane.setVisible(visibility);
-        //TODO: Create Animations here, but move to setAnimation setter when XML implemented
         startAnimation = new Animation();
         startAnimation.setCoreNodeToAnimate(getCoreNode());
         startAnimation.setAnimationType(Animation.SIMPLE_APPEAR);
@@ -117,104 +111,56 @@ public class VideoElement extends SlideElement {
     }
 
     @Override
-    void doClassSpecificRender() {
-
+    public void destroyElement() {
+        mv.getMediaPlayer().stop();
     }
 
-    @Override
-    public Node getCoreNode() {
-        return mv;
+    public boolean isMediaControl() {
+        return mediaControl;
     }
 
-    @Override
-    void setupElement() {
-        StackPane mediaPane = new StackPane();
-        mediaPane.setVisible(true);
-        setUpVideoElement(mediaPane);
-        slideCanvas.getChildren().add(mediaPane);
-        slideCanvas.setPickOnBounds(false);
-    }
-
-    public MediaPlayer getMediaPlayer() {
-        return mp;
-    }
-
-
-    public void setMediaPath(String mediaPath) {
-        this.path = mediaPath;
-    }
-
-    public String getMediaPath() {
-        return path;
-    }
-
-    public void setAutoPlay(boolean isAutoPlay) {
-        this.autoplay = isAutoPlay;
-    }
-
-    public boolean getAutoPlay() {
-        return autoplay;
-    }
-
-    public void setVideoStartTime(Duration startTime) {
-        this.startTime = startTime;
-
-    }
-    public Duration getVideoStartTime(){return startTime;}
-
-    public void setVideoEndTime(Duration endTime) {
-        this.endTime = endTime;
-
-    }
-    public Duration getVideoEndTime(){return endTime;}
-
-
-    public void setStartTime(Duration startTime) {
-        this.startTime = startTime;
-    }
-
-    public Duration getStartTime() {
-        return startTime;
-    }
-
-    public Duration getEndTime() {
-        return endTime;
-    }
-
-    public void setEndTime(Duration endTime) {
-        this.endTime = endTime;
-    }
-
-    public void setxPosition(float xPosition) {
-        this.xPosition = xPosition;
+    public void setMediaControl(boolean mediaControl) {
+        this.mediaControl = mediaControl;
     }
 
     public float getxPosition() {
         return xPosition;
     }
 
-    public void setyPosition(float yPosition) {
-        this.yPosition = yPosition;
+    public void setxPosition(float xPosition) {
+        this.xPosition = xPosition;
     }
 
     public float getyPosition() {
         return yPosition;
     }
 
-    public void setxSize(float xSize) {
-        this.xSize = xSize;
+    public void setyPosition(float yPostition) {
+        this.yPosition = yPostition;
     }
 
     public float getxSize() {
         return xSize;
     }
 
-    public void setySize(float ySize) {
-        this.ySize = ySize;
+    public void setxSize(float xSize) {
+        this.xSize = xSize;
     }
 
     public float getySize() {
         return ySize;
+    }
+
+    public void setySize(float ySize) {
+        this.ySize = ySize;
+    }
+
+    public String getPath() {
+        return path;
+    }
+
+    public void setPath(String path) {
+        this.path = path;
     }
 
     public boolean isLoop() {
@@ -239,22 +185,6 @@ public class VideoElement extends SlideElement {
 
     public void setElementAspectRatio(float elementAspectRatio) {
         this.elementAspectRatio = elementAspectRatio;
-    }//TODO: MAKE THIS DO SOMETHING
-
-    public boolean isMediaControl() {
-        return mediaControl;
-    }
-
-    public void setMediaControl(boolean mediaControl) {
-        this.mediaControl = mediaControl;
-    }
-
-    public String getPath() {
-        return path;
-    }
-
-    public void setPath(String path) {
-        this.path = path;
     }
 
     public boolean isAutoplay() {
@@ -265,22 +195,45 @@ public class VideoElement extends SlideElement {
         this.autoplay = autoplay;
     }
 
-    public MediaPlayer.Status getVideoStatus(){
-        return mp.getStatus();
+    public boolean isFullscreen() {
+        return fullscreen;
     }
 
-    public void playVideo(){
-        mp.play();
+    public void setFullscreen(boolean fullscreen) {
+        this.fullscreen = fullscreen;
     }
 
-    public void pauseVideo(){
-        mp.pause();
+    public Duration getStartTime() {
+        return startTime;
     }
 
-    public void stopVideo(){
-        mp.stop();
+    public void setStartTime(Duration startTime) {
+        this.startTime = startTime;
     }
 
+    public Duration getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(Duration endTime) {
+        this.endTime = endTime;
+    }
+
+    public Media getMedia() {
+        return media;
+    }
+
+    public void setMedia(Media media) {
+        this.media = media;
+    }
+
+    public MediaPlayer getMp() {
+        return mp;
+    }
+
+    public MediaView getMv() {
+        return mv;
+    }
 
     private HBox mediaControl() {
 
@@ -313,7 +266,7 @@ public class VideoElement extends SlideElement {
                 mp.pause();
             }
         });
-       // mediaBar.getChildren().add(playPauseButton);
+        // mediaBar.getChildren().add(playPauseButton);
 
         //Stop Button
         Image stop = new Image("file:externalResources/STOP_WHITE.png",20,20,true,true);
@@ -322,7 +275,7 @@ public class VideoElement extends SlideElement {
             mp.stop();
             playPauseButton.setImage(play);
         });
-       // mediaBar.getChildren().add(stopButton);
+        // mediaBar.getChildren().add(stopButton);
 
         // Seek Control
         final Slider videoTime = new Slider(startTime.toMillis(), 0, 0);
@@ -332,7 +285,7 @@ public class VideoElement extends SlideElement {
             }
         });
         //Update the time bar to match the current playback time.
-        final Holder<Boolean> isProgrammaticChange = new Holder<>(false);
+        final VideoElement.Holder<Boolean> isProgrammaticChange = new VideoElement.Holder<>(false);
         mp.currentTimeProperty().addListener((observableValue) -> {
             isProgrammaticChange.setValue(true);
             videoTime.setValue(mp.getCurrentTime().toMillis());
@@ -341,7 +294,7 @@ public class VideoElement extends SlideElement {
         //Handle any seeking as dictated by the scroll bar
         videoTime.valueProperty().addListener((observable, oldValue, newValue) -> {
             if (!isProgrammaticChange.getValue())
-                mp.seek(new Duration(videoTime.getValue()));
+                mp.seek(new javafx.util.Duration(videoTime.getValue()));
         });
         //mediaBar.getChildren().add(videoTime);
 
@@ -370,33 +323,33 @@ public class VideoElement extends SlideElement {
 
         //Fullscreen Button
         //final ToggleButton fullscreenButton = new ToggleButton("Fullscreen");
-        Image fullscreen = new Image("file:externalResources/Fullscreen_NEW.png",20,20,true,true);
-        ImageView fullscreenButton = new ImageView(fullscreen);
+        Image fullscreenIcon = new Image("file:externalResources/Fullscreen_NEW.png",20,20,true,true);
+        ImageView fullscreenButton = new ImageView(fullscreenIcon);
         final Rectangle2D initialBounds = new Rectangle2D(mv.getFitWidth(), mv.getFitWidth(), mv.getFitHeight(), mv.getFitWidth());
         fullscreenButton.addEventHandler(MouseEvent.MOUSE_CLICKED,(event) -> {
             // TODO: Implement this properly
-            if (!isFullscreen) {
+            if (!fullscreen) {
                 mv.setFitHeight(slideCanvas.getHeight());
                 mv.setFitWidth(slideCanvas.getWidth());
-                isFullscreen = true;
+                fullscreen = true;
             } else {
                 mv.setFitHeight(initialBounds.getHeight());
                 mv.setFitWidth(initialBounds.getWidth());
-                isFullscreen = false;
+                fullscreen = false;
             }
         });
         //mediaBar.getChildren().add(fullscreenButton);
         mediaBar.getChildren().addAll(playPauseButton,stopButton,videoTime,playTime,volume,volumeSlider,fullscreenButton);
         mediaBar.addEventHandler(MouseEvent.MOUSE_ENTERED, evt->{
 
-            FadeTransition ft = new FadeTransition(Duration.millis(500),mediaBar);
+            FadeTransition ft = new FadeTransition(javafx.util.Duration.millis(500),mediaBar);
             ft.setFromValue(0.0);
             ft.setToValue(1.0);
             ft.play();
         });
 
         mediaBar.addEventHandler(MouseEvent.MOUSE_EXITED, evt->{
-            FadeTransition ft = new FadeTransition(Duration.millis(500),mediaBar);
+            FadeTransition ft = new FadeTransition(javafx.util.Duration.millis(500),mediaBar);
             ft.setFromValue(1.0);
             ft.setToValue(0.0);
             ft.play();
@@ -420,4 +373,5 @@ public class VideoElement extends SlideElement {
             this.value = value;
         }
     }
+
 }

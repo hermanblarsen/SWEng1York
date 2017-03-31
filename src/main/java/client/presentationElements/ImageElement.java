@@ -84,7 +84,7 @@ public class ImageElement extends SlideElement {
 
 
     @Override
-    void doClassSpecificRender() {
+    public void doClassSpecificRender() {
 
     }
 
@@ -99,7 +99,12 @@ public class ImageElement extends SlideElement {
     }
 
     @Override
-    void setupElement() {
+    public void setupElement() {
+
+    }
+
+    @Override
+    public void destroyElement() {
 
     }
 

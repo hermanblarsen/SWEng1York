@@ -265,7 +265,6 @@ public class Presentation extends Pane {
         slideElementsSlide1.add(myGraphicElement3);
 
 
-
         TextElement myTextElement1 = new TextElement();
         myTextElement1.setLayer(5);
         myTextElement1.setStartSequence(7);
@@ -294,18 +293,18 @@ public class Presentation extends Pane {
         slideElementsSlide2.add(myTextElementNewSlide);
 
         VideoElement myVideoElement = new VideoElement();
-        myVideoElement.setMediaPath("externalResources/prometheus.mp4");
-        myVideoElement.setAutoPlay(false);
+        myVideoElement.setPath("externalResources/prometheus.mp4");
+        myVideoElement.setAutoplay(true);
         myVideoElement.setMediaControl(true);
         myVideoElement.setLoop(false);
-        myVideoElement.setVideoStartTime(Duration.seconds(0));
-        //myVideoElement.setVideoEndTime(Duration.seconds(7));
+        myVideoElement.setStartTime(Duration.seconds(0));
+        //myVideoElement.setEndTime(Duration.seconds(7));
         myVideoElement.setAspectRatioLock(true);
         //myVideoElement.setxPosition(200);
         //myVideoElement.setyPosition(200);
         myVideoElement.setxSize(500);
         myVideoElement.setySize(500);
-        myVideoElement.setLayer(3);
+        myVideoElement.setLayer(2);
         myVideoElement.setStartSequence(2);
         myVideoElement.setEndSequence(3);
         myVideoElement.setSlideCanvas(slide2);
