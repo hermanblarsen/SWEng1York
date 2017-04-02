@@ -36,7 +36,7 @@ public class TextElement extends SlideElement {
     }
 
     @Override
-    void setupElement() {
+    public void setupElement() {
         //We need to just do this once, had to move this out of the TextElement constructor because of
         //Hermans JUnit XML Test, cant instantiate Nodes without a JavaFX Scene being present.
 
@@ -61,7 +61,11 @@ public class TextElement extends SlideElement {
     }
 
     @Override
-    void doClassSpecificRender() {
+    public void destroyElement() {
+    }
+
+    @Override
+    public void doClassSpecificRender() {
         //Refresh Browser
         browser.requestLayout();
     }

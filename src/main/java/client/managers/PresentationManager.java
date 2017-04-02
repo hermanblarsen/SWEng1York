@@ -32,7 +32,7 @@ public abstract class PresentationManager extends Application {
     protected ProgressBar pb;
     protected Label slideNumber;
     protected Boolean isFullscreen = false;
-    protected Boolean buttonsRemoved = false;
+    //protected Boolean buttonsRemoved = false;
     protected Boolean questionQueueActive = false;
     protected Boolean commentActive = false;
 

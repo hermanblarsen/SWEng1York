@@ -19,35 +19,36 @@ public class VideoElementTest {
     @Before
     public void setUp() throws Exception {
         myVideoElement = new VideoElement();
-        myVideoElement.setMediaPath("http://download.oracle.com/otndocs/products/javafx/oow2010-2.flv");
-        myVideoElement.setAutoPlay(true);
+        myVideoElement.setPath("http://download.oracle.com/otndocs/products/javafx/oow2010-2.flv");
+        myVideoElement.setAutoplay(true);
         myVideoElement.setAspectRatioLock(true);
         myVideoElement.setyPosition(5);
         myVideoElement.setxPosition(6);
-        myVideoElement.setVideoStartTime(Duration.seconds(5));
-        myVideoElement.setVideoEndTime(Duration.seconds(7));
+        myVideoElement.setStartTime(Duration.seconds(5));
+        myVideoElement.setEndTime(Duration.seconds(7));
         myVideoElement.setxSize(2000);
         myVideoElement.setySize(3000);
         myVideoElement.setSlideCanvas(videoPane);
-
+        myVideoElement.setupElement();
+        myVideoElement.doClassSpecificRender();
     }
 
     @Test
     public void verifyVideoPath(){
-        assertEquals("http://download.oracle.com/otndocs/products/javafx/oow2010-2.flv",myVideoElement.getMediaPlayer().getMedia().getSource());
+        assertEquals("http://download.oracle.com/otndocs/products/javafx/oow2010-2.flv",myVideoElement.getMp().getMedia().getSource());
     }
 
     @Test
     public void verifyAutoPlay(){
-        assertEquals(true, myVideoElement.getMediaPlayer().isAutoPlay());
+        assertEquals(true, myVideoElement.getMp().isAutoPlay());
     }
 
     @Test
     public void verifyStartAndEndTime(){
 
-        assertEquals(Duration.seconds(5),myVideoElement.mp.getStartTime());
+        assertEquals(Duration.seconds(5),myVideoElement.getMp().getStartTime());
 
-        assertEquals(Duration.seconds(7),myVideoElement.mp.getStopTime());
+        assertEquals(Duration.seconds(7),myVideoElement.getMp().getStopTime());
     }
 
 //    @Test
@@ -62,18 +63,18 @@ public class VideoElementTest {
 
     @Test
     public void verifyAspectRatioLock(){
-        assertEquals(true,myVideoElement.mv.isPreserveRatio() );
+        assertEquals(true,myVideoElement.getMv().isPreserveRatio() );
     }
 
     @Test
     public void verifyTranslate(){
-        assertEquals(5,myVideoElement.mv.getTranslateY(),1e-8);
+        assertEquals(5,myVideoElement.getMv().getTranslateY(),1e-8);
     }
 
     @Test
     public void verifySize(){
-        assertEquals(2000,myVideoElement.mv.getFitWidth(),1e-8);
-        assertEquals(3000,myVideoElement.mv.getFitHeight(),1e-8);
+        assertEquals(2000,myVideoElement.getMv().getFitWidth(),1e-8);
+        assertEquals(3000,myVideoElement.getMv().getFitHeight(),1e-8);
     }
 
     @After

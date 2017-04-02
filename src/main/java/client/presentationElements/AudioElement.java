@@ -57,7 +57,7 @@ public class AudioElement extends SlideElement {
 
 
     @Override
-    void doClassSpecificRender() {
+    public void doClassSpecificRender() {
 
     }
 
@@ -67,7 +67,12 @@ public class AudioElement extends SlideElement {
     }
 
     @Override
-    void setupElement() {
+    public void setupElement() {
+
+    }
+
+    @Override
+    public void destroyElement() {
 
     }
 

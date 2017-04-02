@@ -1,5 +1,7 @@
 package client.presentationElements;
 
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.scene.Node;
 import javafx.scene.layout.Pane;
 import org.slf4j.Logger;
@@ -18,15 +20,13 @@ public abstract class SlideElement {
     protected boolean visibility;
     protected int startSequence;
     protected int endSequence;
-
     protected String onClickAction;
     protected String onClickInfo;
     protected Pane slideCanvas;
     Animation startAnimation, endAnimation;
-
     boolean onCanvas = false;
 
-    abstract void doClassSpecificRender();
+    public abstract void doClassSpecificRender();
 
     public void removeElement(){
         if(onCanvas){
@@ -49,9 +49,10 @@ public abstract class SlideElement {
                 slideCanvas.getChildren().add(getCoreNode());
                 slideCanvas.setPickOnBounds(false);
             }
+            doClassSpecificRender();
         }
 
-        doClassSpecificRender();
+
 
         if (!(this instanceof AudioElement)) {
             //TODO: Trigger shared refresh
@@ -66,6 +67,7 @@ public abstract class SlideElement {
                     }
                     break;
                 case Animation.EXIT_ANIMATION: //Exit Animation (playback)
+                    destroyElement();
                     if (endAnimation != null) {//Animation Exists as EndSequence Present
                         endAnimation.play();
                         logger.info("Exit animation playing");
@@ -75,9 +77,11 @@ public abstract class SlideElement {
         }
     }
 
-    abstract Node getCoreNode();
+    public abstract Node getCoreNode();
 
-    abstract void setupElement();
+    public abstract void setupElement();
+
+    public abstract void destroyElement();
 
     public void setSlideCanvas(Pane slideCanvas) {
         this.slideCanvas = slideCanvas;
@@ -147,4 +151,5 @@ public abstract class SlideElement {
     public void setOnClickInfo(String onClickInfo) {
         this.onClickInfo = onClickInfo;
     }
+
 }

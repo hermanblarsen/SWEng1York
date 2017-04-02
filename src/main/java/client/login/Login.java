@@ -26,7 +26,7 @@ public class Login extends Application {
     socketClient mySocketClient;
 
     //----------- IF YOU'RE NOT ON THE DATABASE TEAM, SET THIS VARIABLE TO FALSE TO BYPASS THE SERVER STUFF -----------------
-    private static final boolean AM_I_ON_DB_TEAM = true;
+    private static final boolean AM_I_ON_DB_TEAM = false;
 
 
     @Override

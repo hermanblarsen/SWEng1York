@@ -34,7 +34,7 @@ public class GraphicElement extends SlideElement {
     }
 
     @Override
-    void doClassSpecificRender() {
+    public void doClassSpecificRender() {
 
     }
 
@@ -44,7 +44,7 @@ public class GraphicElement extends SlideElement {
     }
 
     @Override
-    void setupElement() {
+    public void setupElement() {
         wrapperPane = new Pane();
 
         graphicShape.setFill(parseRGBAString(fillColour));
@@ -60,6 +60,11 @@ public class GraphicElement extends SlideElement {
         endAnimation = new Animation();
         endAnimation.setCoreNodeToAnimate(getCoreNode());
         endAnimation.setAnimationType(Animation.SIMPLE_DISAPPEAR);
+    }
+
+    @Override
+    public void destroyElement() {
+
     }
 
     public boolean isAspectRatioLock() {
