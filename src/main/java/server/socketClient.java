@@ -22,7 +22,10 @@ import java.util.concurrent.*;
  * Created by amriksadhra on 20/03/2017.
  */
 public class socketClient {
+    //Timeout times for user addition/authorisation asynchronous functions
     private static final int LOGIN_TIMEOUT = 5;
+    private static final int ADDITION_TIMEOUT = 5;
+
     private Logger logger = LoggerFactory.getLogger(socketClient.class);
     private String serverIPAddress;
 
@@ -40,17 +43,14 @@ public class socketClient {
     }
 
     public socketClient(String serverIP, int serverPort) {
-        if (!Utils.validate(serverIP)) {
-            //TODO: Throw exception if invalid IP?
-            logger.error("Invalid Server IP address");
-            return;
-        }
-        serverIPAddress = Utils.buildIPAddress(serverIP, serverPort);
+        serverIPAddress = Utils.buildIPAddress("127.0.0.1", serverPort);
 
-        //connectToRemoteSocket();
+        connectToRemoteSocket();
         connectToRemoteDB();
+
+
         //addResponse(1, 2, "lol");
-        updateResponses(1, 2);
+        //updateResponses(1, 2);
     }
 
     public void connectToRemoteDB(){
@@ -64,6 +64,7 @@ public class socketClient {
 
         try (PGConnection connection = (PGConnection) dataSource.getConnection()) {
             logger.info("Successful connection from client to PostgreSQL database instance");
+            System.out.println("User added: " + userAdd(new User("Test", "User", "lol", false)));
         } catch (Exception e) {
             logger.error("Unable to connect to PostgreSQL on port 5432. PJDBC dump:", e);
         }
@@ -194,6 +195,27 @@ public class socketClient {
         return false;
     }
 
+    public String userAdd(User toAdd) {
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        Future<String> future = executor.submit(new UserAddTask(toAdd));
+
+        try {
+            logger.info("Attempting add of User: " + toAdd.getFirstName() + " " + toAdd.getSecondName());
+            String result = future.get(ADDITION_TIMEOUT, TimeUnit.SECONDS);
+            return result;
+        } catch (TimeoutException e) {
+            future.cancel(true);
+            logger.error("Connection to server timed out.");
+        } catch (InterruptedException e) {
+            logger.error("Connection to server was interrupted.");
+        } catch (ExecutionException e) {
+            logger.error("Connection to server failed. (tragically)");
+        }
+        //If we hit any of the catch statements
+        executor.shutdownNow();
+        return "USER_ADD_FAILED";
+    }
+
     class UserAuthTask implements Callable<Boolean> {
         UserAuth toAuth;
 
@@ -204,6 +226,19 @@ public class socketClient {
         @Override
         public Boolean call() throws Exception {
             return userAuthAsync(toAuth);
+        }
+    }
+
+    class UserAddTask implements Callable<String> {
+        User toAdd;
+
+        public UserAddTask(User toAdd){
+            this.toAdd = toAdd;
+        }
+
+        @Override
+        public String call() throws Exception {
+            return userAddAsync(toAdd);
         }
     }
 
@@ -252,30 +287,40 @@ public class socketClient {
      * @param toAdd User to add to the current users database located serverside
      * @author Amrik Sadhra
      */
-    public void userAdd(User toAdd) {
-        //TODO: Add timeout to this task, such as with userAuth
+    public String userAddAsync(User toAdd) {
+        //Hack to bypass final requirement for Lambda anon methods
+        final FinalWrapper additionSuccessFinal = new FinalWrapper("no_response");
 
         //When we send data as a custom class, we need to wrap it in JSON with fields named after the variables in our class
         JSONObject obj = new JSONObject();
         try {
             obj.put("firstName", toAdd.getFirstName());
             obj.put("secondName", toAdd.getSecondName());
-            obj.put("loginName", toAdd.getLoginName());
             obj.put("password", toAdd.getPassword());
             obj.put("teacherStatus", toAdd.teacherStatus);
             //TODO: If failed, throw custom userAdd exception
             socket.emit("AddUser", obj);
+
             socket.on("AddUser", objects -> {
-                if ((boolean) objects[0]) {
-                    logger.info("User " + toAdd.getLoginName() + " was successfully added to database.");
+                if (!(objects[0]).equals("user_add_failed")) {
+                    logger.info("User " + objects[0] + " was successfully added to database.");
+                    additionSuccessFinal.setNonFinal(objects[0]);
                 } else {
-                    logger.error("User already present in database. Could not be added");
+                    logger.error("Error adding user to database");
+                    additionSuccessFinal.setNonFinal(objects[0]);
                 }
             });
         } catch (JSONException e) {
-
             logger.error("Unable to generate JSON object for passing new user details. ", e);
         }
+
+        //Spinlock method until our final fake boolean has been modified
+        while(additionSuccessFinal.getNonFinal().equals("no_response")){
+            logger.debug("JVM optimises out empty while loops. Waiting for server response.");
+        };
+
+        //Return the login name generated server side
+        return (String) additionSuccessFinal.getNonFinal();
     }
 
 

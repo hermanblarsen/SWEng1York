@@ -8,7 +8,6 @@ public class User {
 
     public String firstName;
     public String secondName;
-    public String loginName;
     public String password;
     public String teacherStatus;
 
@@ -16,11 +15,10 @@ public class User {
 
     }
 
-    public User(String firstName, String secondName, String loginName, String password, boolean teacherStatus) {
+    public User(String firstName, String secondName, String password, boolean teacherStatus) {
         super();
         this.firstName = firstName;
         this.secondName = secondName;
-        this.loginName = loginName;
         this.password = password;
         this.teacherStatus = String.valueOf(teacherStatus);
     }
@@ -31,10 +29,6 @@ public class User {
 
     public String getSecondName() {
         return secondName;
-    }
-
-    public String getLoginName() {
-        return loginName;
     }
 
     public String getPassword() {

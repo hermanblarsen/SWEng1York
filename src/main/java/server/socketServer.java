@@ -33,7 +33,7 @@ public class socketServer {
     ArrayList<SocketIOClient> myClients = new ArrayList<>();
 
     public static void main(String[] args) {
-        new socketServer("db.amriksadhra.com",8080);
+        new socketServer("db.amriksadhra.com", 8080);
     }
 
     public socketServer(String dbHostName, int serverPort) {
@@ -73,40 +73,32 @@ public class socketServer {
         server.addEventListener("AddUser", User.class, new DataListener<User>() {
             @Override
             public void onData(final SocketIOClient client, User data, final AckRequest ackRequest) {
-                //AddUser code goes here
-                String passwordSalt = Crypto.bytetoString(Crypto.generateSalt());
-                String passwordHash = calculateHash(data.getPassword(), passwordSalt);
-
-                //Attempt to add a user
+                //Attempt to add a user using stored procedure
                 try (PGConnection connection = (PGConnection) dataSource.getConnection()) {
                     Statement statement = connection.createStatement();
-
-                    ResultSet presentUser = statement.executeQuery("SELECT login_name FROM USERS where login_name like '" + data.getLoginName() + "';");
-                    if (presentUser.next()) {
-                        logger.error("Tried to add user that was already in database");
-                        //Let client know whether their operation was successful
-                        client.sendEvent("AddUser", false);
-                        return;
-                    }
 
                     StringBuilder sb = new StringBuilder();
 
                     //TODO: Create Stored Procedure on PostgreSQL
-                    sb.append("INSERT INTO public.users (login_name, first_name, second_name, password_hash, password_salt, is_teacher, classes_class_id) VALUES ('");
-                    sb.append(data.getLoginName()).append("', '");
-                    sb.append(data.getFirstName()).append("', '");
-                    sb.append(data.getSecondName()).append("', '");
-                    sb.append(passwordHash).append("', '");
-                    sb.append(passwordSalt).append("', ");
-                    sb.append(data.getTeacher()).append(", ");
-                    sb.append(1 + ");");
+                    sb.append("select edi.public.sp_adduser(");
+                    sb.append("'").append(data.getFirstName()).append("',");
+                    sb.append("'").append(data.getSecondName()).append("',");
+                    sb.append("'").append(data.getPassword()).append("',");
+                    sb.append(data.getTeacher()).append(",");
+                    sb.append(1).append(");");
 
                     logger.info("Adding user to database using SQL: " + sb.toString());
-                    /*TODO: This statement does return a boolean, but it seems to be false even if we've successfully added to db
-                        I set the success boolean to true anyway, but we may be losing some information here.  */
-                    statement.execute(sb.toString());
-                    //Let client know whether their operation was successful
-                    client.sendEvent("AddUser", true);
+                    ResultSet rs = statement.executeQuery(sb.toString());
+
+                    String generatedLoginName = "user_add_failed";
+
+                    while(rs.next()) {
+                        generatedLoginName =  rs.getString("sp_adduser");
+                        System.out.println("Generated login name from SQL database: " + generatedLoginName);
+                    }
+
+                    //TODO: Let client know the login name that was generated at addition time
+                    client.sendEvent("AddUser", generatedLoginName);
 
                     statement.close();
                 } catch (Exception e) {
@@ -151,6 +143,7 @@ public class socketServer {
             }
         });
 
+
         server.start();
     }
 
@@ -158,6 +151,7 @@ public class socketServer {
      * Connects to Local PostgreSQL instance and registers the event listener that fires whenever the
      * database is modified. Requires the connection to remain active, and so has an infinite while loop.
      * It is threaded to account for this.
+     *
      * @author Amrik Sadhra
      */
     public void connectToLocalDB(String dbHostName) {
