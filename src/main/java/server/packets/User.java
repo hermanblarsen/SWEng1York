@@ -9,18 +9,23 @@ public class User {
     public String firstName;
     public String secondName;
     public String password;
-    public String teacherStatus;
+    public String userType;
+    public String emailAddress;
 
     public User(){
 
     }
 
-    public User(String firstName, String secondName, String password, boolean teacherStatus) {
+
+
+
+    public User(String firstName, String secondName, String emailAddress, String password, String userType) {
         super();
         this.firstName = firstName;
         this.secondName = secondName;
+        this.emailAddress = emailAddress;
         this.password = password;
-        this.teacherStatus = String.valueOf(teacherStatus);
+        this.userType = userType;
     }
 
     public String getFirstName() {
@@ -35,7 +40,12 @@ public class User {
         return password;
     }
 
-    public Boolean getTeacher() {
-        return Boolean.valueOf(teacherStatus);
+    public String getUserType() {
+        return userType;
     }
+
+    public String getEmailAddress() {
+        return emailAddress;
+    }
+
 }

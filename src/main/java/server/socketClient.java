@@ -47,10 +47,6 @@ public class socketClient {
 
         connectToRemoteSocket();
         connectToRemoteDB();
-
-
-        //addResponse(1, 2, "lol");
-        //updateResponses(1, 2);
     }
 
     public void connectToRemoteDB(){
@@ -64,7 +60,6 @@ public class socketClient {
 
         try (PGConnection connection = (PGConnection) dataSource.getConnection()) {
             logger.info("Successful connection from client to PostgreSQL database instance");
-            System.out.println("User added: " + userAdd(new User("Test", "User", "lol", false)));
         } catch (Exception e) {
             logger.error("Unable to connect to PostgreSQL on port 5432. PJDBC dump:", e);
         }
@@ -106,8 +101,8 @@ public class socketClient {
             logger.info("Client connected! Spitting bars.");
         }).on("DB_Update", args -> {
             logger.info("Client knows DB has updated:  " + args[0]);
-            updateLocalTables(args[0]);
             //Pull fresh table
+            updateLocalTables(args[0]);
         }).on(Socket.EVENT_DISCONNECT, args -> {
 
         });
@@ -168,7 +163,7 @@ public class socketClient {
     }
 
     /**
-     * Calls userAuthAsync function but with a LOGIN_TIMEOUT timeout. If we hit timeout, return false, else wait for server
+     * Calls userAuthAsync function but with a LOGIN_TIMEOUT second timeout. If we hit timeout, return false, else wait for server
      * to respond with response.
      * @param toAuth User details to authenticate
      * @return Boolean corrsponding to whether authentication was successful or not
@@ -195,6 +190,13 @@ public class socketClient {
         return false;
     }
 
+    /**
+     * Calls userAddAsync function but with a ADDITION_TIMEOUT second timeout. If we hit timeout, return false, else wait for server
+     * to respond with response.
+     * @param toAdd User details to add
+     * @return Generated login name for users supplied details
+     * @author Amrik Sadhra
+     */
     public String userAdd(User toAdd) {
         ExecutorService executor = Executors.newSingleThreadExecutor();
         Future<String> future = executor.submit(new UserAddTask(toAdd));
@@ -296,11 +298,12 @@ public class socketClient {
         try {
             obj.put("firstName", toAdd.getFirstName());
             obj.put("secondName", toAdd.getSecondName());
+            obj.put("emailAddress", toAdd.getEmailAddress());
             obj.put("password", toAdd.getPassword());
-            obj.put("teacherStatus", toAdd.teacherStatus);
+            obj.put("userType", toAdd.userType);
+
             //TODO: If failed, throw custom userAdd exception
             socket.emit("AddUser", obj);
-
             socket.on("AddUser", objects -> {
                 if (!(objects[0]).equals("user_add_failed")) {
                     logger.info("User " + objects[0] + " was successfully added to database.");
@@ -314,7 +317,7 @@ public class socketClient {
             logger.error("Unable to generate JSON object for passing new user details. ", e);
         }
 
-        //Spinlock method until our final fake boolean has been modified
+        //Spinlock method until our final 'fake' String has been modified
         while(additionSuccessFinal.getNonFinal().equals("no_response")){
             logger.debug("JVM optimises out empty while loops. Waiting for server response.");
         };

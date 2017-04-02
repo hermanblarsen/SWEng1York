@@ -65,7 +65,7 @@ public class socketServer {
         server.addDisconnectListener(new DisconnectListener() {
             @Override
             public void onDisconnect(SocketIOClient socketIOClient) {
-                logger.info("Disonnection from " + socketIOClient.getSessionId());
+                logger.info("Disconnection from " + socketIOClient.getSessionId());
                 myClients.remove(socketIOClient);
             }
         });
@@ -73,39 +73,38 @@ public class socketServer {
         server.addEventListener("AddUser", User.class, new DataListener<User>() {
             @Override
             public void onData(final SocketIOClient client, User data, final AckRequest ackRequest) {
+                String generatedLoginName = "user_add_failed";
+
                 //Attempt to add a user using stored procedure
                 try (PGConnection connection = (PGConnection) dataSource.getConnection()) {
                     Statement statement = connection.createStatement();
 
                     StringBuilder sb = new StringBuilder();
 
-                    //TODO: Create Stored Procedure on PostgreSQL
+                    //Call stored procedure on database
                     sb.append("select edi.public.sp_adduser(");
                     sb.append("'").append(data.getFirstName()).append("',");
                     sb.append("'").append(data.getSecondName()).append("',");
+                    sb.append("'").append(data.getEmailAddress()).append("',");
                     sb.append("'").append(data.getPassword()).append("',");
-                    sb.append(data.getTeacher()).append(",");
-                    sb.append(1).append(");");
+                    sb.append("'").append(data.getUserType()).append("',");
+                    sb.append(1).append(");"); //TODO: Add proper classID
 
                     logger.info("Adding user to database using SQL: " + sb.toString());
                     ResultSet rs = statement.executeQuery(sb.toString());
 
-                    String generatedLoginName = "user_add_failed";
-
                     while(rs.next()) {
                         generatedLoginName =  rs.getString("sp_adduser");
-                        System.out.println("Generated login name from SQL database: " + generatedLoginName);
+                        logger.info("Generated login name from SQL database: " + generatedLoginName);
                     }
-
-                    //TODO: Let client know the login name that was generated at addition time
-                    client.sendEvent("AddUser", generatedLoginName);
 
                     statement.close();
                 } catch (Exception e) {
                     logger.error("Unable to connect to PostgreSQL on port 5432. PJDBC dump:", e);
                 }
 
-
+                //Let client know the login name that was generated at addition time
+                client.sendEvent("AddUser", generatedLoginName);
             }
         });
 
@@ -121,18 +120,15 @@ public class socketServer {
                     String enteredPassword = data.getPassword();
 
                     //Auth Test
-                    ResultSet userList = statement.executeQuery("SELECT password_hash, password_salt  FROM USERS where login_name like '" + userToLogin + "';");
+                    ResultSet authStatus = statement.executeQuery("select edi.public.sp_authuser('" + userToLogin + "', '" + enteredPassword + "');");
 
-                    while (userList.next()) {
-                        String password_hash = userList.getString("password_hash");
-                        String password_salt = userList.getString("password_salt");
-
-                        if (calculateHash(enteredPassword, password_salt).equals(password_hash.toLowerCase())) {
+                    while (authStatus.next()) {
+                        if (authStatus.getBoolean("sp_authuser")) {
                             authSuccess = true;
                             logger.info("User " + userToLogin + " successfully logged in! Time to let the client know.");
                         }
                     }
-                    userList.close();
+                    authStatus.close();
                     statement.close();
                 } catch (Exception e) {
                     logger.error("Unable to connect to PostgreSQL on port 5432. PJDBC dump:", e);
