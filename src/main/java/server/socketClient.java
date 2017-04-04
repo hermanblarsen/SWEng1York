@@ -30,7 +30,7 @@ public class socketClient {
     private String serverIPAddress;
 
     //TODO: These will be filled by actual values, for now they are temp and meaningless
-    private int current_presentation_id = 1;;
+    private int current_presentation_id = 1;
     private int current_question_id = 1;
 
     //PostgreSQL database connection
@@ -75,7 +75,7 @@ public class socketClient {
             sb.append("INSERT INTO public.responses (presentation_id, question_id, data) VALUES ('");
             sb.append(presentation_id).append("', '");
             sb.append(question_id).append("', '");
-            sb.append(data + "');");
+            sb.append(data).append("');");
 
             logger.info("Adding response to database using SQL: " + sb.toString());
             statement.execute(sb.toString());
@@ -97,9 +97,7 @@ public class socketClient {
             logger.error("Couldn't create client port");
         }
 
-        socket.on(Socket.EVENT_CONNECT, args -> {
-            logger.info("Client connected! Spitting bars.");
-        }).on("DB_Update", args -> {
+        socket.on(Socket.EVENT_CONNECT, args -> logger.info("Client connected! Spitting bars.")).on("DB_Update", args -> {
             logger.info("Client knows DB has updated:  " + args[0]);
             //Pull fresh table
             updateLocalTables(args[0]);
@@ -148,7 +146,7 @@ public class socketClient {
             StringBuilder sb = new StringBuilder();
 
             //TODO: Create Stored Procedure on PostgreSQL
-            sb.append("SELECT * from public.responses where presentation_id = " + presentation_id + " and question_id = " + question_id + ";");
+            sb.append("SELECT * from public.responses where presentation_id = ").append(presentation_id).append(" and question_id = ").append(question_id).append(";");
             logger.info("Adding response to database using SQL: " + sb.toString());
             ResultSet rs = statement.executeQuery(sb.toString());
 
@@ -169,14 +167,13 @@ public class socketClient {
      * @return Boolean corrsponding to whether authentication was successful or not
      * @author Amrik Sadhra
      */
-    public boolean userAuth(UserAuth toAuth) {
+    public String userAuth(UserAuth toAuth) {
         ExecutorService executor = Executors.newSingleThreadExecutor();
-        Future<Boolean> future = executor.submit(new UserAuthTask(toAuth));
+        Future<String> future = executor.submit(new UserAuthTask(toAuth));
 
         try {
             logger.info("Attempting login of User: " + toAuth.getUserToLogin());
-            Boolean result = future.get(LOGIN_TIMEOUT, TimeUnit.SECONDS);
-            return result;
+            return future.get(LOGIN_TIMEOUT, TimeUnit.SECONDS);
         } catch (TimeoutException e) {
             future.cancel(true);
             logger.error("Connection to server timed out.");
@@ -187,7 +184,7 @@ public class socketClient {
         }
         //If we hit any of the catch statements
         executor.shutdownNow();
-        return false;
+        return "false";
     }
 
     /**
@@ -203,8 +200,7 @@ public class socketClient {
 
         try {
             logger.info("Attempting add of User: " + toAdd.getFirstName() + " " + toAdd.getSecondName());
-            String result = future.get(ADDITION_TIMEOUT, TimeUnit.SECONDS);
-            return result;
+            return future.get(ADDITION_TIMEOUT, TimeUnit.SECONDS);
         } catch (TimeoutException e) {
             future.cancel(true);
             logger.error("Connection to server timed out.");
@@ -218,7 +214,7 @@ public class socketClient {
         return "USER_ADD_FAILED";
     }
 
-    class UserAuthTask implements Callable<Boolean> {
+    class UserAuthTask implements Callable<String> {
         UserAuth toAuth;
 
         public UserAuthTask(UserAuth toAuth){
@@ -226,7 +222,7 @@ public class socketClient {
         }
 
         @Override
-        public Boolean call() throws Exception {
+        public String call() throws Exception {
             return userAuthAsync(toAuth);
         }
     }
@@ -251,7 +247,7 @@ public class socketClient {
      * @param toAuth User to add to the current users database located serverside
      * @author Amrik Sadhra
      */
-    public Boolean userAuthAsync(UserAuth toAuth) {
+    public String userAuthAsync(UserAuth toAuth) {
         //Hack to bypass final requirement for Lambda anon methods
         final FinalWrapper loginSuccessFinal = new FinalWrapper("no_response");
 
@@ -261,13 +257,13 @@ public class socketClient {
             obj.put("password", toAuth.getPassword());
             socket.emit("AuthUser", obj);
             socket.on("AuthUser", objects -> {
-                if ((boolean) objects[0]) {
+                if (!(objects[0]).equals("auth_fail")) {
                     logger.info("User " + toAuth.getUserToLogin() + " has successfully logged in");
-                    loginSuccessFinal.setNonFinal("true");
                 } else {
                     logger.error("Incorrect username/password for login.");
-                    loginSuccessFinal.setNonFinal("false");
                 }
+
+                loginSuccessFinal.setNonFinal(objects[0]);
             });
         } catch (JSONException e) {
             logger.error("Unable to generate JSON object for passing user authentication details. ", e);
@@ -276,10 +272,10 @@ public class socketClient {
         //Spinlock method until our final fake boolean has been modified
         while(loginSuccessFinal.getNonFinal().equals("no_response")){
             logger.debug("JVM optimises out empty while loops. Waiting for server response.");
-        };
+        }
 
         //Convert the string we used to store 3 data types in (no resp/true/false) down to boolean now that no resp has been removed as possibility
-        return Boolean.valueOf((String) loginSuccessFinal.getNonFinal());
+        return (String) loginSuccessFinal.getNonFinal();
     }
 
     /**
@@ -320,7 +316,7 @@ public class socketClient {
         //Spinlock method until our final 'fake' String has been modified
         while(additionSuccessFinal.getNonFinal().equals("no_response")){
             logger.debug("JVM optimises out empty while loops. Waiting for server response.");
-        };
+        }
 
         //Return the login name generated server side
         return (String) additionSuccessFinal.getNonFinal();
@@ -328,21 +324,25 @@ public class socketClient {
 
 
     public void listUsers() {
-            /*//List Users
+        try (PGConnection connection = (PGConnection) dataSource.getConnection()) {
+            Statement statement = connection.createStatement();
+
+            //List Users
             ResultSet userList = statement.executeQuery("SELECT * FROM USERS;");
             while (userList.next()) {
                 int user_id = userList.getInt("user_id");
                 String first_name = userList.getString("first_name");
                 String second_name = userList.getString("second_name");
-                String password = userList.getString("password_hash");
-                boolean teacherStatus = userList.getBoolean("is_teacher");
-                int class_id = userList.getInt("classes_class_id");
                 String login_name = userList.getString("login_name");
+                String userType = userList.getString("user_type");
+                int class_id = userList.getInt("classes_class_id");
 
-                System.out.println("user_ID: " + user_id + " | login_name: " +" | fn: " + first_name + " | sn: " + second_name + " | pw: " + password + " | teacherStatus: " + teacherStatus + " | class_id: " + class_id);
+                System.out.println("user_ID: " + user_id + " | login_name: " + login_name + " | fn: " + first_name + " | sn: " + second_name + " | userType: " + userType + " | class_id: " + class_id);
             }
             userList.close();
-            statement.close();*/
-
+            statement.close();
+        } catch (Exception e) {
+            logger.error("Unable to execute update response procedure, PDJBC dump: ", e);
+        }
     }
 }

@@ -26,7 +26,7 @@ public class Login extends Application {
     socketClient mySocketClient;
 
     //----------- IF YOU'RE NOT ON THE DATABASE TEAM, SET THIS VARIABLE TO FALSE TO BYPASS THE SERVER STUFF -----------------
-    private static final boolean AM_I_ON_DB_TEAM = false;
+    private static final boolean AM_I_ON_DB_TEAM = true;
 
 
     @Override
@@ -50,7 +50,8 @@ public class Login extends Application {
         scenetitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
         grid.add(scenetitle, 0, 0, 2, 1);
 
-        Label userType = new Label("I'm a:");
+        //I believe this is a parameter that should be returned from the database and not GUI accessible
+        /*Label userType = new Label("I'm a:");
         grid.add(userType, 0, 1);
 
         ToggleButton studentButton = new ToggleButton("Student");
@@ -63,7 +64,7 @@ public class Login extends Application {
 
         ToggleGroup userTypeGroup = new ToggleGroup();
         studentButton.setToggleGroup(userTypeGroup);
-        teacherButton.setToggleGroup(userTypeGroup);
+        teacherButton.setToggleGroup(userTypeGroup);*/
 
         Label userName = new Label("User Name:");
         grid.add(userName, 0, 2);
@@ -83,16 +84,32 @@ public class Login extends Application {
 
         //SQL Authentication wanted here
         Button loginButton = new Button("Login");
-        loginButton.getStyleClass().setAll("btn","btn-danger");
+        loginButton.getStyleClass().setAll("btn", "btn-danger");
         grid.add(loginButton, 1, 5, 1, 1);
-        loginButton.setOnAction((ActionEvent event) ->{
+        loginButton.setOnAction((ActionEvent event) -> {
             //TODO: Store this userauth object instead of keeping anonymous.
-            boolean loginSuccessful = this.verifyLogin(new UserAuth(userTextField.getCharacters().toString(), passwordField.getCharacters().toString()));
+            String userType = this.verifyLogin(new UserAuth(userTextField.getCharacters().toString(), passwordField.getCharacters().toString()));
 
-            //Run different dashboards based on userType button
+            //Run different dashboards based on user type returned from DB
             boolean isTeacher = false;
+            boolean loginSuccessful = false;
+            //if (teacherButton.isSelected()) isTeacher = true;          //Run different dashboards based on userType button
 
-            if (teacherButton.isSelected()) isTeacher = true;
+            switch (userType) {
+                case "admin":
+                    loginSuccessful = true;
+                    break;
+                case "teacher":
+                    isTeacher = true;
+                    loginSuccessful = true;
+                    break;
+                case "student":
+                    loginSuccessful = true;
+                    break;
+                case "auth_fail":
+                    loginSuccessful = false;
+                    break;
+            }
 
             if (loginSuccessful) {
                 ediManager.loginSucceded(isTeacher);
@@ -112,8 +129,8 @@ public class Login extends Application {
         primaryStage.show();
     }
 
-    public void serverConnect(){
-        if(AM_I_ON_DB_TEAM) {
+    public void serverConnect() {
+        if (AM_I_ON_DB_TEAM) {
             //TODO: For now, start server here. Should be compiled to separate JAR and run independently
             socketServer mySocketServer = new socketServer("db.amriksadhra.com", 8080);
             //Connect to server
@@ -122,10 +139,10 @@ public class Login extends Application {
         }
     }
 
-    public boolean verifyLogin (UserAuth userToAuth) {
-        if(AM_I_ON_DB_TEAM){
+    public String verifyLogin(UserAuth userToAuth) {
+        if (AM_I_ON_DB_TEAM) {
             return mySocketClient.userAuth(userToAuth);
-        } else return true;
+        } else return "teacher";
     }
 
     public void setEdiManager(EdiManager ediManager) {

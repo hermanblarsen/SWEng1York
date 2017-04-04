@@ -16,8 +16,6 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
 
-import static server.Crypto.calculateHash;
-
 
 /**
  * Created by amriksadhra on 20/03/2017.
@@ -41,7 +39,6 @@ public class socketServer {
 
         connectToLocalDB(dbHostName);
         startSocket();
-
 
     }
 
@@ -111,22 +108,19 @@ public class socketServer {
         server.addEventListener("AuthUser", UserAuth.class, new DataListener<UserAuth>() {
             @Override
             public void onData(final SocketIOClient client, UserAuth data, final AckRequest ackRequest) {
-                boolean authSuccess = false;
+                String userType = "no_response";
 
                 try (PGConnection connection = (PGConnection) dataSource.getConnection()) {
                     Statement statement = connection.createStatement();
 
-                    String userToLogin = data.getUserToLogin();
-                    String enteredPassword = data.getPassword();
-
                     //Auth Test
-                    ResultSet authStatus = statement.executeQuery("select edi.public.sp_authuser('" + userToLogin + "', '" + enteredPassword + "');");
+                    ResultSet authStatus = statement.executeQuery(     "SELECT (f).auth_result_return, (f).user_type_return FROM (SELECT edi.public.sp_authuser('" + data.getUserToLogin() + "', '" + data.getPassword() + "') as f) AS x;");
 
                     while (authStatus.next()) {
-                        if (authStatus.getBoolean("sp_authuser")) {
-                            authSuccess = true;
-                            logger.info("User " + userToLogin + " successfully logged in! Time to let the client know.");
+                        if (authStatus.getBoolean("auth_result_return")) {
+                            logger.info("User " + data.getUserToLogin() + " successfully logged in! Time to let the client know.");
                         }
+                        userType = authStatus.getString("user_type_return");
                     }
                     authStatus.close();
                     statement.close();
@@ -134,8 +128,8 @@ public class socketServer {
                     logger.error("Unable to connect to PostgreSQL on port 5432. PJDBC dump:", e);
                 }
 
-                //Alert client to whether their user auth was a success or fail
-                client.sendEvent("AuthUser", authSuccess);
+                //Alert client to whether their user auth was a success or fail, and what user type is
+                client.sendEvent("AuthUser", userType);
             }
         });
 
@@ -150,6 +144,7 @@ public class socketServer {
      *
      * @author Amrik Sadhra
      */
+    @SuppressWarnings({"InfiniteLoopStatement", "StatementWithEmptyBody"})
     public void connectToLocalDB(String dbHostName) {
         Thread dbPoller = new Thread(() -> {
             //Connect to PostgreSQL Instance
@@ -173,6 +168,7 @@ public class socketServer {
                 connection.addNotificationListener(listener);
                 logger.info("Successful connection to PostgreSQL database instance");
                 while (true) {
+                    //Keep connection active in order to maintain listen/notify events
                 }
             } catch (Exception e) {
                 logger.error("Unable to connect to PostgreSQL on port 5432. PJDBC dump:", e);

@@ -37,7 +37,6 @@ public abstract class PresentationManager extends Application {
     protected Boolean commentActive = false;
 
 
-
     @Override
     public void start(Stage primaryStage){
         primaryStage.setTitle("Edi");
