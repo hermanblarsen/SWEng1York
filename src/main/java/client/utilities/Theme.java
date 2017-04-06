@@ -6,7 +6,7 @@ package client.utilities;
 public class Theme {
     private String backgroundColour;
 //    private Font font;
-    private String font;  //TODO String or font!?
+    private String font;
     private int fontSize;
     private String fontColour;
     private String graphicsColour;

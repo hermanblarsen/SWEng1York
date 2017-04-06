@@ -45,8 +45,6 @@ public abstract class PresentationManager {
     protected Boolean commentActive = false;
 
 
-
-
     public void openPresentation(String path){
         Stage presentationStage = new Stage();
         presentationStage.setTitle("Edi");
@@ -64,6 +62,8 @@ public abstract class PresentationManager {
     }
 
     public void loadPresentation(BorderPane mainUI, String path) {
+        logger.info("Attempting to load presentation located at: " + path);
+
         ParserXML readPresentationParser = new ParserXML(path);
 
         myPresentationElement = Presentation.generateTestPresentation();     //TEST

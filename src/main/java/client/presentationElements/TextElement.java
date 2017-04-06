@@ -1,5 +1,6 @@
 package client.presentationElements;
 
+import client.utilities.Utils;
 import client.utilities.WebDocumentListener;
 import javafx.scene.Node;
 import javafx.scene.layout.Pane;
@@ -30,6 +31,7 @@ public class TextElement extends SlideElement {
 
     protected WebView browser;
     protected WebEngine webEngine;
+    String cssFilePath;
 
     public TextElement() {
 
@@ -37,15 +39,16 @@ public class TextElement extends SlideElement {
 
     @Override
     public void setupElement() {
-        //We need to just do this once, had to move this out of the TextElement constructor because of
-        //Hermans JUnit XML Test, cant instantiate Nodes without a JavaFX Scene being present.
-
         //I moved this to a separate method that can be called whenever it is instantiated/Updated.
         //  Maybe surround this with try-catch statements as well as it has potential to go bad if we are not careful. - Herman
-        //TODO @amrik find a suitable place for this method, and/or split it up and put it where it belongs. No setters can have methods referring to the rendered element
         browser = new WebView();
         webEngine = browser.getEngine();
         webEngine.documentProperty().addListener(new WebDocumentListener(webEngine));
+
+        //Apply Dynamically created CSS to TextElement
+        //TODO: Ensure these match what we read in from XML (correct format). Add Getters and setters for Presentation GUID, SlideID then hook into this method call
+        cssFilePath = Utils.cssGen(1,1, elementID, fontSize, font, fontColour, bgColour);
+        webEngine.setUserStyleSheetLocation(cssFilePath);
 
         webEngine.loadContent(textContent);
         getCoreNode().setTranslateY(xPosition);

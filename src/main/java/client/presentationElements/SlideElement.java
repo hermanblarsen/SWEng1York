@@ -52,8 +52,6 @@ public abstract class SlideElement {
             doClassSpecificRender();
         }
 
-
-
         if (!(this instanceof AudioElement)) {
             //TODO: Trigger shared refresh
             switch (animationType) {

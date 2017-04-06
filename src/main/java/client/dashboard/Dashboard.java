@@ -6,7 +6,6 @@ import client.presentationElements.Presentation;
 import client.presentationViewer.StudentPresentationManager;
 import client.presentationViewer.TeacherPresentationManager;
 import javafx.application.Application;
-import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.scene.Node;
@@ -80,17 +79,17 @@ public abstract class Dashboard extends Application {
         int arraySize = 20;
         Panel[] presentationPanelList = new Panel[arraySize];
 
-        for(int i=0; i<arraySize; i++) {
+        for(int i = 0; i < arraySize; i++) {
+            final int finalI = i;
+
             Panel presentationPanel = new Panel(String.format("Presentation Title %d", i));
 
             presentationPanel.getStyleClass().add("panel-primary");
             presentationPanel.setBody(new Text("Presentation preview"));
 
             presentationPanelList[i] = presentationPanel;
-            presentationPanelList[i].addEventHandler(MouseEvent.MOUSE_CLICKED, event-> {
-                presentationManager = new StudentPresentationManager();
-                presentationManager.openPresentation("poop");
-            });
+
+            presentationPanelList[i].addEventHandler(MouseEvent.MOUSE_CLICKED, event-> launchPresentation(presentationPanelList[finalI].getText()));
         }
 
         for (Panel aPresentationPanelList : presentationPanelList)
@@ -125,6 +124,20 @@ public abstract class Dashboard extends Application {
         return  menuBar;
     }
 
+    /**
+     * Helper method to launch correct Presentation manager dependent upon current object type
+     * @param path Path to presentation
+     * @author Amrik Sadhra
+     */
+    private void launchPresentation(String path){
+        if(this instanceof StudentDashboard) {
+            presentationManager = new StudentPresentationManager();
+        } else if (this instanceof TeacherDashboard){
+            presentationManager = new TeacherPresentationManager();
+        }
+        presentationManager.openPresentation(path);
+    }
+
     private HBox addTopPanel() {
         HBox topPanel = new HBox();
         topPanel.setPadding(new Insets(15, 12, 15, 12));
@@ -144,10 +157,7 @@ public abstract class Dashboard extends Application {
             Window stage = source.getScene().getWindow();
             File file = fileChooser.showOpenDialog(stage);
             if (file != null) {
-                //TODO: Switch based on instance type of dashboard
-                presentationManager = new StudentPresentationManager();
-                presentationManager.openPresentation("shit");
-                presentationManager.loadPresentation(border, file.getPath());
+                launchPresentation(file.getPath());
             }
         });
 
@@ -164,36 +174,6 @@ public abstract class Dashboard extends Application {
         VBox vbox = new VBox();
         vbox.setPadding(new Insets(10));
         vbox.setSpacing(8);
-
-        /*//Generate flexible flowplane to store shape buttons
-        FlowPane controlsPane = new FlowPane();
-        controlsPane.setPadding(new Insets(5, 0, 5, 0));
-        controlsPane.setVgap(4);
-        controlsPane.setHgap(4);
-        controlsPane.setPrefWrapLength(180); // preferred width allows for two columns
-        controlsPane.setStyle("-fx-background-color: #ffffff;");
-
-        //Buttons for shapePane
-        Button backButton = new Button("Back");
-        backButton.getStyleClass().setAll("btn", "btn-success");
-        backButton.setOnAction(event ->{
-            //TODO: Lock these so they only function once presentation loaded
-            controlPresentation(Slide.SLIDE_BACKWARD);
-        });
-        controlsPane.getChildren().add(backButton);
-        Button forwardsButton = new Button("Forwards");
-        forwardsButton.getStyleClass().setAll("btn", "btn-warning");
-        forwardsButton.setOnAction(event ->{
-            //TODO: Lock these so they only function once presentation loaded
-            controlPresentation(Slide.SLIDE_FORWARD);
-        });
-        controlsPane.getChildren().add(forwardsButton);
-        Button fillButton1 = new Button("Filler");
-        fillButton1.getStyleClass().setAll("btn", "btn-info");
-        controlsPane.getChildren().add(fillButton1);
-        Button fillButton2 = new Button("Filler");
-        fillButton2.getStyleClass().setAll("btn", "btn-danger");
-        controlsPane.getChildren().add(fillButton2);*/
 
         VBox controlsPane = new VBox();
         controlsPane.setPadding(new Insets(3, 0, 3, 0));

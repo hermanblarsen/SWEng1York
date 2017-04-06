@@ -28,7 +28,7 @@ public class EdiManager extends Application {
         launch(args);
     }
 
-    //Temporary, so that edimanager can close the connections seamlesslely for quick debug
+    //Temporary, so that edimanager can close the ports and prevent port-in-use errors on next execution
     public void setClient(SocketClient mySocketClient, boolean isDBTeam){
         this.mySocketClient = mySocketClient;
         this.isDBTeam = isDBTeam;
@@ -41,6 +41,7 @@ public class EdiManager extends Application {
         super.init();
     }
 
+    //Closing down Edi; shutting down sockets
     @Override
     public void stop() throws Exception {
         if(isDBTeam) {

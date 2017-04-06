@@ -189,7 +189,12 @@ public class Presentation extends Pane {
         myTextElement.setLayer(0);
         myTextElement.setStartSequence(1);
         myTextElement.setEndSequence(3);
-        myTextElement.setTextContent("<h1 style='background : rgba(0,0,0,0);'><b><font color=\"red\">IILP </font><font color=\"blue\">HTML</font> <font color=\"green\">Support Test</font></b></h1>");
+        myTextElement.setElementID(0);
+        myTextElement.setFont("Arial");
+        myTextElement.setFontSize(12);
+        myTextElement.setFontColour("#AF4567");
+        myTextElement.setBgColour("#000000");
+        myTextElement.setTextContent("<body><b>IILP HTML Support Test</b></body>");
         myTextElement.setSlideCanvas(slide1);
         slideElementsSlide1.add(myTextElement);
 
@@ -246,6 +251,11 @@ public class Presentation extends Pane {
         myTextElement1.setLayer(5);
         myTextElement1.setStartSequence(7);
         myTextElement1.setEndSequence(8);
+        myTextElement1.setElementID(5);
+        myTextElement1.setFont("Times New Roman");
+        myTextElement1.setFontSize(24);
+        myTextElement1.setFontColour("#AA4567");
+        myTextElement1.setBgColour("#000000");
         myTextElement1.setTextContent("<b>This is some sample text for Adar to be impressed by</b>");
         myTextElement1.setSlideCanvas(slide1);
         slideElementsSlide1.add(myTextElement1);
