@@ -39,6 +39,10 @@ public abstract class PresentationManager extends Application {
 
     @Override
     public void start(Stage primaryStage){
+    }
+
+    public void openPresentation(String path){
+        Stage primaryStage = new Stage();
         primaryStage.setTitle("Edi");
 
         border = new BorderPane();
@@ -46,12 +50,11 @@ public abstract class PresentationManager extends Application {
         scene.getStylesheets().add("bootstrapfx.css");
         primaryStage.setScene(scene);
         primaryStage.show();
-        loadPresentation(border, "shit");
+        loadPresentation(border, path);
         pb = new ProgressBar(0);
         slideNumber = new Label("Slide 1 of "+myPresentationElement.getSlideList().size());
         border.setBottom(addPresentationControls(primaryStage));
     }
-
 
     protected void loadPresentation(BorderPane mainUI, String path) {
         ParserXML readPresentationParser = new ParserXML(path);
