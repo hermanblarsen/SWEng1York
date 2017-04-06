@@ -1,6 +1,5 @@
 package server;
 
-import client.utilities.FinalWrapper;
 import client.utilities.Utils;
 import com.impossibl.postgres.api.jdbc.PGConnection;
 import com.impossibl.postgres.jdbc.PGDataSource;
@@ -15,18 +14,20 @@ import server.packets.UserAuth;
 
 import java.net.URISyntaxException;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Created by amriksadhra on 20/03/2017.
  */
-public class socketClient {
+public class SocketClient {
     //Timeout times for user addition/authorisation asynchronous functions
     private static final int LOGIN_TIMEOUT = 5;
     private static final int ADDITION_TIMEOUT = 5;
 
-    private Logger logger = LoggerFactory.getLogger(socketClient.class);
+    private Logger logger = LoggerFactory.getLogger(SocketClient.class);
     private String serverIPAddress;
 
     //TODO: These will be filled by actual values, for now they are temp and meaningless
@@ -39,10 +40,10 @@ public class socketClient {
     Socket socket;
 
     public static void main(String[] args) {
-        new socketClient("127.0.0.1", 8080);
+        new SocketClient("127.0.0.1", 8080);
     }
 
-    public socketClient(String serverIP, int serverPort) {
+    public SocketClient(String serverIP, int serverPort) {
         serverIPAddress = Utils.buildIPAddress("127.0.0.1", serverPort);
 
         connectToRemoteSocket();
@@ -164,7 +165,7 @@ public class socketClient {
      * Calls userAuthAsync function but with a LOGIN_TIMEOUT second timeout. If we hit timeout, return false, else wait for server
      * to respond with response.
      * @param toAuth User details to authenticate
-     * @return Boolean corrsponding to whether authentication was successful or not
+     * @return String containing user_type of authenticated user.
      * @author Amrik Sadhra
      */
     public String userAuth(UserAuth toAuth) {
@@ -248,8 +249,8 @@ public class socketClient {
      * @author Amrik Sadhra
      */
     public String userAuthAsync(UserAuth toAuth) {
-        //Hack to bypass final requirement for Lambda anon methods
-        final FinalWrapper loginSuccessFinal = new FinalWrapper("no_response");
+        //Ensure atomic write to variable, bypassing Lambda final restriction
+        AtomicReference<String> loginSuccessFinal = new  AtomicReference<>("no_response");
 
         JSONObject obj = new JSONObject();
         try {
@@ -263,19 +264,19 @@ public class socketClient {
                     logger.error("Incorrect username/password for login.");
                 }
 
-                loginSuccessFinal.setNonFinal(objects[0]);
+                loginSuccessFinal.set((String) objects[0]);
             });
         } catch (JSONException e) {
             logger.error("Unable to generate JSON object for passing user authentication details. ", e);
         }
 
-        //Spinlock method until our final fake boolean has been modified
-        while(loginSuccessFinal.getNonFinal().equals("no_response")){
+        //Spinlock method until the server has responded, and changed the value of the success variable
+        while(loginSuccessFinal.get().equals("no_response")){
             logger.debug("JVM optimises out empty while loops. Waiting for server response.");
         }
 
-        //Convert the string we used to store 3 data types in (no resp/true/false) down to boolean now that no resp has been removed as possibility
-        return (String) loginSuccessFinal.getNonFinal();
+        //Return the string holding the user_type
+        return loginSuccessFinal.get();
     }
 
     /**
@@ -286,8 +287,8 @@ public class socketClient {
      * @author Amrik Sadhra
      */
     public String userAddAsync(User toAdd) {
-        //Hack to bypass final requirement for Lambda anon methods
-        final FinalWrapper additionSuccessFinal = new FinalWrapper("no_response");
+        //Ensure atomic write to variable, bypassing Lambda final restriction
+        AtomicReference<String> additionSuccessFinal = new AtomicReference<>("no_response");
 
         //When we send data as a custom class, we need to wrap it in JSON with fields named after the variables in our class
         JSONObject obj = new JSONObject();
@@ -303,23 +304,23 @@ public class socketClient {
             socket.on("AddUser", objects -> {
                 if (!(objects[0]).equals("user_add_failed")) {
                     logger.info("User " + objects[0] + " was successfully added to database.");
-                    additionSuccessFinal.setNonFinal(objects[0]);
+                    additionSuccessFinal.set((String) objects[0]);
                 } else {
                     logger.error("Error adding user to database");
-                    additionSuccessFinal.setNonFinal(objects[0]);
+                    additionSuccessFinal.set((String) objects[0]);
                 }
             });
         } catch (JSONException e) {
             logger.error("Unable to generate JSON object for passing new user details. ", e);
         }
 
-        //Spinlock method until our final 'fake' String has been modified
-        while(additionSuccessFinal.getNonFinal().equals("no_response")){
+        //Spinlock method until the server has responded, and changed the value of the success variable
+        while(additionSuccessFinal.get().equals("no_response")){
             logger.debug("JVM optimises out empty while loops. Waiting for server response.");
         }
 
         //Return the login name generated server side
-        return (String) additionSuccessFinal.getNonFinal();
+        return additionSuccessFinal.get();
     }
 
 
@@ -344,5 +345,14 @@ public class socketClient {
         } catch (Exception e) {
             logger.error("Unable to execute update response procedure, PDJBC dump: ", e);
         }
+    }
+
+    public void closeAll(){
+        try {
+            dataSource.getConnection().close();
+        } catch (SQLException e) {
+            logger.info("Failed to close client connection to DB. Non-fatal, still terminating.");
+        }
+        socket.close();
     }
 }

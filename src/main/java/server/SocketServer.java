@@ -13,6 +13,7 @@ import server.packets.User;
 import server.packets.UserAuth;
 
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 
@@ -21,9 +22,13 @@ import java.util.ArrayList;
  * Created by amriksadhra on 20/03/2017.
  */
 @SuppressWarnings("Convert2Lambda")
-public class socketServer {
-    private Logger logger = LoggerFactory.getLogger(socketServer.class);
+public class SocketServer {
+    private Logger logger = LoggerFactory.getLogger(SocketServer.class);
     private int serverPort;
+    SocketIOServer server;
+    Thread dbPoller;
+
+    private boolean keepAlive = true;
 
     //PostgreSQL database connection
     PGDataSource dataSource;
@@ -31,10 +36,10 @@ public class socketServer {
     ArrayList<SocketIOClient> myClients = new ArrayList<>();
 
     public static void main(String[] args) {
-        new socketServer("db.amriksadhra.com", 8080);
+        new SocketServer("db.amriksadhra.com", 8080);
     }
 
-    public socketServer(String dbHostName, int serverPort) {
+    public SocketServer(String dbHostName, int serverPort) {
         this.serverPort = serverPort;
 
         connectToLocalDB(dbHostName);
@@ -50,7 +55,7 @@ public class socketServer {
         config.setHostname("localhost");
         config.setPort(serverPort);
 
-        final SocketIOServer server = new SocketIOServer(config);
+        server = new SocketIOServer(config);
         server.addConnectListener(new ConnectListener() {
             @Override
             public void onConnect(SocketIOClient socketIOClient) {
@@ -106,6 +111,7 @@ public class socketServer {
         });
 
         server.addEventListener("AuthUser", UserAuth.class, new DataListener<UserAuth>() {
+            @SuppressWarnings("SqlResolve")
             @Override
             public void onData(final SocketIOClient client, UserAuth data, final AckRequest ackRequest) {
                 String userType = "no_response";
@@ -146,7 +152,7 @@ public class socketServer {
      */
     @SuppressWarnings({"InfiniteLoopStatement", "StatementWithEmptyBody"})
     public void connectToLocalDB(String dbHostName) {
-        Thread dbPoller = new Thread(() -> {
+        dbPoller = new Thread(() -> {
             //Connect to PostgreSQL Instance
             dataSource = new PGDataSource();
             dataSource.setHost(dbHostName);
@@ -167,7 +173,7 @@ public class socketServer {
                 statement.close();
                 connection.addNotificationListener(listener);
                 logger.info("Successful connection to PostgreSQL database instance");
-                while (true) {
+                while (keepAlive) {
                     //Keep connection active in order to maintain listen/notify events
                 }
             } catch (Exception e) {
@@ -176,5 +182,4 @@ public class socketServer {
         });
         dbPoller.start();
     }
-
 }

@@ -1,12 +1,12 @@
 package client.managers;
 
+import client.exceptions.SequenceNotFoundException;
+import client.presentationElements.Animation;
 import client.presentationElements.Presentation;
 import client.presentationElements.Slide;
+import client.presentationElements.SlideElement;
 import client.utilities.ParserXML;
 import javafx.animation.FadeTransition;
-import javafx.application.Application;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
@@ -18,14 +18,22 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
  * Created by kma517 on 16/03/2017.
  */
-public abstract class PresentationManager extends Application {
+public abstract class PresentationManager {
+    Logger logger = LoggerFactory.getLogger(PresentationManager.class);
+
     protected Scene scene;
     protected BorderPane border;
     protected Presentation myPresentationElement;
@@ -36,41 +44,25 @@ public abstract class PresentationManager extends Application {
     protected Boolean questionQueueActive = false;
     protected Boolean commentActive = false;
 
+    public PresentationManager(Stage primaryStage, Scene scene, BorderPane border, String path){
+        this.scene = scene;
+        this.border = border;
 
-    @Override
-    public void start(Stage primaryStage){
-    }
-
-    public void openPresentation(String path){
-        Stage primaryStage = new Stage();
-        primaryStage.setTitle("Edi");
-
-        border = new BorderPane();
-        scene = new Scene(border, 1000, 600);
-        scene.getStylesheets().add("bootstrapfx.css");
-        primaryStage.setScene(scene);
-        primaryStage.show();
         loadPresentation(border, path);
+
         pb = new ProgressBar(0);
-        slideNumber = new Label("Slide 1 of "+myPresentationElement.getSlideList().size());
+        slideNumber = new Label("Slide 1 of "+ myPresentationElement.getSlideList().size());
         border.setBottom(addPresentationControls(primaryStage));
     }
 
-    protected void loadPresentation(BorderPane mainUI, String path) {
+    public void loadPresentation(BorderPane mainUI, String path) {
         ParserXML readPresentationParser = new ParserXML(path);
 
         myPresentationElement = Presentation.generateTestPresentation();     //TEST
-        //       myPresentationElement = readPresentationParser.parsePresentation();
+        //myPresentationElement = readPresentationParser.parsePresentation();
 
         mainUI.setCenter(myPresentationElement.getCurrentSlide());
         //mainUI.setBottom(addStatBar(myPresentationElement.getCurrentSlide()));
-
-//        for (Slide currentSlide : myPresentationElement.getSlideList()) {
-//            for (SlideElement element : currentSlide.getSlideElementList()) {
-//                element.setSlideCanvas(currentSlide);
-//            }
-//        }
-
 
         //Keyboard listener for moving through presentation
         scene.setOnKeyPressed(key -> {
@@ -83,8 +75,21 @@ public abstract class PresentationManager extends Application {
                 slideProgress(myPresentationElement);
             }
         });
+    }
 
 
+    private void controlPresentation(int direction) {
+        int presentationStatus = slideAdvance(myPresentationElement, direction);
+
+        //If Presentation handler told us that slide is changing, update the Slide present on Main screen
+        //Can do specific things when presentation reached end, or start.
+        if (presentationStatus == Presentation.SLIDE_CHANGE || presentationStatus == Presentation.PRESENTATION_FINISH || presentationStatus == Presentation.PRESENTATION_START) {
+            logger.info("Changing Slides");
+            //Update MainUI panes when changing slides to account for new Slide root pane.
+            border.setCenter(myPresentationElement.getCurrentSlide());
+            //TODO: Incorporate StatBar into Koens progressbar
+            //border.setBottom(addStatBar(myPresentationElement.getCurrentSlide()));
+        }
     }
 
     protected abstract void questionQueueFunction();
@@ -98,7 +103,6 @@ public abstract class PresentationManager extends Application {
         Image next = new Image("file:externalResources/Right_NEW.png",30,30,true,true);
         ImageView nextButton = new ImageView(next);
         nextButton.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
-
             controlPresentation(Slide.SLIDE_FORWARD);
             slideProgress(myPresentationElement);
 
@@ -107,7 +111,6 @@ public abstract class PresentationManager extends Application {
         Image back = new Image("file:externalResources/Left_NEW.png",30,30,true,true);
         ImageView backButton = new ImageView(back);
         backButton.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
-
             controlPresentation(Slide.SLIDE_BACKWARD);
             slideProgress(myPresentationElement);
 
@@ -183,6 +186,39 @@ public abstract class PresentationManager extends Application {
         return presControls;
     }
 
+    private HBox addStatBar(Slide presentationElement) {
+        HBox hbox = new HBox();
+        hbox.setPadding(new Insets(0, 12, 0, 12));
+        hbox.setSpacing(2);
+        hbox.setStyle("-fx-background-color: #34495e;");
+
+        BorderPane border = new BorderPane();
+
+        Text versionText = new Text("Version 0.0.1 Alpha");
+        versionText.setFont(Font.font("San Francisco", FontWeight.NORMAL, 12));
+        versionText.setFill(Color.WHITE);
+
+        border.setLeft(versionText);
+
+        border.setCenter(new Text("                                                     "));
+
+        Text coordTextBar = new Text("Mouse data not available!");
+        coordTextBar.setFont(Font.font("San Francisco", FontWeight.NORMAL, 12));
+        coordTextBar.setFill(Color.WHITE);
+
+        border.setRight(coordTextBar);
+
+        //TODO: This stops working when WebView enters Slide
+        presentationElement.setOnMouseMoved(event -> coordTextBar.setText(
+                "Slide Number: " + presentationElement.getSlideID() + " (x: " + event.getX() + ", y: " + event.getY() + ") -- " +
+                        "(sceneX: " + event.getSceneX() + ", sceneY: " + event.getSceneY() + ") -- " +
+                        "(screenX: " + event.getScreenX() + ", screenY: " + event.getScreenY() + ")"));
+
+        hbox.getChildren().addAll(border);
+
+        return hbox;
+    }
+
 
     protected void slideProgress(Presentation pe){
         double slideNo = pe.getCurrentSlideNumber()+1;
@@ -192,21 +228,99 @@ public abstract class PresentationManager extends Application {
         slideNumber.setText("Slide "+(int) slideNo+" of "+(int) slideMax);
     }
 
-    protected void controlPresentation(int direction) {
-        int presentationStatus = myPresentationElement.advance(direction);
-        // If Presentation handler told us that slide is changing, update the Slide present on Main screen
-        // Can do specific things when presentation reached end, or start.
-        if ((presentationStatus == Presentation.SLIDE_CHANGE) || (presentationStatus == Presentation.PRESENTATION_FINISH) || (presentationStatus == Presentation.PRESENTATION_START)) {
-            //logger.info("Changing Slides");
-            System.out.println("Changing Slides");
+    public int slideAdvance(Presentation presentationToAdvance, int direction) {
+        //Initialise this with something more appropriate
+        int presentationStatus = Presentation.SAME_SLIDE;
 
-            // Update MainUI panes when changing slides to account for new Slide root pane.
-            border.setCenter(myPresentationElement.getCurrentSlide());
-            // border.setBottom(addStatBar(myPresentationElement.getCurrentSlide()));
+        if (direction == Slide.SLIDE_FORWARD) {
+            //If we're not at end of presentation
+            if (presentationToAdvance.getCurrentSlideNumber() < presentationToAdvance.getMaxSlideNumber()) {
+                //If slide tells you to move forward to next slide, do it by changing to next slide in slide list.
+                if (elementAdvance(presentationToAdvance.getCurrentSlide(), direction) == direction) {
+                    presentationToAdvance.setCurrentSlideNumber(presentationToAdvance.getCurrentSlideNumber() + 1);
+                    if (presentationToAdvance.getCurrentSlideNumber() >= presentationToAdvance.getMaxSlideNumber() - 1) {
+                        logger.info("Reached final slide: " + presentationToAdvance.getMaxSlideNumber());
+                        presentationToAdvance.setCurrentSlideNumber(presentationToAdvance.getMaxSlideNumber() - 1); //Wrap to this slide as maximum
+                        presentationStatus = Presentation.PRESENTATION_FINISH;
+                    } else {
+                        presentationStatus = Presentation.SLIDE_CHANGE;
+                    }
+                    presentationToAdvance.setCurrentSlide(presentationToAdvance.getSlideList().get(presentationToAdvance.getCurrentSlideNumber()));
+                }
+            }
+        } else if (direction == Slide.SLIDE_BACKWARD) {
+            //If we're not at start of presentation
+            if (presentationToAdvance.getCurrentSlideNumber() >= 0) {
+                //If slide tells you to move backward to prev slide, do it by changing to prev slide in slide list.
+                //Allow slideElements to play on slide though.
+                if (elementAdvance(presentationToAdvance.getCurrentSlide(), direction) == direction) {
+                    presentationToAdvance.setCurrentSlideNumber(presentationToAdvance.getCurrentSlideNumber() - 1);
+
+                    if (presentationToAdvance.getCurrentSlideNumber() < 0) {
+                        logger.info("Reached Min slide number. Presentation back at start.");
+                        presentationToAdvance.setCurrentSlideNumber(0);//Wrap to this slide as minimum
+                        presentationStatus = Presentation.PRESENTATION_START;
+                    } else {
+                        presentationStatus = Presentation.SLIDE_CHANGE;
+                    }
+                    presentationToAdvance.setCurrentSlide(presentationToAdvance.getSlideList().get(presentationToAdvance.getCurrentSlideNumber()));
+                }
+            }
         }
-
-
+        return presentationStatus;
     }
 
+    public int elementAdvance(Slide slideToAdvance, int direction) {
+        SlideElement checkInVisibleSet;
+        //If we're going forwards and not through all sequences in slide set
+        if ((slideToAdvance.getCurrentSequence() < slideToAdvance.getMaxSequenceNumber()) && (direction == Slide.SLIDE_FORWARD)) {
+            slideToAdvance.setCurrentSequence(slideToAdvance.getCurrentSequence() + 1);
+            //Search for element with matching start sequence or end sequence in visible set. If they're not in there, add them.
+            try {
+                if (!(slideToAdvance.getVisibleSlideElementList().contains(checkInVisibleSet = Slide.searchForSequenceElement(slideToAdvance.getSlideElementList(), slideToAdvance.getCurrentSequence(), Slide.START_SEARCH)))) {
+                    slideToAdvance.getVisibleSlideElementList().add(checkInVisibleSet);
+                }
+                if (!(slideToAdvance.getVisibleSlideElementList().contains(checkInVisibleSet =  Slide.searchForSequenceElement(slideToAdvance.getSlideElementList(), slideToAdvance.getCurrentSequence(), Slide.END_SEARCH)))) {
+                    slideToAdvance.getVisibleSlideElementList().add(checkInVisibleSet);
+                }
+            } catch (SequenceNotFoundException e) {
+                logger.error("Failed to find Element with Sequence number of " + slideToAdvance.getCurrentSequence() + " in slideElementList. XML invalid?");
+                return Slide.SLIDE_NO_MOVE;
+            }
+        } else if ((slideToAdvance.getCurrentSequence() > 0) && (direction == Slide.SLIDE_BACKWARD)) {  //If we're going backwards and still elements left
+            try {
+                if (slideToAdvance.getVisibleSlideElementList().contains(checkInVisibleSet =  Slide.searchForSequenceElement(slideToAdvance.getSlideElementList(), slideToAdvance.getCurrentSequence(), Slide.START_SEARCH))) {
+                    if (checkInVisibleSet != null) {
+                        checkInVisibleSet.removeElement();
+                    }
+                }
+            } catch (SequenceNotFoundException e) {
+                logger.error("Failed to find Element with Sequence number of " + slideToAdvance.getCurrentSequence() + " in slideElementList. XML invalid?");
+                return Slide.SLIDE_NO_MOVE;
+            }
+            slideToAdvance.setCurrentSequence(slideToAdvance.getCurrentSequence() - 1);
+        } else {
+            //If we're at limit of sequence number, alert calling method that we need to move to next/previous slide dependent on direction
+            switch (direction) {
+                case Slide.SLIDE_FORWARD:
+                    return Slide.SLIDE_FORWARD;
+                case Slide.SLIDE_BACKWARD:
+                    return Slide.SLIDE_BACKWARD;
+            }
+        }
 
+        //Sort by Layer
+        Slide.sortElementsByLayer(slideToAdvance.getVisibleSlideElementList());
+        logger.info("Current Sequence is " + slideToAdvance.getCurrentSequence());
+        //Fire animations
+        for (SlideElement elementToAnimate : slideToAdvance.getVisibleSlideElementList()) {
+            if (elementToAnimate.getStartSequence() == slideToAdvance.getCurrentSequence()) {
+                elementToAnimate.renderElement(Animation.ENTRY_ANIMATION); //Entry Sequence
+            } else if (elementToAnimate.getEndSequence() == slideToAdvance.getCurrentSequence()) {
+                elementToAnimate.renderElement(Animation.EXIT_ANIMATION); //Exit Sequence
+            }
+        }
+
+        return Slide.SLIDE_NO_MOVE;
+    }
 }

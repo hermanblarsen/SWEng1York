@@ -34,7 +34,7 @@
                         <configuration>
                             <archive>
                                 <manifest>
-                                    <mainClass>server.socketServer</mainClass>
+                                    <mainClass>server.SocketServer</mainClass>
                                 </manifest>
                             </archive>
                             <descriptorRefs>

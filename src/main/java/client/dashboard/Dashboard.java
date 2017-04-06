@@ -1,33 +1,37 @@
 package client.dashboard;
 
-import client.presentationElements.*;
+import client.managers.EdiManager;
+import client.managers.PresentationManager;
+import client.presentationElements.Presentation;
+import client.presentationViewer.StudentPresentationManager;
 import client.presentationViewer.TeacherPresentationManager;
 import javafx.application.Application;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuBar;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.ScrollPane.ScrollBarPolicy;
-import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.*;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.Window;
-import client.managers.EdiManager;
 import org.kordamp.bootstrapfx.scene.layout.Panel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import client.utilities.*;
-import client.presentationViewer.TeacherPresentationManager;
 
 import java.io.File;
-import java.util.ArrayList;
+
 
 /**
  * Created by amriksadhra on 24/01/2017.
@@ -39,9 +43,12 @@ public abstract class Dashboard extends Application {
     protected Presentation myPresentationElement;
     protected Logger logger = LoggerFactory.getLogger(Dashboard.class);
     private EdiManager ediManager;
+    protected PresentationManager presentationManager;
+    protected Stage primaryStage;
 
     @Override
     public void start(Stage primaryStage) {
+        this.primaryStage = primaryStage;
         //Initialise UI
         primaryStage.setTitle("I^2LP");
 
@@ -56,8 +63,8 @@ public abstract class Dashboard extends Application {
         border.setCenter(addCenterPanel());
         border.setRight(addRightPanel());
 
-        primaryStage.show();
 
+        primaryStage.show();
     }
 
 
@@ -80,13 +87,11 @@ public abstract class Dashboard extends Application {
             presentationPanel.setBody(new Text("Presentation preview"));
 
             presentationPanelList[i] = presentationPanel;
-            presentationPanelList[i].addEventHandler(MouseEvent.MOUSE_CLICKED, evt->{
-                TeacherPresentationManager tpm = new TeacherPresentationManager();
-                tpm.openPresentation("poop");
-            });
+            presentationPanelList[i].addEventHandler(MouseEvent.MOUSE_CLICKED, event-> presentationManager = new StudentPresentationManager(primaryStage, scene, border, "poop"));
         }
 
-        for(int i=0; i<presentationPanelList.length; i++) presentationsFlowPane.getChildren().add(presentationPanelList[i]);
+        for (Panel aPresentationPanelList : presentationPanelList)
+            presentationsFlowPane.getChildren().add(aPresentationPanelList);
 
         ScrollPane centerPane = new ScrollPane();
         centerPane.setContent(presentationsFlowPane);
@@ -136,7 +141,9 @@ public abstract class Dashboard extends Application {
             Window stage = source.getScene().getWindow();
             File file = fileChooser.showOpenDialog(stage);
             if (file != null) {
-                //loadPresentation(border, file.getPath());
+                //TODO: Switch based on instance type of dashboard
+                presentationManager = new StudentPresentationManager(primaryStage, scene, border, "shit");
+                presentationManager.loadPresentation(border, file.getPath());
             }
         });
 
@@ -232,47 +239,13 @@ public abstract class Dashboard extends Application {
             slides[i].setBody(new Text("Slide panel preview here."));
             slides[i].setPrefWidth(170);//Dynamic resizing of panel width possible?
             flow.getChildren().add(slides[i]);
-            flow.setMargin(slides[i], new Insets(0, 20, 0, 5));
+            FlowPane.setMargin(slides[i], new Insets(0, 20, 0, 5));
         }
 
         scroll.setContent(flow);
 
         return scroll;
     }
-
-    private HBox addStatBar(Slide presentationElement) {
-        HBox hbox = new HBox();
-        hbox.setPadding(new Insets(0, 12, 0, 12));
-        hbox.setSpacing(2);
-        hbox.setStyle("-fx-background-color: #34495e;");
-
-        BorderPane border = new BorderPane();
-
-        Text versionText = new Text("Version 0.0.1 Alpha");
-        versionText.setFont(Font.font("San Francisco", FontWeight.NORMAL, 12));
-        versionText.setFill(Color.WHITE);
-
-        border.setLeft(versionText);
-
-        border.setCenter(new Text("                                                     "));
-
-        Text coordTextBar = new Text("Mouse data not available!");
-        coordTextBar.setFont(Font.font("San Francisco", FontWeight.NORMAL, 12));
-        coordTextBar.setFill(Color.WHITE);
-
-        border.setRight(coordTextBar);
-
-        //TODO: This stops working when WebView enters Slide
-        presentationElement.setOnMouseMoved(event -> coordTextBar.setText(
-                "Slide Number: " + presentationElement.getSlideID() + " (x: " + event.getX() + ", y: " + event.getY() + ") -- " +
-                        "(sceneX: " + event.getSceneX() + ", sceneY: " + event.getSceneY() + ") -- " +
-                        "(screenX: " + event.getScreenX() + ", screenY: " + event.getScreenY() + ")"));
-
-        hbox.getChildren().addAll(border);
-
-        return hbox;
-    }
-
 
     public void setEdiManager(EdiManager ediManager) {
         this.ediManager = ediManager;

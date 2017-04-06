@@ -12,6 +12,7 @@ import javafx.stage.Stage;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import server.SocketClient;
 
 /**
  * Created by habl on 11/03/2017.
@@ -19,10 +20,18 @@ import org.slf4j.LoggerFactory;
 public class EdiManager extends Application {
     Logger logger = LoggerFactory.getLogger(EdiManager.class);
     private Login loginDialog;
+    private SocketClient mySocketClient;
+    private boolean isDBTeam;
 
     public static void main(String [] args) {
         //Instantiate the ediManager, which will automatically call init() and start(Stage)
         launch(args);
+    }
+
+    //Temporary, so that edimanager can close the connections seamlesslely for quick debug
+    public void setClient(SocketClient mySocketClient, boolean isDBTeam){
+        this.mySocketClient = mySocketClient;
+        this.isDBTeam = isDBTeam;
     }
 
     //Initialising Edi, possibly gathering information about the system and storing that locally
@@ -30,6 +39,14 @@ public class EdiManager extends Application {
     @Override
     public void init() throws Exception {
         super.init();
+    }
+
+    @Override
+    public void stop() throws Exception {
+        if(isDBTeam) {
+            logger.info("Closing client-side networking ports.");
+            mySocketClient.closeAll();
+        }
     }
 
 

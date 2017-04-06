@@ -36,7 +36,7 @@ public abstract class SlideElement {
     }
 
     //Empty interface for tagging our actual slide elements
-    void renderElement(int animationType) {
+    public void renderElement(int animationType) {
         //Added to the canvas at render time, as otherwise negates use of VisibleSet
         //If we bind to canvas, the element is always visible. Ignoring the sequencing and anims.
         //Add CoreNode to the Pane

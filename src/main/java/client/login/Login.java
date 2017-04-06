@@ -16,14 +16,14 @@ import client.managers.EdiManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import server.packets.UserAuth;
-import server.socketClient;
-import server.socketServer;
+import server.SocketClient;
+import server.SocketServer;
 
 
 public class Login extends Application {
     private EdiManager ediManager;
     private Logger logger = LoggerFactory.getLogger(Login.class);
-    socketClient mySocketClient;
+    SocketClient mySocketClient;
 
     //----------- IF YOU'RE NOT ON THE DATABASE TEAM, SET THIS VARIABLE TO FALSE TO BYPASS THE SERVER STUFF -----------------
     private static final boolean AM_I_ON_DB_TEAM = false;
@@ -33,7 +33,6 @@ public class Login extends Application {
     public void start(Stage primaryStage) {
         //TODO: Mode switching code depending on online/offline functionality
         serverConnect();
-
         primaryStage.setTitle("I^2LP");
 
         GridPane grid = new GridPane();
@@ -44,27 +43,12 @@ public class Login extends Application {
 
         Scene scene = new Scene(grid, 350, 275);
         scene.getStylesheets().add("bootstrapfx.css");
+        //setUserAgentStylesheet(STYLESHEET_MODENA);
         primaryStage.setScene(scene);
 
         Text scenetitle = new Text("Login");
         scenetitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
         grid.add(scenetitle, 0, 0, 2, 1);
-
-        //I believe this is a parameter that should be returned from the database and not GUI accessible
-        /*Label userType = new Label("I'm a:");
-        grid.add(userType, 0, 1);
-
-        ToggleButton studentButton = new ToggleButton("Student");
-        studentButton.getStyleClass().setAll("btn", "btn-default");
-        grid.add(studentButton, 1, 1);
-
-        ToggleButton teacherButton = new ToggleButton("Teacher");
-        teacherButton.getStyleClass().setAll("btn", "btn-default");
-        grid.add(teacherButton, 2, 1);
-
-        ToggleGroup userTypeGroup = new ToggleGroup();
-        studentButton.setToggleGroup(userTypeGroup);
-        teacherButton.setToggleGroup(userTypeGroup);*/
 
         Label userName = new Label("User Name:");
         grid.add(userName, 0, 2);
@@ -93,7 +77,6 @@ public class Login extends Application {
             //Run different dashboards based on user type returned from DB
             boolean isTeacher = false;
             boolean loginSuccessful = false;
-            //if (teacherButton.isSelected()) isTeacher = true;          //Run different dashboards based on userType button
 
             switch (userType) {
                 case "admin":
@@ -125,17 +108,14 @@ public class Login extends Application {
                 //TODO add colour events and stuff here to notify user of unsuccessful client.login.
             }
         });
-
         primaryStage.show();
     }
 
     public void serverConnect() {
         if (AM_I_ON_DB_TEAM) {
-            //TODO: For now, start server here. Should be compiled to separate JAR and run independently
-            socketServer mySocketServer = new socketServer("db.amriksadhra.com", 8080);
             //Connect to server
-            mySocketClient = new socketClient("127.0.0.1", 8080);
-
+            mySocketClient = new SocketClient("127.0.0.1", 8080);
+            ediManager.setClient(mySocketClient, AM_I_ON_DB_TEAM);
         }
     }
 
