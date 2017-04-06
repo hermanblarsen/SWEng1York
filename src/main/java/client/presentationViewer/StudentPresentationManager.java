@@ -10,10 +10,6 @@ import javafx.stage.Stage;
  * Created by kma517 on 16/03/2017.
  */
 public class StudentPresentationManager extends PresentationManager {
-    public StudentPresentationManager(Stage primaryStage, Scene scene, BorderPane border, String path) {
-        super(primaryStage, scene, border, path);
-    }
-
 
     @Override
     protected void questionQueueFunction() {

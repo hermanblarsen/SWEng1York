@@ -44,15 +44,23 @@ public abstract class PresentationManager {
     protected Boolean questionQueueActive = false;
     protected Boolean commentActive = false;
 
-    public PresentationManager(Stage primaryStage, Scene scene, BorderPane border, String path){
-        this.scene = scene;
-        this.border = border;
 
-        loadPresentation(border, path);
 
+
+    public void openPresentation(String path){
+        Stage presentationStage = new Stage();
+        presentationStage.setTitle("Edi");
+
+        border = new BorderPane();
+        scene = new Scene(border,1000,600);
+        scene.getStylesheets().add("bootstrapfx.css");
+        presentationStage.setScene(scene);
+        presentationStage.show();
+        loadPresentation(border,path);
         pb = new ProgressBar(0);
         slideNumber = new Label("Slide 1 of "+ myPresentationElement.getSlideList().size());
-        border.setBottom(addPresentationControls(primaryStage));
+        border.setBottom(addPresentationControls(presentationStage));
+
     }
 
     public void loadPresentation(BorderPane mainUI, String path) {

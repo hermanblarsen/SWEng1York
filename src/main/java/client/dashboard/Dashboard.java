@@ -87,7 +87,10 @@ public abstract class Dashboard extends Application {
             presentationPanel.setBody(new Text("Presentation preview"));
 
             presentationPanelList[i] = presentationPanel;
-            presentationPanelList[i].addEventHandler(MouseEvent.MOUSE_CLICKED, event-> presentationManager = new StudentPresentationManager(primaryStage, scene, border, "poop"));
+            presentationPanelList[i].addEventHandler(MouseEvent.MOUSE_CLICKED, event-> {
+                presentationManager = new StudentPresentationManager();
+                presentationManager.openPresentation("poop");
+            });
         }
 
         for (Panel aPresentationPanelList : presentationPanelList)
@@ -142,7 +145,8 @@ public abstract class Dashboard extends Application {
             File file = fileChooser.showOpenDialog(stage);
             if (file != null) {
                 //TODO: Switch based on instance type of dashboard
-                presentationManager = new StudentPresentationManager(primaryStage, scene, border, "shit");
+                presentationManager = new StudentPresentationManager();
+                presentationManager.openPresentation("shit");
                 presentationManager.loadPresentation(border, file.getPath());
             }
         });
