@@ -38,10 +38,6 @@ public class Slide extends StackPane {
 
     protected int slideID;
 
-
-    //Current Sequence number on slide
-    int currentSequence = 0; //TODO is this something that should be in slide or in a presentation manager? -Herman
-
     public int getMaxSequenceNumber() {
         return maxSequenceNumber;
     }
@@ -80,15 +76,6 @@ public class Slide extends StackPane {
     public void moveElementToIndex(int index) {
 
     }
-
-    public int getCurrentSequence() {
-        return currentSequence;
-    }
-
-    public void setCurrentSequence(int currentSequence) {
-        this.currentSequence = currentSequence;
-    }
-
 
     public List<SlideElement> getSlideElementList() {
         return slideElementList;

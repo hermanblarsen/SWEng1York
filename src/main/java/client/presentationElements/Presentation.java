@@ -27,10 +27,8 @@ public class Presentation extends Pane {
     private boolean isI2lpFormat;
     private ArrayList<String> xmlFaults = null;
 
-    private int currentSlideNumber = 0;
+
     private int maxSlideNumber = 0;
-
-
 
     private Slide currentSlide;
     private boolean autoplayMedia;
@@ -54,15 +52,6 @@ public class Presentation extends Pane {
         this.maxSlideNumber = maxSlideNumber;
     }
 
-
-    public void setCurrentSlideNumber(int currentSlideNumber) {
-        this.currentSlideNumber = currentSlideNumber;
-    }
-
-    public int getCurrentSlideNumber() {
-        return currentSlideNumber;
-    }
-
     public Presentation() {
         slideList = new ArrayList<>();
         this.theme = new Theme();
@@ -72,7 +61,7 @@ public class Presentation extends Pane {
         this.currentSlide = currentSlide;
     }
 
-    public Slide getCurrentSlide() {
+    public Slide getSlide(int currentSlideNumber) {
         return slideList.get(currentSlideNumber);
     }
 

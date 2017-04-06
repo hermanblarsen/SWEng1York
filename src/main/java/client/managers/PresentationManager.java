@@ -18,10 +18,6 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
-import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
-import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import org.slf4j.Logger;
@@ -44,6 +40,8 @@ public abstract class PresentationManager {
     protected Boolean questionQueueActive = false;
     protected Boolean commentActive = false;
 
+    private int currentSlideNumber = 0; //Current slide number in presentation
+    int currentSequenceNumber = 0; //Current Sequence number on slide
 
     public void openPresentation(String path){
         Stage presentationStage = new Stage();
@@ -69,8 +67,8 @@ public abstract class PresentationManager {
         myPresentationElement = Presentation.generateTestPresentation();     //TEST
         //myPresentationElement = readPresentationParser.parsePresentation();
 
-        mainUI.setCenter(myPresentationElement.getCurrentSlide());
-        //mainUI.setBottom(addStatBar(myPresentationElement.getCurrentSlide()));
+        mainUI.setCenter(myPresentationElement.getSlide(currentSlideNumber));
+        //mainUI.setBottom(addStatBar(myPresentationElement.getSlide()));
 
         //Keyboard listener for moving through presentation
         scene.setOnKeyPressed(key -> {
@@ -94,9 +92,7 @@ public abstract class PresentationManager {
         if (presentationStatus == Presentation.SLIDE_CHANGE || presentationStatus == Presentation.PRESENTATION_FINISH || presentationStatus == Presentation.PRESENTATION_START) {
             logger.info("Changing Slides");
             //Update MainUI panes when changing slides to account for new Slide root pane.
-            border.setCenter(myPresentationElement.getCurrentSlide());
-            //TODO: Incorporate StatBar into Koens progressbar
-            //border.setBottom(addStatBar(myPresentationElement.getCurrentSlide()));
+            border.setCenter(myPresentationElement.getSlide(currentSlideNumber));
         }
     }
 
@@ -194,42 +190,8 @@ public abstract class PresentationManager {
         return presControls;
     }
 
-    private HBox addStatBar(Slide presentationElement) {
-        HBox hbox = new HBox();
-        hbox.setPadding(new Insets(0, 12, 0, 12));
-        hbox.setSpacing(2);
-        hbox.setStyle("-fx-background-color: #34495e;");
-
-        BorderPane border = new BorderPane();
-
-        Text versionText = new Text("Version 0.0.1 Alpha");
-        versionText.setFont(Font.font("San Francisco", FontWeight.NORMAL, 12));
-        versionText.setFill(Color.WHITE);
-
-        border.setLeft(versionText);
-
-        border.setCenter(new Text("                                                     "));
-
-        Text coordTextBar = new Text("Mouse data not available!");
-        coordTextBar.setFont(Font.font("San Francisco", FontWeight.NORMAL, 12));
-        coordTextBar.setFill(Color.WHITE);
-
-        border.setRight(coordTextBar);
-
-        //TODO: This stops working when WebView enters Slide
-        presentationElement.setOnMouseMoved(event -> coordTextBar.setText(
-                "Slide Number: " + presentationElement.getSlideID() + " (x: " + event.getX() + ", y: " + event.getY() + ") -- " +
-                        "(sceneX: " + event.getSceneX() + ", sceneY: " + event.getSceneY() + ") -- " +
-                        "(screenX: " + event.getScreenX() + ", screenY: " + event.getScreenY() + ")"));
-
-        hbox.getChildren().addAll(border);
-
-        return hbox;
-    }
-
-
     protected void slideProgress(Presentation pe){
-        double slideNo = pe.getCurrentSlideNumber()+1;
+        double slideNo = currentSlideNumber + 1;
         double slideMax = pe.getSlideList().size();
         double progress  = slideNo/slideMax;
         pb.setProgress(progress);
@@ -242,36 +204,36 @@ public abstract class PresentationManager {
 
         if (direction == Slide.SLIDE_FORWARD) {
             //If we're not at end of presentation
-            if (presentationToAdvance.getCurrentSlideNumber() < presentationToAdvance.getMaxSlideNumber()) {
+            if (currentSlideNumber < presentationToAdvance.getMaxSlideNumber()) {
                 //If slide tells you to move forward to next slide, do it by changing to next slide in slide list.
-                if (elementAdvance(presentationToAdvance.getCurrentSlide(), direction) == direction) {
-                    presentationToAdvance.setCurrentSlideNumber(presentationToAdvance.getCurrentSlideNumber() + 1);
-                    if (presentationToAdvance.getCurrentSlideNumber() >= presentationToAdvance.getMaxSlideNumber() - 1) {
+                if (elementAdvance(presentationToAdvance.getSlide(currentSlideNumber), direction) == direction) {
+                    currentSlideNumber++;
+                    if (currentSlideNumber >= presentationToAdvance.getMaxSlideNumber() - 1) {
                         logger.info("Reached final slide: " + presentationToAdvance.getMaxSlideNumber());
-                        presentationToAdvance.setCurrentSlideNumber(presentationToAdvance.getMaxSlideNumber() - 1); //Wrap to this slide as maximum
+                        currentSlideNumber--; //Wrap to this slide as maximum
                         presentationStatus = Presentation.PRESENTATION_FINISH;
                     } else {
                         presentationStatus = Presentation.SLIDE_CHANGE;
                     }
-                    presentationToAdvance.setCurrentSlide(presentationToAdvance.getSlideList().get(presentationToAdvance.getCurrentSlideNumber()));
+                    presentationToAdvance.setCurrentSlide(presentationToAdvance.getSlideList().get(currentSlideNumber));
                 }
             }
         } else if (direction == Slide.SLIDE_BACKWARD) {
             //If we're not at start of presentation
-            if (presentationToAdvance.getCurrentSlideNumber() >= 0) {
+            if (currentSlideNumber >= 0) {
                 //If slide tells you to move backward to prev slide, do it by changing to prev slide in slide list.
                 //Allow slideElements to play on slide though.
-                if (elementAdvance(presentationToAdvance.getCurrentSlide(), direction) == direction) {
-                    presentationToAdvance.setCurrentSlideNumber(presentationToAdvance.getCurrentSlideNumber() - 1);
+                if (elementAdvance(presentationToAdvance.getSlide(currentSlideNumber), direction) == direction) {
+                   currentSlideNumber--;
 
-                    if (presentationToAdvance.getCurrentSlideNumber() < 0) {
+                    if (currentSlideNumber < 0) {
                         logger.info("Reached Min slide number. Presentation back at start.");
-                        presentationToAdvance.setCurrentSlideNumber(0);//Wrap to this slide as minimum
+                        currentSlideNumber = 0;//Wrap to this slide as minimum
                         presentationStatus = Presentation.PRESENTATION_START;
                     } else {
                         presentationStatus = Presentation.SLIDE_CHANGE;
                     }
-                    presentationToAdvance.setCurrentSlide(presentationToAdvance.getSlideList().get(presentationToAdvance.getCurrentSlideNumber()));
+                    presentationToAdvance.setCurrentSlide(presentationToAdvance.getSlideList().get(currentSlideNumber));
                 }
             }
         }
@@ -281,34 +243,35 @@ public abstract class PresentationManager {
     public int elementAdvance(Slide slideToAdvance, int direction) {
         SlideElement checkInVisibleSet;
         //If we're going forwards and not through all sequences in slide set
-        if ((slideToAdvance.getCurrentSequence() < slideToAdvance.getMaxSequenceNumber()) && (direction == Slide.SLIDE_FORWARD)) {
-            slideToAdvance.setCurrentSequence(slideToAdvance.getCurrentSequence() + 1);
+        if ((currentSequenceNumber < slideToAdvance.getMaxSequenceNumber()) && (direction == Slide.SLIDE_FORWARD)) {
+            currentSequenceNumber++;
             //Search for element with matching start sequence or end sequence in visible set. If they're not in there, add them.
             try {
-                if (!(slideToAdvance.getVisibleSlideElementList().contains(checkInVisibleSet = Slide.searchForSequenceElement(slideToAdvance.getSlideElementList(), slideToAdvance.getCurrentSequence(), Slide.START_SEARCH)))) {
+                if (!(slideToAdvance.getVisibleSlideElementList().contains(checkInVisibleSet = Slide.searchForSequenceElement(slideToAdvance.getSlideElementList(), currentSequenceNumber, Slide.START_SEARCH)))) {
                     slideToAdvance.getVisibleSlideElementList().add(checkInVisibleSet);
                 }
-                if (!(slideToAdvance.getVisibleSlideElementList().contains(checkInVisibleSet =  Slide.searchForSequenceElement(slideToAdvance.getSlideElementList(), slideToAdvance.getCurrentSequence(), Slide.END_SEARCH)))) {
+                if (!(slideToAdvance.getVisibleSlideElementList().contains(checkInVisibleSet =  Slide.searchForSequenceElement(slideToAdvance.getSlideElementList(), currentSequenceNumber, Slide.END_SEARCH)))) {
                     slideToAdvance.getVisibleSlideElementList().add(checkInVisibleSet);
                 }
             } catch (SequenceNotFoundException e) {
-                logger.error("Failed to find Element with Sequence number of " + slideToAdvance.getCurrentSequence() + " in slideElementList. XML invalid?");
+                logger.error("Failed to find Element with Sequence number of " + currentSequenceNumber + " in slideElementList. XML invalid?");
                 return Slide.SLIDE_NO_MOVE;
             }
-        } else if ((slideToAdvance.getCurrentSequence() > 0) && (direction == Slide.SLIDE_BACKWARD)) {  //If we're going backwards and still elements left
+        } else if ((currentSequenceNumber > 0) && (direction == Slide.SLIDE_BACKWARD)) {  //If we're going backwards and still elements left
             try {
-                if (slideToAdvance.getVisibleSlideElementList().contains(checkInVisibleSet =  Slide.searchForSequenceElement(slideToAdvance.getSlideElementList(), slideToAdvance.getCurrentSequence(), Slide.START_SEARCH))) {
+                if (slideToAdvance.getVisibleSlideElementList().contains(checkInVisibleSet =  Slide.searchForSequenceElement(slideToAdvance.getSlideElementList(), currentSequenceNumber, Slide.START_SEARCH))) {
                     if (checkInVisibleSet != null) {
                         checkInVisibleSet.removeElement();
                     }
                 }
             } catch (SequenceNotFoundException e) {
-                logger.error("Failed to find Element with Sequence number of " + slideToAdvance.getCurrentSequence() + " in slideElementList. XML invalid?");
+                logger.error("Failed to find Element with Sequence number of " + currentSequenceNumber + " in slideElementList. XML invalid?");
                 return Slide.SLIDE_NO_MOVE;
             }
-            slideToAdvance.setCurrentSequence(slideToAdvance.getCurrentSequence() - 1);
+           currentSequenceNumber--;
         } else {
-            //If we're at limit of sequence number, alert calling method that we need to move to next/previous slide dependent on direction
+            //If we're at limit of sequence number, alert calling method that we need to move to next/previous slide dependent on direction and reset sequence number
+            currentSequenceNumber = 0;
             switch (direction) {
                 case Slide.SLIDE_FORWARD:
                     return Slide.SLIDE_FORWARD;
@@ -319,12 +282,12 @@ public abstract class PresentationManager {
 
         //Sort by Layer
         Slide.sortElementsByLayer(slideToAdvance.getVisibleSlideElementList());
-        logger.info("Current Sequence is " + slideToAdvance.getCurrentSequence());
+        logger.info("Current Sequence is " + currentSequenceNumber);
         //Fire animations
         for (SlideElement elementToAnimate : slideToAdvance.getVisibleSlideElementList()) {
-            if (elementToAnimate.getStartSequence() == slideToAdvance.getCurrentSequence()) {
+            if (elementToAnimate.getStartSequence() == currentSequenceNumber) {
                 elementToAnimate.renderElement(Animation.ENTRY_ANIMATION); //Entry Sequence
-            } else if (elementToAnimate.getEndSequence() == slideToAdvance.getCurrentSequence()) {
+            } else if (elementToAnimate.getEndSequence() == currentSequenceNumber) {
                 elementToAnimate.renderElement(Animation.EXIT_ANIMATION); //Exit Sequence
             }
         }

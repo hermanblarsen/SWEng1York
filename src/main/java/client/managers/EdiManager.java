@@ -53,7 +53,6 @@ public class EdiManager extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        //TODO make a client.login dialog, then wait for calling of loginSucceded(boolean isTeacher);
         loginDialog = new Login();
         Stage loginStage = new Stage();
         loginDialog.setEdiManager(this);
