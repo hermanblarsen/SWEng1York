@@ -3,9 +3,13 @@ package client.presentationElements;
 import client.utilities.Utils;
 import client.utilities.WebDocumentListener;
 import javafx.scene.Node;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
+import javafx.scene.text.Text;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
+
+import java.beans.EventHandler;
 
 /**
  * Created by habl on 26/02/2017.
@@ -19,6 +23,9 @@ public class TextElement extends SlideElement {
     protected int fontSize;
     protected String fontColour;
     protected String bgColour;
+
+
+    private int borderSize;
     protected String borderColour;
 
     protected float xPosition;
@@ -29,7 +36,7 @@ public class TextElement extends SlideElement {
     protected boolean aspectRatioLock;
     protected float elementAspectRatio;
 
-    protected WebView browser;
+    protected WebViewFitContent browser;
     protected WebEngine webEngine;
     String cssFilePath;
 
@@ -39,20 +46,31 @@ public class TextElement extends SlideElement {
 
     @Override
     public void setupElement() {
+        Text lol = new Text("Banana");
         //I moved this to a separate method that can be called whenever it is instantiated/Updated.
         //  Maybe surround this with try-catch statements as well as it has potential to go bad if we are not careful. - Herman
-        browser = new WebView();
-        webEngine = browser.getEngine();
+        browser = new WebViewFitContent(textContent);
+        webEngine = browser.webEngine;
         webEngine.documentProperty().addListener(new WebDocumentListener(webEngine));
 
         //Apply Dynamically created CSS to TextElement
         //TODO: Ensure these match what we read in from XML (correct format). Add Getters and setters for Presentation GUID, SlideID then hook into this method call
-        cssFilePath = Utils.cssGen(1,1, elementID, fontSize, font, fontColour, bgColour);
+        cssFilePath = Utils.cssGen(1, 1, elementID, fontSize, font, fontColour, bgColour, borderColour, borderSize);
+
+
+        //TODO: Lol it just hit me how fucked we are on this. We have to set MaxWidth and Height proportionally to content size
+        //logger.info("Width: " + Integer.valueOf(((String) browser.getEngine().executeScript("window.getComputedStyle(document.body, null).getPropertyValue('width')")).replace("px", "")));
+        //logger.info("Height: " + Integer.valueOf(((String) browser.getEngine().executeScript("window.getComputedStyle(document.body, null).getPropertyValue('height')")).replace("px", "")));
+        //logger.info("Text Element width: " + Integer.parseInt(browser.getEngine().executeScript("document.width").toString()));
+        //logger.info("Text Element height: " + Integer.parseInt(browser.getEngine().executeScript("document.height").toString()));
+
         webEngine.setUserStyleSheetLocation(cssFilePath);
 
-        webEngine.loadContent(textContent);
+        //webEngine.loadContent(textContent);
         getCoreNode().setTranslateY(xPosition);
         getCoreNode().setTranslateX(xPosition);
+
+        getCoreNode().addEventHandler(MouseEvent.MOUSE_CLICKED, event -> logger.info("Clicked textElement!"));
 
         //TODO: Create Animations here, but move to setAnimation setter when XML implemented
         startAnimation = new Animation();
@@ -189,6 +207,13 @@ public class TextElement extends SlideElement {
         this.elementAspectRatio = elementAspectRatio;
     }
 
+    public int getBorderSize() {
+        return borderSize;
+    }
+
+    public void setBorderSize(int borderSize) {
+        this.borderSize = borderSize;
+    }
 
     @Override
     public Node getCoreNode() {

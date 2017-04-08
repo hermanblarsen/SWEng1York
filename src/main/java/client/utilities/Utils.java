@@ -8,6 +8,7 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -46,7 +47,7 @@ public class Utils {
      * @param bgColor    Desired background colour provided as ARGB hex
      * @return Filename of CSS file that stores the CSS for a given TextElement
      */
-    public static String cssGen(int presentationID, int slideID, int elementID, int fontSize, String font, String fontColour, String bgColor) {
+    public static String cssGen(int presentationID, int slideID, int elementID, int fontSize, String font, String fontColour, String bgColor, String borderColour, int borderSize) {
         Path tempDirectoryPath = Paths.get(System.getProperty("java.io.tmpdir") + "/EdiPresentationResources/" + "Presentation" + presentationID + "/");
 
         try {
@@ -55,13 +56,22 @@ public class Utils {
             logger.error("Unable to create temporary directory with which to store runtime presentation resources");
         }
 
-        List<String> lines = Arrays.asList("body {",
-                "   background-color: " + bgColor + ";",
-                "   font-family: " + font + ";",
-                "   color: " + fontColour + ";",
-                "   font-size: " + fontSize + "px;",
-                "}",
-                "");
+        ArrayList<String> lines = new ArrayList<>();
+
+        lines.add("body{");
+        //TODO: Check validity of each passed in parameter? This would take a while, would ensure we keep program sanity when XML is invalid. But does our development assume perfect XML?
+        //This is the perfect place for default adding for element
+        if(bgColor != null) lines.add("   background-color: " + bgColor + ";");
+        if(fontColour != null) lines.add("   color: " + fontColour + ";");
+        if(font != null) lines.add("   font-family: " + font + ";");
+        if(fontSize != 0) lines.add("   font-size: " + fontSize + "px;");
+
+        if(borderSize != 0){
+            lines.add("     border-style: solid;");
+            lines.add("     border-width: " + borderSize + "px;");
+            if(borderColour != null) lines.add("    border-color: " + borderColour + ";");
+        }
+        lines.add( "}");
 
         String cssFileName = "Slide" + slideID + "Element" + elementID + "format.css";
         String cssFilePath = tempDirectoryPath + "/" + cssFileName;
