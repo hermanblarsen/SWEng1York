@@ -56,7 +56,6 @@ public abstract class PresentationManager {
         pb = new ProgressBar(0);
         slideNumber = new Label("Slide 1 of "+ myPresentationElement.getSlideList().size());
         border.setBottom(addPresentationControls(presentationStage));
-
     }
 
     public void loadPresentation(BorderPane mainUI, String path) {
@@ -171,7 +170,7 @@ public abstract class PresentationManager {
         pb.setMinSize(200,10);
         progressBar.getChildren().addAll(pb,slideNumber);
 
-        presControls.getChildren().addAll(backButton, nextButton, fullScreenButton,questionQ,commentButton,progressBar);
+        presControls.getChildren().addAll(backButton, nextButton, fullScreenButton, questionQ, commentButton, progressBar);
 
         presControls.addEventHandler(MouseEvent.MOUSE_ENTERED, evt ->{
             presControls.setVisible(true);

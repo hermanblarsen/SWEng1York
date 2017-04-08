@@ -859,4 +859,17 @@ public class ParserXML {
         if (path.contains(".xml")) validated= true;
         return validated;
     }
+
+    public String getPresentationId() {
+
+        //Store the documentID:
+        // Find all (root)elements named "document"
+        NodeList presentationDocumentList = xmlDocument.getElementsByTagName("document");
+
+        //there is only one (root) element "document", hence choose the first index.
+        Node presentationDocumentNode = presentationDocumentList.item(0);
+
+        //return the attribute of the document node
+        return  presentationDocumentNode.getAttributes().item(0).getNodeValue();
+    }
 }

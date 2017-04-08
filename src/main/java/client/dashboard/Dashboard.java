@@ -5,16 +5,21 @@ import client.managers.PresentationManager;
 import client.presentationElements.Presentation;
 import client.presentationViewer.StudentPresentationManager;
 import client.presentationViewer.TeacherPresentationManager;
+import client.utilities.ParserXML;
 import javafx.application.Application;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.SnapshotParameters;
 import javafx.scene.control.Button;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.ScrollPane.ScrollBarPolicy;
+import javafx.scene.image.ImageView;
+import javafx.scene.image.WritableImage;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
@@ -29,7 +34,9 @@ import org.kordamp.bootstrapfx.scene.layout.Panel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.imageio.ImageIO;
 import java.io.File;
+import java.io.IOException;
 
 
 /**
@@ -44,6 +51,7 @@ public abstract class Dashboard extends Application {
     private EdiManager ediManager;
     protected PresentationManager presentationManager;
     protected Stage primaryStage;
+    protected String selectedPresID;
 
     @Override
     public void start(Stage primaryStage) {
@@ -77,19 +85,25 @@ public abstract class Dashboard extends Application {
         presentationsFlowPane.setStyle("-fx-background-color: #ffffff;");
 
         int arraySize = 20;
-        Panel[] presentationPanelList = new Panel[arraySize];
+        PresentationPreviewPanel[] presentationPanelList = new PresentationPreviewPanel[arraySize];
 
         for(int i = 0; i < arraySize; i++) {
             final int finalI = i;
 
-            Panel presentationPanel = new Panel(String.format("Presentation Title %d", i));
+            presentationPanelList[i] = new PresentationPreviewPanel();
+            generateSlideThumbnails(presentationPanelList[i].getPresentationPath());
+            presentationPanelList[i].addEventHandler(MouseEvent.MOUSE_CLICKED, event-> {
+                if(presentationPanelList[finalI].isSelected())
+                    launchPresentation(presentationPanelList[finalI].getPresentationPath());
+                else {
+                    for(int j=0; j<arraySize; j++)
+                        presentationPanelList[j].setSelected(false);
 
-            presentationPanel.getStyleClass().add("panel-primary");
-            presentationPanel.setBody(new Text("Presentation preview"));
-
-            presentationPanelList[i] = presentationPanel;
-
-            presentationPanelList[i].addEventHandler(MouseEvent.MOUSE_CLICKED, event-> launchPresentation(presentationPanelList[finalI].getText()));
+                    presentationPanelList[finalI].setSelected(true);
+                    selectedPresID = presentationPanelList[finalI].getPresentationID();
+                    border.setRight(addRightPanel());
+                }
+            });
         }
 
         for (Panel aPresentationPanelList : presentationPanelList)
@@ -124,7 +138,7 @@ public abstract class Dashboard extends Application {
         return  menuBar;
     }
 
-    /**
+    /**s
      * Helper method to launch correct Presentation manager dependent upon current object type
      * @param path Path to presentation
      * @author Amrik Sadhra
@@ -192,7 +206,7 @@ public abstract class Dashboard extends Application {
         subjectButton3.getStyleClass().setAll("btn", "btn-success");
         controlsPane.getChildren().add(subjectButton3);
 
-        //Create Panel for shapes
+        //Create Panel for subject filters
         Panel slideControls = new Panel();
         slideControls.setText("My subjects");
         slideControls.getStyleClass().add("panel-primary");
@@ -218,9 +232,23 @@ public abstract class Dashboard extends Application {
         Panel[] slides = new Panel[numSlides];
 
         for (int i = 0; i < numSlides; i++) {
-            slides[i] = new Panel();
+            slides[i] = new Panel("Slide " + i);
             slides[i].getStyleClass().add("panel-primary");
-            slides[i].setBody(new Text("Slide panel preview here."));
+
+            ImageView preview;
+            try {
+                preview = new ImageView("file:externalResources/" + selectedPresID + "_slide" + i + "_thumbnail.png");
+            } catch(NullPointerException | IllegalArgumentException e) {
+                logger.info("Slide thumbnail not found");
+                preview = new ImageView("file:externalResources/emptyThumbnail.png");
+            }
+
+            preview.setFitWidth(150);
+            preview.setPreserveRatio(true);
+            preview.setSmooth(true);
+            preview.setCache(true);
+
+            slides[i].setBody(preview);
             slides[i].setPrefWidth(170);//Dynamic resizing of panel width possible?
             flow.getChildren().add(slides[i]);
             FlowPane.setMargin(slides[i], new Insets(0, 20, 0, 5));
@@ -229,6 +257,21 @@ public abstract class Dashboard extends Application {
         scroll.setContent(flow);
 
         return scroll;
+    }
+
+    private void generateSlideThumbnails(String presentationPath) {
+        ParserXML parser = new ParserXML(presentationPath);
+        Presentation presentation = parser.parsePresentation();
+        for(int i=0; i<presentation.getMaxSlideNumber(); i++) {
+            WritableImage thumbnail = presentation.getSlide(i).snapshot(new SnapshotParameters(), null);
+            File thumbnailFile = new File("externalResources/" + presentation.getDocumentID() + "_slide" + i +"_thumbnail.png");
+            try {
+                ImageIO.write(SwingFXUtils.fromFXImage(thumbnail, null), "png", thumbnailFile);
+            } catch (IOException e) {
+                logger.error("Generating presentation thumbnail failed");
+            }
+        }
+
     }
 
     public void setEdiManager(EdiManager ediManager) {
