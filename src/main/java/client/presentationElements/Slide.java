@@ -144,48 +144,31 @@ public class Slide extends StackPane {
     }
 
     /**
-     * Searches for currentSequence number in either start sequence or end sequence field. Used to determine whether to add an element to the visible
-     * set. Throws not found exception if cant find a start or end sequence that matches.
+     * Searches for currentSequence number in either start sequence or end sequence field. Used to determine whether to add elements to the visible
+     * set. Throws not found exception if cant find elements with a start or end sequence that matches.
      *
      * @param toSearch   List of Slide elements to search
      * @param sequence   Sequence number to search for in list (start or end)
-     * @param startOrEnd Specifies whether to search for start sequence or end sequence
-     * @return Returns slideElement corresponding to element with desired sequence number and type
+     * @return Returns ArrayList of slideElements corresponding to elements with desired sequence number
      * @throws SequenceNotFoundException If a sequence number cant be found, there is most likely an error
      */
-    public static SlideElement searchForSequenceElement(List<SlideElement> toSearch, int sequence, int startOrEnd) throws SequenceNotFoundException {
-        SlideElement toReturnStart = null;
-        SlideElement toReturnEnd = null;
+    public static ArrayList<SlideElement> searchForSequenceElement(List<SlideElement> toSearch, int sequence) throws SequenceNotFoundException {
+        ArrayList<SlideElement> toReturn = new ArrayList<>();
 
         //Search simulateously for start and end sequence elements
         for (SlideElement slideElement : toSearch) {
-            if (slideElement.getStartSequence() == sequence) {
-                toReturnStart = slideElement;
-            }
-
-            if (slideElement.getEndSequence() == sequence) {
-                toReturnEnd = slideElement;
+            if (slideElement.getStartSequence() ==sequence  || slideElement.getEndSequence() == sequence) {
+                toReturn.add(slideElement);
             }
         }
 
         //We cant find an element in SlideElementList with correct sequenceNumber. An error has occurred.
-        if ((toReturnStart == null) && (toReturnEnd == null)) {
+        if (toReturn.isEmpty()) {
             throw new SequenceNotFoundException();
         }
 
-        //If we can return element with startSequence, do it. Else return endSequence. Avoids checking for null return;
-        switch (startOrEnd) {
-            case START_SEARCH:
-                if (toReturnStart == null) return toReturnEnd;
-                else return toReturnStart;
-
-            case END_SEARCH:
-                if (toReturnEnd == null) return toReturnStart;
-                else return toReturnEnd;
-        }
-
-        //We should never hit this. Satisfy JVM.
-        return null;
+        //Return elements that satisfy the sequence number
+        return toReturn;
     }
 
     public List<TextElement> getTextElementList() {
