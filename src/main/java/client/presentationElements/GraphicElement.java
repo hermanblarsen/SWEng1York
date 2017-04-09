@@ -124,9 +124,11 @@ public class GraphicElement extends SlideElement {
     }
 
     public static Color parseRGBAString(String rgba){
-       String rgb = rgba.substring(0, 6);
-       String alphaString = rgba.substring(6);
+       String rgb = rgba.substring(0, 7);
+       String alphaString = rgba.substring(7);
        double alpha = Integer.parseInt(alphaString, 16)/255;
+       //Clamp alpha at maximum of 1, else Color.web fails
+       if(alpha > 1.0) alpha = 1.0;
        return Color.web(rgb, alpha);
     }
 

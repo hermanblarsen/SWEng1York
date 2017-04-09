@@ -244,7 +244,7 @@ public class Presentation extends Pane {
         myGraphicElement3.setEndSequence(6);
         myGraphicElement3.setFillColour("FF0000FF");
         myGraphicElement3.setLineColour("0000FFFF");
-        myGraphicElement3.setShape( new PolygonBuilder(
+        myGraphicElement3.setShape(new PolygonBuilder(
                         new float[]{500, 100, 200, 200},
                         new float[]{100, 200, 200, 100},
                         true

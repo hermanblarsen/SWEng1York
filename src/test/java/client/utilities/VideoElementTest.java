@@ -1,7 +1,9 @@
 package client.utilities;
 
 import client.presentationElements.VideoElement;
+import javafx.application.Application;
 import javafx.scene.layout.Pane;
+import javafx.stage.Stage;
 import javafx.util.Duration;
 import org.junit.After;
 import org.junit.Before;

@@ -9,7 +9,6 @@ import client.presentationViewer.StudentPresentationManager;
 public class StudentDashboard extends Dashboard {
     public StudentDashboard(){
         super();
-        //presentationManager = new StudentPresentationManager();
     }
 
 }

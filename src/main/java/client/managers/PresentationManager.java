@@ -44,6 +44,21 @@ public abstract class PresentationManager {
 
     private int currentSlideNumber = 0; //Current slide number in presentation
 
+
+    /**
+     * Assign Slide to each SlideElement within a presentation, to enable them to be setup and rendered. Plumbs XML parsing into
+     * Presentation rendering.
+     * @param myPresentationElement Presentation within which to assign canvas's
+     * @author Amrik Sadhra
+     */
+    private void assignCanvas(Presentation myPresentationElement){
+        for(Slide toAssign : myPresentationElement.getSlideList()){
+            for(SlideElement toBeAssigned : toAssign.getSlideElementList()){
+                toBeAssigned.setSlideCanvas(toAssign);
+            }
+        }
+    }
+
     public void openPresentation(String path) {
         Stage presentationStage = new Stage();
         presentationStage.setTitle("Edi");
@@ -64,15 +79,13 @@ public abstract class PresentationManager {
 
         ParserXML readPresentationParser = new ParserXML(path);
 
-        myPresentationElement = Presentation.generateTestPresentation();     //TEST
-        //myPresentationElement = readPresentationParser.parsePresentation();
-
+        //myPresentationElement = Presentation.generateTestPresentation();     //TEST
+        myPresentationElement = readPresentationParser.parsePresentation();
+        assignCanvas(myPresentationElement);
         mainUI.setCenter(myPresentationElement.getSlide(currentSlideNumber));
-        //mainUI.setBottom(addStatBar(myPresentationElement.getSlide()));
 
         //Keyboard listener for moving through presentation
         scene.setOnKeyPressed(key -> {
-
             if (key.getCode().equals(KeyCode.RIGHT)) {
                 controlPresentation(Slide.SLIDE_FORWARD);
                 slideProgress(myPresentationElement);
@@ -118,7 +131,6 @@ public abstract class PresentationManager {
         backButton.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
             controlPresentation(Slide.SLIDE_BACKWARD);
             slideProgress(myPresentationElement);
-
         });
 
         Image fullScreen = new Image("file:externalResources/Fullscreen_NEW.png", 30, 30, true, true);
@@ -253,8 +265,7 @@ public abstract class PresentationManager {
                     }
                 }
             } catch (SequenceNotFoundException e) {
-                logger.error("Failed to find Element with Sequence number of " + slideToAdvance.getCurrentSequenceNumber() + " in slideElementList. XML invalid?");
-                return Slide.SLIDE_NO_MOVE;
+                logger.error("Failed to find Element with Sequence number of " + slideToAdvance.getCurrentSequenceNumber() + " in slideElementList.");
             }
         } else if ((slideToAdvance.getCurrentSequenceNumber() > 0) && (direction == Slide.SLIDE_BACKWARD)) {  //If we're going backwards and still elements left
             try {
@@ -266,10 +277,8 @@ public abstract class PresentationManager {
                     }
                 }
             } catch (SequenceNotFoundException e) {
-                logger.error("Failed to find Element with Sequence number of " + slideToAdvance.getCurrentSequenceNumber() + " in slideElementList. XML invalid?");
-                return Slide.SLIDE_NO_MOVE;
+                logger.error("Failed to find Element with Sequence number of " + slideToAdvance.getCurrentSequenceNumber() + " in slideElementList.");
             }
-
             slideToAdvance.setCurrentSequenceNumber(slideToAdvance.getCurrentSequenceNumber() - 1);
         } else {
             //If we're at limit of sequence number, alert calling method that we need to move to next/previous slide dependent on direction and reset sequence number

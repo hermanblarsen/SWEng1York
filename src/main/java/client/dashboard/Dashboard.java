@@ -87,16 +87,16 @@ public abstract class Dashboard extends Application {
         int arraySize = 20;
         PresentationPreviewPanel[] presentationPanelList = new PresentationPreviewPanel[arraySize];
 
-        for(int i = 0; i < arraySize; i++) {
+        for (int i = 0; i < arraySize; i++) {
             final int finalI = i;
 
             presentationPanelList[i] = new PresentationPreviewPanel();
-            generateSlideThumbnails(presentationPanelList[i].getPresentationPath());
-            presentationPanelList[i].addEventHandler(MouseEvent.MOUSE_CLICKED, event-> {
-                if(presentationPanelList[finalI].isSelected())
+            //generateSlideThumbnails(presentationPanelList[i].getPresentationPath());
+            presentationPanelList[i].addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
+                if (presentationPanelList[finalI].isSelected()) {
                     launchPresentation(presentationPanelList[finalI].getPresentationPath());
-                else {
-                    for(int j=0; j<arraySize; j++)
+                } else {
+                    for (int j = 0; j < arraySize; j++)
                         presentationPanelList[j].setSelected(false);
 
                     presentationPanelList[finalI].setSelected(true);
@@ -129,24 +129,26 @@ public abstract class Dashboard extends Application {
         MenuBar menuBar = new MenuBar();
         //Due to travis fails, this couldn't be done in the constructor:
         menuBar.getMenus().addAll(new Menu("File"),
-                                new Menu("Edit"),
-                                new Menu("Dogs"),
-                                new Menu("Spinach"));
+                new Menu("Edit"),
+                new Menu("Dogs"),
+                new Menu("Spinach"));
 
         menuBar.setUseSystemMenuBar(true);
 
-        return  menuBar;
+        return menuBar;
     }
 
-    /**s
+    /**
+     * s
      * Helper method to launch correct Presentation manager dependent upon current object type
+     *
      * @param path Path to presentation
      * @author Amrik Sadhra
      */
-    private void launchPresentation(String path){
-        if(this instanceof StudentDashboard) {
+    private void launchPresentation(String path) {
+        if (this instanceof StudentDashboard) {
             presentationManager = new StudentPresentationManager();
-        } else if (this instanceof TeacherDashboard){
+        } else if (this instanceof TeacherDashboard) {
             presentationManager = new TeacherPresentationManager();
         }
         presentationManager.openPresentation(path);
@@ -238,7 +240,7 @@ public abstract class Dashboard extends Application {
             ImageView preview;
             try {
                 preview = new ImageView("file:externalResources/" + selectedPresID + "_slide" + i + "_thumbnail.png");
-            } catch(NullPointerException | IllegalArgumentException e) {
+            } catch (NullPointerException | IllegalArgumentException e) {
                 logger.info("Slide thumbnail not found");
                 preview = new ImageView("file:externalResources/emptyThumbnail.png");
             }
@@ -262,9 +264,9 @@ public abstract class Dashboard extends Application {
     private void generateSlideThumbnails(String presentationPath) {
         ParserXML parser = new ParserXML(presentationPath);
         Presentation presentation = parser.parsePresentation();
-        for(int i=0; i<presentation.getMaxSlideNumber(); i++) {
+        for (int i = 0; i < presentation.getMaxSlideNumber(); i++) {
             WritableImage thumbnail = presentation.getSlide(i).snapshot(new SnapshotParameters(), null);
-            File thumbnailFile = new File("externalResources/" + presentation.getDocumentID() + "_slide" + i +"_thumbnail.png");
+            File thumbnailFile = new File("externalResources/" + presentation.getDocumentID() + "_slide" + i + "_thumbnail.png");
             try {
                 ImageIO.write(SwingFXUtils.fromFXImage(thumbnail, null), "png", thumbnailFile);
             } catch (IOException e) {
