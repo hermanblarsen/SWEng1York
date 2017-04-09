@@ -189,6 +189,22 @@ public class Presentation extends Pane {
         myTextElement.setSlideCanvas(slide1);
         slideElementsSlide1.add(myTextElement);
 
+        //Create a test Text element, add some text and pop it onto our stack pane. This code will all be driven from XML parser
+        TextElement myTextElement1 = new TextElement();
+        myTextElement1.setLayer(0);
+        myTextElement1.setStartSequence(1);
+        myTextElement1.setEndSequence(3);
+        myTextElement1.setElementID(0);
+        myTextElement1.setFont("Arial");
+        myTextElement1.setFontSize(12);
+        myTextElement1.setFontColour("#AF4567");
+        //myTextElement.setBgColour("#000000");
+        myTextElement1.setBorderSize(2);
+        myTextElement1.setBorderColour("#000000");
+        myTextElement1.setTextContent("<b>Same starting sequence</b>");
+        myTextElement1.setSlideCanvas(slide1);
+        slideElementsSlide1.add(myTextElement1);
+
         GraphicElement myGraphicElement2 = new GraphicElement();
         myGraphicElement2.setLayer(1);
         myGraphicElement2.setStartSequence(3);
@@ -238,18 +254,18 @@ public class Presentation extends Pane {
         slideElementsSlide1.add(myGraphicElement3);
 
 
-        TextElement myTextElement1 = new TextElement();
-        myTextElement1.setLayer(5);
-        myTextElement1.setStartSequence(7);
-        myTextElement1.setEndSequence(8);
-        myTextElement1.setElementID(5);
-        myTextElement1.setFont("Times New Roman");
-        myTextElement1.setFontSize(24);
-        myTextElement1.setFontColour("#AA4567");
-        myTextElement1.setBgColour("#000000");
-        myTextElement1.setTextContent("<b>This is some sample text for Adar to be impressed by</b>");
-        myTextElement1.setSlideCanvas(slide1);
-        slideElementsSlide1.add(myTextElement1);
+        TextElement myTextElement11 = new TextElement();
+        myTextElement11.setLayer(5);
+        myTextElement11.setStartSequence(7);
+        myTextElement11.setEndSequence(8);
+        myTextElement11.setElementID(5);
+        myTextElement11.setFont("Times New Roman");
+        myTextElement11.setFontSize(24);
+        myTextElement11.setFontColour("#AA4567");
+        myTextElement11.setBgColour("#000000");
+        myTextElement11.setTextContent("<b>This is some sample text for Adar to be impressed by</b>");
+        myTextElement11.setSlideCanvas(slide1);
+        slideElementsSlide1.add(myTextElement11);
 
         slide1.setSlideElementList(slideElementsSlide1);
 

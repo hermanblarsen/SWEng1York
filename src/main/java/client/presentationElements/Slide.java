@@ -38,15 +38,19 @@ public class Slide extends StackPane {
 
     protected int slideID;
 
-    public int getMaxSequenceNumber() {
-        return maxSequenceNumber;
+
+    public int getCurrentSequenceNumber() {
+        return currentSequenceNumber;
     }
 
-    public void setMaxSequenceNumber(int maxSequenceNumber) {
-        this.maxSequenceNumber = maxSequenceNumber;
+    public void setCurrentSequenceNumber(int currentSequenceNumber) {
+        this.currentSequenceNumber = currentSequenceNumber;
     }
 
-    int maxSequenceNumber;
+    int currentSequenceNumber = 0;
+    int maxSequenceNumber = 0;
+
+
 
     public Slide() {
         slideElementList = new ArrayList<>();
@@ -65,6 +69,8 @@ public class Slide extends StackPane {
     }
 
 
+
+
     public void deleteElementWithIndex(int elementIndex) {
 
     }
@@ -75,6 +81,14 @@ public class Slide extends StackPane {
 
     public void moveElementToIndex(int index) {
 
+    }
+
+    public int getMaxSequenceNumber() {
+        return maxSequenceNumber;
+    }
+
+    public void setMaxSequenceNumber(int maxSequenceNumber) {
+        this.maxSequenceNumber = maxSequenceNumber;
     }
 
     public List<SlideElement> getSlideElementList() {

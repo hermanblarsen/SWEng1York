@@ -41,7 +41,6 @@ public abstract class PresentationManager {
     protected Boolean commentActive = false;
 
     private int currentSlideNumber = 0; //Current slide number in presentation
-    int currentSequenceNumber = 0; //Current Sequence number on slide
 
     public void openPresentation(String path){
         Stage presentationStage = new Stage();
@@ -206,12 +205,11 @@ public abstract class PresentationManager {
             if (currentSlideNumber < presentationToAdvance.getMaxSlideNumber()) {
                 //If slide tells you to move forward to next slide, do it by changing to next slide in slide list.
                 if (elementAdvance(presentationToAdvance.getSlide(currentSlideNumber), direction) == direction) {
-                    currentSlideNumber++;
-                    if (currentSlideNumber >= presentationToAdvance.getMaxSlideNumber() - 1) {
+                    if (currentSlideNumber + 1 >= presentationToAdvance.getMaxSlideNumber()) {
                         logger.info("Reached final slide: " + presentationToAdvance.getMaxSlideNumber());
-                        currentSlideNumber--; //Wrap to this slide as maximum
                         presentationStatus = Presentation.PRESENTATION_FINISH;
                     } else {
+                        currentSlideNumber++;
                         presentationStatus = Presentation.SLIDE_CHANGE;
                     }
                     presentationToAdvance.setCurrentSlide(presentationToAdvance.getSlideList().get(currentSlideNumber));
@@ -224,7 +222,6 @@ public abstract class PresentationManager {
                 //Allow slideElements to play on slide though.
                 if (elementAdvance(presentationToAdvance.getSlide(currentSlideNumber), direction) == direction) {
                    currentSlideNumber--;
-
                     if (currentSlideNumber < 0) {
                         logger.info("Reached Min slide number. Presentation back at start.");
                         currentSlideNumber = 0;//Wrap to this slide as minimum
@@ -242,35 +239,34 @@ public abstract class PresentationManager {
     public int elementAdvance(Slide slideToAdvance, int direction) {
         SlideElement checkInVisibleSet;
         //If we're going forwards and not through all sequences in slide set
-        if ((currentSequenceNumber < slideToAdvance.getMaxSequenceNumber()) && (direction == Slide.SLIDE_FORWARD)) {
-            currentSequenceNumber++;
+        if ((slideToAdvance.getCurrentSequenceNumber() < slideToAdvance.getMaxSequenceNumber()) && (direction == Slide.SLIDE_FORWARD)) {
+            slideToAdvance.setCurrentSequenceNumber(slideToAdvance.getCurrentSequenceNumber() + 1);
             //Search for element with matching start sequence or end sequence in visible set. If they're not in there, add them.
             try {
-                if (!(slideToAdvance.getVisibleSlideElementList().contains(checkInVisibleSet = Slide.searchForSequenceElement(slideToAdvance.getSlideElementList(), currentSequenceNumber, Slide.START_SEARCH)))) {
+                if (!(slideToAdvance.getVisibleSlideElementList().contains(checkInVisibleSet = Slide.searchForSequenceElement(slideToAdvance.getSlideElementList(), slideToAdvance.getCurrentSequenceNumber(), Slide.START_SEARCH)))) {
                     slideToAdvance.getVisibleSlideElementList().add(checkInVisibleSet);
                 }
-                if (!(slideToAdvance.getVisibleSlideElementList().contains(checkInVisibleSet =  Slide.searchForSequenceElement(slideToAdvance.getSlideElementList(), currentSequenceNumber, Slide.END_SEARCH)))) {
+                if (!(slideToAdvance.getVisibleSlideElementList().contains(checkInVisibleSet =  Slide.searchForSequenceElement(slideToAdvance.getSlideElementList(), slideToAdvance.getCurrentSequenceNumber(), Slide.END_SEARCH)))) {
                     slideToAdvance.getVisibleSlideElementList().add(checkInVisibleSet);
                 }
             } catch (SequenceNotFoundException e) {
-                logger.error("Failed to find Element with Sequence number of " + currentSequenceNumber + " in slideElementList. XML invalid?");
+                logger.error("Failed to find Element with Sequence number of " + slideToAdvance.getCurrentSequenceNumber() + " in slideElementList. XML invalid?");
                 return Slide.SLIDE_NO_MOVE;
             }
-        } else if ((currentSequenceNumber > 0) && (direction == Slide.SLIDE_BACKWARD)) {  //If we're going backwards and still elements left
+        } else if ((slideToAdvance.getCurrentSequenceNumber() > 0) && (direction == Slide.SLIDE_BACKWARD)) {  //If we're going backwards and still elements left
             try {
-                if (slideToAdvance.getVisibleSlideElementList().contains(checkInVisibleSet =  Slide.searchForSequenceElement(slideToAdvance.getSlideElementList(), currentSequenceNumber, Slide.START_SEARCH))) {
+                if (slideToAdvance.getVisibleSlideElementList().contains(checkInVisibleSet =  Slide.searchForSequenceElement(slideToAdvance.getSlideElementList(), slideToAdvance.getCurrentSequenceNumber(), Slide.START_SEARCH))) {
                     if (checkInVisibleSet != null) {
                         checkInVisibleSet.removeElement();
                     }
                 }
             } catch (SequenceNotFoundException e) {
-                logger.error("Failed to find Element with Sequence number of " + currentSequenceNumber + " in slideElementList. XML invalid?");
+                logger.error("Failed to find Element with Sequence number of " + slideToAdvance.getCurrentSequenceNumber() + " in slideElementList. XML invalid?");
                 return Slide.SLIDE_NO_MOVE;
             }
-           currentSequenceNumber--;
+            slideToAdvance.setCurrentSequenceNumber(slideToAdvance.getCurrentSequenceNumber() - 1);
         } else {
             //If we're at limit of sequence number, alert calling method that we need to move to next/previous slide dependent on direction and reset sequence number
-            currentSequenceNumber = 0;
             switch (direction) {
                 case Slide.SLIDE_FORWARD:
                     return Slide.SLIDE_FORWARD;
@@ -281,12 +277,12 @@ public abstract class PresentationManager {
 
         //Sort by Layer
         Slide.sortElementsByLayer(slideToAdvance.getVisibleSlideElementList());
-        logger.info("Current Sequence is " + currentSequenceNumber);
+        logger.info("Current Sequence is " + slideToAdvance.getCurrentSequenceNumber());
         //Fire animations
         for (SlideElement elementToAnimate : slideToAdvance.getVisibleSlideElementList()) {
-            if (elementToAnimate.getStartSequence() == currentSequenceNumber) {
+            if (elementToAnimate.getStartSequence() == slideToAdvance.getCurrentSequenceNumber()) {
                 elementToAnimate.renderElement(Animation.ENTRY_ANIMATION); //Entry Sequence
-            } else if (elementToAnimate.getEndSequence() == currentSequenceNumber) {
+            } else if (elementToAnimate.getEndSequence() == slideToAdvance.getCurrentSequenceNumber()) {
                 elementToAnimate.renderElement(Animation.EXIT_ANIMATION); //Exit Sequence
             }
         }
