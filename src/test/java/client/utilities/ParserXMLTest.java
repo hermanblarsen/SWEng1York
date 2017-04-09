@@ -2,19 +2,23 @@
  * Created by habl on 26/02/2017.
  */
 package client.utilities;
+import client.presentationElements.*;
 
-        import static org.junit.Assert.*;
+import java.nio.file.InvalidPathException;
+import java.util.ArrayList;
 
-        import java.util.ArrayList;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-        import client.presentationElements.*;
-        import org.junit.After;
-        import org.junit.Before;
-        import org.junit.Test;
+import static org.junit.Assert.*;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 public class ParserXMLTest {
-
     private static final double ERROR_MARGIN = 0.01;
+
+    private Logger logger = LoggerFactory.getLogger(ParserXMLTest.class);
     private ParserXML parserXML;
     private Presentation presentation;
     private Theme theme;
@@ -23,15 +27,22 @@ public class ParserXMLTest {
     private Slide slide2;
     private Slide slide3;
     private Slide slide4;
-    private ArrayList slideElementArray1;
-    private ArrayList slideElementArray2;
-    private ArrayList slideElementArray3;
-    private ArrayList slideElementArray4;
+    private ArrayList<SlideElement> slideElementArray1;
+    private ArrayList<SlideElement> slideElementArray3;
+    private ArrayList<SlideElement> slideElementArray4;
+    private ArrayList<SlideElement> slideElementArray2;
+    private String examplePath = "externalResources/sampleXml.xml";
 
     @Before
     public void setUp() throws Exception {
-        parserXML = new ParserXML("externalResources/sampleXml.xml");
-        presentation = parserXML.parsePresentation();
+        parserXML = new ParserXML(examplePath);
+
+        try {
+            presentation = parserXML.parsePresentation();
+        } catch (InvalidPathException exception) {
+            logger.warn(exception.getMessage() + " due to " + exception.getCause());
+        }
+
         theme = presentation.getTheme();
         slideArray = (ArrayList<Slide>) presentation.getSlideList();
 
@@ -47,34 +58,33 @@ public class ParserXMLTest {
     }
 
     @Test
-    public void verifyCreationOfPresentation() {
+    public void verifyCreationOfPresentationAndID() {
         assertNotNull(presentation);
         assertTrue(presentation instanceof Presentation);
-    }
 
-    @Test
-    public void verifyCreationOfSlides () {
-        for (int i = 0; i < slideArray.size(); i++) {
-            assertNotNull(slideArray.get(i));
-        }
-    }
-
-    @Test
-    public void verifyCreationOfSlideElements () {
-        for (int i = 0; i < slideElementArray1.size(); i++) assertNotNull(slideElementArray1.get(i));
-        for (int i = 0; i < slideElementArray2.size(); i++) assertNotNull(slideElementArray2.get(i));
-        for (int i = 0; i < slideElementArray3.size(); i++) assertNotNull(slideElementArray3.get(i));
-        for (int i = 0; i < slideElementArray4.size(); i++) assertNotNull(slideElementArray4.get(i));
-    }
-
-
-    @Test
-    public void verifyDocumentID () {
         assertEquals("sampleinput", presentation.getDocumentID());
     }
 
+
     @Test
-    public void verifySpecificDocumentDetails () {
+    public void verifyCreationOfSlidesAndIDs() {
+        for (Slide slide : slideArray) assertNotNull(slide);
+
+        //Verify IDs
+        for (int i = 0; i < slideArray.size(); i++) assertEquals((i + 1), slideArray.get(i).getSlideID(), ERROR_MARGIN);
+    }
+
+
+    @Test
+    public void verifyCreationOfSlideElements () {
+        for (SlideElement element : slideElementArray1) assertNotNull(element);
+        for (SlideElement element : slideElementArray2) assertNotNull(element);
+        for (SlideElement element : slideElementArray3) assertNotNull(element);
+        for (SlideElement element : slideElementArray4) assertNotNull(element);
+    }
+
+    @Test
+    public void verifyDocumentDetails() {
         assertEquals("Joe Bloggs", presentation.getAuthor());
         assertEquals(1.0, presentation.getVersion(), ERROR_MARGIN);
         assertEquals( 1.78, presentation.getDocumentAspectRatio(), ERROR_MARGIN);
@@ -84,7 +94,7 @@ public class ParserXMLTest {
     }
 
     @Test
-    public void verifySlideshowDefaultsAndTheme () {
+    public void verifyPresentationDefaults() {
         assertNotNull(theme);
         assertEquals("#FF2304", theme.getBackgroundColour());
         assertEquals("Arial", theme.getFont());
@@ -92,11 +102,6 @@ public class ParserXMLTest {
         assertEquals("#F00D33FF", theme.getFontColour() );
         assertEquals("#F40D33FF", theme.getGraphicsColour());
         assertEquals(true, presentation.isAutoplayMedia());
-    }
-
-    @Test
-    public void verifySlideArrayAndIds () {
-        for (int i = 0; i < slideArray.size(); i++) assertEquals((i + 1), slideArray.get(i).getSlideID(), ERROR_MARGIN);
     }
 
     @Test
@@ -108,14 +113,15 @@ public class ParserXMLTest {
     }
 
     @Test
-    public void verifySlide1ElementContent () {
-        for (int i = 0; i < slideElementArray1.size(); i++) assertNotNull(slideElementArray1.get(i));
+    public void verifySlide1TextElement1Content() {
+        for (SlideElement element : slideElementArray1) assertNotNull(element);
+
         ArrayList<TextElement> slide1TextElementArray = (ArrayList)slide1.getTextElementList();
-        for (int i = 0; i < slide1TextElementArray.size(); i++) assertNotNull(slide1TextElementArray.get(i));
+        for (TextElement textElement : slide1TextElementArray) assertNotNull(textElement);
 
         assert(slideElementArray1.get(0) instanceof TextElement);
         assert(slide1TextElementArray.get(0) instanceof TextElement);
-        //Assert the two object are the same
+        //Assert the two object in the separate arrays are the same object
         assertEquals(slideElementArray1.get(0), slide1TextElementArray.get(0));
 
         TextElement slide1TextElement1 = slide1TextElementArray.get(0);
@@ -129,28 +135,78 @@ public class ParserXMLTest {
         assertEquals( 20.5, slide1TextElement1.getDuration(), ERROR_MARGIN);
         assertEquals("#EEEEEEFF", slide1TextElementArray.get(0).getFontColour());
         assertEquals(1.2, slide1TextElementArray.get(0).getElementAspectRatio(), ERROR_MARGIN);
-
-
-//        assertEquals( , );
-//        assertEquals( , );
-//        assertEquals( , );
-//        assertEquals( , );
     }
 
     @Test
     public void verifyOtherContent () {
-        for (int i = 0; i < slideElementArray2.size(); i++) assertNotNull(slideElementArray2.get(i));
+        for (SlideElement element : slideElementArray2) assertNotNull(element);
+        for (SlideElement element : slideElementArray3) assertNotNull(element);
+        for (SlideElement element : slideElementArray4) assertNotNull(element);
 
+        //Slide 2
         assert(slideElementArray2.get(0) instanceof GraphicElement);
         assert(slideElementArray2.get(1) instanceof GraphicElement);
         assert(slideElementArray2.get(2) instanceof AudioElement);
 
-        assertNotNull(slideElementArray3.get(1));
-        assert(slideElementArray2.get(0) instanceof GraphicElement);
-        assert(slideElementArray2.get(1) instanceof GraphicElement);
-        assert(slideElementArray2.get(2) instanceof AudioElement);
+        GraphicElement polygonGraphic = slide2.getGraphicElementList().get(0);
+        assertEquals(1, polygonGraphic.getElementID());
+        assertEquals(1, polygonGraphic.getStartSequence());
+        Float[] xPositions = {0.12f, 0.02f, 0.02f};
+        for (int i = 0; i < xPositions.length; i++) {
+            assertEquals(xPositions[i], polygonGraphic.getPolygon().getxPositions()[i], ERROR_MARGIN);
+        }
+        Float[] y = {0.3f, 0.1f, 0.04f};
+        for (int i = 0; i < y.length; i++) {
+            assertEquals(y[i], polygonGraphic.getPolygon().getyPositions()[i], ERROR_MARGIN);
+        }
+        assertEquals(Boolean.TRUE, polygonGraphic.getPolygon().isClosed());
+
+        GraphicElement ovalGraphic = slide2.getGraphicElementList().get(1);
+        assertEquals(0.05, ovalGraphic.getOval().getrHorizontal(), ERROR_MARGIN);
+        assertEquals(0.1, ovalGraphic.getOval().getrVertical(), ERROR_MARGIN);
+        assertEquals(45f, ovalGraphic.getOval().getRotation(), ERROR_MARGIN);
+
+        AudioElement audioElement = slide2.getAudioElementList().get(0);
+        assertEquals("audio.mp3", audioElement.getPath());
+        assertEquals(Boolean.TRUE, audioElement.isLoop());
+        assertEquals(Boolean.FALSE, audioElement.isAutoplay());
+        assertEquals(1f, audioElement.getStartTime(), ERROR_MARGIN);
+        assertEquals(5f, audioElement.getEndTime(), ERROR_MARGIN);
+
+
+        //Slide 3
+        assert(slideElementArray3.get(0) instanceof ImageElement);
+        assert(slideElementArray3.get(1) instanceof ImageElement);
+
+        ImageElement imageElement = slide3.getImageElementList().get(0);
+        assertEquals("http://www.amp.york.ac.uk/myImage.jpg", imageElement.getPath());
+        assertEquals(0.9f, imageElement.getOpacity(), ERROR_MARGIN);
+
+
+        //Slide 4
+        assert(slideElementArray4.get(0) instanceof VideoElement);
+        VideoElement videoElement = slide4.getVideoElementList().get(0);
+        assertEquals(1, videoElement.getElementID());
+        assertEquals(367.43f, videoElement.getDuration(), ERROR_MARGIN);
     }
 
+    @Test
+    public void testFaultyXml(){
+        ParserXML faultyParserXML = new ParserXML("externalResources/faultyTestXml.xml");
+        Presentation faultyPresentation = null;
+        logger.info("Testing Faulty XML document: ...");
+        faultyPresentation = faultyParserXML.parsePresentation();
+        assertTrue(faultyPresentation.getXmlFaults().size() > 0);
+    }
+
+    @Test
+    public void testEmptyXml(){
+        ParserXML faultyParserXML = new ParserXML("externalResources/emptyTestXml.xml");
+        Presentation faultyPresentation = null;
+        logger.info("Testing Empty XML document: ...");
+        faultyPresentation = faultyParserXML.parsePresentation();
+        assertTrue(faultyPresentation.getXmlFaults().size() > 0);
+    }
 
     @After
     public void tearDown() throws Exception {

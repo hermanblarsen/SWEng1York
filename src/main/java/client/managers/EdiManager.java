@@ -35,23 +35,13 @@ public class EdiManager extends Application {
     }
 
     //Initialising Edi, possibly gathering information about the system and storing that locally
-    //No stages or scenes in this method.
+    //No stages or scenes in this method. Called by launch()
     @Override
     public void init() throws Exception {
         super.init();
     }
 
-    //Closing down Edi; shutting down sockets
-    @Override
-    public void stop() throws Exception {
-        if(isDBTeam) {
-            logger.info("Closing client-side networking ports.");
-            mySocketClient.closeAll();
-        }
-    }
-
-
-    @Override
+    @Override //Called by launch()
     public void start(Stage primaryStage) throws Exception {
         loginDialog = new Login();
         Stage loginStage = new Stage();
@@ -59,7 +49,7 @@ public class EdiManager extends Application {
         loginDialog.start(loginStage);
     }
 
-
+    //This is called from login when the user has input valid credentials
     public void loginSucceded(boolean isTeacher) {
         logger.info("Login succeeded");
         Stage dashboardStage = new Stage();
@@ -75,6 +65,15 @@ public class EdiManager extends Application {
             StudentDashboard studentDashboard = new StudentDashboard();
             studentDashboard.setEdiManager(this);
             studentDashboard.start(dashboardStage);
+        }
+    }
+
+    //Closing down Edi; shutting down sockets
+    @Override
+    public void stop() throws Exception {
+        if(isDBTeam) {
+            logger.info("Closing client-side networking ports.");
+            mySocketClient.closeAll();
         }
     }
 }
