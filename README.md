@@ -15,10 +15,9 @@
 ##### Run Configuration
 
 1. Set Login.AM_I_ON_DB_TEAM = false. All networking and database functionality will be disabled for EdiManager.
-2. Create a Run Configuration in IntelliJ called "EdiManager", with the main class being "client.EdiManager"
-3. Create a Run Configuration in IntelliJ called "Edi", with the main class being "client.managers.EdiManager".
-5. Launch Edi
-6. Login can be bypassed by pressing login button with no details
+2. Create a Run Configuration in IntelliJ called "Edi", with the main class being "client.managers.EdiManager".
+3. Launch Edi
+4. Login can be 'bypassed' by pressing login button without entering details
 
 #### Database Team
 
