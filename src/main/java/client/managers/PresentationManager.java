@@ -77,10 +77,10 @@ public abstract class PresentationManager {
     public void loadPresentation(BorderPane mainUI, String path) {
         logger.info("Attempting to load presentation located at: " + path);
 
-        ParserXML readPresentationParser = new ParserXML(path);
+        //ParserXML readPresentationParser = new ParserXML(path);
 
-        //myPresentationElement = Presentation.generateTestPresentation();     //TEST
-        myPresentationElement = readPresentationParser.parsePresentation();
+        myPresentationElement = Presentation.generateTestPresentation();     //TEST
+        //myPresentationElement = readPresentationParser.parsePresentation();
         assignCanvas(myPresentationElement);
         mainUI.setCenter(myPresentationElement.getSlide(currentSlideNumber));
 

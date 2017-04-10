@@ -209,8 +209,8 @@ public class Presentation extends Pane {
         myGraphicElement2.setLayer(1);
         myGraphicElement2.setStartSequence(3);
         myGraphicElement2.setEndSequence(5);
-        myGraphicElement2.setFillColour("00000000");
-        myGraphicElement2.setLineColour("00FF00FF");
+        myGraphicElement2.setFillColour("#00000000");
+        myGraphicElement2.setLineColour("#00FF00FF");
         myGraphicElement2.setShape(new PolygonBuilder(
                         new float[]{100, 100, 200},
                         new float[]{100, 200, 200},
@@ -224,8 +224,8 @@ public class Presentation extends Pane {
         myGraphicElement.setLayer(2);
         myGraphicElement.setStartSequence(2);
         myGraphicElement.setEndSequence(5);
-        myGraphicElement.setFillColour("00000000");
-        myGraphicElement.setLineColour("0000FFFF");
+        myGraphicElement.setFillColour("#00000000");
+        myGraphicElement.setLineColour("#0000FFFF");
         myGraphicElement.setShape(new OvalBuilder(
                         500.0f,
                         100.0f,
@@ -242,8 +242,8 @@ public class Presentation extends Pane {
         myGraphicElement3.setLayer(3);
         myGraphicElement3.setStartSequence(4);
         myGraphicElement3.setEndSequence(6);
-        myGraphicElement3.setFillColour("FF0000FF");
-        myGraphicElement3.setLineColour("0000FFFF");
+        myGraphicElement3.setFillColour("#FF0000FF");
+        myGraphicElement3.setLineColour("#0000FFFF");
         myGraphicElement3.setShape(new PolygonBuilder(
                         new float[]{500, 100, 200, 200},
                         new float[]{100, 200, 200, 100},
@@ -266,6 +266,23 @@ public class Presentation extends Pane {
         myTextElement11.setTextContent("<b>This is some sample text for Adar to be impressed by</b>");
         myTextElement11.setSlideCanvas(slide1);
         slideElementsSlide1.add(myTextElement11);
+
+
+        PollElement poll = new PollElement();
+        List<String> answers = new ArrayList<>();
+        answers.add(0,"ANS 1");
+        answers.add(1,"ANS 2");
+        answers.add(2,"ANS 3");
+        answers.add(3,"ANS 4");
+        poll.setPossibleAnswers(answers);
+        poll.setPollQuestion("HERE IS A SAMPLE QUESTION!");
+
+        poll.setLayer(6);
+        poll.setStartSequence(9);
+        poll.setEndSequence(10);
+        poll.setElementID(111111);
+        poll.setSlideCanvas(slide1);
+        slideElementsSlide1.add(poll);
 
         slide1.setSlideElementList(slideElementsSlide1);
 
