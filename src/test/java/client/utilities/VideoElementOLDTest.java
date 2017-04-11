@@ -1,9 +1,7 @@
 package client.utilities;
 
 import client.presentationElements.VideoElement;
-import javafx.application.Application;
 import javafx.scene.layout.Pane;
-import javafx.stage.Stage;
 import javafx.util.Duration;
 import org.junit.After;
 import org.junit.Before;
@@ -14,7 +12,7 @@ import static org.junit.Assert.*;
 /**
  * Created by kma517 on 08/03/2017.
  */
-public class VideoElementTest {
+public class VideoElementOLDTest {
     private VideoElement myVideoElement;
     Pane videoPane = new Pane();
 

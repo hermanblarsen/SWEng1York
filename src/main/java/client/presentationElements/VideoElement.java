@@ -20,9 +20,8 @@ import javafx.util.Duration;
 
 import java.io.File;
 
-
 /**
- * Created by kma517 on 31/03/2017.
+ * Created by Koen on 11/04/2017.
  */
 public class VideoElement extends SlideElement{
     protected boolean mediaControl = true;
@@ -43,65 +42,67 @@ public class VideoElement extends SlideElement{
     protected Media media;
     private StackPane mediaPane;
 
+
     @Override
     public void doClassSpecificRender() {
-        if(mv.getMediaPlayer() == null) {
-            if (path.contains("http") || path.contains("www.")) {
-                media = new Media(path);
-            } else {
-                File file = new File(path);
-                String mediaPath = file.toURI().toString();
-                media = new Media(mediaPath);
-            }
-            mp = new MediaPlayer(media);
-            StackPane mediaPane = new StackPane();
-
-            if (startTime != null) {
-                mp.setStartTime(startTime);
-            } else {
-                mp.setStartTime(javafx.util.Duration.ZERO);
-            }
-            if (endTime != null) {
-                mp.setStopTime(endTime);
-            } else {
-                mp.setStopTime(media.getDuration());
-            }
-            if (loop) {
-                mp.setCycleCount(MediaPlayer.INDEFINITE);
-            }
-            mp.setAutoPlay(autoplay);
-
-
-            mv.setMediaPlayer(mp);
-            mv.setPreserveRatio(aspectRatioLock);
-            mv.setTranslateX(xPosition);
-            mv.setTranslateY(yPosition);
-            if (xSize == 0 || ySize == 0) {
-                mv.fitWidthProperty().bind(slideCanvas.widthProperty());
-                mv.fitHeightProperty().bind(slideCanvas.heightProperty());
-            } else {
-                mv.setFitHeight(ySize);
-                mv.setFitWidth(xSize);
-            }
-            mediaPane.getChildren().add(mv);
-            mediaPane.setStyle("-fx-background-color: black");
-            if (mediaControl) {
-                mp.setOnReady(() -> mediaPane.setMaxSize(mv.getFitWidth(), mv.getFitHeight()));
-                mediaPane.getChildren().add(mediaControl());
-            }
-            slideCanvas.getChildren().add(mediaPane);
-            slideCanvas.setPickOnBounds(false);
+        if(autoplay){
+            mp.play();
         }
     }
 
     @Override
     public Node getCoreNode() {
-        return mv;
+        return mediaPane;
     }
 
     @Override
     public void setupElement() {
-        mv = new MediaView();
+        mediaPane = new StackPane();
+
+        if (path.contains("http") || path.contains("www.")) {
+            media = new Media(path);
+        } else {
+            File file = new File(path);
+            String mediaPath = file.toURI().toString();
+            media = new Media(mediaPath);
+        }
+
+        mp = new MediaPlayer(media);
+        mv = new MediaView(mp);
+        //mediaPane.getChildren().add(mv);
+
+
+        if (startTime != null) {
+            mp.setStartTime(startTime);
+        } else {
+            mp.setStartTime(javafx.util.Duration.ZERO);
+        }
+        if (endTime != null) {
+            mp.setStopTime(endTime);
+        } else {
+            mp.setStopTime(media.getDuration());
+        }
+        if (loop) {
+            mp.setCycleCount(MediaPlayer.INDEFINITE);
+        }
+
+        mv.setPreserveRatio(aspectRatioLock);
+        mv.setTranslateX(xPosition);
+        mv.setTranslateY(yPosition);
+        if (xSize == 0 || ySize == 0) {
+            mv.fitWidthProperty().bind(slideCanvas.widthProperty());
+            mv.fitHeightProperty().bind(slideCanvas.heightProperty());
+        } else {
+            mv.setFitHeight(ySize);
+            mv.setFitWidth(xSize);
+        }
+        mediaPane.getChildren().add(mv);
+        mediaPane.setStyle("-fx-background-color: black");
+        if (mediaControl) {
+            mp.setOnReady(() -> mediaPane.setMaxSize(mv.getFitWidth(), mv.getFitHeight()));
+            mediaPane.getChildren().add(mediaControl());
+        }
+
         startAnimation = new Animation();
         startAnimation.setCoreNodeToAnimate(getCoreNode());
         startAnimation.setAnimationType(Animation.SIMPLE_APPEAR);

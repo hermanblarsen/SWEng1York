@@ -6,8 +6,6 @@ import client.utilities.PolygonBuilder;
 import client.utilities.Theme;
 import javafx.scene.layout.Pane;
 import javafx.util.Duration;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
