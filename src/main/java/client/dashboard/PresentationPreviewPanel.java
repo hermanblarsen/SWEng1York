@@ -1,9 +1,11 @@
 package client.dashboard;
 
 import client.utilities.ParserXML;
+import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
 import org.kordamp.bootstrapfx.scene.layout.Panel;
 
+import java.util.Random;
 import java.util.function.Predicate;
 
 /**
@@ -12,6 +14,8 @@ import java.util.function.Predicate;
 public class PresentationPreviewPanel extends Panel {
     private final String presentationPath;
     private final String presentationID;
+
+    private final String presentationSubject;
     private boolean isSelected;
 
     public PresentationPreviewPanel(String presentationPath) {
@@ -22,6 +26,8 @@ public class PresentationPreviewPanel extends Panel {
 
         ParserXML parser = new ParserXML(presentationPath);
         presentationID = parser.getPresentationId();
+        Random random = new Random();
+        presentationSubject = new String("Subject " + random.nextInt(3)); //TODO: Get presentation subject from XML
 
         this.setText("ID: " + presentationID);
 
@@ -37,6 +43,7 @@ public class PresentationPreviewPanel extends Panel {
         preview.setSmooth(true);
         preview.setCache(true);
         this.setBody(preview);
+        this.setFooter(new Label("Subject: " + presentationSubject));
     }
 
     public PresentationPreviewPanel(){
@@ -74,4 +81,6 @@ public class PresentationPreviewPanel extends Panel {
     }
 
     public String getPresentationID() { return presentationID; }
+
+    public String getPresentationSubject() { return presentationSubject; }
 }

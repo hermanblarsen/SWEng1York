@@ -9,19 +9,19 @@ import client.managers.ThumbnailGenerationManager;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Menu;
-import javafx.scene.control.MenuBar;
-import javafx.scene.control.ScrollPane;
+import javafx.scene.control.*;
 import javafx.scene.control.ScrollPane.ScrollBarPolicy;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
+import javafx.stage.Popup;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 import org.kordamp.bootstrapfx.scene.layout.Panel;
@@ -29,6 +29,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.concurrent.atomic.AtomicReference;
 
 
 /**
@@ -44,6 +47,8 @@ public abstract class Dashboard extends Application {
     protected PresentationManager presentationManager;
     protected Stage primaryStage;
     protected String selectedPresID;
+    private ArrayList<PresentationPreviewPanel> previewPanels;
+    private FlowPane presentationsFlowPane;
 
     @Override
     public void start(Stage primaryStage) {
@@ -56,6 +61,39 @@ public abstract class Dashboard extends Application {
         scene.getStylesheets().add("bootstrapfx.css");
         primaryStage.setScene(scene);
 
+        previewPanels = new ArrayList<PresentationPreviewPanel>();
+
+        int numOfPresentations = 20; //TODO: numOfPresentations to be read from database
+        for (int i=0; i<numOfPresentations; i++) {
+            PresentationPreviewPanel previewPanel = new PresentationPreviewPanel();
+            previewPanel.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
+                if(event.getButton() == MouseButton.PRIMARY) {
+                    if (previewPanel.isSelected()) {
+                        launchPresentation(previewPanel.getPresentationPath());
+                    } else {
+                        for (int j = 0; j < numOfPresentations; j++)
+                            previewPanels.get(j).setSelected(false);
+
+                        previewPanel.setSelected(true);
+                        selectedPresID = previewPanel.getPresentationID();
+                        border.setRight(addRightPanel());
+                    }
+                } else if (event.getButton() == MouseButton.SECONDARY) {
+                    ContextMenu cMenu = new ContextMenu();
+
+                    MenuItem schedule = new MenuItem("Schedule");
+                    schedule.setOnAction(event1 -> {
+                        showScheduler(event.getScreenX(), event.getScreenY());
+                    });
+                    cMenu.getItems().add(schedule);
+
+                    cMenu.show(previewPanel, event.getScreenX(), event.getScreenY());
+                }
+
+            });
+            previewPanels.add(previewPanel);
+        }
+
         border.setTop(addBorderTop());
         border.setLeft(addLeftPanel());
         border.setCenter(addCenterPanel());
@@ -64,40 +102,16 @@ public abstract class Dashboard extends Application {
         primaryStage.show();
     }
 
-
     private ScrollPane addCenterPanel() {
 
-        FlowPane presentationsFlowPane = new FlowPane(Orientation.HORIZONTAL);
+        presentationsFlowPane = new FlowPane(Orientation.HORIZONTAL);
 
         presentationsFlowPane.setPadding(new Insets(5, 0, 5, 0));
         presentationsFlowPane.setVgap(4);
         presentationsFlowPane.setHgap(4);
         presentationsFlowPane.setStyle("-fx-background-color: #ffffff;");
 
-        int arraySize = 20;
-        PresentationPreviewPanel[] presentationPanelList = new PresentationPreviewPanel[arraySize];
-
-        for (int i = 0; i < arraySize; i++) {
-            final int finalI = i;
-
-            presentationPanelList[i] = new PresentationPreviewPanel();
-            //ThumbnailGenerationManager.generateSlideThumbnails(presentationPanelList[i].getPresentationPath());
-            presentationPanelList[i].addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
-                if (presentationPanelList[finalI].isSelected()) {
-                    launchPresentation(presentationPanelList[finalI].getPresentationPath());
-                } else {
-                    for (int j = 0; j < arraySize; j++)
-                        presentationPanelList[j].setSelected(false);
-
-                    presentationPanelList[finalI].setSelected(true);
-                    selectedPresID = presentationPanelList[finalI].getPresentationID();
-                    border.setRight(addRightPanel());
-                }
-            });
-        }
-
-        for (Panel aPresentationPanelList : presentationPanelList)
-            presentationsFlowPane.getChildren().add(aPresentationPanelList);
+        showAllPreviewPanels();
 
         ScrollPane centerPane = new ScrollPane();
         centerPane.setContent(presentationsFlowPane);
@@ -187,16 +201,27 @@ public abstract class Dashboard extends Application {
         controlsPane.setSpacing(3);
         controlsPane.setStyle("-fx-background-color: #ffffff;");
 
-        Button subjectButton1 = new Button("Subject 1");
+        Label filterBySubjectLabel = new Label("Filter by subject:");
+        controlsPane.getChildren().add(filterBySubjectLabel);
+
+        Button showAllButton = new Button("Show all");
+        showAllButton.getStyleClass().setAll("btn", "btn-success");
+        showAllButton.setOnAction(event -> showAllPreviewPanels());
+        controlsPane.getChildren().add(showAllButton);
+
+        Button subjectButton1 = new Button("Subject 0");
         subjectButton1.getStyleClass().setAll("btn", "btn-success");
+        subjectButton1.setOnAction(event -> filterBySubject(subjectButton1.getText()));
         controlsPane.getChildren().add(subjectButton1);
 
-        Button subjectButton2 = new Button("Subject 3");
+        Button subjectButton2 = new Button("Subject 1");
         subjectButton2.getStyleClass().setAll("btn", "btn-success");
+        subjectButton2.setOnAction(event -> filterBySubject(subjectButton2.getText()));
         controlsPane.getChildren().add(subjectButton2);
 
-        Button subjectButton3 = new Button("Subject 3");
+        Button subjectButton3 = new Button("Subject 2");
         subjectButton3.getStyleClass().setAll("btn", "btn-success");
+        subjectButton3.setOnAction(event -> filterBySubject(subjectButton3.getText()));
         controlsPane.getChildren().add(subjectButton3);
 
         //Create Panel for subject filters
@@ -220,7 +245,7 @@ public abstract class Dashboard extends Application {
         flow.setPrefWrapLength(170); // preferred width allows for two columns
         flow.setStyle("-fx-background-color: #ffffff;");
 
-        int numSlides = 20;
+        int numSlides = 20; //TODO: Obtain number of slides from XML
 
         Panel[] slides = new Panel[numSlides];
 
@@ -250,6 +275,45 @@ public abstract class Dashboard extends Application {
         scroll.setContent(flow);
 
         return scroll;
+    }
+
+    private void showAllPreviewPanels() {
+        for (Panel panel : previewPanels)
+            if(!presentationsFlowPane.getChildren().contains(panel))
+                presentationsFlowPane.getChildren().add(panel);
+    }
+
+    private void filterBySubject(String text) {
+        for(PresentationPreviewPanel panel : previewPanels) {
+            if(!text.equals(panel.getPresentationSubject()) && presentationsFlowPane.getChildren().contains(panel))
+                presentationsFlowPane.getChildren().remove(panel);
+            else if(text.equals(panel.getPresentationSubject()) && !presentationsFlowPane.getChildren().contains(panel))
+                presentationsFlowPane.getChildren().add(panel);
+        }
+    }
+
+    private void showScheduler(double x, double y) {
+        Popup schedulerPopup = new Popup();
+        BorderPane popupBorder = new BorderPane();
+
+        DatePicker datePicker = new DatePicker(LocalDate.now());
+        popupBorder.setCenter(datePicker);
+
+        Button scheduleButton = new Button("Schedule");
+        scheduleButton.getStyleClass().setAll("btn", "btn-default");
+        scheduleButton.setOnAction(event -> {
+            LocalDate date = datePicker.getValue();
+            logger.info("Selected Date: " + date);
+            schedulerPopup.hide();
+        });
+        popupBorder.setBottom(scheduleButton);
+        popupBorder.setAlignment(scheduleButton, Pos.CENTER);
+
+        //TODO: JavaFX has no native time picker, we need to find one made by someone or implement one ourselves
+
+        schedulerPopup.getContent().add(popupBorder);
+        schedulerPopup.setAutoHide(true);
+        schedulerPopup.show(primaryStage, x, y);
     }
 
     public void setEdiManager(EdiManager ediManager) {
