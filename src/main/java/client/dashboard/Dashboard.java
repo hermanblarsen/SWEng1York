@@ -97,7 +97,7 @@ public abstract class Dashboard extends Application {
             final int finalI = i;
 
             presentationPanelList[i] = new PresentationPreviewPanel();
-            generateSlideThumbnails(presentationPanelList[i].getPresentationPath());
+            //generateSlideThumbnails(presentationPanelList[i].getPresentationPath());
             presentationPanelList[i].addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
                 if (presentationPanelList[finalI].isSelected()) {
                     launchPresentation(presentationPanelList[finalI].getPresentationPath());
@@ -166,7 +166,7 @@ public abstract class Dashboard extends Application {
         topPanel.setSpacing(10);
         topPanel.setStyle("-fx-background-color: #34495e;");
 
-        Button createPresButton = new Button("Create Presentation");
+        Button createPresButton = new Button("TEST: Generate Thumbnails");
         createPresButton.getStyleClass().setAll("btn", "btn-success");
         createPresButton.setOnAction(event -> {
             Dashboard.generateSlideThumbnails("file:externalResources/sampleXMLsimple.xml");
@@ -273,7 +273,10 @@ public abstract class Dashboard extends Application {
     private static void generateSlideThumbnails(String presentationPath) {
         PresentationManager slideGenManager = new TeacherPresentationManager();
         slideGenManager.openPresentation(presentationPath);
+        generateSlideThumbNail(slideGenManager);
+    }
 
+    private static void generateSlideThumbNail(PresentationManager slideGenManager){
         Presentation presentation = slideGenManager.myPresentationElement;
 
         //TODO: This method works for the first slide. To make it work for all of them, change  while (slideGenManager.slideAdvance(presentation, Slide.SLIDE_FORWARD) != Presentation.SLIDE_CHANGE) ;
@@ -285,6 +288,7 @@ public abstract class Dashboard extends Application {
 
         //Move to end of current slide so all elements are visible in snapshot
         while (slideGenManager.slideAdvance(presentation, Slide.SLIDE_FORWARD) != Presentation.SLIDE_CHANGE) ;
+
         //If we're in last element of slide, take snapshot
         if (presentation.getSlide(slideGenManager.currentSlideNumber - 1).getCurrentSequenceNumber() == presentation.getSlide(slideGenManager.currentSlideNumber - 1).getMaxSequenceNumber()) {
             File thumbnailFile = new File(System.getProperty("java.io.tmpdir") + "Edi/Thumbnails/" + presentation.getDocumentID() + "_slide" + (slideGenManager.currentSlideNumber - 1) + "_thumbnail.png");
@@ -337,11 +341,18 @@ public abstract class Dashboard extends Application {
             //When webviews rendered, can take snapshot
             webviewRenderChecker.setOnSucceeded(event -> {
                 logger.info("Generating thumbnail file for " + presentation.getDocumentID() + " Slide " + (slideGenManager.currentSlideNumber - 1) + " at " + thumbnailFile.getAbsolutePath());
-                WritableImage thumbnail = presentation.getSlide(0).snapshot(new SnapshotParameters(), null);
+                WritableImage thumbnail = presentation.getSlide(slideGenManager.currentSlideNumber - 1).snapshot(new SnapshotParameters(), null);
                 try {
                     //Write the snapshot to the chosen file
                     ImageIO.write(SwingFXUtils.fromFXImage(thumbnail, null), "png", thumbnailFile);
                     logger.info("Done");
+                    //Advance to next slide, and generate next Slide Thumbnail
+                    if(slideGenManager.slideAdvance(presentation, Slide.SLIDE_FORWARD) != Presentation.PRESENTATION_FINISH){
+                        logger.info("Done generating thumbnails for presentation " + presentation.getDocumentID());
+                        return;
+                    } else {
+                        generateSlideThumbNail(slideGenManager);
+                    }
                 } catch (IOException ex) {
                     logger.error("Generating presentation thumbnail for " + presentation.getDocumentID() + " at " + thumbnailFile.getAbsolutePath() + " failed");
                 }
