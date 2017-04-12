@@ -36,8 +36,8 @@ public class TextElement extends SlideElement {
     protected boolean aspectRatioLock;
     protected float elementAspectRatio;
 
-    protected WebViewFitContent browser;
-    protected WebEngine webEngine;
+    protected WebView browser;
+    public WebEngine webEngine;
     String cssFilePath;
 
     public TextElement() {
@@ -49,8 +49,8 @@ public class TextElement extends SlideElement {
         Text lol = new Text("Banana");
         //I moved this to a separate method that can be called whenever it is instantiated/Updated.
         //  Maybe surround this with try-catch statements as well as it has potential to go bad if we are not careful. - Herman
-        browser = new WebViewFitContent(textContent);
-        webEngine = browser.webEngine;
+        browser = new WebView();
+        webEngine = browser.getEngine();
         webEngine.documentProperty().addListener(new WebDocumentListener(webEngine));
 
         //Apply Dynamically created CSS to TextElement
@@ -63,7 +63,7 @@ public class TextElement extends SlideElement {
         //logger.info("Height: " + Integer.valueOf(((String) browser.getEngine().executeScript("window.getComputedStyle(document.body, null).getPropertyValue('height')")).replace("px", "")));
         //logger.info("Text Element width: " + Integer.parseInt(browser.getEngine().executeScript("document.width").toString()));
         //logger.info("Text Element height: " + Integer.parseInt(browser.getEngine().executeScript("document.height").toString()));
-
+        webEngine.loadContent(textContent);
         webEngine.setUserStyleSheetLocation(cssFilePath);
 
         //webEngine.loadContent(textContent);

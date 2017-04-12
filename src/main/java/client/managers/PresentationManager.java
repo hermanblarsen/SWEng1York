@@ -34,7 +34,7 @@ public abstract class PresentationManager {
 
     protected Scene scene;
     protected BorderPane border;
-    protected Presentation myPresentationElement;
+    public Presentation myPresentationElement;
     protected ProgressBar pb;
     protected Label slideNumber;
     protected Boolean isFullscreen = false;
@@ -42,18 +42,19 @@ public abstract class PresentationManager {
     protected Boolean questionQueueActive = false;
     protected Boolean commentActive = false;
 
-    private int currentSlideNumber = 0; //Current slide number in presentation
+    public int currentSlideNumber = 0; //Current slide number in presentation
 
 
     /**
      * Assign Slide to each SlideElement within a presentation, to enable them to be setup and rendered. Plumbs XML parsing into
      * Presentation rendering.
+     *
      * @param myPresentationElement Presentation within which to assign canvas's
      * @author Amrik Sadhra
      */
-    private void assignCanvas(Presentation myPresentationElement){
-        for(Slide toAssign : myPresentationElement.getSlideList()){
-            for(SlideElement toBeAssigned : toAssign.getSlideElementList()){
+    private void assignCanvas(Presentation myPresentationElement) {
+        for (Slide toAssign : myPresentationElement.getSlideList()) {
+            for (SlideElement toBeAssigned : toAssign.getSlideElementList()) {
                 toBeAssigned.setSlideCanvas(toAssign);
             }
         }
@@ -77,10 +78,10 @@ public abstract class PresentationManager {
     public void loadPresentation(BorderPane mainUI, String path) {
         logger.info("Attempting to load presentation located at: " + path);
 
-        //ParserXML readPresentationParser = new ParserXML(path);
+        ParserXML readPresentationParser = new ParserXML(path);
+        myPresentationElement = readPresentationParser.parsePresentation();
+        //myPresentationElement = Presentation.generateTestPresentation();     //TEST
 
-        myPresentationElement = Presentation.generateTestPresentation();     //TEST
-        //myPresentationElement = readPresentationParser.parsePresentation();
         assignCanvas(myPresentationElement);
         mainUI.setCenter(myPresentationElement.getSlide(currentSlideNumber));
 
@@ -95,7 +96,6 @@ public abstract class PresentationManager {
             }
         });
     }
-
 
     private void controlPresentation(int direction) {
         int presentationStatus = slideAdvance(myPresentationElement, direction);

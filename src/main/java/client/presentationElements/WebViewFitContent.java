@@ -19,6 +19,7 @@ public final class WebViewFitContent extends Region {
 
     final WebView webview = new WebView();
     final WebEngine webEngine = webview.getEngine();
+    public boolean isReady = false;
 
     public WebViewFitContent(String content) {
         webview.setPrefHeight(5);
@@ -32,6 +33,7 @@ public final class WebViewFitContent extends Region {
         webview.getEngine().getLoadWorker().stateProperty().addListener((arg0, oldState, newState) -> {
             if (newState == Worker.State.SUCCEEDED) {
                 adjustHeight();
+                isReady = true;
             }
         });
 

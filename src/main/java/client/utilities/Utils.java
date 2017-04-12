@@ -48,7 +48,7 @@ public class Utils {
      * @return Filename of CSS file that stores the CSS for a given TextElement
      */
     public static String cssGen(int presentationID, int slideID, int elementID, int fontSize, String font, String fontColour, String bgColor, String borderColour, int borderSize) {
-        Path tempDirectoryPath = Paths.get(System.getProperty("java.io.tmpdir") + "/EdiPresentationResources/" + "Presentation" + presentationID + "/");
+        Path tempDirectoryPath = Paths.get(System.getProperty("java.io.tmpdir") + "Edi/" + "Presentation" + presentationID + "/");
 
         try {
             tempDirectoryPath = Files.createDirectories(tempDirectoryPath);

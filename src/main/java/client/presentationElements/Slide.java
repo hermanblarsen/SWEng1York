@@ -28,9 +28,6 @@ public class Slide extends StackPane {
     protected List<VideoElement> videoElementList = new ArrayList<>();
     protected List<AudioElement> audioElementList = new ArrayList<>();
 
-    public static final int START_SEARCH = 0;
-    public static final int END_SEARCH = 1;
-
     //Passed back up to Presentation layer, to alert on whether sequence has changed the current slide or not
     public static final int SLIDE_NO_MOVE = 0;
     public static final int SLIDE_FORWARD = 1;

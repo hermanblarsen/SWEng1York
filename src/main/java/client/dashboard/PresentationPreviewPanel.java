@@ -27,7 +27,7 @@ public class PresentationPreviewPanel extends Panel {
 
         ImageView preview;
         try {
-            preview = new ImageView("file:externalResources/" + presentationID + "_slide0_thumbnail.png");
+            preview = new ImageView("file:"+ System.getProperty("java.io.tmpdir") + "Edi/Thumbnails/" + presentationID + "_slide0_thumbnail.png");
         } catch(NullPointerException | IllegalArgumentException e) {
             preview = new ImageView("file:externalResources/emptyThumbnail.png");
         }
@@ -40,7 +40,7 @@ public class PresentationPreviewPanel extends Panel {
     }
 
     public PresentationPreviewPanel(){
-        this("externalResources/i2lpSampleXml.xml");
+        this("file:externalResources/sampleXMLsimple.xml");
     }
 
     public String getPresentationPath() {
