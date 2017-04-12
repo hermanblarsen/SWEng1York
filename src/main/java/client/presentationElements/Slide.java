@@ -32,6 +32,7 @@ public class Slide extends StackPane {
     public static final int SLIDE_NO_MOVE = 0;
     public static final int SLIDE_FORWARD = 1;
     public static final int SLIDE_BACKWARD = 2;
+    public static final int SLIDE_PRE_CHANGE = 3;
 
     protected int slideID;
 

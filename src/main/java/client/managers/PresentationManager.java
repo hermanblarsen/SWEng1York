@@ -33,7 +33,7 @@ public abstract class PresentationManager {
     Logger logger = LoggerFactory.getLogger(PresentationManager.class);
 
     protected Scene scene;
-    protected BorderPane border;
+    public BorderPane border;
     public Presentation myPresentationElement;
     protected ProgressBar pb;
     protected Label slideNumber;
@@ -41,6 +41,7 @@ public abstract class PresentationManager {
     //protected Boolean buttonsRemoved = false;
     protected Boolean questionQueueActive = false;
     protected Boolean commentActive = false;
+    protected Stage presentationStage;
 
     public int currentSlideNumber = 0; //Current slide number in presentation
 
@@ -52,7 +53,7 @@ public abstract class PresentationManager {
      * @param myPresentationElement Presentation within which to assign canvas's
      * @author Amrik Sadhra
      */
-    private void assignCanvas(Presentation myPresentationElement) {
+    protected void assignCanvas(Presentation myPresentationElement) {
         for (Slide toAssign : myPresentationElement.getSlideList()) {
             for (SlideElement toBeAssigned : toAssign.getSlideElementList()) {
                 toBeAssigned.setSlideCanvas(toAssign);
@@ -61,7 +62,7 @@ public abstract class PresentationManager {
     }
 
     public void openPresentation(String path) {
-        Stage presentationStage = new Stage();
+        presentationStage = new Stage();
         presentationStage.setTitle("Edi");
 
         border = new BorderPane();
@@ -70,6 +71,7 @@ public abstract class PresentationManager {
         presentationStage.setScene(scene);
         presentationStage.show();
         loadPresentation(border, path);
+
         pb = new ProgressBar(0);
         slideNumber = new Label("Slide 1 of " + myPresentationElement.getSlideList().size());
         border.setBottom(addPresentationControls(presentationStage));
@@ -102,10 +104,16 @@ public abstract class PresentationManager {
 
         //If Presentation handler told us that slide is changing, update the Slide present on Main screen
         //Can do specific things when presentation reached end, or start.
-        if (presentationStatus == Presentation.SLIDE_CHANGE || presentationStatus == Presentation.PRESENTATION_FINISH || presentationStatus == Presentation.PRESENTATION_START) {
-            logger.info("Changing Slides");
-            //Update MainUI panes when changing slides to account for new Slide root pane.
-            border.setCenter(myPresentationElement.getSlide(currentSlideNumber));
+        if (presentationStatus == Presentation.SLIDE_CHANGE || presentationStatus == Presentation.PRESENTATION_FINISH || presentationStatus == Presentation.PRESENTATION_START || presentationStatus == Presentation.SLIDE_LAST_ELEMENT) {
+            if (presentationStatus == Presentation.SLIDE_CHANGE) {
+                logger.info("Changing Slides");
+            } else if (presentationStatus == Presentation.PRESENTATION_START) {
+                logger.info("At Presentation start");
+            } else if (presentationStatus == Presentation.PRESENTATION_FINISH) {
+                logger.info("At Presentation finish");
+            } else if (presentationStatus == Presentation.SLIDE_LAST_ELEMENT) {
+                logger.info("On last element in slide");
+            }
         }
     }
 
@@ -173,7 +181,6 @@ public abstract class PresentationManager {
             } else {
                 commentFunction();
                 commentActive = false;
-
             }
 
         });
@@ -213,21 +220,28 @@ public abstract class PresentationManager {
     public int slideAdvance(Presentation presentationToAdvance, int direction) {
         //Initialise this with something more appropriate
         int presentationStatus = Presentation.SAME_SLIDE;
-
+        int changeStatus;
         if (direction == Slide.SLIDE_FORWARD) {
             //If we're not at end of presentation
             if (currentSlideNumber < presentationToAdvance.getMaxSlideNumber()) {
                 //If slide tells you to move forward to next slide, do it by changing to next slide in slide list.
-                if (elementAdvance(presentationToAdvance.getSlide(currentSlideNumber), direction) == direction) {
+                if ((changeStatus = elementAdvance(presentationToAdvance.getSlide(currentSlideNumber), direction)) == direction) {
                     if (currentSlideNumber + 1 >= presentationToAdvance.getMaxSlideNumber()) {
                         logger.info("Reached final slide: " + presentationToAdvance.getMaxSlideNumber());
                         presentationStatus = Presentation.PRESENTATION_FINISH;
                     } else {
                         currentSlideNumber++;
                         presentationStatus = Presentation.SLIDE_CHANGE;
+                        //Update MainUI panes when changing slides to account for new Slide root pane.
+                        border.setCenter(myPresentationElement.getSlide(currentSlideNumber));
                     }
-                    presentationToAdvance.setCurrentSlide(presentationToAdvance.getSlideList().get(currentSlideNumber));
+                } else if (changeStatus == Slide.SLIDE_PRE_CHANGE){
+                    //Userful state for Thumbnail generation
+                    presentationStatus = Presentation.SLIDE_LAST_ELEMENT;
                 }
+            } else {//If on last slide, as == maxSlideNumber
+                logger.info("Reached final slide: " + presentationToAdvance.getMaxSlideNumber());
+                presentationStatus = Presentation.PRESENTATION_FINISH;
             }
         } else if (direction == Slide.SLIDE_BACKWARD) {
             //If we're not at start of presentation
@@ -244,6 +258,8 @@ public abstract class PresentationManager {
                         presentationStatus = Presentation.SLIDE_CHANGE;
                     }
                     presentationToAdvance.setCurrentSlide(presentationToAdvance.getSlideList().get(currentSlideNumber));
+                    //Update MainUI panes when changing slides to account for new Slide root pane.
+                    border.setCenter(myPresentationElement.getSlide(currentSlideNumber));
                 }
             }
         }
@@ -302,6 +318,21 @@ public abstract class PresentationManager {
             }
         }
 
+        if(slideToAdvance.getCurrentSequenceNumber() == slideToAdvance.getMaxSequenceNumber()) return Slide.SLIDE_PRE_CHANGE;
         return Slide.SLIDE_NO_MOVE;
+    }
+
+    /**
+     * Shutdown the presentation manager cleanly.
+     *
+     */
+    @SuppressWarnings("FinalizeCalledExplicitly")
+    public void close(){
+        presentationStage.close();
+        try {
+            finalize();
+        } catch (Throwable throwable) {
+            logger.error("Couldnt finalize PresMan");
+        }
     }
 }

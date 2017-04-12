@@ -3,6 +3,7 @@ package client.utilities;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
@@ -48,12 +49,13 @@ public class Utils {
      * @return Filename of CSS file that stores the CSS for a given TextElement
      */
     public static String cssGen(int presentationID, int slideID, int elementID, int fontSize, String font, String fontColour, String bgColor, String borderColour, int borderSize) {
-        Path tempDirectoryPath = Paths.get(System.getProperty("java.io.tmpdir") + "Edi/" + "Presentation" + presentationID + "/");
+        File cssFilePath = new File(System.getProperty("java.io.tmpdir") + "Edi/" + "Presentation" + presentationID + "/" + "Slide" + slideID + "Element" + elementID + "format.css");
 
-        try {
-            tempDirectoryPath = Files.createDirectories(tempDirectoryPath);
-        } catch (IOException e) {
-            logger.error("Unable to create temporary directory with which to store runtime presentation resources");
+        logger.info(cssFilePath.getAbsolutePath());
+        if (cssFilePath.exists()) {
+            return "file:" + cssFilePath.getAbsolutePath();
+        } else {
+            cssFilePath.getParentFile().mkdirs(); //Create directory structure if not present yet
         }
 
         ArrayList<String> lines = new ArrayList<>();
@@ -73,14 +75,11 @@ public class Utils {
         }
         lines.add( "}");
 
-        String cssFileName = "Slide" + slideID + "Element" + elementID + "format.css";
-        String cssFilePath = tempDirectoryPath + "/" + cssFileName;
 
         logger.info("Writing runtime created CSS to " + cssFilePath);
 
         try {
-
-            Files.write(Paths.get(cssFilePath), lines);
+            Files.write(cssFilePath.toPath(), lines);
         } catch (IOException e) {
             logger.error("Unable to create CSS file for text reference on Slide" + slideID + " element " + elementID);
         }

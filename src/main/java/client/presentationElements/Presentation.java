@@ -37,6 +37,7 @@ public class Presentation extends Pane {
     public static final int PRESENTATION_FINISH = 1;
     public static final int SLIDE_CHANGE = 2;
     public static final int SAME_SLIDE = 3;
+    public static final int SLIDE_LAST_ELEMENT = 4;
 
     private List<Slide> slideList;
 

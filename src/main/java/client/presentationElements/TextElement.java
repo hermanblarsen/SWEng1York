@@ -2,6 +2,7 @@ package client.presentationElements;
 
 import client.utilities.Utils;
 import client.utilities.WebDocumentListener;
+import javafx.concurrent.Worker;
 import javafx.scene.Node;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
@@ -40,6 +41,9 @@ public class TextElement extends SlideElement {
     public WebEngine webEngine;
     String cssFilePath;
 
+
+    private boolean isRendered = false;
+
     public TextElement() {
 
     }
@@ -65,6 +69,13 @@ public class TextElement extends SlideElement {
         //logger.info("Text Element height: " + Integer.parseInt(browser.getEngine().executeScript("document.height").toString()));
         webEngine.loadContent(textContent);
         webEngine.setUserStyleSheetLocation(cssFilePath);
+
+
+        webEngine.getLoadWorker().stateProperty().addListener((arg0, oldState, newState) -> {
+            if (newState == Worker.State.SUCCEEDED) {
+                isRendered = true;
+            }
+        });
 
         //webEngine.loadContent(textContent);
         getCoreNode().setTranslateY(xPosition);
@@ -214,6 +225,11 @@ public class TextElement extends SlideElement {
     public void setBorderSize(int borderSize) {
         this.borderSize = borderSize;
     }
+
+    public boolean isRendered() {
+        return isRendered;
+    }
+
 
     @Override
     public Node getCoreNode() {
