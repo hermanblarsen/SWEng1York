@@ -1,0 +1,52 @@
+#http://circleci.com/docs/1.0/configuration/
+#The circle.yml file has seven primary sections. Each section represents a phase of the Build-Test-Deploy process:
+#
+#machine: adjust the behavior of the virtual machine (VM)
+#checkout: checkout and clone code from a repository
+#dependencies: install your project’s language-specific dependencies
+#database: prepare a database for tests
+#compile: compile your project
+#test: run your tests
+#deployment: deploy your code to your web servers
+#A circle.yml can also contain 2 optional sections that are not linked to specific phases:
+#
+#general: use for broader build-related configuration
+#experimental: test out features that are currently in development
+#
+#Each section consists of settings and/or Bash commands, which are run in the order they appear in the file.
+#
+#Each command is run in a separate shell, which means they do not share environments with preceding commands. This means that something like export foo=bar will not work. If you want to set global environment variables, specify them in the machine section.
+#
+#On completion, each command will return an exit code: 0 is a success, and any other number is a failure.
+#
+#If a command fails during any of the setup sections (machine, checkout, dependencies, database, compile), the entire build will fail early. If a command fails in the test section, the build will continue to run.
+#
+#You can specify when to run custom commands relative to CircleCI’s inferred commands using three special keys:
+#
+#pre: run before inferred commands
+#override: run instead of inferred commands
+#post: run after inferred commands
+
+#Modifiers
+
+# You can tweak individual commands by adding a modifier. Allowed modifiers are:
+#
+# timeout: if a command runs this many seconds without output, kill it (default:600s)
+# pwd: run commands using this value as the current working directory (default: the checkout directory named for your project, except in the machine and checkout/pre sections, where it defaults to $HOME.)
+# environment: a hash creating a list of environment variables set for this command (see Machine configuration for this modifier’s properties when used in the machine section of the file)
+# parallel: (only used with commands in the test section) if you have manually set up parallelism, set this to true to run a command across all VMs
+# files: The files identified by the file list (or globs) will be appended to the command arguments. The files will be distributed across all containers running the build. Check manual parallelism setup document for more details.
+# background: when “true”, runs a command in the background. It is similar to ending a shell command with ‘&’, but works correctly over ssh. Useful for starting servers, which your tests will connect to.
+# Note that YAML is very strict about indentation each time you add a new property. For that reason, modifiers must be indented one level from their command. In the following example, we treat the bundle install command as a key, with timeout, environment, and pwd as the command’s hash values. This means you will need to add a colon to the end of the command for it to parse correctly.
+#
+# Important note: modifiers are double indented, so four spaces instead of two. (This is probably the cause if you get an error like Syntax Error while parsing circle.yml: mapping values are not allowed here...)
+#
+# dependencies:
+#   override:
+#     - bundle install: # note the colon here
+#         timeout: 240 # note the double indentation (four spaces) here
+#         environment:
+#           foo: bar
+#           foo2: bar2
+#         pwd:
+#           test_dir
