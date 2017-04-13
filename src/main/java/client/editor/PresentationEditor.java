@@ -68,7 +68,6 @@ public class PresentationEditor {
     }
 
     private void addPoll() {
-        vbox.getChildren().add(new PollEditorPanel());
+        vbox.getChildren().add(new PollEditorPanel(vbox));
     }
-
 }
