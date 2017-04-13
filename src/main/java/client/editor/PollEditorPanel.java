@@ -52,10 +52,10 @@ public class PollEditorPanel extends Panel {
 
         body.add(new Label("Response Type"), 1, 0);
         responseTypeChoiceBox = new ChoiceBox<>();
-        responseTypeChoiceBox.setOnAction(event -> setResponseType(responseTypeChoiceBox.getValue()));
         responseTypeChoiceBox.getItems().add("Open");
         responseTypeChoiceBox.getItems().add("Multiple choice");
         responseTypeChoiceBox.setValue(responseTypeChoiceBox.getItems().get(0));
+        responseTypeChoiceBox.setOnAction(event -> setResponseType(responseTypeChoiceBox.getValue()));
         body.add(responseTypeChoiceBox, 1, 1);
     }
 
