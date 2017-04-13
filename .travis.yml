@@ -1,6 +1,0 @@
-language: java
-jdk: oraclejdk8
-sudo: false
-notifications:
-  slack: sweng1york:Y7YjvRoRjnoxHAgu2i86hdqj
-script: "./build.sh"

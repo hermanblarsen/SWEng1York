@@ -1,12 +1,9 @@
-### Build Status: [![Build Status](https://travis-ci.com/hermanblarsen/SWEng1York.svg?token=8qJcq4nagt6VVZqKxAqF&branch=master)](https://travis-ci.com/SwEng1York)
+### Build Status: [![CircleCI](https://circleci.com/gh/hermanblarsen/SWEng1York.svg?style=shield&circle-token=e154ce67a04d48efa0149fc61c732c65a0dbc871)](https://circleci.com/gh/hermanblarsen/SWEng1York)
 ## Project Links
 
-- [Trello (Agile Task Organisation)][c0cf7e50]
-  [c0cf7e50]: https://trello.com/b/m53LdUNP/sweng-agile-board "Trello"
-- [Slack Chat][b9db431a]
-  [b9db431a]: https://sweng1york.slack.com/ "Slack Chat"
-- [Travis CI][a8a89aa4]
-  [a8a89aa4]: https://travis-ci.com/ "Travis CI"
+- [Trello (Agile Task Organisation)](https://trello.com/b/m53LdUNP/sweng-agile-board)
+- [Slack Chat](https://sweng1york.slack.com/)
+- [Travis CI](https://travis-ci.com/)
 
 ### Running the Code
 
