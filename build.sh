@@ -7,4 +7,3 @@
 
    mvn surefire-report:report-only
    mv target/site/surefire-report.html target/site/$filename
-   #curl --ftp-create-dirs -T target/site/$filename -u bscftp:Combline90+ ftp://ftp.amriksadhra.com/TravisBuilds/

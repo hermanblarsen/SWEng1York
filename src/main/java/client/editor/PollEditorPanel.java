@@ -1,9 +1,9 @@
 package client.editor;
 
 import javafx.geometry.HPos;
+import javafx.scene.Node;
 import javafx.scene.control.*;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
+import javafx.scene.layout.*;
 import org.kordamp.bootstrapfx.scene.layout.Panel;
 
 import java.util.ArrayList;
@@ -22,16 +22,27 @@ public class PollEditorPanel extends Panel {
     private ArrayList<Label> answerLabels;
     private ArrayList<Button> answerRemoveButtons;
     private int answerNumber;
+    private VBox parent;
 
-    public PollEditorPanel() {
+    public PollEditorPanel(VBox parent) {
+        this.parent = parent;
         this.getStyleClass().add("panel-primary");
 
         HBox titleBox = new HBox();
         Label title = new Label("Poll");
         titleBox.getChildren().add(title);
-        //Button removeButton = new Button("Remove");
-        //removeButton.setOnAction(event -> ); //Removing a panel from its parent is apparently trickier than expected
-        //titleBox.getChildren().add(removeButton);
+        Region separatorRegion = new Region();
+        titleBox.getChildren().add(separatorRegion);
+        titleBox.setHgrow(separatorRegion, Priority.ALWAYS);
+        Button moveUpButton = new Button("Move up");
+        moveUpButton.setOnAction(event -> moveUp());
+        titleBox.getChildren().add(moveUpButton);
+        Button moveDownButton = new Button("Move down");
+        moveDownButton.setOnAction(event -> moveDown());
+        titleBox.getChildren().add(moveDownButton);
+        Button removeButton = new Button("Remove");
+        removeButton.setOnAction(event -> parent.getChildren().remove(this));
+        titleBox.getChildren().add(removeButton);
         this.setHeading(titleBox);
 
         answerTextFields = new ArrayList<>();
@@ -97,7 +108,6 @@ public class PollEditorPanel extends Panel {
             } catch(Exception e) {
                 //Handle exception?
             }
-
         }
     }
 
@@ -145,6 +155,38 @@ public class PollEditorPanel extends Panel {
             body.getChildren().remove(answerRemoveButton);
             if(answerTextFields.size() > 2) //Don't allow fewer than 2 answers
                 body.add(answerRemoveButton, 4, answerRemoveButtons.indexOf(answerRemoveButton) + 1);
+        }
+    }
+
+    private void moveUp() {
+        if(parent.getChildren().indexOf(this) != 0) {
+            Node nodeAbove = parent.getChildren().get(parent.getChildren().indexOf(this) - 1);
+            swap(nodeAbove, this);
+        }
+    }
+
+    private void moveDown() {
+        if(parent.getChildren().indexOf(this) != parent.getChildren().size() - 1) {
+            Node nodeBelow = parent.getChildren().get(parent.getChildren().indexOf(this) + 1);
+            swap(nodeBelow, this);
+        }
+    }
+
+    private void swap(Node node1, Node node2) {
+        ArrayList<Node> childrenList = new ArrayList<>();
+
+        for(Node node : parent.getChildren())
+            childrenList.add(node);
+
+        parent.getChildren().clear();
+
+        for(Node node : childrenList) {
+            if(node == node1)
+                parent.getChildren().add(node2);
+            else if(node == node2)
+                parent.getChildren().add(node1);
+            else
+                parent.getChildren().add(node);
         }
     }
 }

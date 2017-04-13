@@ -23,11 +23,24 @@ public class Utils {
     static final Pattern PATTERN = Pattern.compile(
             "^(([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.){3}([01]?\\d\\d?|2[0-4]\\d|25[0-5])$");
 
+    /**
+     * Simple regex to determine if IP address is valid
+     * @param ip IP address to parse
+     * @return Boolean corresponding to IP address validity
+     * @author Amrik Sadhra
+     */
     public static boolean validate(final String ip) {
         return PATTERN.matcher(ip).matches();
     }
 
 
+    /**
+     * Builds string for socket.IO connection
+     * @param serverIP Socket.IO server IP address to connect to
+     * @param serverPort Socket.IO server port to connect to
+     * @return String containing concatenated result of serverIP and serverPort
+     * @author Amrik Sadhra
+     */
     public static String buildIPAddress(String serverIP, int serverPort) {
         StringBuilder sb = new StringBuilder();
         sb.append("http://");
@@ -51,7 +64,6 @@ public class Utils {
     public static String cssGen(int presentationID, int slideID, int elementID, int fontSize, String font, String fontColour, String bgColor, String borderColour, int borderSize) {
         File cssFilePath = new File(System.getProperty("java.io.tmpdir") + "Edi/" + "Presentation" + presentationID + "/" + "Slide" + slideID + "Element" + elementID + "format.css");
 
-        logger.info(cssFilePath.getAbsolutePath());
         if (cssFilePath.exists()) {
             return "file:" + cssFilePath.getAbsolutePath();
         } else {
