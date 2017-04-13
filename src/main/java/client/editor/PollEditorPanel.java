@@ -54,7 +54,7 @@ public class PollEditorPanel extends Panel {
         responseTypeChoiceBox = new ChoiceBox<>();
         responseTypeChoiceBox.getItems().add("Open");
         responseTypeChoiceBox.getItems().add("Multiple choice");
-        responseTypeChoiceBox.setValue(responseTypeChoiceBox.getItems().get(0));
+        responseTypeChoiceBox.setValue("Open");
         responseTypeChoiceBox.setOnAction(event -> setResponseType(responseTypeChoiceBox.getValue()));
         body.add(responseTypeChoiceBox, 1, 1);
     }
@@ -90,8 +90,17 @@ public class PollEditorPanel extends Panel {
             answerLabels.clear();
             answerRemoveButtons.clear();
 
-            body.getChildren().remove(answersLabel);
-            body.getChildren().remove(addAnswerButton);
+            try {
+                body.getChildren().remove(answersLabel);
+            } catch(Exception e) {
+                //Handle exception
+            }
+            try {
+                body.getChildren().remove(addAnswerButton);
+            } catch(Exception e) {
+                //Handle exception
+            }
+
         }
     }
 
