@@ -1,3 +1,6 @@
+#info at http://circleci.com/docs/1.0/configuration/
+
+
 test:
   post:
     - mkdir -p $CIRCLE_TEST_REPORTS/junit/
