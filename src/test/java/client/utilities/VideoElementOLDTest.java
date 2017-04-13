@@ -5,6 +5,7 @@ import javafx.scene.layout.Pane;
 import javafx.util.Duration;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -12,6 +13,7 @@ import static org.junit.Assert.*;
 /**
  * Created by kma517 on 08/03/2017.
  */
+@Ignore
 public class VideoElementOLDTest {
     private VideoElement myVideoElement;
     Pane videoPane = new Pane();
