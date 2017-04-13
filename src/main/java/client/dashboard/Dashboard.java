@@ -1,11 +1,12 @@
 package client.dashboard;
 
+import client.editor.PresentationEditor;
 import client.managers.EdiManager;
 import client.managers.PresentationManager;
+import client.managers.ThumbnailGenerationManager;
 import client.presentationElements.Presentation;
 import client.presentationViewer.StudentPresentationManager;
 import client.presentationViewer.TeacherPresentationManager;
-import client.managers.ThumbnailGenerationManager;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
@@ -17,7 +18,10 @@ import javafx.scene.control.ScrollPane.ScrollBarPolicy;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.*;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
@@ -31,7 +35,6 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.concurrent.atomic.AtomicReference;
 
 
 /**
@@ -78,16 +81,18 @@ public abstract class Dashboard extends Application {
                         selectedPresID = previewPanel.getPresentationID();
                         border.setRight(addRightPanel());
                     }
-                } else if (event.getButton() == MouseButton.SECONDARY) {
+                } else if (event.getButton() == MouseButton.SECONDARY && this instanceof TeacherDashboard) {
                     ContextMenu cMenu = new ContextMenu();
 
+                    MenuItem edit = new MenuItem("Edit");
+                    edit.setOnAction(editEvent -> showPresentationEditor(previewPanel.getPresentationPath()));
+                    cMenu.getItems().add(edit);
+
                     MenuItem schedule = new MenuItem("Schedule");
-                    schedule.setOnAction(event1 -> {
-                        showScheduler(event.getScreenX(), event.getScreenY());
-                    });
+                    schedule.setOnAction(ScheduleEvent -> showScheduler(event.getScreenX(), event.getScreenY()));
                     cMenu.getItems().add(schedule);
 
-                    cMenu.show(previewPanel, event.getScreenX(), event.getScreenY());
+                    cMenu.show(primaryStage, event.getScreenX(), event.getScreenY());
                 }
 
             });
@@ -136,8 +141,6 @@ public abstract class Dashboard extends Application {
                 new Menu("Edit"),
                 new Menu("Dogs"),
                 new Menu("Spinach"));
-
-        menuBar.setUseSystemMenuBar(true);
 
         return menuBar;
     }
@@ -312,8 +315,11 @@ public abstract class Dashboard extends Application {
         //TODO: JavaFX has no native time picker, we need to find one made by someone or implement one ourselves
 
         schedulerPopup.getContent().add(popupBorder);
-        schedulerPopup.setAutoHide(true);
         schedulerPopup.show(primaryStage, x, y);
+    }
+
+    private void showPresentationEditor(String presentationPath) {
+        new PresentationEditor(presentationPath);
     }
 
     public void setEdiManager(EdiManager ediManager) {
