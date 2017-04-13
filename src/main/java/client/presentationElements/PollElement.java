@@ -24,6 +24,9 @@ public class PollElement extends InteractiveElement {
     protected boolean timerStart = false;
     VBox answerSelection;
 
+    public PollElement() {
+
+    }
 
     @Override
     public void sendDataToServer() {
@@ -59,7 +62,7 @@ public class PollElement extends InteractiveElement {
         Label question = new Label(pollQuestion);
         question.setMinWidth(slideCanvas.getMaxWidth());
 
-        question.setStyle("-fx-background-color: blueviolet");
+        //question.setStyle("-fx-background-color: blueviolet");
         //question.setAlignment(Pos.CENTER);
         PauseTransition delay = new PauseTransition(Duration.seconds(10));
         delay.setOnFinished(evt -> {
