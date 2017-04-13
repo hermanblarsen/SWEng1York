@@ -1,10 +1,7 @@
 package client.editor;
 
 import javafx.geometry.HPos;
-import javafx.scene.control.Button;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import org.kordamp.bootstrapfx.scene.layout.Panel;
@@ -18,7 +15,7 @@ public class PollEditorPanel extends Panel {
     private GridPane body;
     private TextField questionTextField;
     private String responseType; //Should this be an enum? Could be a boolean if only two options: open question (text) or multiple-choice question (choose a, b, c)
-    private ChoiceBox<String> responseTypeChoiceBox;
+    private ComboBox<String> responseTypeChoiceBox;
     private Label answersLabel;
     private Button addAnswerButton;
     private ArrayList<TextField> answerTextFields;
@@ -51,7 +48,7 @@ public class PollEditorPanel extends Panel {
         body.add(questionTextField, 0, 1);
 
         body.add(new Label("Response Type"), 1, 0);
-        responseTypeChoiceBox = new ChoiceBox<>();
+        responseTypeChoiceBox = new ComboBox<>();
         responseTypeChoiceBox.getItems().add("Open");
         responseTypeChoiceBox.getItems().add("Multiple choice");
         responseTypeChoiceBox.setValue("Open");
@@ -93,12 +90,12 @@ public class PollEditorPanel extends Panel {
             try {
                 body.getChildren().remove(answersLabel);
             } catch(Exception e) {
-                //Handle exception
+                //Handle exception?
             }
             try {
                 body.getChildren().remove(addAnswerButton);
             } catch(Exception e) {
-                //Handle exception
+                //Handle exception?
             }
 
         }
