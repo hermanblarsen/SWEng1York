@@ -3,11 +3,13 @@
 
 - [Trello (Agile Task Organisation)](https://trello.com/b/m53LdUNP/sweng-agile-board)
 - [Slack Chat](https://sweng1york.slack.com/)
-- [Travis CI](https://travis-ci.com/)
+- [Circle CI](https://circleci.com)
 
 ### Running the Code
+See "Run Configurations"
 
 #### Viewer Teams
+For the teams not dealing with the database.
 
 ##### Run Configuration
 
@@ -17,6 +19,7 @@
 4. Login can be 'bypassed' by pressing login button without entering details
 
 #### Database Team
+For the teams being on the database team.
 
 ##### Database Management
 
@@ -32,11 +35,11 @@ Use DataGrip/IntelliJ SQL management to connect to the database with the followi
 1. Set Login.AM_I_ON_DB_TEAM = true. All networking and database functionality will be enabled for EdiManager.
 2. Create a Run Configuration in IntelliJ called "Server", with the main class being "com.i2lp.edi.server.SocketServer"
 3. Create a Run Configuration in IntelliJ called "Edi", with the main class being "com.i2lp.edi.client.managers.EdiManager"
-4. Launch Server, wait for Startup:
+4. Launch Server, wait for Startup information to appear:
 	INFO  SocketIOServer:155 - SocketIO com.i2lp.edi.server started at port: 8080
 	INFO  SocketServer:175 - Successful connection to PostgreSQL database instance
 5. Launch Edi
-6. Login with "LoginName", "password"
+6. Login with credentials: "LoginName" & "password"
 
 ### Testing
 
@@ -46,8 +49,8 @@ Use DataGrip/IntelliJ SQL management to connect to the database with the followi
 
 ### Maven
 
-We use Maven to generate project structure and create build profiles. Key points:
+Maven is used to generate project structure and create build profiles. Key points:
 
 - We don't have to add .jar files for libraries, can add < dependency> to pom.xml, can find these dependencies here: https://mvnrepository.com/. Latest library version will always be downloaded, and we only have to distribute the pom instead of all jars, reducing project size.
 
-##### - Amrik
+##### - Amrik is a giant fart
