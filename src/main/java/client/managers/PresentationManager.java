@@ -18,8 +18,10 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
+import javafx.scene.web.HTMLEditor;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import org.kordamp.bootstrapfx.scene.layout.Panel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,6 +44,8 @@ public abstract class PresentationManager {
     protected Boolean questionQueueActive = false;
     protected Boolean commentActive = false;
     protected Stage presentationStage;
+    protected Boolean elementClicked = false;
+    protected HTMLEditor he = new HTMLEditor();
 
     public int currentSlideNumber = 0; //Current slide number in presentation
 
@@ -119,7 +123,16 @@ public abstract class PresentationManager {
 
     protected abstract void questionQueueFunction();
 
-    protected abstract void commentFunction();
+    protected void commentFunction() {
+        he.setMaxWidth(650);
+        if(!elementClicked) {
+            border.setRight(he);
+            elementClicked = true;
+        }else{
+            border.getChildren().remove(he);
+            elementClicked = false;
+        }
+    }
 
     public HBox addPresentationControls(Stage primaryStage) {
         HBox presControls = new HBox();

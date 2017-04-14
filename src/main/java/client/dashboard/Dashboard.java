@@ -273,6 +273,7 @@ public abstract class Dashboard extends Application {
             slides[i].setPrefWidth(170);//Dynamic resizing of panel width possible?
             flow.getChildren().add(slides[i]);
             FlowPane.setMargin(slides[i], new Insets(0, 20, 0, 5));
+
         }
 
         scroll.setContent(flow);
