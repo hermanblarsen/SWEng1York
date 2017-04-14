@@ -97,7 +97,7 @@ public class SocketServer {
 
                     while(rs.next()) {
                         generatedLoginName =  rs.getString("sp_adduser");
-                        logger.info("Generated login name from SQL database: " + generatedLoginName);
+                        logger.info("Generated loginWindow name from SQL database: " + generatedLoginName);
                     }
 
                     statement.close();
@@ -105,7 +105,7 @@ public class SocketServer {
                     logger.error("Unable to connect to PostgreSQL on port 5432. PJDBC dump:", e);
                 }
 
-                //Let com.i2lp.edi.client know the login name that was generated at addition time
+                //Let com.i2lp.edi.client know the loginWindow name that was generated at addition time
                 client.sendEvent("AddUser", generatedLoginName);
             }
         });

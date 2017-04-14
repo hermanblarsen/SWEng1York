@@ -1,4 +1,4 @@
-package com.i2lp.edi.client.login;
+package com.i2lp.edi.client.loginWindow;
 
 import javafx.application.Application;
 import javafx.event.ActionEvent;
@@ -104,7 +104,7 @@ public class Login extends Application {
                 }
             } else {
                 logger.info("Login unsuccessful");
-                //TODO add colour events and stuff here to notify user of unsuccessful com.i2lp.edi.client.login.
+                //TODO add colour events and stuff here to notify user of unsuccessful com.i2lp.edi.client.loginWindow.
             }
         });
         primaryStage.show();

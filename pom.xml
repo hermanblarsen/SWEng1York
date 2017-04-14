@@ -17,7 +17,8 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.I2LP</groupId>
-    <artifactId>edi</artifactId><version>0.14</version>
+    <artifactId>edi</artifactId>
+    <version>0.15</version>
 
     <name>Edi</name>
     <description>
@@ -95,7 +96,7 @@
                 </configuration>
             </plugin>
 
-            <!-- Bundle dependencies into Jar files for separcom.i2lp.edi.clientient com.i2lp.edi.serverrver jars -->
+            <!-- Bundle dependencies into Jar files for client and server jars -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
@@ -110,7 +111,7 @@
                         </goals>
                         <configuration>
                             <!-- Set name of Jar, even if maven doesn't like it -->
-                            <finalName>${project.artifactId}-${project.version}-com.i2lp.edi.server</finalName>
+                            <finalName>${project.artifactId}-${project.version}-server</finalName>
                             <archive>
                                 <manifest>
                                     <mainClass>com.i2lp.edi.server.SocketServer</mainClass>
@@ -130,7 +131,7 @@
                         </goals>
                         <configuration>
                             <!-- Set name of Jar, even if maven doesn't like it -->
-                            <finalName>${project.artifactId}-${project.version}-com.i2lp.edi.client</finalName>
+                            <finalName>${project.artifactId}-${project.version}-client</finalName>
                             <archive>
                                 <manifest>
                                     <mainClass>com.i2lp.edi.client.managers.EdiManager</mainClass>
@@ -177,7 +178,7 @@
             <version>2.5</version>
         </dependency>
 
-        <!-- com.i2lp.edi.clientient.login auth crypto -->
+        <!-- client login auth crypto -->
         <dependency>
             <groupId>commons-codec</groupId>
             <artifactId>commons-codec</artifactId>

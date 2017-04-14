@@ -3,7 +3,7 @@ package com.i2lp.edi.client.managers;
 
 import com.i2lp.edi.client.dashboard.StudentDashboard;
 import com.i2lp.edi.client.dashboard.TeacherDashboard;
-import com.i2lp.edi.client.login.Login;
+import com.i2lp.edi.client.loginWindow.Login;
 
 
 import javafx.application.Application;
@@ -49,12 +49,12 @@ public class EdiManager extends Application {
         loginDialog.start(loginStage);
     }
 
-    //This is called from login when the user has input valid credentials
+    //This is called from loginWindow when the user has input valid credentials
     public void loginSucceded(boolean isTeacher) {
         logger.info("Login succeeded");
         Stage dashboardStage = new Stage();
 
-        //Additional com.i2lp.edi.client.login stuff
+        //Additional com.i2lp.edi.client.loginWindow stuff
         if (isTeacher) {
             logger.info("Teacher Dashboard Opened");
             TeacherDashboard teacherDashboard = new TeacherDashboard();
