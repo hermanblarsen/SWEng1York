@@ -12,7 +12,7 @@
 ##### Run Configuration
 
 1. Set Login.AM_I_ON_DB_TEAM = false. All networking and database functionality will be disabled for EdiManager.
-2. Create a Run Configuration in IntelliJ called "Edi", with the main class being "client.managers.EdiManager".
+2. Create a Run Configuration in IntelliJ called "Edi", with the main class being "com.i2lp.edi.client.managers.EdiManager".
 3. Launch Edi
 4. Login can be 'bypassed' by pressing login button without entering details
 
@@ -30,10 +30,10 @@ Use DataGrip/IntelliJ SQL management to connect to the database with the followi
 ##### Run Configuration
 
 1. Set Login.AM_I_ON_DB_TEAM = true. All networking and database functionality will be enabled for EdiManager.
-2. Create a Run Configuration in IntelliJ called "Server", with the main class being "server.SocketServer"
-3. Create a Run Configuration in IntelliJ called "Edi", with the main class being "client.managers.EdiManager"
+2. Create a Run Configuration in IntelliJ called "Server", with the main class being "com.i2lp.edi.server.SocketServer"
+3. Create a Run Configuration in IntelliJ called "Edi", with the main class being "com.i2lp.edi.client.managers.EdiManager"
 4. Launch Server, wait for Startup:
-	INFO  SocketIOServer:155 - SocketIO server started at port: 8080
+	INFO  SocketIOServer:155 - SocketIO com.i2lp.edi.server started at port: 8080
 	INFO  SocketServer:175 - Successful connection to PostgreSQL database instance
 5. Launch Edi
 6. Login with "LoginName", "password"

@@ -86,7 +86,7 @@
                 </configuration>
             </plugin>
 
-            <!-- Bundle dependencies into Jar files for separate client and server jars -->
+            <!-- Bundle dependencies into Jar files for separcom.i2lp.edi.clientient com.i2lp.edi.serverrver jars -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
@@ -94,7 +94,7 @@
                 <executions>
                     <!-- Server jar generation -->
                     <execution>
-                        <id>create-server-jar</id>
+                        <id>create-com.i2lp.edi.server-jar</id>
                         <phase>package</phase>
                         <goals>
                             <goal>single</goal>
@@ -102,10 +102,10 @@
                         <configuration>
                             <!-- Set name of Jar, even if maven doesn't like it
                             TODO @Amrik can we get this to spit out the auto build numbers?-->
-                            <finalName>${project.artifactId}-${project.version}-server</finalName>
+                            <finalName>${project.artifactId}-${project.version}-com.i2lp.edi.server</finalName>
                             <archive>
                                 <manifest>
-                                    <mainClass>server.SocketServer</mainClass>
+                                    <mainClass>com.i2lp.edi.server.SocketServer</mainClass>
                                 </manifest>
                             </archive>
                             <descriptorRefs>
@@ -115,17 +115,17 @@
                     </execution>
                     <!-- Client jar generation -->
                     <execution>
-                        <id>create-client-jar</id>
+                        <id>create-com.i2lp.edi.client-jar</id>
                         <phase>package</phase>
                         <goals>
                             <goal>single</goal>
                         </goals>
                         <configuration>
                             <!-- Set name of Jar, even if maven doesn't like it -->
-                            <finalName>${project.artifactId}-${project.version}-client</finalName>
+                            <finalName>${project.artifactId}-${project.version}-com.i2lp.edi.client</finalName>
                             <archive>
                                 <manifest>
-                                    <mainClass>client.managers.EdiManager</mainClass>
+                                    <mainClass>com.i2lp.edi.client.managers.EdiManager</mainClass>
                                 </manifest>
                             </archive>
                             <descriptorRefs>
@@ -169,7 +169,7 @@
             <version>2.5</version>
         </dependency>
 
-        <!-- For client.login auth crypto -->
+        <!-- com.i2lp.edi.clientient.login auth crypto -->
         <dependency>
             <groupId>commons-codec</groupId>
             <artifactId>commons-codec</artifactId>
