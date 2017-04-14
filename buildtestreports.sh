@@ -16,8 +16,10 @@ echo "Uploading HTML report to google drive"
  ./bin/gdrive --refresh-token "$GDRIVE_REFRESH_TOKEN" upload --parent "$GDRIVE_DIR" target/site/$filename
 
 # Make Artifact collection easy on Circle by moving to some Dirs
-mkdir -p "Test Reports/junit/"
-mkdir -p "JAR Files/"
-find . -type f -regex ".*/target/surefire-reports/.*xml" -exec cp {} "Test Reports/junit/" \;
-find . -type f -regex ".*/target/site/.*html" -exec cp {} "Test Reports/junit/" \;
-find . -type f -regex ".*/target/.*jar" -exec cp {} "JAR Files/" \;
+mkdir -p "$CIRCLE_ARTIFACTS/Test Reports/junit/"
+mkdir -p "$CIRCLE_ARTIFACTS/JAR Files/"
+
+echo "Moving Build Artifacts"
+find . -type f -regex ".*/target/surefire-reports/.*xml" -exec cp {} "$CIRCLE_ARTIFACTS/Test Reports/junit/" \;
+find . -type f -regex ".*/target/site/.*html" -exec cp {} "$CIRCLE_ARTIFACTS/Test Reports/junit/" \;
+find . -type f -regex ".*/target/.*jar" -exec cp {} "$CIRCLE_ARTIFACTS/JAR Files/" \;
