@@ -3,6 +3,8 @@
 
 test:
   post:
+    - ./buildtestreports.sh
     - mkdir -p $CIRCLE_TEST_REPORTS/junit/
     - find . -type f -regex ".*/target/surefire-reports/.*xml" -exec cp {} $CIRCLE_TEST_REPORTS/junit/ \;
-    - ./buildtestreports.sh
+    - find . -type f -regex ".*/target/site/.*html" -exec cp {} $CIRCLE_TEST_REPORTS/junit/ \;
+    
