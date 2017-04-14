@@ -4,6 +4,7 @@ import com.corundumstudio.socketio.*;
 import com.corundumstudio.socketio.listener.ConnectListener;
 import com.corundumstudio.socketio.listener.DataListener;
 import com.corundumstudio.socketio.listener.DisconnectListener;
+import com.i2lp.edi.client.Constants;
 import com.impossibl.postgres.api.jdbc.PGConnection;
 import com.impossibl.postgres.api.jdbc.PGNotificationListener;
 import com.impossibl.postgres.jdbc.PGDataSource;
@@ -40,7 +41,7 @@ public class SocketServer {
 
     public SocketServer(String dbHostName, int serverPort) {
         this.serverPort = serverPort;
-
+        logger.info("EDI Server " + Constants.BUILD_STRING);
         connectToLocalDB(dbHostName);
         startSocket();
 

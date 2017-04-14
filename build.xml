@@ -5,23 +5,42 @@
     <!-- set global properties for this build -->
     <property name="src" location="./src"/>
 
+    <!-- Allow Variable addition -->
+    <macrodef name="property-exp">
+        <attribute name="name" />
+        <attribute name="value" />
+        <sequential>
+            <script language="javascript">
+                project.setProperty("@{name}", eval(@{value}));
+            </script>
+        </sequential>
+    </macrodef>
+
     <target name="updateBuildNum">
         <echo>ANT Updating BUILD_NUMBER and BUILD_DATE variable in Constants.java</echo>
         <buildnumber/>
+
+        <property-exp name="build-number-actual" value="${build.number} + 1" />
 
         <tstamp>
             <format property="timestamp" pattern="yyyy-MM-dd HH:mm:ss"/>
         </tstamp>
 
-        <replaceregexp file="/com/i2lp/edi/client/Constants.java"
+        <replaceregexp file="${src}/main/java/com/i2lp/edi/client/Constants.java"
                        match="private\s+static\s+final\s+String\s+BUILD_NUMBER\s+=\s+&quot;.*&quot;;"
-                       replace="private static final String BUILD_NUMBER = &quot;${build.number}&quot;;"
+                       replace="private static final String BUILD_NUMBER = &quot;${build-number-actual}&quot;;"
                        byline="true"
         />
 
-        <replaceregexp file="/com/i2lp/edi/client/Constants.java"
+        <replaceregexp file="${src}/main/java/com/i2lp/edi/client/Constants.java"
                        match="private\s+static\s+final\s+String\s+BUILD_DATE\s+=\s+&quot;.*&quot;;"
                        replace="private static final String BUILD_DATE = &quot;${timestamp}&quot;;"
+                       byline="true"
+        />
+
+        <replaceregexp file="./pom.xml"
+                       match="&lt;artifactId&gt;edi&lt;/artifactId&gt;&lt;version&gt;.*&lt;/version&gt;"
+                       replace="&lt;artifactId&gt;edi&lt;/artifactId&gt;&lt;version&gt;0.${build-number-actual}&lt;/version&gt;"
                        byline="true"
         />
 
