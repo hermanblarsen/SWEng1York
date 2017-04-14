@@ -39,6 +39,25 @@
 
     <build>
         <plugins>
+            <!-- Auto increment build number -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>1.7</version>
+                <executions>
+                    <execution>
+                        <phase>compile</phase>
+                        <configuration>
+                            <target>
+                                <ant antfile="build.xml" target="updateBuildNum"/>
+                            </target>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
             <!-- Set Maven Jar default phase to none, so no default jar is built. We only want assemblies -->
             <plugin>
                 <artifactId>maven-jar-plugin</artifactId>

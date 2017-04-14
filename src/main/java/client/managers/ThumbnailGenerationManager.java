@@ -68,11 +68,13 @@ public class ThumbnailGenerationManager extends PresentationManager {
         Presentation presentation = slideGenManager.myPresentationElement;
 
         //Move to end of current slide so all elements are visible in snapshot
+        //noinspection StatementWithEmptyBody
         while (slideGenManager.slideAdvance(presentation, Slide.SLIDE_FORWARD) != Presentation.SLIDE_LAST_ELEMENT);
 
         //If we're in last element of slide, take snapshot
         File thumbnailFile = new File(System.getProperty("java.io.tmpdir") + "Edi/Thumbnails/" + presentation.getDocumentID() + "_slide" + (slideGenManager.currentSlideNumber) + "_thumbnail.png");
         if (!thumbnailFile.exists()) {
+            logger.debug("Thumbnail at " + thumbnailFile.getAbsolutePath() + " already exists");
             thumbnailFile.getParentFile().mkdirs(); //Create directory structure if not present yet
         } else {
             return;
@@ -122,7 +124,6 @@ public class ThumbnailGenerationManager extends PresentationManager {
                 if (slideGenManager.slideAdvance(presentation, Slide.SLIDE_FORWARD) == Presentation.PRESENTATION_FINISH) {
                     logger.info("Done generating thumbnails for presentation " + presentation.getDocumentID());
                     slideGenManager.close();
-                    return;
                 } else {
                     generateSlideThumbNail(slideGenManager);
                 }

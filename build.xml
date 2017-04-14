@@ -1,0 +1,29 @@
+<project name="Edi" default="updateBuildNum" basedir=".">
+    <description>
+        Increment version number and date in Constants strings
+    </description>
+    <!-- set global properties for this build -->
+    <property name="src" location="./src"/>
+
+    <target name="updateBuildNum">
+        <echo>ANT Updating BUILD_NUMBER and BUILD_DATE variable in Constants.java</echo>
+        <buildnumber/>
+
+        <tstamp>
+            <format property="timestamp" pattern="yyyy-MM-dd HH:mm:ss"/>
+        </tstamp>
+
+        <replaceregexp file="${src}/main/java/client/Constants.java"
+                       match="private\s+static\s+final\s+String\s+BUILD_NUMBER\s+=\s+&quot;.*&quot;;"
+                       replace="private static final String BUILD_NUMBER = &quot;${build.number}&quot;;"
+                       byline="true"
+        />
+
+        <replaceregexp file="${src}/main/java/client/Constants.java"
+                       match="private\s+static\s+final\s+String\s+BUILD_DATE\s+=\s+&quot;.*&quot;;"
+                       replace="private static final String BUILD_DATE = &quot;${timestamp}&quot;;"
+                       byline="true"
+        />
+
+    </target>
+</project>
