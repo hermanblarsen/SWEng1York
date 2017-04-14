@@ -10,13 +10,14 @@ mvn surefire-report:report-only
 mv target/site/surefire-report.html target/site/$filename
 
 # Make gdrive executable
-chmod a+x /bin/gdrive
+chmod a+x ./bin/gdrive
 
 echo "Uploading HTML report to google drive"
  ./bin/gdrive --refresh-token "$GDRIVE_REFRESH_TOKEN" upload --parent "$GDRIVE_DIR" target/site/$filename
 
 # Make Artifact collection easy on Circle by moving to some Dirs
 mkdir -p "Test Reports/junit/"
+mkdir -p "JAR Files/"
 find . -type f -regex ".*/target/surefire-reports/.*xml" -exec cp {} "Test Reports/junit/" \;
 find . -type f -regex ".*/target/site/.*html" -exec cp {} "Test Reports/junit/" \;
 find . -type f -regex ".*/target/.*jar" -exec cp {} "JAR Files/" \;
