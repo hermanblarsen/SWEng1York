@@ -18,7 +18,7 @@ public class ParserXML {
 
     private DOMParser xmlParser;
     private Document xmlDocument;
-    private String presentationXmlPath = "externalResources/sampleXml.xml";
+    private String presentationXmlPath = "projectResources/sampleFiles/sampleXml.xml";
     private Logger logger = LoggerFactory.getLogger(ParserXML.class);
     private boolean i2lpFormatted = false;
     private Presentation myPresentation;

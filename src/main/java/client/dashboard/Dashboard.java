@@ -169,7 +169,7 @@ public abstract class Dashboard extends Application {
 
         Button createPresButton = new Button("TEST: Generate Thumbnails");
         createPresButton.getStyleClass().setAll("btn", "btn-success");
-        createPresButton.setOnAction(event -> ThumbnailGenerationManager.generateSlideThumbnails("file:externalResources/sampleXMLsimple.xml"));
+        createPresButton.setOnAction(event -> ThumbnailGenerationManager.generateSlideThumbnails("file:projectResources/sampleXMLsimple.xml"));
 
         final FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Open Resource File");
@@ -261,7 +261,7 @@ public abstract class Dashboard extends Application {
                 preview = new ImageView("file:" + System.getProperty("java.io.tmpdir") + "Edi/Thumbnails/" + selectedPresID + "_slide" + i + "_thumbnail.png");
             } catch (NullPointerException | IllegalArgumentException e) {
                 logger.info("Slide thumbnail not found");
-                preview = new ImageView("file:externalResources/emptyThumbnail.png");
+                preview = new ImageView("file:projectResources/emptyThumbnail.png");
             }
 
             preview.setFitWidth(150);

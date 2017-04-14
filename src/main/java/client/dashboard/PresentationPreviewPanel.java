@@ -35,7 +35,7 @@ public class PresentationPreviewPanel extends Panel {
         try {
             preview = new ImageView("file:"+ System.getProperty("java.io.tmpdir") + "Edi/Thumbnails/" + presentationID + "_slide0_thumbnail.png");
         } catch(NullPointerException | IllegalArgumentException e) {
-            preview = new ImageView("file:externalResources/emptyThumbnail.png");
+            preview = new ImageView("file:projectResources/emptyThumbnail.png");
         }
 
         preview.setFitWidth(150);
@@ -47,7 +47,7 @@ public class PresentationPreviewPanel extends Panel {
     }
 
     public PresentationPreviewPanel(){
-        this("file:externalResources/sampleXMLsimple.xml");
+        this("file:projectResources/sampleXMLsimple.xml");
     }
 
     public String getPresentationPath() {

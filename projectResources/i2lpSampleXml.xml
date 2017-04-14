@@ -1,0 +1,138 @@
+<document documentid="sampleinput">
+	<documentdetails>
+		<author>Herman Larsen</author>
+		<version>1.0</version>
+		<documentaspectratio>1.5</documentaspectratio>
+		<description>I2LP Sample XML input</description>
+		<tags>sample,xml,input,I2LP</tags>
+		<groupformat>2</groupformat>
+	</documentdetails>
+	<slideshow>
+		<defaults>
+			<bgcolour>#111111FF</bgcolour>
+			<font>Arial</font>
+			<fontsize>12</fontsize>
+			<fontcolour>#FFFFFFFF</fontcolour>
+			<graphicscolour>#00000FFFF</graphicscolour>
+			<autoplaymedia>true</autoplaymedia>
+		</defaults>
+		<slide slideid="1">
+			<text elementid ="1" layer="1" visibility="true" startsequence="1" endsequence="4" duration="0">
+				<textcontent>
+					<html>Example HTML text input. This is supposed to be a list: <ul><li><i>italic</i></li><li><b>bold</b></li></ul></html>
+				</textcontent>
+				<xposition>0.2</xposition>
+				<yposition>0.1</yposition>
+				<xsize>0.6</xsize>
+				<ysize>0.3</ysize>
+				<font>Comic Sans</font>
+				<fontsize>12</fontsize>
+				<fontcolour>#FFFFFFFF</fontcolour>
+				<bgcolour>#000000FF</bgcolour>
+				<bordercolour>#FFFFFFFF</bordercolour>
+				<onclickaction>openwebsite</onclickaction>
+				<onclickinfo>https://www.google.no/</onclickinfo>
+				<aspectratiolock>true</aspectratiolock>
+				<elementaspectratio>1.2</elementaspectratio>
+			</text>
+			<text elementid ="2" layer="2" visibility="true" startsequence="2" endsequence="5">
+				<textcontent>
+					<html>Example HTML Number 2! Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</html>
+                </textcontent>
+				<xposition>0.2</xposition>
+				<yposition>0.4</yposition>
+				<xsize>0.6</xsize>
+				<ysize>0.5</ysize>
+				<font>Comic Sans</font>
+				<fontsize>12</fontsize>
+				<fontcolour>#FFFFFFFF</fontcolour>
+				<bgcolour>#000000FF</bgcolour>
+				<bordercolour>#FFFFFFFF</bordercolour>
+				<onclickaction>openwebsite</onclickaction>
+				<onclickinfo>https://www.google.no/</onclickinfo>
+				<aspectratiolock>true</aspectratiolock>
+				<elementaspectratio>1.2</elementaspectratio>
+			</text>
+		</slide>
+		<slide slideid="2">
+			<graphic elementid ="1" layer="1" visibility="false" startsequence="1">
+				<onclickaction>dynamicmediatoggle</onclickaction>
+				<onclickinfo>3</onclickinfo>
+				<aspectratiolock>true</aspectratiolock>
+				<elementaspectratio>1.0</elementaspectratio>
+				<linecolour>#FF0000FF</linecolour>
+				<fillcolour>#00FF0066</fillcolour>
+				<polygon>
+					<xpositions>0.1, 0.2, 0.15</xpositions>
+					<ypositions>0.1, 0.2, 0.15</ypositions>
+					<isclosed>true</isclosed>					
+				</polygon>
+			</graphic>
+			<graphic elementid ="2" layer="2" visibility="true" startsequence="2">
+				<onclickaction>gotoslide</onclickaction>
+				<onclickinfo>1</onclickinfo>
+				<aspectratiolock>false</aspectratiolock>
+				<elementaspectratio>1.5</elementaspectratio>
+				<linecolour>#FF000066</linecolour>
+				<fillcolour>#000000FF</fillcolour>
+				<oval>
+					<xposition>0.6</xposition>
+					<yposition>0.2</yposition>
+					<rhorizontal>0.1</rhorizontal>
+					<rvertical>0.05</rvertical>
+					<rotation>45</rotation>
+				</oval>
+			</graphic>
+			<audio elementid ="3" startsequence="2">
+				<path>/projectResources/NorwegianPimsleur.mp3</path>
+				<loop>true</loop>
+				<autoplay>false</autoplay>
+				<starttime>0</starttime>
+				<endtime>15</endtime>
+			</audio>
+		</slide>
+		<slide slideid="3">
+			<image elementid ="1" layer="1" visibility="true" startsequence="1" >
+				<xposition>0.1</xposition>
+				<yposition>0.1</yposition>
+				<xsize>0.8</xsize>
+				<ysize>0.8</ysize>
+				<path>projectResources/edi.png</path>
+				<onclickaction>gotoslide</onclickaction>
+				<onclickinfo>2</onclickinfo>
+				<opacity>0.3</opacity>
+				<aspectratiolock>true</aspectratiolock>
+				<elementaspectratio>1.0</elementaspectratio>
+			</image>
+			<image elementid ="2" layer="2" visibility="true" startsequence="2">
+				<xposition>0.2</xposition>
+				<yposition>0.2</yposition>
+				<xsize>0.8</xsize>
+				<ysize>0.8</ysize>
+				<path>projectResources/edi.png</path>
+				<onclickaction>gotoslide</onclickaction>
+				<onclickinfo>2</onclickinfo>
+				<opacity>1</opacity>
+				<aspectratiolock>true</aspectratiolock>
+				<elementaspectratio>1.5</elementaspectratio>
+			</image>
+		</slide>
+		<slide slideid="4">
+			<video elementid ="1" layer="1" visibility="true" startsequence="1" endsequence="2">
+				<xposition>0</xposition>
+				<yposition>0</yposition>
+				<xsize>1</xsize>
+				<ysize>1</ysize>
+				<path>projectResources/prometheus.mp4</path>
+				<onclickaction>openwebsite</onclickaction>
+				<onclickinfo>https://www.google.no/</onclickinfo>
+				<loop>true</loop>
+				<aspectratiolock>true</aspectratiolock>
+				<elementaspectratio>2</elementaspectratio>
+				<autoplay>false</autoplay>
+				<starttime>0</starttime>
+				<endtime>55</endtime>
+			</video>
+		</slide>
+	</slideshow>
+</document>

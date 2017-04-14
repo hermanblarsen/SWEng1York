@@ -17,15 +17,10 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="Edi" />
-        <module name="Hello JavaFX" />
-        <module name="InteractiveLearningPlatform" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="Edi" target="1.8" />
-      <module name="Hello JavaFX" target="1.8" />
-      <module name="Hello-JavaFX" target="1.8" />
-      <module name="InteractiveLearningPlatform" target="1.8" />
     </bytecodeTargetLevel>
   </component>
 </project>

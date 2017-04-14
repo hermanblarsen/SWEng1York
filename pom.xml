@@ -31,19 +31,25 @@
 
     <!-- Set some overall versions -->
     <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven-compiler-plugin-version>3.6.1</maven-compiler-plugin-version>
         <maven-assembly-plugin-version>3.0.0</maven-assembly-plugin-version>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
+        <maven-antrun-plugin>1.7</maven-antrun-plugin>
+        <maven-jar-plugin>2.3.1</maven-jar-plugin>
+        <maven-enforcer-plugin>1.4.1</maven-enforcer-plugin>
+        <minimum-required-maven-version>3.0</minimum-required-maven-version>
     </properties>
 
     <build>
         <plugins>
+
             <!-- Auto increment build number -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-antrun-plugin</artifactId>
-                <version>1.7</version>
+                <version>${maven-antrun-plugin}</version>
                 <executions>
                     <execution>
                         <phase>compile</phase>
@@ -58,10 +64,11 @@
                     </execution>
                 </executions>
             </plugin>
+
             <!-- Set Maven Jar default phase to none, so no default jar is built. We only want assemblies -->
             <plugin>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>2.3.1</version>
+                <version>${maven-jar-plugin}</version>
                 <executions>
                     <execution>
                         <id>default-jar</id>
@@ -78,6 +85,7 @@
                     <target>${maven.compiler.target}</target>
                 </configuration>
             </plugin>
+
             <!-- Bundle dependencies into Jar files for separate client and server jars -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -92,7 +100,8 @@
                             <goal>single</goal>
                         </goals>
                         <configuration>
-                            <!-- Set name of Jar, even if maven doesn't like it -->
+                            <!-- Set name of Jar, even if maven doesn't like it
+                            TODO @Amrik can we get this to spit out the auto build numbers?-->
                             <finalName>${project.artifactId}-${project.version}-server</finalName>
                             <archive>
                                 <manifest>
@@ -126,11 +135,12 @@
                     </execution>
                 </executions>
             </plugin>
+
             <!-- Enforce maven version 3-->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-enforcer-plugin</artifactId>
-                <version>1.4.1</version>
+                <version>${maven-enforcer-plugin}</version>
                 <executions>
                     <execution>
                         <id>enforce-maven</id>
@@ -140,13 +150,14 @@
                         <configuration>
                             <rules>
                                 <requireMavenVersion>
-                                    <version>3.0</version>
+                                    <version>${minimum-required-maven-version}</version>
                                 </requireMavenVersion>
                             </rules>
                         </configuration>
                     </execution>
                 </executions>
             </plugin>
+
         </plugins>
     </build>
 
@@ -157,24 +168,28 @@
             <artifactId>maven-jxr-plugin</artifactId>
             <version>2.5</version>
         </dependency>
+
         <!-- For client.login auth crypto -->
         <dependency>
             <groupId>commons-codec</groupId>
             <artifactId>commons-codec</artifactId>
             <version>1.6</version>
         </dependency>
+
         <!-- Socket IO Client -->
         <dependency>
             <groupId>io.socket</groupId>
             <artifactId>socket.io-client</artifactId>
             <version>0.8.3</version>
         </dependency>
+
         <!-- Socket IO Server -->
         <dependency>
             <groupId>com.corundumstudio.socketio</groupId>
             <artifactId>netty-socketio</artifactId>
             <version>1.7.12</version>
         </dependency>
+
         <!-- PostgreSQL Database driver -->
         <dependency>
             <groupId>com.impossibl.pgjdbc-ng</groupId>
@@ -182,6 +197,7 @@
             <version>0.7</version>
             <classifier>complete</classifier>
         </dependency>
+
         <!-- https://mvnrepository.com/artifact/de.jensd/fontawesomefx -->
         <!-- Pretty Fonts and Icons from FontAwesome-->
         <dependency>
@@ -189,40 +205,46 @@
             <artifactId>fontawesomefx</artifactId>
             <version>8.9</version>
         </dependency>
+
         <!-- Unit Testing Framework -->
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.11</version>
         </dependency>
+
         <!-- Gorgeous CSS bindings for JavaFx Objects-->
         <dependency>
             <groupId>org.kordamp.bootstrapfx</groupId>
             <artifactId>bootstrapfx-core</artifactId>
             <version>0.2.1</version>
         </dependency>
+
         <!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-api -->
-        <!-- Loggng Framework -->
+        <!-- Logging Framework -->
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-            <version>1.7.5</version>
+            <version>1.8.0-alpha1</version>
         </dependency>
+
         <!-- add log4j binding to classpath -->
         <!-- routes slf4j calls to log4j -->
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-log4j12</artifactId>
-            <version>1.7.5</version>
+            <version>1.8.0-alpha1</version>
             <scope>runtime</scope>
         </dependency>
+
         <!-- add log4j to classpath -->
         <!-- does the logging -->
         <dependency>
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
-            <version>1.2.16</version>
+            <version>1.2.17</version>
         </dependency>
+
     </dependencies>
 
 </project>

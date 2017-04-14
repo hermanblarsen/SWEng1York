@@ -1,0 +1,134 @@
+<document documentid="sampleinput_69">
+    <documentdetails>
+        <author>Joe Bloggs</author>
+        <version>1.0</version>
+        <documentaspectratio>1.78</documentaspectratio>
+        <description>Sample XML input</description>
+        <tags>sample,xml,input</tags>
+        <groupformat>2</groupformat>
+    </documentdetails>
+    <slideshow>
+        <defaults>
+            <bgcolour>#FF2304</bgcolour>
+            <font>Arial</font>
+            <fontsize>12</fontsize>
+            <fontcolour>#F00D33FF</fontcolour>
+            <graphicscolour>#F40D33FF</graphicscolour>
+            <autoplaymedia>true</autoplaymedia>
+        </defaults>
+        <slide slideid="1">
+            <text elementid ="1" layer="1" visibility="true" startsequence="1" endsequence="-1" duration="20.5">
+                <textcontent>
+                    <h1><b>Slide 1 Text Element 1 Text</b></h1>
+                </textcontent>
+                <xposition>0.12</xposition>
+                <yposition>0.3</yposition>
+                <xsize>0.05</xsize>
+                <ysize>0.6</ysize>
+                <font>Comic Sans</font>
+                <fontsize>12</fontsize>
+                <fontcolour>#EEEEEEFF</fontcolour>
+                <bgcolour>#000000FF</bgcolour>
+                <bordercolour>#ABCDEFFF</bordercolour>
+                <onclickaction>openwebsite</onclickaction>
+                <onclickinfo>https://www.google.no/</onclickinfo>
+                <aspectratiolock>false</aspectratiolock>
+                <elementaspectratio>1.2</elementaspectratio>
+            </text>
+            <text elementid ="2" layer="2" visibility="true" startsequence="2" endsequence="-1">
+                <textcontent>
+                    <h1><b>Slide 1 Text Element 2 Text</b></h1>
+                </textcontent>
+                <xposition>0.12</xposition>
+                <yposition>0.3</yposition>
+                <xsize>0.1</xsize>
+                <ysize>0.4</ysize>
+                <font>Arial</font>
+                <fontsize>12</fontsize>
+                <fontcolour>#EEEEEEFF</fontcolour>
+                <bgcolour>#000000FF</bgcolour>
+                <bordercolour>#ABCDEFFF</bordercolour>
+                <onclickaction>gotoslide</onclickaction>
+                <onclickinfo>3</onclickinfo>
+                <aspectratiolock>true</aspectratiolock>
+                <elementaspectratio>2</elementaspectratio>
+            </text>
+        </slide>
+        <slide slideid="2">
+            <text elementid ="1" layer="1" visibility="true" startsequence="1" endsequence="-1">
+                <textcontent>
+                    <h1>Poop</h1>
+                </textcontent>
+                <xposition>0.12</xposition>
+                <yposition>0.3</yposition>
+                <xsize>0.1</xsize>
+                <ysize>0.4</ysize>
+                <font>Arial</font>
+                <fontsize>12</fontsize>
+                <fontcolour>#EEEEEEFF</fontcolour>
+                <bgcolour>#000000FF</bgcolour>
+                <bordercolour>#ABCDEFFF</bordercolour>
+                <onclickaction>gotoslide</onclickaction>
+                <onclickinfo>3</onclickinfo>
+                <aspectratiolock>true</aspectratiolock>
+                <elementaspectratio>2</elementaspectratio>
+            </text>
+            <text elementid ="2" layer="2" visibility="true" startsequence="2" endsequence="-1">
+                <textcontent>
+                    <h1>On the floor</h1>
+                </textcontent>
+                <xposition>0.12</xposition>
+                <yposition>0.3</yposition>
+                <xsize>0.1</xsize>
+                <ysize>0.4</ysize>
+                <font>Arial</font>
+                <fontsize>12</fontsize>
+                <fontcolour>#EEEEEEFF</fontcolour>
+                <bgcolour>#000000FF</bgcolour>
+                <bordercolour>#ABCDEFFF</bordercolour>
+                <onclickaction>gotoslide</onclickaction>
+                <onclickinfo>3</onclickinfo>
+                <aspectratiolock>true</aspectratiolock>
+                <elementaspectratio>2</elementaspectratio>
+            </text>
+        </slide>
+        <slide slideid="3">
+            <text elementid ="1" layer="1" visibility="true" startsequence="1" endsequence="-1">
+                <textcontent>
+                    <h1>Slide 3</h1>
+                </textcontent>
+                <xposition>0.12</xposition>
+                <yposition>0.3</yposition>
+                <xsize>0.1</xsize>
+                <ysize>0.4</ysize>
+                <font>Arial</font>
+                <fontsize>12</fontsize>
+                <fontcolour>#EEEEEEFF</fontcolour>
+                <bgcolour>#000000FF</bgcolour>
+                <bordercolour>#ABCDEFFF</bordercolour>
+                <onclickaction>gotoslide</onclickaction>
+                <onclickinfo>3</onclickinfo>
+                <aspectratiolock>true</aspectratiolock>
+                <elementaspectratio>2</elementaspectratio>
+            </text>
+            <text elementid ="2" layer="2" visibility="true" startsequence="2" endsequence="-1">
+                <textcontent>
+                    <h1>Finally</h1>
+                </textcontent>
+                <xposition>0.12</xposition>
+                <yposition>0.3</yposition>
+                <xsize>0.1</xsize>
+                <ysize>0.4</ysize>
+                <font>Arial</font>
+                <fontsize>12</fontsize>
+                <fontcolour>#EEEEEEFF</fontcolour>
+                <bgcolour>#000000FF</bgcolour>
+                <bordercolour>#ABCDEFFF</bordercolour>
+                <onclickaction>gotoslide</onclickaction>
+                <onclickinfo>3</onclickinfo>
+                <aspectratiolock>true</aspectratiolock>
+                <elementaspectratio>2</elementaspectratio>
+            </text>
+        </slide>
+    </slideshow>
+</document>

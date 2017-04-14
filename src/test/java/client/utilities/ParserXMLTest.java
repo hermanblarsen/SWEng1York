@@ -31,7 +31,7 @@ public class ParserXMLTest {
     private ArrayList<SlideElement> slideElementArray3;
     private ArrayList<SlideElement> slideElementArray4;
     private ArrayList<SlideElement> slideElementArray2;
-    private String examplePath = "externalResources/sampleXml.xml";
+    private String examplePath = "projectResources/sampleFiles/sampleXml.xml";
 
     @Before
     public void setUp() throws Exception {
@@ -192,7 +192,7 @@ public class ParserXMLTest {
 
     @Test
     public void testFaultyXml(){
-        ParserXML faultyParserXML = new ParserXML("externalResources/faultyTestXml.xml");
+        ParserXML faultyParserXML = new ParserXML("projectResources/sampleFiles/xmlTests/faultyTestXml.xml");
         Presentation faultyPresentation = null;
         logger.info("Testing Faulty XML document: ...");
         faultyPresentation = faultyParserXML.parsePresentation();
@@ -201,7 +201,7 @@ public class ParserXMLTest {
 
     @Test
     public void testEmptyXml(){
-        ParserXML faultyParserXML = new ParserXML("externalResources/emptyTestXml.xml");
+        ParserXML faultyParserXML = new ParserXML("projectResources/sampleFiles/xmlTests/emptyTestXml.xml");
         Presentation faultyPresentation = null;
         logger.info("Testing Empty XML document: ...");
         faultyPresentation = faultyParserXML.parsePresentation();

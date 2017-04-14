@@ -252,8 +252,8 @@ public class VideoElement extends SlideElement{
         //BorderPane.setAlignment(mediaBar, Pos.CENTER);
 
         //Play/Pause Button
-        Image play = new Image("file:externalResources/PLAY_WHITE.png",20,20,true,true);
-        Image pause = new Image("file:externalResources/PAUSE_WHITE.png",20,20,true,true);
+        Image play = new Image("file:projectResources/PLAY_WHITE.png",20,20,true,true);
+        Image pause = new Image("file:projectResources/PAUSE_WHITE.png",20,20,true,true);
         ImageView playPauseButton = new ImageView(play);
         if (autoplay) {
             playPauseButton.setImage(pause);
@@ -270,7 +270,7 @@ public class VideoElement extends SlideElement{
         // mediaBar.getChildren().add(playPauseButton);
 
         //Stop Button
-        Image stop = new Image("file:externalResources/STOP_WHITE.png",20,20,true,true);
+        Image stop = new Image("file:projectResources/STOP_WHITE.png",20,20,true,true);
         ImageView stopButton = new ImageView(stop);
         stopButton.addEventHandler(MouseEvent.MOUSE_CLICKED,evt -> {
             mp.stop();
@@ -324,7 +324,7 @@ public class VideoElement extends SlideElement{
 
         //Fullscreen Button
         //final ToggleButton fullscreenButton = new ToggleButton("Fullscreen");
-        Image fullscreenIcon = new Image("file:externalResources/Fullscreen_NEW.png",20,20,true,true);
+        Image fullscreenIcon = new Image("file:projectResources/Fullscreen_NEW.png",20,20,true,true);
         ImageView fullscreenButton = new ImageView(fullscreenIcon);
         final Rectangle2D initialBounds = new Rectangle2D(mv.getFitWidth(), mv.getFitWidth(), mv.getFitHeight(), mv.getFitWidth());
         fullscreenButton.addEventHandler(MouseEvent.MOUSE_CLICKED,(event) -> {

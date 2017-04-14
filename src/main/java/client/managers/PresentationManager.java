@@ -139,7 +139,7 @@ public abstract class PresentationManager {
         presControls.setStyle("-fx-background-color: #34495e;");
         presControls.setPadding(new Insets(5, 12, 5, 12));
         presControls.setSpacing(5);
-        Image next = new Image("file:externalResources/Right_NEW.png", 30, 30, true, true);
+        Image next = new Image("file:projectResources/Right_NEW.png", 30, 30, true, true);
         ImageView nextButton = new ImageView(next);
         nextButton.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
             controlPresentation(Slide.SLIDE_FORWARD);
@@ -147,14 +147,14 @@ public abstract class PresentationManager {
 
         });
 
-        Image back = new Image("file:externalResources/Left_NEW.png", 30, 30, true, true);
+        Image back = new Image("file:projectResources/Left_NEW.png", 30, 30, true, true);
         ImageView backButton = new ImageView(back);
         backButton.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
             controlPresentation(Slide.SLIDE_BACKWARD);
             slideProgress(myPresentationElement);
         });
 
-        Image fullScreen = new Image("file:externalResources/Fullscreen_NEW.png", 30, 30, true, true);
+        Image fullScreen = new Image("file:projectResources/Fullscreen_NEW.png", 30, 30, true, true);
 
         ImageView fullScreenButton = new ImageView(fullScreen);
 
@@ -170,7 +170,7 @@ public abstract class PresentationManager {
 
         });
 
-        Image questionBubble = new Image("file:externalResources/QM_Filled.png", 30, 30, true, true);
+        Image questionBubble = new Image("file:projectResources/QM_Filled.png", 30, 30, true, true);
         ImageView questionQ = new ImageView(questionBubble);
         questionQ.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
             if (!questionQueueActive) {
@@ -184,7 +184,7 @@ public abstract class PresentationManager {
             }
         });
 
-        Image commentIcon = new Image("file:externalResources/SB_filled.png", 30, 30, true, true);
+        Image commentIcon = new Image("file:projectResources/SB_filled.png", 30, 30, true, true);
         ImageView commentButton = new ImageView(commentIcon);
         commentButton.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
             if (!commentActive) {
