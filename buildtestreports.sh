@@ -1,5 +1,5 @@
 #!/bin/bash
-# Send SureFire Report to my Server for syncing with GDrive (Kacper QA)
+# Send SureFire Report to my(Amrik's) Server for syncing with GDrive (Kacper QA)
 
    echo "Deploying Maven Surefire Test Report to remote server"
    today=`date '+%Y_%m_%d__%H_%M_%S'`;

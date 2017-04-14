@@ -1,30 +1,60 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- This is the maven "Project Object Model"
+        for more info see:
+        -   http://www.vogella.com/tutorials/ApacheMaven/article.html#maven_configurationpom
+        -   https://www.jetbrains.com/help/idea/2017.1/getting-started-with-maven.html
+        -   https://maven.apache.org/guides/introduction/introduction-to-the-pom.html
+        -   http://search.maven.org/
+        -   https://mvnrepository.com/ (search for repos)
+        -   http://maven.apache.org/pom.html#Plugin%5FManagement
+
+        For dependency version control, checks etc., use these commands in terminal
+        -   $ mvn versions:display-dependency-updates
+        -   $ mvn versions:display-plugin-updates
+        -->
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
-    <groupId>com.learningUnLtd</groupId>
-    <artifactId>Hello-JavaFX</artifactId>
+    <groupId>com.I2LP</groupId>
+    <artifactId>edi</artifactId>
     <version>1.0-SNAPSHOT</version>
     <!-- Output to jar format -->
     <packaging>jar</packaging>
+    <name>Edi</name>
+    <description>
+        Edi is a product produced through the SWENG project at the University of York in 2016/17
+    </description>
 
+    <prerequisites>
+        <maven>3.0</maven>
+    </prerequisites>
+
+    <!-- Set some overall versions -->
+    <properties>
+        <maven-compiler-plugin-version>3.6.1</maven-compiler-plugin-version>
+        <maven-assembly-plugin-version>3.0.0</maven-assembly-plugin-version>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+    </properties>
 
     <build>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
+                <version>${maven-compiler-plugin-version}</version>
                 <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
+                    <source>${maven.compiler.source}</source>
+                    <target>${maven.compiler.target}</target>
                 </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
+                <version>${maven-assembly-plugin-version}</version>
                 <executions>
+                    <!-- TODO comment on what this does @Amrik-->
                     <execution>
                         <id>create-my-bundle</id>
                         <phase>package</phase>
@@ -44,8 +74,28 @@
                     </execution>
                 </executions>
             </plugin>
+            <!-- Enforce maven version 3-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <version>1.4.1</version>
+                <executions>
+                    <execution>
+                        <id>enforce-maven</id>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <requireMavenVersion>
+                                    <version>3.0</version>
+                                </requireMavenVersion>
+                            </rules>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
-
     </build>
 
     <dependencies>
@@ -74,13 +124,6 @@
             <version>0.7</version>
             <classifier>complete</classifier>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-api -->
-        <!-- Loggng Framework -->
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <version>1.7.5</version>
-        </dependency>
         <!-- https://mvnrepository.com/artifact/de.jensd/fontawesomefx -->
         <!-- Pretty Fonts and Icons from FontAwesome-->
         <dependency>
@@ -100,6 +143,13 @@
             <artifactId>bootstrapfx-core</artifactId>
             <version>0.2.1</version>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-api -->
+        <!-- Loggng Framework -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.7.5</version>
+        </dependency>
         <!-- add log4j binding to classpath -->
         <!-- routes slf4j calls to log4j -->
         <dependency>
@@ -108,7 +158,6 @@
             <version>1.7.5</version>
             <scope>runtime</scope>
         </dependency>
-
         <!-- add log4j to classpath -->
         <!-- does the logging -->
         <dependency>
@@ -117,12 +166,5 @@
             <version>1.2.16</version>
         </dependency>
     </dependencies>
-
-    <!--<properties>-->
-        <!--<maven.compiler.source>1.8</maven.compiler.source>-->
-        <!--<maven.compiler.target>1.8</maven.compiler.target>-->
-    <!--</properties>-->
-
-
 
 </project>
