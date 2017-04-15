@@ -1,5 +1,6 @@
 package com.i2lp.edi.client.dashboard;
 
+import com.i2lp.edi.client.Constants;
 import com.i2lp.edi.client.editor.PresentationEditor;
 import com.i2lp.edi.client.managers.EdiManager;
 import com.i2lp.edi.client.managers.PresentationManager;
@@ -15,13 +16,11 @@ import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.ScrollPane.ScrollBarPolicy;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.FlowPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
@@ -51,7 +50,7 @@ public abstract class Dashboard extends Application {
     protected Stage primaryStage;
     protected String selectedPresID;
     private ArrayList<PresentationPreviewPanel> previewPanels;
-    private FlowPane presentationsFlowPane;
+    private FlowPane presentationPreviewsFlowPane;
 
     @Override
     public void start(Stage primaryStage) {
@@ -64,11 +63,15 @@ public abstract class Dashboard extends Application {
         scene.getStylesheets().add("bootstrapfx.css");
         primaryStage.setScene(scene);
 
-        previewPanels = new ArrayList<PresentationPreviewPanel>();
+        previewPanels = new ArrayList<>();
 
+        border.setTop(addBorderTop());
+        border.setCenter(addBorderCenter());
+
+        //The following code has to be placed between addBorderCenter() and addBorderLeft()
         int numOfPresentations = 20; //TODO: numOfPresentations to be read from database
         for (int i=0; i<numOfPresentations; i++) {
-            PresentationPreviewPanel previewPanel = new PresentationPreviewPanel();
+            PresentationPreviewPanel previewPanel = new PresentationPreviewPanel(presentationPreviewsFlowPane);
             previewPanel.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
                 if(event.getButton() == MouseButton.PRIMARY) {
                     if (previewPanel.isSelected()) {
@@ -79,7 +82,7 @@ public abstract class Dashboard extends Application {
 
                         previewPanel.setSelected(true);
                         selectedPresID = previewPanel.getPresentationID();
-                        border.setRight(addRightPanel());
+                        border.setRight(addBorderRight());
                     }
                 } else if (event.getButton() == MouseButton.SECONDARY && this instanceof TeacherDashboard) {
                     ContextMenu cMenu = new ContextMenu();
@@ -99,27 +102,25 @@ public abstract class Dashboard extends Application {
             previewPanels.add(previewPanel);
         }
 
-        border.setTop(addBorderTop());
-        border.setLeft(addLeftPanel());
-        border.setCenter(addCenterPanel());
-        border.setRight(addRightPanel());
+        border.setRight(addBorderRight());
+        border.setLeft(addBorderLeft());
 
         primaryStage.show();
     }
 
-    private ScrollPane addCenterPanel() {
+    private ScrollPane addBorderCenter() {
 
-        presentationsFlowPane = new FlowPane(Orientation.HORIZONTAL);
+        presentationPreviewsFlowPane = new FlowPane(Orientation.HORIZONTAL);
 
-        presentationsFlowPane.setPadding(new Insets(5, 0, 5, 0));
-        presentationsFlowPane.setVgap(4);
-        presentationsFlowPane.setHgap(4);
-        presentationsFlowPane.setStyle("-fx-background-color: #ffffff;");
+        presentationPreviewsFlowPane.setPadding(new Insets(5, 0, 5, 0));
+        presentationPreviewsFlowPane.setVgap(4);
+        presentationPreviewsFlowPane.setHgap(4);
+        presentationPreviewsFlowPane.setStyle("-fx-background-color: #ffffff;");
 
         showAllPreviewPanels();
 
         ScrollPane centerPane = new ScrollPane();
-        centerPane.setContent(presentationsFlowPane);
+        centerPane.setContent(presentationPreviewsFlowPane);
         centerPane.setHbarPolicy(ScrollBarPolicy.NEVER);
         centerPane.setFitToWidth(true);
 
@@ -137,12 +138,39 @@ public abstract class Dashboard extends Application {
     private MenuBar addMenuBar() {
         MenuBar menuBar = new MenuBar();
         //Due to travis fails, this couldn't be done in the constructor:
-        menuBar.getMenus().addAll(new Menu("File"),
-                new Menu("Edit"),
-                new Menu("Dogs"),
-                new Menu("Spinach"));
+
+        Menu fileMenu = new Menu("File");
+        Menu editMenu = new Menu("Edit");
+        Menu helpMenu = new Menu("Help");
+        MenuItem aboutMenuItem = new MenuItem("About");
+        aboutMenuItem.setOnAction(event -> showAboutWindow());
+        helpMenu.getItems().add(aboutMenuItem);
+        menuBar.getMenus().addAll(fileMenu, editMenu, helpMenu);
 
         return menuBar;
+    }
+
+    private void showAboutWindow() {
+        Popup aboutPopup = new Popup();
+        StackPane aboutStackPane = new StackPane();
+        aboutPopup.getContent().add(aboutStackPane);
+        Region backgroundRegion = new Region();
+        backgroundRegion.setBackground(new Background(new BackgroundFill(Color.WHITE, null, null)));
+        aboutStackPane.getChildren().add(backgroundRegion);
+        BorderPane aboutBorder = new BorderPane();
+        aboutStackPane.getChildren().add(aboutBorder);
+        ImageView ediLogoImageView = new ImageView(new Image("file:projectResources/edi.png"));
+        ediLogoImageView.setPreserveRatio(true);
+        ediLogoImageView.setSmooth(true);
+        ediLogoImageView.setFitWidth(300);
+        ediLogoImageView.setCache(true);
+        Label aboutLabel = new Label("Edi by I2LP, " + Constants.BUILD_STRING);
+        aboutBorder.setBottom(aboutLabel);
+        aboutBorder.setAlignment(aboutLabel, Pos.CENTER);
+        aboutBorder.setCenter(ediLogoImageView);
+
+        aboutPopup.setAutoHide(true);
+        aboutPopup.show(primaryStage);
     }
 
     /**
@@ -194,51 +222,61 @@ public abstract class Dashboard extends Application {
         return topPanel;
     }
 
-    private VBox addLeftPanel() {
-        VBox vbox = new VBox();
-        vbox.setPadding(new Insets(10));
-        vbox.setSpacing(8);
+    private VBox addBorderLeft() {
+        VBox controlsVBox = new VBox();
+        controlsVBox.setPadding(new Insets(10));
+        controlsVBox.setSpacing(8);
 
-        VBox controlsPane = new VBox();
-        controlsPane.setPadding(new Insets(3, 0, 3, 0));
-        controlsPane.setSpacing(3);
-        controlsPane.setStyle("-fx-background-color: #ffffff;");
+        VBox subjectsVBox = new VBox();
+        subjectsVBox.setPadding(new Insets(3, 0, 3, 0));
+        subjectsVBox.setSpacing(3);
+        subjectsVBox.setStyle("-fx-background-color: #ffffff;");
 
         Label filterBySubjectLabel = new Label("Filter by subject:");
-        controlsPane.getChildren().add(filterBySubjectLabel);
+        subjectsVBox.getChildren().add(filterBySubjectLabel);
 
         Button showAllButton = new Button("Show all");
         showAllButton.getStyleClass().setAll("btn", "btn-success");
         showAllButton.setOnAction(event -> showAllPreviewPanels());
-        controlsPane.getChildren().add(showAllButton);
+        subjectsVBox.getChildren().add(showAllButton);
 
         Button subjectButton1 = new Button("Subject 0");
         subjectButton1.getStyleClass().setAll("btn", "btn-success");
         subjectButton1.setOnAction(event -> filterBySubject(subjectButton1.getText()));
-        controlsPane.getChildren().add(subjectButton1);
+        subjectsVBox.getChildren().add(subjectButton1);
 
         Button subjectButton2 = new Button("Subject 1");
         subjectButton2.getStyleClass().setAll("btn", "btn-success");
         subjectButton2.setOnAction(event -> filterBySubject(subjectButton2.getText()));
-        controlsPane.getChildren().add(subjectButton2);
+        subjectsVBox.getChildren().add(subjectButton2);
 
         Button subjectButton3 = new Button("Subject 2");
         subjectButton3.getStyleClass().setAll("btn", "btn-success");
         subjectButton3.setOnAction(event -> filterBySubject(subjectButton3.getText()));
-        controlsPane.getChildren().add(subjectButton3);
+        subjectsVBox.getChildren().add(subjectButton3);
 
         //Create Panel for subject filters
-        Panel slideControls = new Panel();
-        slideControls.setText("My subjects");
-        slideControls.getStyleClass().add("panel-primary");
-        slideControls.setBody(controlsPane);
-        VBox.setMargin(slideControls, new Insets(0, 0, 0, 0));
-        vbox.getChildren().add(slideControls);
+        Panel subjectsPanel = new Panel("My subjects");
+        subjectsPanel.getStyleClass().add("panel-primary");
+        subjectsPanel.setBody(subjectsVBox);
+        VBox.setMargin(subjectsPanel, new Insets(0, 0, 0, 0));
+        controlsVBox.getChildren().add(subjectsPanel);
 
-        return vbox;
+        Panel sortPanel = new Panel("Sort by");
+        sortPanel.getStyleClass().add("panel-primary");
+        VBox sortVBox = new VBox();
+        ComboBox<String> sortCombo = new ComboBox<>();
+        sortCombo.getItems().addAll("Name A-Z", "Name Z-A", "Subject A-Z", "Subject Z-A");
+        sortCombo.setOnAction(event -> sortBy(sortCombo.getValue()));
+        sortCombo.setValue(sortCombo.getItems().get(0));
+        sortBy(sortCombo.getItems().get(0));
+        sortPanel.setBody(sortCombo);
+        controlsVBox.getChildren().add(sortPanel);
+
+        return controlsVBox;
     }
 
-    private ScrollPane addRightPanel() {
+    private ScrollPane addBorderRight() {
         ScrollPane scroll = new ScrollPane();
 
         FlowPane flow = new FlowPane();
@@ -282,17 +320,40 @@ public abstract class Dashboard extends Application {
     }
 
     private void showAllPreviewPanels() {
-        for (Panel panel : previewPanels)
-            if(!presentationsFlowPane.getChildren().contains(panel))
-                presentationsFlowPane.getChildren().add(panel);
+        presentationPreviewsFlowPane.getChildren().clear();
+
+        for (PresentationPreviewPanel panel : previewPanels)
+            panel.setHidden(false);
     }
 
-    private void filterBySubject(String text) {
+    //TODO: Will this maintain sorting order?
+    private void filterBySubject(String subject) {
         for(PresentationPreviewPanel panel : previewPanels) {
-            if(!text.equals(panel.getPresentationSubject()) && presentationsFlowPane.getChildren().contains(panel))
-                presentationsFlowPane.getChildren().remove(panel);
-            else if(text.equals(panel.getPresentationSubject()) && !presentationsFlowPane.getChildren().contains(panel))
-                presentationsFlowPane.getChildren().add(panel);
+            if(!subject.equals(panel.getPresentationSubject()) && !panel.isHidden())
+                panel.setHidden(true);
+            else if(subject.equals(panel.getPresentationSubject()) && panel.isHidden())
+                panel.setHidden(false);
+        }
+    }
+
+    //The sorting method is pretty ghetto for now, will have to refactor depending on what sorting key we'll allow
+    private void sortBy(String sortKey) {
+        previewPanels.sort((p1, p2) -> {
+            if(sortKey.equals("Name A-Z"))
+                return p1.getPresentationID().compareTo(p2.getPresentationID());
+            else if(sortKey.equals("Name Z-A"))
+                return -p1.getPresentationID().compareTo(p2.getPresentationID());
+            else if(sortKey.equals("Subject A-Z"))
+                return p1.getPresentationSubject().compareTo(p2.getPresentationSubject());
+            else if(sortKey.equals("Subject Z-A"))
+                return -p1.getPresentationSubject().compareTo(p2.getPresentationSubject());
+            else return 0;
+        });
+
+        presentationPreviewsFlowPane.getChildren().clear();
+        for(PresentationPreviewPanel panel : previewPanels) {
+            if(!panel.isHidden())
+                presentationPreviewsFlowPane.getChildren().add(panel);
         }
     }
 

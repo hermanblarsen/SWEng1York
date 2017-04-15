@@ -3,7 +3,10 @@ package com.i2lp.edi.client.dashboard;
 import com.i2lp.edi.client.utilities.ParserXML;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.Pane;
 import org.kordamp.bootstrapfx.scene.layout.Panel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Random;
 import java.util.function.Predicate;
@@ -12,16 +15,20 @@ import java.util.function.Predicate;
  * Created by Kacper on 2017-04-08.
  */
 public class PresentationPreviewPanel extends Panel {
+    protected static Logger logger = LoggerFactory.getLogger(Dashboard.class);
+    private final Pane parentPane;
     private final String presentationPath;
     private final String presentationID;
-
     private final String presentationSubject;
     private boolean isSelected;
+    private boolean isHidden;
 
-    public PresentationPreviewPanel(String presentationPath) {
+    public PresentationPreviewPanel(Pane parentPane, String presentationPath) {
         super();
+        this.parentPane = parentPane;
         this.presentationPath = presentationPath;
-        this.isSelected = false;
+        this.setSelected(false);
+        this.setHidden(false);
         this.getStyleClass().add("panel-primary");
 
         ParserXML parser = new ParserXML(presentationPath);
@@ -46,8 +53,8 @@ public class PresentationPreviewPanel extends Panel {
         this.setFooter(new Label("Subject: " + presentationSubject));
     }
 
-    public PresentationPreviewPanel(){
-        this("file:projectResources/sampleXMLsimple.xml");
+    public PresentationPreviewPanel(Pane parentPane){
+        this(parentPane, "file:projectResources/sampleXMLsimple.xml");
     }
 
     public String getPresentationPath() {
@@ -83,4 +90,19 @@ public class PresentationPreviewPanel extends Panel {
     public String getPresentationID() { return presentationID; }
 
     public String getPresentationSubject() { return presentationSubject; }
+
+    public boolean isHidden() { return isHidden; }
+
+    public void setHidden(boolean hidden) {
+        isHidden = hidden;
+        if(hidden)
+            try {
+                parentPane.getChildren().remove(this);
+            } catch(NullPointerException e) {
+                logger.info("Couldn't hide previewPanel");
+                //Do nothing
+            }
+        else
+            parentPane.getChildren().add(this);
+    }
 }
