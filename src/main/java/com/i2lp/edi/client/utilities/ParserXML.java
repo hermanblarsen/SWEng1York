@@ -387,6 +387,9 @@ public class ParserXML {
                     case "elementaspectratio":
                         textElement.setElementAspectRatio(Float.valueOf(elementContent));
                         break;
+                    case "bordersize":
+                        textElement.setBorderSize(Integer.valueOf(elementContent));
+                        break;
                     default:
                         logger.warn("Text Element Property Name Not Recognised! Name: " + elementName +
                                 ", Value: " + elementContent + ", and XML-Type: " + elementNode.getNodeType());

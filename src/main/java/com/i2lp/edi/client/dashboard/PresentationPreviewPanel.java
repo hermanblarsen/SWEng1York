@@ -67,21 +67,15 @@ public class PresentationPreviewPanel extends Panel {
         isSelected = selected;
 
         if(isSelected) {
-            this.getStyleClass().removeIf(new Predicate<String>() {
-                @Override
-                public boolean test(String s) {
+            this.getStyleClass().removeIf(s -> {
                     if(s.equals("panel-primary")) return true;
                     else return false;
-                }
             });
             this.getStyleClass().add("panel-success");
         } else {
-            this.getStyleClass().removeIf(new Predicate<String>() {
-                @Override
-                public boolean test(String s) {
+            this.getStyleClass().removeIf(s -> {
                     if(s.equals("panel-success")) return true;
                     else return false;
-                }
             });
             this.getStyleClass().add("panel-primary");
         }

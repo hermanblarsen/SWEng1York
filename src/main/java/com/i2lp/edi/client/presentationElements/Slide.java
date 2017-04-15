@@ -1,7 +1,7 @@
 package com.i2lp.edi.client.presentationElements;
 
 import com.i2lp.edi.client.exceptions.SequenceNotFoundException;
-import javafx.scene.layout.StackPane;
+import javafx.scene.layout.Pane;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,7 +12,7 @@ import java.util.List;
  * Created by habl on 23/02/2017.
  */
 @SuppressWarnings({"WeakerAccess", "unused"})
-public class Slide extends StackPane {
+public class Slide extends Pane {
     Logger logger = LoggerFactory.getLogger(Slide.class);
 
     protected List<SlideElement> slideElementList;
@@ -53,7 +53,7 @@ public class Slide extends StackPane {
     public Slide() {
         slideElementList = new ArrayList<>();
         visibleSlideElementList = new ArrayList<>();
-        this.setPickOnBounds(false);
+        //this.setPickOnBounds(false);
     }
 
     public void addElement(int elementIndex, SlideElement newElement) {

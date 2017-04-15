@@ -56,9 +56,11 @@ public abstract class PresentationManager {
      * @param myPresentationElement Presentation within which to assign canvas's
      * @author Amrik Sadhra
      */
-    protected void assignCanvas(Presentation myPresentationElement) {
+    protected void assignAttributes(Presentation myPresentationElement) {
         for (Slide toAssign : myPresentationElement.getSlideList()) {
             for (SlideElement toBeAssigned : toAssign.getSlideElementList()) {
+                toBeAssigned.setSlideID(toAssign.getSlideID());
+                toBeAssigned.setPresentationID(myPresentationElement.getDocumentID());
                 toBeAssigned.setSlideCanvas(toAssign);
             }
         }
@@ -87,7 +89,7 @@ public abstract class PresentationManager {
         myPresentationElement = readPresentationParser.parsePresentation();
         //myPresentationElement = Presentation.generateTestPresentation();     //TEST
 
-        assignCanvas(myPresentationElement);
+        assignAttributes(myPresentationElement);
         mainUI.setCenter(myPresentationElement.getSlide(currentSlideNumber));
 
         //Keyboard listener for moving through presentation
@@ -102,6 +104,7 @@ public abstract class PresentationManager {
         });
     }
 
+    @SuppressWarnings("ConstantConditions")
     private void controlPresentation(int direction) {
         int presentationStatus = slideAdvance(myPresentationElement, direction);
 

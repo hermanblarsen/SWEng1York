@@ -56,7 +56,7 @@ public class Utils {
      * @param bgColor    Desired background colour provided as ARGB hex
      * @return Filename of CSS file that stores the CSS for a given TextElement
      */
-    public static String cssGen(int presentationID, int slideID, int elementID, int fontSize, String font, String fontColour, String bgColor, String borderColour, int borderSize) {
+    public static String cssGen(String presentationID, int slideID, int elementID, int fontSize, String font, String fontColour, String bgColor, String borderColour, int borderSize) {
         File cssFilePath = new File(System.getProperty("java.io.tmpdir") + "Edi/" + "Presentation" + presentationID + "/" + "Slide" + slideID + "Element" + elementID + "format.css");
 
         if (cssFilePath.exists()) {
@@ -76,9 +76,9 @@ public class Utils {
         if(fontSize != 0) lines.add("   font-size: " + fontSize + "px;");
 
         if(borderSize != 0){
-            lines.add("     border-style: solid;");
-            lines.add("     border-width: " + borderSize + "px;");
-            if(borderColour != null) lines.add("    border-color: " + borderColour + ";");
+            lines.add("   border-style: solid;");
+            lines.add("   border-width: " + borderSize + "px;");
+            if(borderColour != null) lines.add("   border-color: " + borderColour + ";");
         }
         lines.add( "}");
 

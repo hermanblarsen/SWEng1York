@@ -9,6 +9,7 @@ import com.i2lp.edi.client.presentationElements.Presentation;
 import com.i2lp.edi.client.presentationViewer.StudentPresentationManager;
 import com.i2lp.edi.client.presentationViewer.TeacherPresentationManager;
 import javafx.application.Application;
+import javafx.event.EventType;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
@@ -153,6 +154,7 @@ public abstract class Dashboard extends Application {
     private void showAboutWindow() {
         Popup aboutPopup = new Popup();
         StackPane aboutStackPane = new StackPane();
+        aboutStackPane.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> aboutPopup.hide());
         aboutPopup.getContent().add(aboutStackPane);
         Region backgroundRegion = new Region();
         backgroundRegion.setBackground(new Background(new BackgroundFill(Color.WHITE, null, null)));

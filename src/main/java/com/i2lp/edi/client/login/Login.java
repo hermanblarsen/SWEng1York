@@ -61,7 +61,7 @@ public class Login extends Application {
         if (!offline) {
             serverConnect();
         } else {
-
+            //TODO do something while offline!
         }
     }
 
@@ -74,12 +74,16 @@ public class Login extends Application {
         gridPane.add(username, 0, 2);
 
         usernameField = new TextField();
+        usernameField.setText("Teacher");
+        usernameField.setOnAction(event -> login(loginStage));
         gridPane.add(usernameField, 1, 2, 2, 1);
 
         Label password = new Label("Password:");
         gridPane.add(password, 0, 3);
 
         passwordField = new PasswordField();
+        passwordField.setText("password");
+        passwordField.setOnAction(event -> login(loginStage));
         gridPane.add(passwordField, 1, 3, 2, 1);
 
         forgotPasswordButton = new Button("Forgot password?");
@@ -96,27 +100,27 @@ public class Login extends Application {
         loginButton.setOnAction((ActionEvent event) -> {
             //TODO: Store this userauth object instead of keeping anonymous.
             String userType = this.verifyLogin(new UserAuth(usernameField.getCharacters().toString(),
-                    passwordField.getCharacters().toString()));
+                                                            passwordField.getCharacters().toString()));
 
-            //Run different dashboards based on user type returned from DB
-            boolean isTeacher = false;
-            loginSuccessful = false;
+        //Run different dashboards based on user type returned from DB
+        boolean isTeacher = false;
+        loginSuccessful = false;
 
-            switch (userType) {
-                case "admin":
-                    loginSuccessful = true;
-                    break;
-                case "teacher":
-                    isTeacher = true;
-                    loginSuccessful = true;
-                    break;
-                case "student":
-                    loginSuccessful = true;
-                    break;
-                case "auth_fail":
-                    loginSuccessful = false;
-                    break;
-            }
+        switch (userType) {
+            case "admin":
+                loginSuccessful = true;
+                break;
+            case "teacher":
+                isTeacher = true;
+                loginSuccessful = true;
+                break;
+            case "student":
+                loginSuccessful = true;
+                break;
+            case "auth_fail":
+                loginSuccessful = false;
+                break;
+        }
 
             if (loginSuccessful) {
                 //If login is successfull, notify ediManager to close login stage and open dashboard.
