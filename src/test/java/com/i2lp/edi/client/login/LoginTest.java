@@ -27,7 +27,7 @@ import static org.testfx.api.FxAssert.verifyThat;
  * Created by habl on 15/04/2017.
  * Project: SWEng1York - Package: com.i2lp.edi.client.login
  */
-
+@Ignore
 public class LoginTest extends ApplicationTest{ //With TestFX environment
 
 //–—public class LoginTest extends Application{ //With JavaFXThreadingRule environment
