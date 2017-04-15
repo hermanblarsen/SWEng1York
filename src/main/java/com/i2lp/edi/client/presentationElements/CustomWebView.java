@@ -1,5 +1,6 @@
 package com.i2lp.edi.client.presentationElements;
 
+import com.sun.webkit.WebPage;
 import javafx.application.Platform;
 import javafx.collections.ListChangeListener;
 import javafx.concurrent.Worker;
@@ -11,27 +12,42 @@ import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import netscape.javascript.JSException;
 
+import java.lang.reflect.Field;
 import java.util.Set;
 
-public final class WebViewFitContent extends Region {
+public final class CustomWebView extends Region {
 
     final WebView webview = new WebView();
     final WebEngine webEngine = webview.getEngine();
     public boolean isReady = false;
 
-    public WebViewFitContent(String content) {
+    public CustomWebView(String content) {
         webview.setPrefHeight(5);
 
         widthProperty().addListener((observable, oldValue, newValue) -> {
             Double width = (Double)newValue;
+            System.out.println("WIDTH CHANGE!" + width);
             webview.setPrefWidth(width);
             adjustHeight();
         });
-
+        
         webview.getEngine().getLoadWorker().stateProperty().addListener((arg0, oldState, newState) -> {
+            //If done rendering, adjust height to fit content, set isReady variable for thumbnail generation
             if (newState == Worker.State.SUCCEEDED) {
                 adjustHeight();
                 isReady = true;
+            }
+            //Set Background of WebView to transparent (using reflection)
+            try {
+                // Use reflection to retrieve the WebEngine's private 'page' field.
+                Field f = webEngine.getClass().getDeclaredField("page");
+                f.setAccessible(true);
+                WebPage page = (WebPage) f.get(webEngine);
+                // Set the background color of the page to be transparent.
+                //page.setBackgroundColor((new java.awt.Color(0, 0, 0, 0)).getRGB());
+                page.setBackgroundColor((new java.awt.Color(255, 255, 255, 0)).getRGB());
+            } catch (Exception e) {
+                System.out.println("Error: " + e);
             }
         });
 
@@ -72,7 +88,7 @@ public final class WebViewFitContent extends Region {
                     webview.setPrefHeight(height);
                     webview.getPrefHeight();
                 }
-            } catch (JSException e) { }
+            } catch (JSException e) {System.out.println("Error:" + e);}
         });
     }
 

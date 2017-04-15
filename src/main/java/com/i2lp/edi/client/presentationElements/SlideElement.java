@@ -13,6 +13,9 @@ public abstract class SlideElement {
     Logger logger = LoggerFactory.getLogger(getClass());
 
     protected float duration;
+    protected int slideID; //Needed for CSS generation, CSS filename needs this to identify what to apply
+
+    protected String presentationID; //Needed for CSS generation
     protected int elementID;
     protected int layer;
     protected boolean visibility;
@@ -148,4 +151,11 @@ public abstract class SlideElement {
         this.onClickInfo = onClickInfo;
     }
 
+    public void setSlideID(int slideID) {
+        this.slideID = slideID;
+    }
+
+    public void setPresentationID(String presentationID) {
+        this.presentationID = presentationID;
+    }
 }

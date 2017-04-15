@@ -19,10 +19,11 @@
         <slide slideid="1">
             <text elementid ="1" layer="1" visibility="true" startsequence="1" endsequence="-1" duration="20.5">
                 <textcontent>
-                    <h1><b>Slide 1 Text Element 1 Text</b></h1>
+                    <p>This is a paragraph.</p>&#13;&#10;
+                    <p>This is another paragraph.</p>
                 </textcontent>
-                <xposition>0.12</xposition>
-                <yposition>0.3</yposition>
+                <xposition>11</xposition>
+                <yposition>12</yposition>
                 <xsize>0.05</xsize>
                 <ysize>0.6</ysize>
                 <font>Comic Sans</font>
@@ -30,6 +31,7 @@
                 <fontcolour>#EEEEEEFF</fontcolour>
                 <bgcolour>#000000FF</bgcolour>
                 <bordercolour>#ABCDEFFF</bordercolour>
+                <bordersize>2</bordersize>
                 <onclickaction>openwebsite</onclickaction>
                 <onclickinfo>https://www.google.no/</onclickinfo>
                 <aspectratiolock>false</aspectratiolock>

@@ -43,7 +43,7 @@ public class ThumbnailGenerationManager extends PresentationManager {
 
         ParserXML readPresentationParser = new ParserXML(path);
         myPresentationElement = readPresentationParser.parsePresentation();
-        assignCanvas(myPresentationElement);
+        assignAttributes(myPresentationElement);
         mainUI.setCenter(myPresentationElement.getSlide(currentSlideNumber));
     }
 
