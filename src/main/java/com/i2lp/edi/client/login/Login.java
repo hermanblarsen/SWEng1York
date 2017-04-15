@@ -58,14 +58,16 @@ public class Login extends Application {
         grid.add(username, 0, 2);
 
         usernameField = new TextField();
-        usernameField.setId("usernameField");
+        usernameField.setText("Teacher");
+        usernameField.setOnAction(event -> login(primaryStage));
         grid.add(usernameField, 1, 2, 2, 1);
 
         Label password = new Label("Password:");
         grid.add(password, 0, 3);
 
         passwordField = new PasswordField();
-        passwordField.setId("passwordField");
+        passwordField.setText("password");
+        passwordField.setOnAction(event -> login(primaryStage));
         grid.add(passwordField, 1, 3, 2, 1);
 
         forgotPasswordButton = new Button("Forgot password?");
@@ -78,46 +80,7 @@ public class Login extends Application {
         loginButton.getStyleClass().setAll("btn", "btn-danger");
         grid.add(loginButton, 1, 5, 1, 1);
 
-        loginButton.setOnAction((ActionEvent event) -> {
-            //TODO: Store this userauth object instead of keeping anonymous.
-            String userType = this.verifyLogin(new UserAuth(usernameField.getCharacters().toString(),
-                                                            passwordField.getCharacters().toString()));
-
-            //Run different dashboards based on user type returned from DB
-            boolean isTeacher = false;
-            loginSuccessful = false;
-
-            switch (userType) {
-                case "admin":
-                    loginSuccessful = true;
-                    break;
-                case "teacher":
-                    isTeacher = true;
-                    loginSuccessful = true;
-                    break;
-                case "student":
-                    loginSuccessful = true;
-                    break;
-                case "auth_fail":
-                    loginSuccessful = false;
-                    break;
-            }
-
-            if (loginSuccessful) {
-                //If login is successfull, notify ediManager to close login stage and open dashboard.
-                ediManager.loginSucceded(isTeacher);
-                try {
-                    this.stop();
-                    primaryStage.close();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    logger.warn("Closing of Login Dialog unsuccessful!");
-                }
-            } else {
-                logger.info("Login unsuccessful");
-                //TODO add colour events and stuff here to notify user of unsuccessful com.i2lp.edi.client.login.
-            }
-        });
+        loginButton.setOnAction((ActionEvent event) -> login(primaryStage));
         primaryStage.show();
     }
 
@@ -125,6 +88,48 @@ public class Login extends Application {
         //Connect to com.i2lp.edi.server
         mySocketClient = new SocketClient("db.amriksadhra.com", 8080);
         ediManager.setClient(mySocketClient);
+    }
+
+    private void login(Stage stage) {
+        //TODO: Store this userauth object instead of keeping anonymous.
+        String userType = this.verifyLogin(new UserAuth(usernameField.getCharacters().toString(),
+                passwordField.getCharacters().toString()));
+
+        //Run different dashboards based on user type returned from DB
+        boolean isTeacher = false;
+        loginSuccessful = false;
+
+        switch (userType) {
+            case "admin":
+                loginSuccessful = true;
+                break;
+            case "teacher":
+                isTeacher = true;
+                loginSuccessful = true;
+                break;
+            case "student":
+                loginSuccessful = true;
+                break;
+            case "auth_fail":
+                loginSuccessful = false;
+                break;
+        }
+
+        if (loginSuccessful) {
+            //If login is successful, notify ediManager to close login stage and open dashboard.
+            ediManager.loginSucceded(isTeacher);
+            try {
+                this.stop();
+                stage.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+                logger.warn("Closing of Login Dialog unsuccessful!");
+            }
+        } else {
+            logger.info("Login unsuccessful");
+            //TODO add colour events and stuff here to notify user of unsuccessful com.i2lp.edi.client.login.
+        }
+
     }
 
     public String verifyLogin(UserAuth userToAuth) {

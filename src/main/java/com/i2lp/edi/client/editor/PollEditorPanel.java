@@ -35,13 +35,19 @@ public class PollEditorPanel extends Panel {
         titleBox.getChildren().add(separatorRegion);
         titleBox.setHgrow(separatorRegion, Priority.ALWAYS);
         Button moveUpButton = new Button("Move up");
+        moveUpButton.getStyleClass().setAll("btn");
+        moveUpButton.getStyleClass().add("btn-primary");
         moveUpButton.setOnAction(event -> moveUp());
         titleBox.getChildren().add(moveUpButton);
         Button moveDownButton = new Button("Move down");
         moveDownButton.setOnAction(event -> moveDown());
+        moveDownButton.getStyleClass().setAll("btn");
+        moveDownButton.getStyleClass().add("btn-primary");
         titleBox.getChildren().add(moveDownButton);
         Button removeButton = new Button("Remove");
         removeButton.setOnAction(event -> parent.getChildren().remove(this));
+        removeButton.getStyleClass().setAll("btn");
+        removeButton.getStyleClass().add("btn-danger");
         titleBox.getChildren().add(removeButton);
         this.setHeading(titleBox);
 
@@ -75,7 +81,8 @@ public class PollEditorPanel extends Panel {
             body.add(answersLabel, 2, 0, 2, 1);
             body.setHalignment(answersLabel, HPos.CENTER);
             addAnswerButton = new Button("Add answer");
-            //addAnswerButton.getStylesheets().setAll("btn", "btn-primary");
+            addAnswerButton.getStyleClass().setAll("btn");
+            addAnswerButton.getStyleClass().add("btn-success");
             addAnswerButton.setOnAction(event -> addAnswer());
             body.add(addAnswerButton, 4, 0);
 
@@ -121,6 +128,8 @@ public class PollEditorPanel extends Panel {
         Button answerRemoveButton = new Button("Remove");
         //answerRemoveButton.getStylesheets().setAll("btn", "btn-danger");
         answerRemoveButton.setOnAction(event -> removeAnswer(answerTextField, answerLabel, answerRemoveButton));
+        answerRemoveButton.getStyleClass().setAll("btn");
+        answerRemoveButton.getStyleClass().add("btn-danger");
         answerRemoveButtons.add(answerRemoveButton);
 
         answerNumber++;
