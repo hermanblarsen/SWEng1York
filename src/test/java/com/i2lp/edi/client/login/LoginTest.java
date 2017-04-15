@@ -139,7 +139,9 @@ public class LoginTest extends ApplicationTest{ //With TestFX environment
         clickOn(passwordField).write("password");
 
         clickOn(loginButton);
-        assertTrue(myLogin.loginSuccessful);
+//        assertTrue(myLogin.loginSuccessful);
+        assertEquals("LoginName", userNameField.getText());
+        assertEquals("password", passwordField.getText());
 
         targetWindow("I2LP").closeCurrentWindow();
     }
