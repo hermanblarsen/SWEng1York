@@ -14,6 +14,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.i2lp.edi.server.SocketClient;
 
+import java.io.IOException;
+import java.net.*;
+
 /**
  * Created by habl on 11/03/2017.
  */
@@ -21,6 +24,8 @@ public class EdiManager extends Application {
     Logger logger = LoggerFactory.getLogger(EdiManager.class);
     private Login loginDialog;
     private SocketClient mySocketClient;
+    private boolean offline = false;
+    private boolean loginSuccessful;
 
     public static void main(String [] args) {
         //Instantiate the ediManager, which will automatically call init() and start(Stage)
@@ -41,10 +46,34 @@ public class EdiManager extends Application {
 
     @Override //Called by launch()
     public void start(Stage primaryStage) throws Exception {
+        //Checking for internet connection: //TODO maybe put on a timer and/or in a thread if not connected? Or maybe just bad idea...
+        verifyInternetAccess();
+
         loginDialog = new Login();
         Stage loginStage = new Stage();
         loginDialog.setEdiManager(this);
+        loginDialog.setOffline(offline);
         loginDialog.start(loginStage);
+    }
+
+    private void verifyInternetAccess() {
+        Socket testSocket = new Socket();
+        InetSocketAddress address = new InetSocketAddress("google.com",80);
+        try {
+            testSocket.connect(address,2000);
+        } catch (IOException e) {
+            logger.info("Offline Mode activated");
+            offline = true;
+        } finally {
+            try {
+                if (!testSocket.isClosed()) testSocket.close();
+                logger.info("Socket for internet access check closed");
+            } catch (IOException e) {
+                logger.warn("IOException when closing socket for internet access check");
+            }
+        }
+
+
     }
 
     //This is called from loginWindow when the user has input valid credentials
@@ -68,8 +97,12 @@ public class EdiManager extends Application {
 
     //Closing down Edi; shutting down sockets
     @Override
-    public void stop() throws Exception {
-            logger.info("Closing com.i2lp.edi.client-side networking ports.");
-            mySocketClient.closeAll();
+    public void stop() {
+        logger.info("Closing client-side networking ports.");
+        if (!offline) mySocketClient.closeAll();
+    }
+
+    public void setOffline(boolean offline) {
+        this.offline = offline;
     }
 }

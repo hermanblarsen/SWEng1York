@@ -183,11 +183,11 @@ public class SocketClient {
             return future.get(LOGIN_TIMEOUT, TimeUnit.SECONDS);
         } catch (TimeoutException e) {
             future.cancel(true);
-            logger.error("Connection to com.i2lp.edi.server timed out.");
+            logger.error("Connection to server timed out."); //TODO if timed out, maybe look for possible fixes (assuming its the socket..?)
         } catch (InterruptedException e) {
-            logger.error("Connection to com.i2lp.edi.server was interrupted.");
+            logger.error("Connection to server was interrupted.");
         } catch (ExecutionException e) {
-            logger.error("Connection to com.i2lp.edi.server failed. (tragically)");
+            logger.error("Connection to server failed. (tragically)");
         }
         //If we hit any of the catch statements
         executor.shutdownNow();

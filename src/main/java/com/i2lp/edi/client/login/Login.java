@@ -9,7 +9,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.control.PasswordField;
-import javafx.scene.layout.Background;
 import javafx.scene.layout.GridPane;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
@@ -24,64 +23,80 @@ import com.i2lp.edi.server.SocketClient;
 
 
 public class Login extends Application {
-    protected EdiManager ediManager;
     protected Logger logger = LoggerFactory.getLogger(Login.class);
+
+    private Stage loginStage;
+    private GridPane gridPane;
+    protected EdiManager ediManager;
     protected SocketClient mySocketClient;
     protected TextField usernameField;
     protected PasswordField passwordField;
     protected Button loginButton;
     protected Button forgotPasswordButton;
-    boolean loginSuccessful;
+
+    protected boolean loginSuccessful = false;
+    protected boolean offline = false;
 
     @Override
-    public void start(Stage primaryStage) {
-        //TODO: Mode switching code depending on online/offline functionality
-        serverConnect();
-        primaryStage.setTitle("I^2LP");
+    public void start(Stage loginStage) {
+        this.loginStage = loginStage;
+        loginStage.setTitle("I2LP");
 
-        GridPane grid = new GridPane();
-        grid.setAlignment(Pos.CENTER);
-        grid.setHgap(10);
-        grid.setVgap(10);
-        grid.setPadding(new Insets(25, 25, 25, 25));
+        gridPane = new GridPane();
+        gridPane.setAlignment(Pos.CENTER);
+        gridPane.setHgap(10);
+        gridPane.setVgap(10);
+        gridPane.setPadding(new Insets(25, 25, 25, 25));
 
-        Scene scene = new Scene(grid, 350, 275);
+        Scene scene = new Scene(gridPane, 350, 275);
         scene.getStylesheets().add("bootstrapfx.css");
-        //setUserAgentStylesheet(STYLESHEET_MODENA);
-        primaryStage.setScene(scene);
+        //setUserAgentStylesheet(STYLESHEET_MODENA); //TODO remove? -herman
+        loginStage.setScene(scene);
 
-        Text scenetitle = new Text("Login");
-        scenetitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
-        grid.add(scenetitle, 0, 0, 2, 1);
+        populateGUI();
+        addActionEvents();
+        loginStage.show();
+
+        //TODO: Mode switching code depending on online/offline functionality
+        if (!offline) {
+            serverConnect();
+        } else {
+
+        }
+    }
+
+    private void populateGUI() {
+        Text sceneTitle = new Text("Login");
+        sceneTitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
+        gridPane.add(sceneTitle, 0, 0, 2, 1);
 
         Label username = new Label("User Name:");
-        grid.add(username, 0, 2);
+        gridPane.add(username, 0, 2);
 
         usernameField = new TextField();
-        usernameField.setId("usernameField");
-        grid.add(usernameField, 1, 2, 2, 1);
+        gridPane.add(usernameField, 1, 2, 2, 1);
 
         Label password = new Label("Password:");
-        grid.add(password, 0, 3);
+        gridPane.add(password, 0, 3);
 
         passwordField = new PasswordField();
-        passwordField.setId("passwordField");
-        grid.add(passwordField, 1, 3, 2, 1);
+        gridPane.add(passwordField, 1, 3, 2, 1);
 
         forgotPasswordButton = new Button("Forgot password?");
-        forgotPasswordButton.setId("forgotPasswordButton");
         forgotPasswordButton.getStyleClass().setAll("btn");
-        grid.add(forgotPasswordButton, 1, 4, 2, 1);
+        gridPane.add(forgotPasswordButton, 1, 4, 2, 1);
 
         loginButton = new Button("Login");
-        loginButton.setId("loginButton");
         loginButton.getStyleClass().setAll("btn", "btn-danger");
-        grid.add(loginButton, 1, 5, 1, 1);
+        loginButton.setDefaultButton(true); //ties enter button to Login button
+        gridPane.add(loginButton, 1, 5, 1, 1);
+    }
 
+    private void addActionEvents() {
         loginButton.setOnAction((ActionEvent event) -> {
             //TODO: Store this userauth object instead of keeping anonymous.
             String userType = this.verifyLogin(new UserAuth(usernameField.getCharacters().toString(),
-                                                            passwordField.getCharacters().toString()));
+                    passwordField.getCharacters().toString()));
 
             //Run different dashboards based on user type returned from DB
             boolean isTeacher = false;
@@ -105,26 +120,32 @@ public class Login extends Application {
 
             if (loginSuccessful) {
                 //If login is successfull, notify ediManager to close login stage and open dashboard.
-                ediManager.loginSucceded(isTeacher);
+                loginSuccessful = true;
                 try {
                     this.stop();
-                    primaryStage.close();
                 } catch (Exception e) {
                     e.printStackTrace();
                     logger.warn("Closing of Login Dialog unsuccessful!");
+                }
+                finally {
+                    ediManager.loginSucceded(isTeacher); //Do this after shutting down the login window.
                 }
             } else {
                 logger.info("Login unsuccessful");
                 //TODO add colour events and stuff here to notify user of unsuccessful com.i2lp.edi.client.login.
             }
         });
-        primaryStage.show();
     }
 
     public void serverConnect() {
-        //Connect to com.i2lp.edi.server
-        mySocketClient = new SocketClient("db.amriksadhra.com", 8080);
-        ediManager.setClient(mySocketClient);
+        if (!offline) {
+            //Connect to com.i2lp.edi.server
+            mySocketClient = new SocketClient("db.amriksadhra.com", 8080);
+            ediManager.setClient(mySocketClient);
+        }
+        else {
+            //TODO figure out what to do when offline
+        }
     }
 
     public String verifyLogin(UserAuth userToAuth) {
@@ -133,5 +154,24 @@ public class Login extends Application {
 
     public void setEdiManager(EdiManager ediManager) {
         this.ediManager = ediManager;
+    }
+
+    public void setOffline(boolean offline) {
+        this.offline = offline;
+    }
+
+    @Override
+    public void stop() {
+        logger.info("Login Stage Closed");
+        loginStage.close();
+        if (!loginSuccessful) {
+            try {
+                ediManager.stop();
+                logger.info("EdiManager Closed");
+            } catch (Exception e) {
+                e.printStackTrace();
+                logger.warn("Exception when closing EdiManager");
+            }
+        }
     }
 }
