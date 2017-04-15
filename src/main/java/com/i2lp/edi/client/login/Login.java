@@ -54,7 +54,6 @@ public class Login extends Application {
         loginStage.setScene(scene);
 
         populateGUI();
-        addActionEvents();
         loginStage.show();
 
         //TODO: Mode switching code depending on online/offline functionality
@@ -75,7 +74,6 @@ public class Login extends Application {
 
         usernameField = new TextField();
         usernameField.setText("Teacher");
-        usernameField.setOnAction(event -> login(loginStage));
         gridPane.add(usernameField, 1, 2, 2, 1);
 
         Label password = new Label("Password:");
@@ -83,7 +81,6 @@ public class Login extends Application {
 
         passwordField = new PasswordField();
         passwordField.setText("password");
-        passwordField.setOnAction(event -> login(loginStage));
         gridPane.add(passwordField, 1, 3, 2, 1);
 
         forgotPasswordButton = new Button("Forgot password?");
@@ -91,16 +88,20 @@ public class Login extends Application {
         gridPane.add(forgotPasswordButton, 1, 4, 2, 1);
 
         loginButton = new Button("Login");
+        loginButton.setOnAction((ActionEvent event) -> {
+            if (!offline) login();
+            else ;//TODO decide what to do if offline
+        });
         loginButton.getStyleClass().setAll("btn", "btn-danger");
         loginButton.setDefaultButton(true); //ties enter button to Login button
         gridPane.add(loginButton, 1, 5, 1, 1);
     }
 
-    private void addActionEvents() {
-        loginButton.setOnAction((ActionEvent event) -> {
-            //TODO: Store this userauth object instead of keeping anonymous.
-            String userType = this.verifyLogin(new UserAuth(usernameField.getCharacters().toString(),
-                                                            passwordField.getCharacters().toString()));
+    private void login() {
+        //TODO: Store this userauth object instead of keeping anonymous.
+
+        String userType = this.verifyLogin(new UserAuth(usernameField.getCharacters().toString(),
+                passwordField.getCharacters().toString()));
 
         //Run different dashboards based on user type returned from DB
         boolean isTeacher = false;
@@ -122,24 +123,24 @@ public class Login extends Application {
                 break;
         }
 
-            if (loginSuccessful) {
-                //If login is successfull, notify ediManager to close login stage and open dashboard.
-                loginSuccessful = true;
-                try {
-                    this.stop();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    logger.warn("Closing of Login Dialog unsuccessful!");
-                }
-                finally {
-                    ediManager.loginSucceded(isTeacher); //Do this after shutting down the login window.
-                }
-            } else {
-                logger.info("Login unsuccessful");
-                //TODO add colour events and stuff here to notify user of unsuccessful com.i2lp.edi.client.login.
+        if (loginSuccessful) {
+            //If login is successfull, notify ediManager to close login stage and open dashboard.
+            loginSuccessful = true;
+            try {
+                this.stop();
+            } catch (Exception e) {
+                e.printStackTrace();
+                logger.warn("Closing of Login Dialog unsuccessful!");
             }
-        });
+            finally {
+                ediManager.loginSucceded(isTeacher); //Do this after shutting down the login window.
+            }
+        } else {
+            logger.info("Login unsuccessful");
+            //TODO add colour events and stuff here to notify user of unsuccessful login.
+        }
     }
+
 
     public void serverConnect() {
         if (!offline) {

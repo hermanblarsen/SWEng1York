@@ -47,6 +47,7 @@ public class EdiManager extends Application {
     @Override //Called by launch()
     public void start(Stage primaryStage) throws Exception {
         //Checking for internet connection: //TODO maybe put on a timer and/or in a thread if not connected? Or maybe just bad idea...
+        //TODO put recurrent connections tries on timer? -Herman
         verifyInternetAccess();
 
         loginDialog = new Login();
@@ -72,8 +73,6 @@ public class EdiManager extends Application {
                 logger.warn("IOException when closing socket for internet access check");
             }
         }
-
-
     }
 
     //This is called from loginWindow when the user has input valid credentials
