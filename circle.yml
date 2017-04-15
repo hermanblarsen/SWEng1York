@@ -4,3 +4,8 @@ test:
   post:
     - ./post-build.sh
 
+deployment:
+  production:
+    branch: master
+    commands:
+      - ./deploy_prod.sh

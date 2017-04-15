@@ -23,7 +23,6 @@ public class TextElement extends SlideElement {
     protected String fontColour;
     protected String bgColour;
 
-
     private int borderSize;
     protected String borderColour;
 
