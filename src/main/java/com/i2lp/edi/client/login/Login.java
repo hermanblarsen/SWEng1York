@@ -33,13 +33,6 @@ public class Login extends Application {
     protected Button forgotPasswordButton;
     boolean loginSuccessful;
 
-    //----------- IF YOU'RE NOT ON THE DATABASE TEAM, SET THIS VARIABLE TO FALSE TO BYPASS THE SERVER STUFF -----------------
-    private static final boolean AM_I_ON_DB_TEAM = false;
-
-    public static void main(String[] args) {
-        launch(args); //For testing purposes
-    }
-
     @Override
     public void start(Stage primaryStage) {
         //TODO: Mode switching code depending on online/offline functionality
@@ -129,17 +122,13 @@ public class Login extends Application {
     }
 
     public void serverConnect() {
-        if (AM_I_ON_DB_TEAM) {
-            //Connect to com.i2lp.edi.server
-            mySocketClient = new SocketClient("db.amriksadhra.com", 8080);
-            ediManager.setClient(mySocketClient, AM_I_ON_DB_TEAM);
-        }
+        //Connect to com.i2lp.edi.server
+        mySocketClient = new SocketClient("db.amriksadhra.com", 8080);
+        ediManager.setClient(mySocketClient);
     }
 
     public String verifyLogin(UserAuth userToAuth) {
-        if (AM_I_ON_DB_TEAM) {
-            return mySocketClient.userAuth(userToAuth);
-        } else return "teacher";
+        return mySocketClient.userAuth(userToAuth);
     }
 
     public void setEdiManager(EdiManager ediManager) {

@@ -40,7 +40,7 @@ public class SocketClient {
     Socket socket;
 
     public static void main(String[] args) {
-        new SocketClient("127.0.0.1", 8080);
+        new SocketClient("db.amriksadhra.com", 8080);
     }
 
     public SocketClient(String serverIP, int serverPort) {
@@ -50,7 +50,7 @@ public class SocketClient {
         connectToRemoteDB();
     }
 
-    public void connectToRemoteDB(){
+    public void connectToRemoteDB() {
         //Connect to PostgreSQL Instance
         dataSource = new PGDataSource();
         dataSource.setHost("db.amriksadhra.com");
@@ -60,13 +60,13 @@ public class SocketClient {
         dataSource.setPassword("group1SWENG");
 
         try (PGConnection connection = (PGConnection) dataSource.getConnection()) {
-            logger.info("Successful connection from com.i2lp.edi.client to PostgreSQL database instance");
+            logger.info("Successful connection from client to PostgreSQL database instance");
         } catch (Exception e) {
             logger.error("Unable to connect to PostgreSQL on port 5432. PJDBC dump:", e);
         }
     }
 
-    public void addResponse(int presentation_id, int question_id, String data){
+    public void addResponse(int presentation_id, int question_id, String data) {
         //Attempt to add a user
         try (PGConnection connection = (PGConnection) dataSource.getConnection()) {
             Statement statement = connection.createStatement();
@@ -80,7 +80,7 @@ public class SocketClient {
 
             logger.info("Adding response to database using SQL: " + sb.toString());
             statement.execute(sb.toString());
-            //Let com.i2lp.edi.client know whether their operation was successful
+            //Let client know whether their operation was successful
             //TODO: Do what the comment above says
             statement.close();
         } catch (Exception e) {
@@ -95,10 +95,14 @@ public class SocketClient {
         try {
             socket = IO.socket(serverIPAddress);
         } catch (URISyntaxException e) {
-            logger.error("Couldn't create com.i2lp.edi.client port");
+            logger.error("Couldn't create client port: May be in use by other program!");
         }
 
-        socket.on(Socket.EVENT_CONNECT, args -> logger.info("Client connected! Spitting bars.")).on("DB_Update", args -> {
+        socket.on(Socket.EVENT_CONNECT, args -> {
+            logger.info("Client successfully connected to Edi Server");
+        });
+
+        socket.on("DB_Update", args -> {
             logger.info("Client knows DB has updated:  " + args[0]);
             //Pull fresh table
             updateLocalTables(args[0]);
@@ -113,6 +117,7 @@ public class SocketClient {
     /**
      * The main controller for remote database updates. We can act appropriately based upon what has updated remotely.
      * e.g. Live responses to the current presentation can be used to update current graph object on slide.
+     *
      * @param tableToUpdate Table that has been updated on Server
      * @author Amrik Sadhra
      */
@@ -151,7 +156,7 @@ public class SocketClient {
             logger.info("Adding response to database using SQL: " + sb.toString());
             ResultSet rs = statement.executeQuery(sb.toString());
 
-            while(rs.next()){
+            while (rs.next()) {
                 logger.info(rs.getString("data"));
             }
 
@@ -164,6 +169,7 @@ public class SocketClient {
     /**
      * Calls userAuthAsync function but with a LOGIN_TIMEOUT second timeout. If we hit timeout, return false, else wait for com.i2lp.edi.server
      * to respond with response.
+     *
      * @param toAuth User details to authenticate
      * @return String containing user_type of authenticated user.
      * @author Amrik Sadhra
@@ -191,6 +197,7 @@ public class SocketClient {
     /**
      * Calls userAddAsync function but with a ADDITION_TIMEOUT second timeout. If we hit timeout, return false, else wait for com.i2lp.edi.server
      * to respond with response.
+     *
      * @param toAdd User details to add
      * @return Generated login name for users supplied details
      * @author Amrik Sadhra
@@ -218,7 +225,7 @@ public class SocketClient {
     class UserAuthTask implements Callable<String> {
         UserAuth toAuth;
 
-        public UserAuthTask(UserAuth toAuth){
+        public UserAuthTask(UserAuth toAuth) {
             this.toAuth = toAuth;
         }
 
@@ -231,7 +238,7 @@ public class SocketClient {
     class UserAddTask implements Callable<String> {
         User toAdd;
 
-        public UserAddTask(User toAdd){
+        public UserAddTask(User toAdd) {
             this.toAdd = toAdd;
         }
 
@@ -250,7 +257,7 @@ public class SocketClient {
      */
     public String userAuthAsync(UserAuth toAuth) {
         //Ensure atomic write to variable, bypassing Lambda final restriction
-        AtomicReference<String> loginSuccessFinal = new  AtomicReference<>("no_response");
+        AtomicReference<String> loginSuccessFinal = new AtomicReference<>("no_response");
 
         JSONObject obj = new JSONObject();
         try {
@@ -271,8 +278,8 @@ public class SocketClient {
         }
 
         //Spinlock method until the com.i2lp.edi.server has responded, and changed the value of the success variable
-        while(loginSuccessFinal.get().equals("no_response")){
-            logger.debug("JVM optimises out empty while loops. Waiting for com.i2lp.edi.server response.");
+        while (loginSuccessFinal.get().equals("no_response")) {
+            logger.debug("JVM optimises out empty while loops. Waiting for server response.");
         }
 
         //Return the string holding the user_type
@@ -315,7 +322,7 @@ public class SocketClient {
         }
 
         //Spinlock method until the com.i2lp.edi.server has responded, and changed the value of the success variable
-        while(additionSuccessFinal.get().equals("no_response")){
+        while (additionSuccessFinal.get().equals("no_response")) {
             logger.debug("JVM optimises out empty while loops. Waiting for com.i2lp.edi.server response.");
         }
 
@@ -347,7 +354,7 @@ public class SocketClient {
         }
     }
 
-    public void closeAll(){
+    public void closeAll() {
         try {
             dataSource.getConnection().close();
         } catch (SQLException e) {
