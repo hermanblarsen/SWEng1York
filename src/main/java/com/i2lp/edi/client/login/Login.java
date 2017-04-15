@@ -26,8 +26,12 @@ import com.i2lp.edi.server.SocketClient;
 public class Login extends Application {
     protected EdiManager ediManager;
     protected Logger logger = LoggerFactory.getLogger(Login.class);
-    SocketClient mySocketClient;
-    protected GridPane grid;
+    protected SocketClient mySocketClient;
+    protected TextField usernameField;
+    protected PasswordField passwordField;
+    protected Button loginButton;
+    protected Button forgotPasswordButton;
+    boolean loginSuccessful;
 
     //----------- IF YOU'RE NOT ON THE DATABASE TEAM, SET THIS VARIABLE TO FALSE TO BYPASS THE SERVER STUFF -----------------
     private static final boolean AM_I_ON_DB_TEAM = false;
@@ -42,7 +46,7 @@ public class Login extends Application {
         serverConnect();
         primaryStage.setTitle("I^2LP");
 
-        grid = new GridPane();
+        GridPane grid = new GridPane();
         grid.setAlignment(Pos.CENTER);
         grid.setHgap(10);
         grid.setVgap(10);
@@ -60,27 +64,27 @@ public class Login extends Application {
         Label username = new Label("User Name:");
         grid.add(username, 0, 2);
 
-        TextField usernameField = new TextField();
+        usernameField = new TextField();
         usernameField.setId("usernameField");
         grid.add(usernameField, 1, 2, 2, 1);
 
         Label password = new Label("Password:");
         grid.add(password, 0, 3);
 
-        PasswordField passwordField = new PasswordField();
+        passwordField = new PasswordField();
         passwordField.setId("passwordField");
         grid.add(passwordField, 1, 3, 2, 1);
 
-        Button forgotPasswordButton = new Button("Forgot password?");
+        forgotPasswordButton = new Button("Forgot password?");
         forgotPasswordButton.setId("forgotPasswordButton");
         forgotPasswordButton.getStyleClass().setAll("btn");
         grid.add(forgotPasswordButton, 1, 4, 2, 1);
 
-        //SQL Authentication wanted here
-        Button loginButton = new Button("Login");
+        loginButton = new Button("Login");
         loginButton.setId("loginButton");
         loginButton.getStyleClass().setAll("btn", "btn-danger");
         grid.add(loginButton, 1, 5, 1, 1);
+
         loginButton.setOnAction((ActionEvent event) -> {
             //TODO: Store this userauth object instead of keeping anonymous.
             String userType = this.verifyLogin(new UserAuth(usernameField.getCharacters().toString(),
@@ -88,7 +92,7 @@ public class Login extends Application {
 
             //Run different dashboards based on user type returned from DB
             boolean isTeacher = false;
-            boolean loginSuccessful = false;
+            loginSuccessful = false;
 
             switch (userType) {
                 case "admin":

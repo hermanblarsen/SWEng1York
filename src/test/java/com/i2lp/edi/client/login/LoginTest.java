@@ -43,15 +43,17 @@ public class LoginTest extends ApplicationTest{ //With TestFX environment
     * */
 
     //Elements on the GUI:
-    final String LOGIN = "Login";
+    private static Pane pane;
+    private Parent moduleUnderTest;
 
     private TextField userNameField;
     private PasswordField passwordField;
     private Button loginButton;
-    private Parent moduleUnderTest;
+    private Button forgotPasswordButton;
+
+
     private EdiManager ediManager;
     private static Login myLogin;
-    private static Pane pane;
 
 
     /*
@@ -111,35 +113,36 @@ public class LoginTest extends ApplicationTest{ //With TestFX environment
         return lookup(query).query();
     }
 
-
     @Before
     public void setUp() {
-        userNameField = find("usernameField");
-//        userNameField = find(".usernameField");
-//        userNameField = find("#usernameField");
-    }
-
-    @Test //(expected = FxRobotException.class)
-    public void testTest() {
-        clickOn("usernameField").write("123");
-        assertEquals(123, find("usernameField").getAccessibleText());
-    }
-
-    /*
-    @Test
-    public void serverConnect() {
-
+        userNameField = myLogin.usernameField;
+        passwordField = myLogin.passwordField;
+        forgotPasswordButton = myLogin.forgotPasswordButton;
+        loginButton = myLogin.loginButton;
     }
 
     @Test
-    public void verifyLogin() {
+    public void usernameTest() {
+        clickOn(userNameField).write("123");
+        assertEquals("123", userNameField.getText());
     }
 
     @Test
-    public void setEdiManager() {
-
+    public void passwordTest() {
+        clickOn(passwordField).write("123");
+        assertEquals("123", passwordField.getText());
     }
-    */
+
+    @Test
+    public void loginTest() {
+        clickOn(userNameField).write("LoginName");
+        clickOn(passwordField).write("password");
+
+        clickOn(loginButton);
+        assertTrue(myLogin.loginSuccessful);
+
+        targetWindow("I2LP").closeCurrentWindow();
+    }
 
     @After
     public void tearDown()  {
@@ -151,5 +154,4 @@ public class LoginTest extends ApplicationTest{ //With TestFX environment
         release(new KeyCode[]{});
         release(new MouseButton[]{});
     }
-
 }

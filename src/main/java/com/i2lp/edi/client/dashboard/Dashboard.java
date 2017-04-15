@@ -57,7 +57,7 @@ public abstract class Dashboard extends Application {
     public void start(Stage primaryStage) {
         this.primaryStage = primaryStage;
         //Initialise UI
-        primaryStage.setTitle("I^2LP");
+        primaryStage.setTitle("I2LP");
 
         border = new BorderPane();
         scene = new Scene(border, 1000, 600);

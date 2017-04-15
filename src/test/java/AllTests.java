@@ -9,9 +9,12 @@ import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
-@SuiteClasses({ com.i2lp.edi.client.utilities.ParserXMLTest.class,
-                VideoElementOLDTest.class,
-                com.i2lp.edi.client.utilities.GraphicElementTest.class })
+@SuiteClasses({
+        com.i2lp.edi.client.utilities.ParserXMLTest.class,
+        com.i2lp.edi.client.utilities.VideoElementOLDTest.class,
+        com.i2lp.edi.client.utilities.GraphicElementTest.class,
+        com.i2lp.edi.client.login.LoginTest.class
+})
 public class AllTests {
 
 }
