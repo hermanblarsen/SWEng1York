@@ -5,6 +5,7 @@ import com.corundumstudio.socketio.listener.ConnectListener;
 import com.corundumstudio.socketio.listener.DataListener;
 import com.corundumstudio.socketio.listener.DisconnectListener;
 import com.i2lp.edi.client.Constants;
+import com.i2lp.edi.client.utilities.Utils;
 import com.impossibl.postgres.api.jdbc.PGConnection;
 import com.impossibl.postgres.api.jdbc.PGNotificationListener;
 import com.impossibl.postgres.jdbc.PGDataSource;
@@ -13,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import com.i2lp.edi.server.packets.User;
 import com.i2lp.edi.server.packets.UserAuth;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
@@ -47,7 +49,7 @@ public class SocketServer {
 
     public void startSocket(String socketHostName, int serverPort) {
         //Startup Socket.IO Server so can pump update events to clients
-        logger.info("Attempting to start up Socket.IO com.i2lp.edi.server on port " + serverPort);
+        logger.info("Attempting to start up Socket.IO server on port " + Utils.buildIPAddress(socketHostName, serverPort));
 
         Configuration config = new Configuration();
         config.setHostname(socketHostName);
@@ -58,7 +60,7 @@ public class SocketServer {
             @Override
             public void onConnect(SocketIOClient socketIOClient) {
                 myClients.add(socketIOClient);
-                logger.info("Connection from com.i2lp.edi.client UUID: " + socketIOClient.getSessionId());
+                logger.info("Connection from client UUID: " + socketIOClient.getSessionId());
             }
         });
 
@@ -77,24 +79,21 @@ public class SocketServer {
 
                 //Attempt to add a user using stored procedure
                 try (PGConnection connection = (PGConnection) dataSource.getConnection()) {
-                    Statement statement = connection.createStatement();
+                    PreparedStatement statement = connection.prepareStatement("select edi.public.sp_adduser(?, ?, ?, ?, ?, ?);");
 
-                    StringBuilder sb = new StringBuilder();
+                    //Fill prepared statements to avoid SQL injection
+                    statement.setString(1, data.getFirstName());
+                    statement.setString(2, data.getSecondName());
+                    statement.setString(3, data.getEmailAddress());
+                    statement.setString(4, data.getPassword());
+                    statement.setString(5, data.getUserType());
+                    statement.setInt(6, 1);//TODO: Add proper classID
 
                     //Call stored procedure on database
-                    sb.append("select edi.public.sp_adduser(");
-                    sb.append("'").append(data.getFirstName()).append("',");
-                    sb.append("'").append(data.getSecondName()).append("',");
-                    sb.append("'").append(data.getEmailAddress()).append("',");
-                    sb.append("'").append(data.getPassword()).append("',");
-                    sb.append("'").append(data.getUserType()).append("',");
-                    sb.append(1).append(");"); //TODO: Add proper classID
+                    ResultSet rs = statement.executeQuery();
 
-                    logger.info("Adding user to database using SQL: " + sb.toString());
-                    ResultSet rs = statement.executeQuery(sb.toString());
-
-                    while(rs.next()) {
-                        generatedLoginName =  rs.getString("sp_adduser");
+                    while (rs.next()) {
+                        generatedLoginName = rs.getString("sp_adduser");
                         logger.info("Generated login name from SQL database: " + generatedLoginName);
                     }
 
@@ -115,14 +114,18 @@ public class SocketServer {
                 String userType = "no_response";
 
                 try (PGConnection connection = (PGConnection) dataSource.getConnection()) {
-                    Statement statement = connection.createStatement();
+                    PreparedStatement statement = connection.prepareStatement("SELECT (f).auth_result_return, (f).user_type_return FROM (SELECT edi.public.sp_authuser(? , ?) AS f) AS x;");
 
-                    //Auth Test
-                    ResultSet authStatus = statement.executeQuery(     "SELECT (f).auth_result_return, (f).user_type_return FROM (SELECT edi.public.sp_authuser('" + data.getUserToLogin() + "', '" + data.getPassword() + "') as f) AS x;");
+                    //Fill prepared statements to avoid SQL injection
+                    statement.setString(1, data.getUserToLogin());
+                    statement.setString(2, data.getPassword());
+
+                    //Call stored procedure on database
+                    ResultSet authStatus = statement.executeQuery();
 
                     while (authStatus.next()) {
                         if (authStatus.getBoolean("auth_result_return")) {
-                            logger.info("User " + data.getUserToLogin() + " successfully logged in! Time to let the com.i2lp.edi.client know.");
+                            logger.info("User " + data.getUserToLogin() + " successfully logged in! Time to let the client know.");
                         }
                         userType = authStatus.getString("user_type_return");
                     }

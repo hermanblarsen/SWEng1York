@@ -48,7 +48,6 @@ public class TextElement extends SlideElement {
 
     @Override
     public void setupElement() {
-        Text lol = new Text("Banana");
         //I moved this to a separate method that can be called whenever it is instantiated/Updated.
         //  Maybe surround this with try-catch statements as well as it has potential to go bad if we are not careful. - Herman
         browser = new WebView();

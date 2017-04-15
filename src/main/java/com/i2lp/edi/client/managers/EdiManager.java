@@ -21,11 +21,15 @@ public class EdiManager extends Application {
     Logger logger = LoggerFactory.getLogger(EdiManager.class);
     private Login loginDialog;
     private SocketClient mySocketClient;
-    private boolean isDBTeam;
 
     public static void main(String [] args) {
         //Instantiate the ediManager, which will automatically call init() and start(Stage)
         launch(args);
+    }
+
+    //Temporary, so that edimanager can close the ports and prevent port-in-use errors on next execution
+    public void setClient(SocketClient mySocketClient){
+        this.mySocketClient = mySocketClient;
     }
 
     //Initialising Edi, possibly gathering information about the system and storing that locally
@@ -43,14 +47,7 @@ public class EdiManager extends Application {
         loginDialog.start(loginStage);
     }
 
-    //Temporary, so that edimanager can close the ports and prevent port-in-use errors on next execution
-    //TODO remove when not needed
-    public void setClient(SocketClient mySocketClient, boolean isDBTeam){
-        this.mySocketClient = mySocketClient;
-        this.isDBTeam = isDBTeam;
-    }
-
-    //This is called from login when the user has input valid credentials
+    //This is called from loginWindow when the user has input valid credentials
     public void loginSucceded(boolean isTeacher) {
         logger.info("Login succeeded");
         Stage dashboardStage = new Stage();
@@ -72,9 +69,7 @@ public class EdiManager extends Application {
     //Closing down Edi; shutting down sockets
     @Override
     public void stop() throws Exception {
-        if(isDBTeam) {
             logger.info("Closing com.i2lp.edi.client-side networking ports.");
             mySocketClient.closeAll();
-        }
     }
 }
