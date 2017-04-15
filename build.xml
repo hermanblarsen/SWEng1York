@@ -26,6 +26,7 @@
             <format property="timestamp" pattern="yyyy-MM-dd HH:mm:ss"/>
         </tstamp>
 
+        <!--suppress AntResolveInspection -->
         <replaceregexp file="${src}/main/java/com/i2lp/edi/client/Constants.java"
                        match="private\s+static\s+final\s+String\s+BUILD_NUMBER\s+=\s+&quot;.*&quot;;"
                        replace="private static final String BUILD_NUMBER = &quot;${build-number-actual}&quot;;"
@@ -38,6 +39,7 @@
                        byline="true"
         />
 
+        <!--suppress AntResolveInspection -->
         <replaceregexp file="./pom.xml"
                        match="&lt;artifactId&gt;edi&lt;/artifactId&gt;&lt;version&gt;.*&lt;/version&gt;"
                        replace="&lt;artifactId&gt;edi&lt;/artifactId&gt;&lt;version&gt;0.${build-number-actual}&lt;/version&gt;"

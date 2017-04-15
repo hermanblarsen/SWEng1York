@@ -24,7 +24,6 @@ import java.util.ArrayList;
 @SuppressWarnings("Convert2Lambda")
 public class SocketServer {
     private Logger logger = LoggerFactory.getLogger(SocketServer.class);
-    private int serverPort;
     SocketIOServer server;
     Thread dbPoller;
 
@@ -39,20 +38,19 @@ public class SocketServer {
         new SocketServer("db.amriksadhra.com", 8080);
     }
 
-    public SocketServer(String dbHostName, int serverPort) {
-        this.serverPort = serverPort;
+    public SocketServer(String hostName, int serverPort) {
         logger.info("EDI Server " + Constants.BUILD_STRING);
-        connectToLocalDB(dbHostName);
-        startSocket();
 
+        connectToLocalDB(hostName);
+        startSocket(hostName, serverPort);
     }
 
-    public void startSocket() {
+    public void startSocket(String socketHostName, int serverPort) {
         //Startup Socket.IO Server so can pump update events to clients
         logger.info("Attempting to start up Socket.IO com.i2lp.edi.server on port " + serverPort);
 
         Configuration config = new Configuration();
-        config.setHostname("localhost");
+        config.setHostname(socketHostName);
         config.setPort(serverPort);
 
         server = new SocketIOServer(config);

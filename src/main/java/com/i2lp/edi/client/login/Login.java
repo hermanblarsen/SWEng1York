@@ -25,7 +25,7 @@ public class Login extends Application {
     SocketClient mySocketClient;
 
     //----------- IF YOU'RE NOT ON THE DATABASE TEAM, SET THIS VARIABLE TO FALSE TO BYPASS THE SERVER STUFF -----------------
-    private static final boolean AM_I_ON_DB_TEAM = false;
+    private static final boolean AM_I_ON_DB_TEAM = true;
 
 
     @Override
@@ -113,7 +113,7 @@ public class Login extends Application {
     public void serverConnect() {
         if (AM_I_ON_DB_TEAM) {
             //Connect to com.i2lp.edi.server
-            mySocketClient = new SocketClient("127.0.0.1", 8080);
+            mySocketClient = new SocketClient("db.amriksadhra.com", 8080);
             ediManager.setClient(mySocketClient, AM_I_ON_DB_TEAM);
         }
     }

@@ -2,5 +2,5 @@
 
 test:
   post:
-    - ./buildtestreports.sh
+    - ./post-build.sh
 

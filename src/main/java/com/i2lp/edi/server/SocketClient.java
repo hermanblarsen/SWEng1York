@@ -44,7 +44,7 @@ public class SocketClient {
     }
 
     public SocketClient(String serverIP, int serverPort) {
-        serverIPAddress = Utils.buildIPAddress("127.0.0.1", serverPort);
+        serverIPAddress = Utils.buildIPAddress(serverIP, serverPort);
 
         connectToRemoteSocket();
         connectToRemoteDB();
