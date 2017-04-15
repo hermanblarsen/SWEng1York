@@ -30,7 +30,7 @@ public final class CustomWebView extends Region {
             webview.setPrefWidth(width);
             adjustHeight();
         });
-        
+
         webview.getEngine().getLoadWorker().stateProperty().addListener((arg0, oldState, newState) -> {
             //If done rendering, adjust height to fit content, set isReady variable for thumbnail generation
             if (newState == Worker.State.SUCCEEDED) {
