@@ -173,7 +173,7 @@ public class SocketClient {
         Future<String> future = executor.submit(new UserAuthTask(toAuth));
 
         try {
-            logger.info("Attempting loginWindow of User: " + toAuth.getUserToLogin());
+            logger.info("Attempting login of User: " + toAuth.getUserToLogin());
             return future.get(LOGIN_TIMEOUT, TimeUnit.SECONDS);
         } catch (TimeoutException e) {
             future.cancel(true);
@@ -192,7 +192,7 @@ public class SocketClient {
      * Calls userAddAsync function but with a ADDITION_TIMEOUT second timeout. If we hit timeout, return false, else wait for com.i2lp.edi.server
      * to respond with response.
      * @param toAdd User details to add
-     * @return Generated loginWindow name for users supplied details
+     * @return Generated login name for users supplied details
      * @author Amrik Sadhra
      */
     public String userAdd(User toAdd) {
@@ -261,7 +261,7 @@ public class SocketClient {
                 if (!(objects[0]).equals("auth_fail")) {
                     logger.info("User " + toAuth.getUserToLogin() + " has successfully logged in");
                 } else {
-                    logger.error("Incorrect username/password for loginWindow.");
+                    logger.error("Incorrect username/password for login.");
                 }
 
                 loginSuccessFinal.set((String) objects[0]);
@@ -319,7 +319,7 @@ public class SocketClient {
             logger.debug("JVM optimises out empty while loops. Waiting for com.i2lp.edi.server response.");
         }
 
-        //Return the loginWindow name generated com.i2lp.edi.server side
+        //Return the login name generated com.i2lp.edi.server side
         return additionSuccessFinal.get();
     }
 

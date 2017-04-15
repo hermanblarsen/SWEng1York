@@ -1,11 +1,15 @@
-package com.i2lp.edi.client.loginWindow;
+package com.i2lp.edi.client.login;
 
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
+import javafx.scene.control.PasswordField;
+import javafx.scene.layout.Background;
 import javafx.scene.layout.GridPane;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
@@ -20,13 +24,17 @@ import com.i2lp.edi.server.SocketClient;
 
 
 public class Login extends Application {
-    private EdiManager ediManager;
-    private Logger logger = LoggerFactory.getLogger(Login.class);
+    protected EdiManager ediManager;
+    protected Logger logger = LoggerFactory.getLogger(Login.class);
     SocketClient mySocketClient;
+    protected GridPane grid;
 
     //----------- IF YOU'RE NOT ON THE DATABASE TEAM, SET THIS VARIABLE TO FALSE TO BYPASS THE SERVER STUFF -----------------
-    private static final boolean AM_I_ON_DB_TEAM = true;
+    private static final boolean AM_I_ON_DB_TEAM = false;
 
+    public static void main(String[] args) {
+        launch(args); //For testing purposes
+    }
 
     @Override
     public void start(Stage primaryStage) {
@@ -34,7 +42,7 @@ public class Login extends Application {
         serverConnect();
         primaryStage.setTitle("I^2LP");
 
-        GridPane grid = new GridPane();
+        grid = new GridPane();
         grid.setAlignment(Pos.CENTER);
         grid.setHgap(10);
         grid.setVgap(10);
@@ -49,29 +57,34 @@ public class Login extends Application {
         scenetitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
         grid.add(scenetitle, 0, 0, 2, 1);
 
-        Label userName = new Label("User Name:");
-        grid.add(userName, 0, 2);
+        Label username = new Label("User Name:");
+        grid.add(username, 0, 2);
 
-        TextField userTextField = new TextField();
-        grid.add(userTextField, 1, 2, 2, 1);
+        TextField usernameField = new TextField();
+        usernameField.setId("usernameField");
+        grid.add(usernameField, 1, 2, 2, 1);
 
         Label password = new Label("Password:");
         grid.add(password, 0, 3);
 
         PasswordField passwordField = new PasswordField();
+        passwordField.setId("passwordField");
         grid.add(passwordField, 1, 3, 2, 1);
 
-        Button forgotPassword = new Button("Forgot password?");
-        forgotPassword.getStyleClass().setAll("btn");
-        grid.add(forgotPassword, 1, 4, 2, 1);
+        Button forgotPasswordButton = new Button("Forgot password?");
+        forgotPasswordButton.setId("forgotPasswordButton");
+        forgotPasswordButton.getStyleClass().setAll("btn");
+        grid.add(forgotPasswordButton, 1, 4, 2, 1);
 
         //SQL Authentication wanted here
         Button loginButton = new Button("Login");
+        loginButton.setId("loginButton");
         loginButton.getStyleClass().setAll("btn", "btn-danger");
         grid.add(loginButton, 1, 5, 1, 1);
         loginButton.setOnAction((ActionEvent event) -> {
             //TODO: Store this userauth object instead of keeping anonymous.
-            String userType = this.verifyLogin(new UserAuth(userTextField.getCharacters().toString(), passwordField.getCharacters().toString()));
+            String userType = this.verifyLogin(new UserAuth(usernameField.getCharacters().toString(),
+                                                            passwordField.getCharacters().toString()));
 
             //Run different dashboards based on user type returned from DB
             boolean isTeacher = false;
@@ -94,17 +107,18 @@ public class Login extends Application {
             }
 
             if (loginSuccessful) {
+                //If login is successfull, notify ediManager to close login stage and open dashboard.
                 ediManager.loginSucceded(isTeacher);
                 try {
                     this.stop();
                     primaryStage.close();
                 } catch (Exception e) {
                     e.printStackTrace();
-                    logger.error("Closing of Login Dialog unsuccessful!");
+                    logger.warn("Closing of Login Dialog unsuccessful!");
                 }
             } else {
                 logger.info("Login unsuccessful");
-                //TODO add colour events and stuff here to notify user of unsuccessful com.i2lp.edi.client.loginWindow.
+                //TODO add colour events and stuff here to notify user of unsuccessful com.i2lp.edi.client.login.
             }
         });
         primaryStage.show();

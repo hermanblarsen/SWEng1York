@@ -3,7 +3,7 @@ package com.i2lp.edi.client.managers;
 
 import com.i2lp.edi.client.dashboard.StudentDashboard;
 import com.i2lp.edi.client.dashboard.TeacherDashboard;
-import com.i2lp.edi.client.loginWindow.Login;
+import com.i2lp.edi.client.login.Login;
 
 
 import javafx.application.Application;
@@ -28,12 +28,6 @@ public class EdiManager extends Application {
         launch(args);
     }
 
-    //Temporary, so that edimanager can close the ports and prevent port-in-use errors on next execution
-    public void setClient(SocketClient mySocketClient, boolean isDBTeam){
-        this.mySocketClient = mySocketClient;
-        this.isDBTeam = isDBTeam;
-    }
-
     //Initialising Edi, possibly gathering information about the system and storing that locally
     //No stages or scenes in this method. Called by launch()
     @Override
@@ -49,12 +43,19 @@ public class EdiManager extends Application {
         loginDialog.start(loginStage);
     }
 
-    //This is called from loginWindow when the user has input valid credentials
+    //Temporary, so that edimanager can close the ports and prevent port-in-use errors on next execution
+    //TODO remove when not needed
+    public void setClient(SocketClient mySocketClient, boolean isDBTeam){
+        this.mySocketClient = mySocketClient;
+        this.isDBTeam = isDBTeam;
+    }
+
+    //This is called from login when the user has input valid credentials
     public void loginSucceded(boolean isTeacher) {
         logger.info("Login succeeded");
         Stage dashboardStage = new Stage();
 
-        //Additional com.i2lp.edi.client.loginWindow stuff
+        //Additional com.i2lp.edi.client.login stuff
         if (isTeacher) {
             logger.info("Teacher Dashboard Opened");
             TeacherDashboard teacherDashboard = new TeacherDashboard();
