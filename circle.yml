@@ -1,5 +1,9 @@
 #info at http://circleci.com/docs/1.0/configuration/
 
+dependencies:
+  override:
+    - mvn --fail-never dependency:go-offline || true
+
 test:
   post:
     - ./post-build.sh
