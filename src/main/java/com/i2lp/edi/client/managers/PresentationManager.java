@@ -8,7 +8,9 @@ import com.i2lp.edi.client.presentationElements.SlideElement;
 import com.i2lp.edi.client.utilities.ParserXML;
 import javafx.animation.FadeTransition;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.image.Image;
@@ -18,9 +20,14 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
+import javafx.scene.text.Text;
 import javafx.scene.web.HTMLEditor;
+import javafx.scene.web.WebEngine;
+import javafx.scene.web.WebView;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import org.kordamp.bootstrapfx.scene.layout.Panel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,6 +52,9 @@ public abstract class PresentationManager {
     protected Stage presentationStage;
     protected Boolean elementClicked = false;
     protected HTMLEditor he = new HTMLEditor();
+    protected VBox commentEditor;
+    protected Panel commentView;
+    protected String comment = "";
 
     public int currentSlideNumber = 0; //Current slide number in presentation
 
@@ -79,7 +89,12 @@ public abstract class PresentationManager {
 
         pb = new ProgressBar(0);
         slideNumber = new Label("Slide 1 of " + myPresentationElement.getSlideList().size());
-        border.setBottom(addPresentationControls(presentationStage));
+
+        createCommentView();
+        createCommentEditor();
+        VBox bottomPane = new VBox();
+        bottomPane.getChildren().addAll(commentView, addPresentationControls(presentationStage));
+        border.setBottom(bottomPane);
     }
 
     public void loadPresentation(BorderPane mainUI, String path) {
@@ -126,14 +141,28 @@ public abstract class PresentationManager {
     protected abstract void questionQueueFunction();
 
     protected void commentFunction() {
-        he.setMaxWidth(650);
         if(!elementClicked) {
-            border.setRight(he);
+            border.setRight(commentEditor);
             elementClicked = true;
         }else{
-            border.getChildren().remove(he);
+            border.getChildren().remove(commentEditor);
             elementClicked = false;
         }
+    }
+
+    protected void createCommentView() {
+        WebView webV = new WebView();
+        WebEngine webE = webV.getEngine();
+        webE.loadContent(comment);
+
+        commentView = new Panel("Comments");
+        commentView.getStyleClass().add("panel-primary");
+        commentView.setBody(webV);
+        commentView.setMaxHeight(150);
+    }
+
+    protected void createCommentEditor() {
+
     }
 
     public HBox addPresentationControls(Stage primaryStage) {

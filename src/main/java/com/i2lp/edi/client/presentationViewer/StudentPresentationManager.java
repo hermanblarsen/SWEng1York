@@ -4,6 +4,8 @@ import com.i2lp.edi.client.managers.PresentationManager;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.image.Image;
@@ -11,8 +13,12 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Text;
 import javafx.scene.web.HTMLEditor;
+import javafx.scene.web.WebEngine;
+import javafx.scene.web.WebView;
 import javafx.stage.Stage;
 
 
@@ -66,5 +72,38 @@ public class StudentPresentationManager extends PresentationManager {
         questionQueueStage.show();
     }
 
+    @Override
+    protected void createCommentEditor() {
+        he.setMaxWidth(Double.MAX_VALUE);
+
+        Button saveButton = new Button("Save Locally");
+        saveButton.getStyleClass().setAll("btn", "btn-default");
+        saveButton.setOnAction(event -> {
+            comment = he.getHtmlText();
+            WebView webV = new WebView();
+            WebEngine webE = webV.getEngine();
+            webE.loadContent(comment);
+            commentView.setBody(webV);
+        });
+
+        Button submitButton = new Button("Submit To Lecturer");
+        submitButton.getStyleClass().setAll("btn", "btn-default");
+        submitButton.setOnAction(event -> commentSubmitFunction());
+
+        HBox controlBox = new HBox();
+        controlBox.setStyle("-fx-background-color: #34495e;");
+        controlBox.setPadding(new Insets(5, 12, 5, 12));
+        controlBox.setSpacing(12);
+        controlBox.setMaxWidth(Double.MAX_VALUE);
+        controlBox.getChildren().addAll(saveButton, submitButton);
+
+        commentEditor = new VBox();
+        commentEditor.setMaxSize(600, 600);
+        commentEditor.getChildren().addAll(he, controlBox);
+    }
+
+    protected void commentSubmitFunction(){
+        System.out.print("Not yet implemented");
+    }
 }
 
