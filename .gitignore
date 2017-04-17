@@ -6,6 +6,9 @@
 .idea/workspace.xml
 .idea/tasks.xml
 
+# Program Specific stuff:
+*.log
+
 # Sensitive or high-churn files:
 .idea/dataSources/
 .idea/dataSources.ids

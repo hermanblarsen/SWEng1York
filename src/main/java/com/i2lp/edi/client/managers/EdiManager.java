@@ -78,6 +78,7 @@ public class EdiManager extends Application {
     //This is called from loginWindow when the user has input valid credentials
     public void loginSucceded(boolean isTeacher) {
         logger.info("Login succeeded");
+        loginSuccessful = true;
         Stage dashboardStage = new Stage();
 
         //Additional com.i2lp.edi.client.login stuff
@@ -99,9 +100,5 @@ public class EdiManager extends Application {
     public void stop() {
         logger.info("Closing client-side networking ports.");
         if (!offline) mySocketClient.closeAll();
-    }
-
-    public void setOffline(boolean offline) {
-        this.offline = offline;
     }
 }
