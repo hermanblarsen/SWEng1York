@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+# LOG4J logfile and console properties, see
+#   - http://logging.apache.org/log4j/1.2/apidocs/org/apache/log4j/Level.html
+#   - https://www.mkyong.com/logging/log4j-log4j-properties-examples/
+#   - https://www.tutorialspoint.com/log4j/log4j_configuration.html
+https://logging.apache.org/log4j/2.x/manual/configuration.html
+#   - https://logging.apache.org/log4j/2.x/manual/migration.html
+#   - https://logging.apache.org/log4j/2.x/log4j-users-guide.pdf page 35 esp.
+# Logging level:
+#   - FATAL: shows messages at a FATAL level only
+#   - ERROR: Shows messages classified as ERROR and FATAL
+#   - WARNING: Shows messages classified as WARNING, ERROR, and FATAL
+#   - INFO: Shows messages classified as INFO, WARNING, ERROR, and FATAL
+#   - DEBUG: Shows messages classified as DEBUG, INFO, WARNING, ERROR, and FATAL
+#   - TRACE : Shows messages classified as TRACE,DEBUG, INFO, WARNING, ERROR, and FATAL
+#   - ALL : Shows messages classified as TRACE,DEBUG, INFO, WARNING, ERROR, and FATAL
+#   - OFF : No log messages display
+-->
+
+<!--Configuration of LOG4j2! -->
+
+<Configuration status="WARN"> <!--LOG4j2 error log! -->
+
+    <Properties>
+        <Property name="InfoFileName">target/logs/InfoLog-$${date:MM-dd-yyyy}.log</Property>
+        <Property name="WarnFileName">target/logs/WarnLog_0-$${date:MM-dd-yyyy}.log</Property>
+        <Property name="DebugFileName">target/logs/DebugLog-$${date:MM-dd-yyyy}.log</Property>
+        <Property name="SimplePattern">%d{yyyy-MM-dd HH:mm:ss,SSS}ms %rms \t %-5p [%c{1}:%L] - %m%n</Property>
+        <Property name="DebugPattern">%d{yyyy-MM-dd HH:mm:ss,SSS}ms %rms \t %-5p [%t] [%c{1}:%L] - %m%n</Property>
+    </Properties>
+
+    <Appenders>
+        <File name="InfoFile" fileName="${InfoFileName}">
+            <PatternLayout>
+                <Pattern>${SimplePattern}</Pattern>
+            </PatternLayout>
+        </File>
+        <File name="WarnFile" fileName="${WarnFileName}">
+            <PatternLayout>
+                <Pattern>${SimplePattern}</Pattern>
+            </PatternLayout>
+        </File>
+        <RollingFile name="DebugFile" fileName="${DebugFileName}"
+                     filePattern="target/logs/DebugLog_%i-$${date:MM-dd-yyyy}.log">>
+            <PatternLayout>
+                <Pattern>${DebugPattern}</Pattern>
+            </PatternLayout>
+            <Policies>
+                <SizeBasedTriggeringPolicy size="10 MB" />
+            </Policies>
+        </RollingFile>
+        <Console name="STDOUT" target="SYSTEM_OUT">
+            <PatternLayout>
+                <Pattern>${SimplePattern}</Pattern>
+            </PatternLayout>
+        </Console>
+    </Appenders>
+
+    <Loggers>
+        <Root level="trace">
+            <AppenderRef ref="InfoFile" level="INFO"/>
+            <AppenderRef ref="WarnFile" level="WARN"/>
+            <AppenderRef ref="DebugFile" level="DEBUG"/>
+            <AppenderRef ref="STDOUT" level="INFO"/>
+        </Root>
+    </Loggers>
+</Configuration>

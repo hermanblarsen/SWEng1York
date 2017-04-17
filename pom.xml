@@ -17,7 +17,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.I2LP</groupId>
-    <artifactId>edi</artifactId><version>0.22</version>
+    <artifactId>edi</artifactId><version>0.25</version>
 
     <name>Edi</name>
     <description>
@@ -31,14 +31,14 @@
     <!-- Set some overall versions -->
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <minimum-required-maven-version>3.0</minimum-required-maven-version>
         <maven-compiler-plugin-version>3.6.1</maven-compiler-plugin-version>
         <maven-assembly-plugin-version>3.0.0</maven-assembly-plugin-version>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
-        <maven-antrun-plugin>1.7</maven-antrun-plugin>
-        <maven-jar-plugin>2.3.1</maven-jar-plugin>
+        <maven-antrun-plugin>1.8</maven-antrun-plugin>
+        <maven-jar-plugin>3.0.2</maven-jar-plugin>
         <maven-enforcer-plugin>1.4.1</maven-enforcer-plugin>
-        <minimum-required-maven-version>3.0</minimum-required-maven-version>
     </properties>
 
     <!-- Remove XREF warning in build progress -->
@@ -181,7 +181,7 @@
         <dependency>
             <groupId>commons-codec</groupId>
             <artifactId>commons-codec</artifactId>
-            <version>1.9</version> <!-- updated from 1.6 to 1.9 -->
+            <version>1.10</version> <!-- updated from 1.6 to 1.10 -->
         </dependency>
 
         <!-- Socket IO Client -->
@@ -202,7 +202,7 @@
         <dependency>
             <groupId>com.impossibl.pgjdbc-ng</groupId>
             <artifactId>pgjdbc-ng</artifactId>
-            <version>0.7</version>
+            <version>0.7.1</version>
             <classifier>complete</classifier>
         </dependency>
 
@@ -252,24 +252,43 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-            <version>1.8.0-alpha1</version>
+            <version>1.7.24</version> <!-- 1.8.0-alpha1 or 1.7.24 ?? -->
         </dependency>
 
         <!-- add log4j binding to classpath -->
         <!-- routes slf4j calls to log4j -->
-        <dependency>
+        <!--<dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-log4j12</artifactId>
             <version>1.8.0-alpha1</version>
+           <!- <exclusions>
+                <exclusion>
+                    <groupId>log4j</groupId>
+                    <artifactId>log4j</artifactId>
+                </exclusion>
+            </exclusions>
             <scope>runtime</scope>
-        </dependency>
-
-        <!-- add log4j to classpath -->
-        <!-- does the logging -->
+        </dependency> -->
+        <!-- add a newer log4j binding to classpath -->
+        <!-- routes slf4j calls to log4j.
+        Doesn't work as it requires  "ServiceLoader mechanism". The slf4j-log4j12
+        adds log4j1.2, which is why it works... -->
         <dependency>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
-            <version>1.2.17</version>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-slf4j-impl</artifactId>
+            <version>2.8.2</version>
+        </dependency>
+        <!-- hhttps://logging.apache.org/log4j/2.x/index.html -->
+        <!-- newer and better Logging Backend -->
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-api</artifactId>
+            <version>2.8.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-core</artifactId>
+            <version>2.8.2</version>
         </dependency>
 
     </dependencies>

@@ -7,6 +7,7 @@
 .idea/tasks.xml
 
 # Program Specific stuff:
+#Logs
 *.log
 
 # Sensitive or high-churn files:

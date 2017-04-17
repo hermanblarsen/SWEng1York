@@ -68,7 +68,7 @@ public class EdiManager extends Application {
         } finally {
             try {
                 if (!testSocket.isClosed()) testSocket.close();
-                logger.info("Socket for internet access check closed");
+                logger.debug("Socket for internet access check closed");
             } catch (IOException e) {
                 logger.warn("IOException when closing socket for internet access check");
             }
