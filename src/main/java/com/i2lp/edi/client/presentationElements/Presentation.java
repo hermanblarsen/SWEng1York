@@ -275,6 +275,7 @@ public class Presentation extends Pane {
         answers.add(3,"ANS 4");
         poll.setPossibleAnswers(answers);
         poll.setPollQuestion("HERE IS A SAMPLE QUESTION!");
+        poll.setTimeLimit(15);
 
         poll.setLayer(6);
         poll.setStartSequence(9);
