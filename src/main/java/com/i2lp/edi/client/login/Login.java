@@ -4,12 +4,16 @@ import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.geometry.Side;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.control.PasswordField;
-import javafx.scene.layout.GridPane;
+import javafx.scene.effect.DropShadow;
+import javafx.scene.image.Image;
+import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
@@ -20,6 +24,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.i2lp.edi.server.packets.UserAuth;
 import com.i2lp.edi.server.SocketClient;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class Login extends Application {
@@ -40,7 +47,10 @@ public class Login extends Application {
     @Override
     public void start(Stage loginStage) {
         this.loginStage = loginStage;
-        loginStage.setTitle("I2LP");
+        loginStage.setTitle("Edi Login Dialog");
+        Image ediLogoSmall = new Image("file:projectResources/general/EdiLogo.png"); //TODO make a smaller version (16x16, 32x32, 64x64
+        loginStage.getIcons().add(ediLogoSmall);
+
 
         gridPane = new GridPane();
         gridPane.setAlignment(Pos.CENTER);
@@ -48,10 +58,34 @@ public class Login extends Application {
         gridPane.setVgap(10);
         gridPane.setPadding(new Insets(25, 25, 25, 25));
 
-        Scene scene = new Scene(gridPane, 350, 275);
+        ArrayList<BackgroundImage> backgroundImageList = new ArrayList<BackgroundImage>();
+        Image ediLogo = new Image("file:projectResources/general/EdiLogo.png");
+        Image i2lpLogo = new Image("file:projectResources/general/I2LPLogo.png");
+        backgroundImageList.add(new BackgroundImage(ediLogo,
+                BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT,
+                new BackgroundPosition(Side.RIGHT, 0, true,
+                                        Side.TOP, 0.5, true),
+                new BackgroundSize(BackgroundSize.AUTO, BackgroundSize.AUTO,
+                                false, false,
+                                true, false)));
+        backgroundImageList.add(new BackgroundImage(i2lpLogo,
+                BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT,
+                BackgroundPosition.DEFAULT,
+                new BackgroundSize(BackgroundSize.AUTO, BackgroundSize.AUTO,
+                        false, false,
+                        true, false)));
+        ArrayList<BackgroundFill> backgroundFillList = new ArrayList<BackgroundFill>();
+        backgroundFillList.add(new BackgroundFill(Color.DARKGRAY, CornerRadii.EMPTY, Insets.EMPTY));
+        gridPane.setBackground(new Background(backgroundFillList, backgroundImageList));
+
+        Scene scene = new Scene(gridPane, 800, 275); //TODO originally: 350, 275
+        //sets the stylesheet to https://github.com/aalmiray/bootstrapfx, giving us access to various premade CSS styles.
+        //More available on https://docs.oracle.com/javase/8/javafx/api/javafx/scene/doc-files/cssref.html
+        //IMprove looks: https://docs.oracle.com/javase/8/javafx/visual-effects-tutorial/effect-types.htm
         scene.getStylesheets().add("bootstrapfx.css");
         //setUserAgentStylesheet(STYLESHEET_MODENA); //TODO remove? -herman
         loginStage.setScene(scene);
+        loginStage.setResizable(true); //After setting scene //TODO set false
 
         populateGUI();
         loginStage.show();
@@ -65,36 +99,53 @@ public class Login extends Application {
     }
 
     private void populateGUI() {
-        Text sceneTitle = new Text("Login");
-        sceneTitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
-        gridPane.add(sceneTitle, 0, 0, 2, 1);
+        DropShadow titleDropShadow = new DropShadow();
+        titleDropShadow.setRadius(5.0);
+        titleDropShadow.setOffsetX(3.0);
+        titleDropShadow.setOffsetY(3.0);
+        titleDropShadow.setColor(Color.AZURE);
 
-        Label username = new Label("User Name:");
-        gridPane.add(username, 0, 2);
+        Text sceneTitle = new Text("Login");
+        sceneTitle.getStyleClass().setAll("h1", "text-primary");
+        sceneTitle.setEffect(titleDropShadow);
+        gridPane.add(sceneTitle, 2, 0, 3, 1);
+
+        Background labelBackground = new Background(new BackgroundFill(Color.BEIGE,
+               new CornerRadii(3, false), new Insets(-6,-5,-6,-115)));
 
         usernameField = new TextField();
         usernameField.setText("Teacher");
-        gridPane.add(usernameField, 1, 2, 2, 1);
-
-        Label password = new Label("Password:");
-        gridPane.add(password, 0, 3);
+        usernameField.setBackground(labelBackground);
+        gridPane.add(usernameField, 2, 2, 3, 1);
 
         passwordField = new PasswordField();
         passwordField.setText("password");
-        gridPane.add(passwordField, 1, 3, 2, 1);
+        passwordField.setBackground(labelBackground);
+        gridPane.add(passwordField, 2, 3, 3, 1);
+
+        Label username = new Label("User Name:");
+        username.getStyleClass().setAll("h4");
+//        username.setBackground(labelBackground);
+        gridPane.add(username, 0, 2, 2, 1);
+
+        Label password = new Label("Password:");
+        password.getStyleClass().setAll("h4");
+//        password.setBackground(labelBackground);
+        gridPane.add(password, 0, 3, 2, 1);
 
         forgotPasswordButton = new Button("Forgot password?");
         forgotPasswordButton.getStyleClass().setAll("btn");
         gridPane.add(forgotPasswordButton, 1, 4, 2, 1);
 
         loginButton = new Button("Login");
+        loginButton.getStyleClass().setAll("btn", "btn-primary");
+        loginButton.setDefaultButton(true); //ties enter button to Login button
+
         loginButton.setOnAction((ActionEvent event) -> {
             if (!offline) login();
             else ;//TODO decide what to do if offline
         });
-        loginButton.getStyleClass().setAll("btn", "btn-danger");
-        loginButton.setDefaultButton(true); //ties enter button to Login button
-        gridPane.add(loginButton, 1, 5, 1, 1);
+        gridPane.add(loginButton, 2, 5, 2, 1);
     }
 
     private void login() {

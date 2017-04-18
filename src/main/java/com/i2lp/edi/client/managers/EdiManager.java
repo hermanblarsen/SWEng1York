@@ -7,6 +7,7 @@ import com.i2lp.edi.client.login.Login;
 
 
 import javafx.application.Application;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
 
@@ -50,6 +51,8 @@ public class EdiManager extends Application {
         //TODO put recurrent connections tries on timer? -Herman
         verifyInternetAccess();
 
+
+
         loginDialog = new Login();
         Stage loginStage = new Stage();
         loginDialog.setEdiManager(this);
@@ -63,7 +66,7 @@ public class EdiManager extends Application {
         try {
             testSocket.connect(address,2000);
         } catch (IOException e) {
-            logger.info("Offline Mode activated");
+            logger.info("You are not connected to the WWW. Offline Mode activated");
             offline = true;
         } finally {
             try {

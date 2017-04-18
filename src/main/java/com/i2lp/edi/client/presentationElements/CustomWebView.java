@@ -11,11 +11,14 @@ import javafx.scene.layout.Region;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import netscape.javascript.JSException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Field;
 import java.util.Set;
 
 public final class CustomWebView extends Region {
+    Logger logger = LoggerFactory.getLogger(CustomWebView.class);
 
     final WebView webview = new WebView();
     final WebEngine webEngine = webview.getEngine();
@@ -26,7 +29,7 @@ public final class CustomWebView extends Region {
 
         widthProperty().addListener((observable, oldValue, newValue) -> {
             Double width = (Double)newValue;
-            System.out.println("WIDTH CHANGE!" + width);
+            logger.info("WIDTH CHANGE!" + width);
             webview.setPrefWidth(width);
             adjustHeight();
         });
@@ -68,7 +71,6 @@ public final class CustomWebView extends Region {
             Platform.runLater(() -> adjustHeight());
         });
     }
-
 
     @Override
     protected void layoutChildren() {

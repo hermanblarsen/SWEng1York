@@ -279,7 +279,7 @@ public class SocketClient {
 
         //Spinlock method until the com.i2lp.edi.server has responded, and changed the value of the success variable
         while (loginSuccessFinal.get().equals("no_response")) {
-            logger.debug("JVM optimises out empty while loops. Waiting for server response.");
+            logger.trace("JVM optimises out empty while loops, hence this.. Waiting for server response.");
         }
 
         //Return the string holding the user_type
@@ -323,7 +323,7 @@ public class SocketClient {
 
         //Spinlock method until the com.i2lp.edi.server has responded, and changed the value of the success variable
         while (additionSuccessFinal.get().equals("no_response")) {
-            logger.debug("JVM optimises out empty while loops. Waiting for com.i2lp.edi.server response.");
+            logger.trace("JVM optimises out empty while loops. Waiting for com.i2lp.edi.server response.");
         }
 
         //Return the login name generated com.i2lp.edi.server side
