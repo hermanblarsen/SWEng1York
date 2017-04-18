@@ -52,6 +52,7 @@ public class GraphicElement extends SlideElement {
         graphicShape.setStrokeWidth(LINE_THICKNESS);
 
         wrapperPane.getChildren().add(graphicShape);
+        getCoreNode().setPickOnBounds(false);
     }
 
     @Override

@@ -103,6 +103,7 @@ public class VideoElement extends SlideElement{
             mp.setOnReady(() -> mediaPane.setMaxSize(mv.getFitWidth(), mv.getFitHeight()));
             mediaPane.getChildren().add(mediaControl());
         }
+        getCoreNode().setPickOnBounds(false);
     }
 
     @Override

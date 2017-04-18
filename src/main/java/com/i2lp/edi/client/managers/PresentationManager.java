@@ -101,8 +101,8 @@ public abstract class PresentationManager {
         logger.info("Attempting to load presentation located at: " + path);
 
         ParserXML readPresentationParser = new ParserXML(path);
-        myPresentationElement = readPresentationParser.parsePresentation();
-        //myPresentationElement = Presentation.generateTestPresentation();     //TEST
+        //myPresentationElement = readPresentationParser.parsePresentation();
+        myPresentationElement = Presentation.generateTestPresentation();     //TEST
 
         assignAttributes(myPresentationElement);
         mainUI.setCenter(myPresentationElement.getSlide(currentSlideNumber));

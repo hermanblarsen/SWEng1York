@@ -181,6 +181,7 @@ public class Presentation extends Pane {
         myTextElement.setFont("Arial");
         myTextElement.setFontSize(12);
         myTextElement.setFontColour("#AF4567");
+        myTextElement.setBgColour("#000000");
         //myTextElement.setBgColour("#000000");
         myTextElement.setBorderSize(2);
         myTextElement.setBorderColour("#000000");
@@ -193,11 +194,11 @@ public class Presentation extends Pane {
         myTextElement1.setLayer(0);
         myTextElement1.setStartSequence(1);
         myTextElement1.setEndSequence(3);
-        myTextElement1.setElementID(0);
+        myTextElement1.setElementID(9);
         myTextElement1.setFont("Arial");
         myTextElement1.setFontSize(12);
         myTextElement1.setFontColour("#AF4567");
-        //myTextElement.setBgColour("#000000");
+        myTextElement1.setBgColour("#000000");
         myTextElement1.setBorderSize(2);
         myTextElement1.setBorderColour("#000000");
         myTextElement1.setTextContent("<b>Same starting sequence</b>");
@@ -239,8 +240,8 @@ public class Presentation extends Pane {
 
         GraphicElement myGraphicElement3 = new GraphicElement();
         myGraphicElement3.setLayer(3);
-        myGraphicElement3.setStartSequence(4);
-        myGraphicElement3.setEndSequence(6);
+        myGraphicElement3.setStartSequence(6);
+        myGraphicElement3.setEndSequence(8);
         myGraphicElement3.setFillColour("#FF0000FF");
         myGraphicElement3.setLineColour("#0000FFFF");
         myGraphicElement3.setShape(new PolygonBuilder(
@@ -254,9 +255,9 @@ public class Presentation extends Pane {
 
 
         TextElement myTextElement11 = new TextElement();
-        myTextElement11.setLayer(5);
-        myTextElement11.setStartSequence(7);
-        myTextElement11.setEndSequence(8);
+        myTextElement11.setLayer(2);
+        myTextElement11.setStartSequence(4);
+        myTextElement11.setEndSequence(7);
         myTextElement11.setElementID(5);
         myTextElement11.setFont("Times New Roman");
         myTextElement11.setFontSize(24);
@@ -296,8 +297,8 @@ public class Presentation extends Pane {
 
         //Create a test Text element, add some text and pop it onto our stack pane. This code will all be driven from XML parser
         TextElement myTextElementNewSlide = new TextElement();
-        myTextElementNewSlide.setLayer(1);
-        myTextElementNewSlide.setStartSequence(1);
+        myTextElementNewSlide.setLayer(2);
+        myTextElementNewSlide.setStartSequence(2);
         myTextElementNewSlide.setEndSequence(4);
         myTextElementNewSlide.setElementID(69);
         myTextElementNewSlide.setTextContent("<b>Slide2</b>");
@@ -316,8 +317,8 @@ public class Presentation extends Pane {
         //myVideoElement.setyPosition(200);
         myVideoElement.setxSize(500);
         myVideoElement.setySize(500);
-        myVideoElement.setLayer(2);
-        myVideoElement.setStartSequence(2);
+        myVideoElement.setLayer(1);
+        myVideoElement.setStartSequence(1);
         myVideoElement.setEndSequence(3);
         myVideoElement.setSlideCanvas(slide2);
         slideElementsSlide2.add(myVideoElement);

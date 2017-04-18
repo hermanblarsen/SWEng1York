@@ -57,6 +57,7 @@ public class TextElement extends SlideElement {
         getCoreNode().setTranslateX(xPosition);
 
         getCoreNode().addEventHandler(MouseEvent.MOUSE_CLICKED, event -> logger.info("Clicked textElement!"));
+        getCoreNode().setPickOnBounds(false);
     }
 
     @Override

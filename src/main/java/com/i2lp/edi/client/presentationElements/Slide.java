@@ -53,7 +53,6 @@ public class Slide extends Pane {
     public Slide() {
         slideElementList = new ArrayList<>();
         visibleSlideElementList = new ArrayList<>();
-        //this.setPickOnBounds(false);
     }
 
     public void addElement(int elementIndex, SlideElement newElement) {
