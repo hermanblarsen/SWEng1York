@@ -1,6 +1,7 @@
 package com.i2lp.edi.client.utilities;
 
 import com.i2lp.edi.client.Animation.OpacityAnimation;
+import com.i2lp.edi.client.Animation.PathAnimation;
 import com.i2lp.edi.client.Animation.ScaleAnimation;
 import com.i2lp.edi.client.Animation.TranslationAnimation;
 import javafx.application.Application;
@@ -44,6 +45,7 @@ public class AnimationTestbench extends Application {
         TranslationAnimation translationAnimation = new TranslationAnimation(100,0,500,500, 1000);
         ScaleAnimation scaleAnimation = new ScaleAnimation(0, 1, 1000);
         OpacityAnimation opacityAnimation = new OpacityAnimation( 0, 1, 1000);
+        PathAnimation pathAnimation = new PathAnimation("M100 100, s-500 1200 500 800, c-500 -10 170 -800 170 -800 Z", 3000);
 
         // Setup test node
         Rectangle testRect = new Rectangle(50, 50);
@@ -54,6 +56,7 @@ public class AnimationTestbench extends Application {
         translationAnimation.setCoreNodeToAnimate(testRect);
         scaleAnimation.setCoreNodeToAnimate(testRect);
         opacityAnimation.setCoreNodeToAnimate(testRect);
+        pathAnimation.setCoreNodeToAnimate(testRect);
 
         // Add Test Translation Animation Button
         Button translationButton = new Button("Play Translation Animation");
@@ -67,12 +70,17 @@ public class AnimationTestbench extends Application {
         Button opacityButton = new Button("Play Opacity Animation");
         opacityButton.addEventHandler(MouseEvent.MOUSE_CLICKED, e-> opacityAnimation.play());
 
+        // Add Test Path Animation Button
+        Button pathButton = new Button("Play Path Animation");
+        pathButton.addEventHandler(MouseEvent.MOUSE_CLICKED, e-> pathAnimation.play());
+
 
         // Setup controls panel to window
         VBox buttonsBox = new VBox();
         buttonsBox.getChildren().add(translationButton);
         buttonsBox.getChildren().add(scaleButton);
         buttonsBox.getChildren().add(opacityButton);
+        buttonsBox.getChildren().add(pathButton);
 
         //Setup the root border pane, controls on the left.
         BorderPane root = new BorderPane();

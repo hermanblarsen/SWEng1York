@@ -7,7 +7,7 @@ import javafx.util.Duration;
  * Created by amriksadhra on 02/03/2017.
  */
 
-public class Animation {
+public abstract class Animation {
     //Logger logger = LoggerFactory.getLogger(this.getClass());
 
     //Animation Appearance Types
@@ -18,13 +18,11 @@ public class Animation {
     Node coreNodeToAnimate;
     protected Duration duration; //The duration of any transition
 
-    public Animation() {
-    }
-
+    public  Animation(){}
     /*
      * Play animation
      */
-    public void play() {
+    public abstract void play();
 
 //            case SVG_MOVEMENT_TEST://Will be moved to a different class for complex animation.
 //                final Path path = new Path();
@@ -49,7 +47,7 @@ public class Animation {
 //                pathTransition.setCycleCount(Timeline.INDEFINITE);
 //                //pathTransition.setAutoReverse(true);
 //                pathTransition.play();
-    }
+
 
     public Node getCoreNodeToAnimate() {
         return coreNodeToAnimate;
