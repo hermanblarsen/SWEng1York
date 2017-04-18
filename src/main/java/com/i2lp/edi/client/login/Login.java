@@ -79,13 +79,15 @@ public class Login extends Application {
         gridPane.setBackground(new Background(backgroundFillList, backgroundImageList));
 
         Scene scene = new Scene(gridPane, 800, 275); //TODO originally: 350, 275
+
         //sets the stylesheet to https://github.com/aalmiray/bootstrapfx, giving us access to various premade CSS styles.
         //More available on https://docs.oracle.com/javase/8/javafx/api/javafx/scene/doc-files/cssref.html
         //IMprove looks: https://docs.oracle.com/javase/8/javafx/visual-effects-tutorial/effect-types.htm
+
         scene.getStylesheets().add("bootstrapfx.css");
         //setUserAgentStylesheet(STYLESHEET_MODENA); //TODO remove? -herman
         loginStage.setScene(scene);
-        loginStage.setResizable(true); //After setting scene //TODO set false
+        loginStage.setResizable(false); //Do after setting scene
 
         populateGUI();
         loginStage.show();
