@@ -1,7 +1,7 @@
 package com.i2lp.edi.client.managers;
 
 import com.i2lp.edi.client.exceptions.SequenceNotFoundException;
-import com.i2lp.edi.client.presentationElements.Animation;
+import com.i2lp.edi.client.Animation.Animation;
 import com.i2lp.edi.client.presentationElements.Presentation;
 import com.i2lp.edi.client.presentationElements.Slide;
 import com.i2lp.edi.client.presentationElements.SlideElement;
@@ -101,8 +101,8 @@ public abstract class PresentationManager {
         logger.info("Attempting to load presentation located at: " + path);
 
         ParserXML readPresentationParser = new ParserXML(path);
-        myPresentationElement = readPresentationParser.parsePresentation();
-        //myPresentationElement = Presentation.generateTestPresentation();     //TEST
+        //myPresentationElement = readPresentationParser.parsePresentation();
+        myPresentationElement = Presentation.generateTestPresentation();     //TEST
 
         assignAttributes(myPresentationElement);
         mainUI.setCenter(myPresentationElement.getSlide(currentSlideNumber));
