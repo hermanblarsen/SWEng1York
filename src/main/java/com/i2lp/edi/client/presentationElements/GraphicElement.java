@@ -52,14 +52,6 @@ public class GraphicElement extends SlideElement {
         graphicShape.setStrokeWidth(LINE_THICKNESS);
 
         wrapperPane.getChildren().add(graphicShape);
-
-        //TODO: Create Animations here, but move to setAnimation setter when XML implemented
-        startAnimation = new Animation();
-        startAnimation.setCoreNodeToAnimate(getCoreNode());
-        startAnimation.setAnimationType(Animation.SIMPLE_APPEAR);
-        endAnimation = new Animation();
-        endAnimation.setCoreNodeToAnimate(getCoreNode());
-        endAnimation.setAnimationType(Animation.SIMPLE_DISAPPEAR);
     }
 
     @Override

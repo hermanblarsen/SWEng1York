@@ -1,5 +1,6 @@
 package com.i2lp.edi.client.presentationElements;
 
+import com.i2lp.edi.client.Animation.Animation;
 import javafx.animation.FadeTransition;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -102,13 +103,6 @@ public class VideoElement extends SlideElement{
             mp.setOnReady(() -> mediaPane.setMaxSize(mv.getFitWidth(), mv.getFitHeight()));
             mediaPane.getChildren().add(mediaControl());
         }
-
-        startAnimation = new Animation();
-        startAnimation.setCoreNodeToAnimate(getCoreNode());
-        startAnimation.setAnimationType(Animation.SIMPLE_APPEAR);
-        endAnimation = new Animation();
-        endAnimation.setCoreNodeToAnimate(getCoreNode());
-        endAnimation.setAnimationType(Animation.SIMPLE_DISAPPEAR);
     }
 
     @Override

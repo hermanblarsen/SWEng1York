@@ -1,5 +1,9 @@
 package com.i2lp.edi.client.presentationElements;
 
+import com.i2lp.edi.client.Animation.Animation;
+import com.i2lp.edi.client.Animation.OpacityAnimation;
+import com.i2lp.edi.client.Animation.ScaleAnimation;
+import com.i2lp.edi.client.Animation.TranslationAnimation;
 import com.i2lp.edi.client.utilities.Utils;
 import javafx.scene.Node;
 import javafx.scene.input.MouseEvent;
@@ -53,14 +57,6 @@ public class TextElement extends SlideElement {
         getCoreNode().setTranslateX(xPosition);
 
         getCoreNode().addEventHandler(MouseEvent.MOUSE_CLICKED, event -> logger.info("Clicked textElement!"));
-
-        //TODO: Create Animations here, but move to setAnimation setter when XML implemented
-        startAnimation = new Animation();
-        startAnimation.setCoreNodeToAnimate(getCoreNode());
-        startAnimation.setAnimationType(Animation.SIMPLE_APPEAR);
-        endAnimation = new Animation();
-        endAnimation.setCoreNodeToAnimate(getCoreNode());
-        endAnimation.setAnimationType(Animation.SIMPLE_DISAPPEAR);
     }
 
     @Override

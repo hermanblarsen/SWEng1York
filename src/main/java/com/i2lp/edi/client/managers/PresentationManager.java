@@ -1,7 +1,7 @@
 package com.i2lp.edi.client.managers;
 
 import com.i2lp.edi.client.exceptions.SequenceNotFoundException;
-import com.i2lp.edi.client.presentationElements.Animation;
+import com.i2lp.edi.client.Animation.Animation;
 import com.i2lp.edi.client.presentationElements.Presentation;
 import com.i2lp.edi.client.presentationElements.Slide;
 import com.i2lp.edi.client.presentationElements.SlideElement;
