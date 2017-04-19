@@ -28,6 +28,8 @@ public abstract class SlideElement {
     Animation startAnimation, endAnimation;
     boolean onCanvas = false;
 
+    protected boolean teacher;
+
     public abstract void doClassSpecificRender();
 
     public void removeElement(){
@@ -162,5 +164,13 @@ public abstract class SlideElement {
 
     public void setPresentationID(String presentationID) {
         this.presentationID = presentationID;
+    }
+
+    public boolean isTeacher() {
+        return teacher;
+    }
+
+    public void setTeacher(boolean teacher) {
+        this.teacher = teacher;
     }
 }

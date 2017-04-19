@@ -1,5 +1,9 @@
 package com.i2lp.edi.client.presentationViewer;
 import com.i2lp.edi.client.managers.PresentationManager;
+import javafx.animation.Animation;
+import javafx.animation.FillTransition;
+import javafx.animation.Interpolator;
+import javafx.animation.Transition;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -7,14 +11,13 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.FlowPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 import org.kordamp.bootstrapfx.scene.layout.Panel;
 
 
@@ -57,13 +60,28 @@ public class TeacherPresentationManager extends PresentationManager {
 
         for(int i = 0;i< numTestCases;i++){
             slides[i] = new Panel("This is test question: "+i);
-            slides[i].getStyleClass().add("panel-primary");
+            //slides[i].getStyleClass().add("panel-primary");
             slides[i].setMinWidth(400);
             fp.getChildren().add(slides[i]);
             Label lab = new Label(slides[i].getText());
             slides[i].addEventHandler(MouseEvent.MOUSE_CLICKED,evt->{
                     border.setCenter(lab);
             });
+
+            int finalI = i;
+            Animation animation = new Transition() {
+                {
+                    setCycleDuration(Duration.minutes(5));
+                    setInterpolator(Interpolator.EASE_OUT);
+                }
+                @Override
+                protected void interpolate(double frac) {
+                    Color vColor = new Color(1,0,0,0 + frac);
+                    slides[finalI].setBackground(new Background(new BackgroundFill(vColor, CornerRadii.EMPTY, Insets.EMPTY)));
+                }
+            };
+            animation.play();
+
         }
         sp.setContent(fp);
         bp.setCenter(sp);

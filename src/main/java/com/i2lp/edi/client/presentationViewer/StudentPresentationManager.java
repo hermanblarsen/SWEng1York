@@ -52,13 +52,13 @@ public class StudentPresentationManager extends PresentationManager {
         ta.setWrapText(true);
         border.setCenter(ta);
 
-        Image tick = new Image("file:projectResources/Tick.png",30,30,true,true);
+        Image tick = new Image("file:projectResources/icons/Tick.png",30,30,true,true);
         ImageView tickPanel = new ImageView(tick);
         tickPanel.addEventHandler(MouseEvent.MOUSE_CLICKED,evt->{
             questionQueueStage.close();
         });
 
-        Image cross = new Image("file:projectResources/cancel.png",30,30,true,true);
+        Image cross = new Image("file:projectResources/icons/cancel.png",30,30,true,true);
         ImageView crossPanel = new ImageView(cross);
         crossPanel.addEventHandler(MouseEvent.MOUSE_CLICKED,evt->{
             questionQueueStage.close();

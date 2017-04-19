@@ -28,7 +28,6 @@ public class PollElement extends InteractiveElement {
     protected String pollQuestion;
     protected List<String> possibleAnswers;
     protected boolean answered = false;
-    protected boolean teacher = false;
     protected boolean timerStart = false;
     protected int timeLimit = 20;
     protected HBox pollOptions;
@@ -94,7 +93,7 @@ public class PollElement extends InteractiveElement {
             }
         });
 
-        if(!teacher){
+        if(teacher){
             Button startTimer = new Button("START");
             startTimer.getStyleClass().setAll("btn", "btn-default");
             startTimer.addEventHandler(MouseEvent.MOUSE_CLICKED,evt->{
