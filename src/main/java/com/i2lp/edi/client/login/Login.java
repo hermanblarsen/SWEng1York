@@ -75,7 +75,7 @@ public class Login extends Application {
                         false, false,
                         true, false)));
         ArrayList<BackgroundFill> backgroundFillList = new ArrayList<BackgroundFill>();
-        backgroundFillList.add(new BackgroundFill(Color.DARKGRAY, CornerRadii.EMPTY, Insets.EMPTY));
+        backgroundFillList.add(new BackgroundFill(Color.GRAY, CornerRadii.EMPTY, Insets.EMPTY));
         gridPane.setBackground(new Background(backgroundFillList, backgroundImageList));
 
         Scene scene = new Scene(gridPane, 800, 275); //TODO originally: 350, 275
@@ -112,7 +112,7 @@ public class Login extends Application {
         sceneTitle.setEffect(titleDropShadow);
         gridPane.add(sceneTitle, 2, 0, 3, 1);
 
-        Background labelBackground = new Background(new BackgroundFill(Color.BEIGE,
+        Background labelBackground = new Background(new BackgroundFill(Color.LIGHTGRAY,
                new CornerRadii(3, false), new Insets(-6,-5,-6,-115)));
 
         usernameField = new TextField();
