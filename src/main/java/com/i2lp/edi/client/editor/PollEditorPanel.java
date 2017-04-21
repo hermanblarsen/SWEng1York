@@ -61,7 +61,8 @@ public class PollEditorPanel extends Panel {
         this.setBody(body);
 
         body.add(new Label("Question"), 0, 0);
-        questionTextField = new TextField("Type your question here");
+        questionTextField = new TextField();
+        questionTextField.setPromptText("Type your question here");
         body.add(questionTextField, 0, 1);
 
         body.add(new Label("Response Type"), 1, 0);
@@ -86,7 +87,7 @@ public class PollEditorPanel extends Panel {
             addAnswerButton.setOnAction(event -> addAnswer());
             body.add(addAnswerButton, 4, 0);
 
-            answerNumber = 1;
+            answerNumber = 0;
             addAnswer();
             addAnswer();
         } else if(responseType.equals("Open")) {
@@ -119,10 +120,10 @@ public class PollEditorPanel extends Panel {
     }
 
     private void addAnswer() {
-        Label answerLabel = new Label("Answer " + answerNumber);
+        Label answerLabel = new Label();
         answerLabels.add(answerLabel);
 
-        TextField answerTextField = new TextField("Answer " + answerNumber);
+        TextField answerTextField = new TextField();
         answerTextFields.add(answerTextField);
 
         Button answerRemoveButton = new Button("Remove");
@@ -146,6 +147,7 @@ public class PollEditorPanel extends Panel {
         answerRemoveButtons.remove(answerRemoveButton);
         body.getChildren().remove(answerRemoveButton);
 
+        answerNumber--;
         refreshDisplayedAnswers();
     }
 
@@ -153,11 +155,14 @@ public class PollEditorPanel extends Panel {
         for(Label answerLabel : answerLabels) {
             body.getChildren().remove(answerLabel);
             body.add(answerLabel, 2, answerLabels.indexOf(answerLabel) + 1);
+            answerLabel.setText("Answer " + Integer.toString(answerLabels.indexOf(answerLabel) + 1));
         }
 
         for(TextField answerTextField : answerTextFields) {
             body.getChildren().remove(answerTextField);
             body.add(answerTextField, 3, answerTextFields.indexOf(answerTextField) + 1);
+            if(answerTextField.getText().isEmpty())
+                answerTextField.setPromptText("Answer " + Integer.toString(answerLabels.indexOf(answerTextField) + 1));
         }
 
         for(Button answerRemoveButton : answerRemoveButtons) {
@@ -197,5 +202,9 @@ public class PollEditorPanel extends Panel {
             else
                 parent.getChildren().add(node);
         }
+    }
+
+    public int getAnswerNumber() {
+        return answerNumber;
     }
 }

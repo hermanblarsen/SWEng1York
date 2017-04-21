@@ -1,5 +1,6 @@
 package com.i2lp.edi.client.presentationViewer;
 import com.i2lp.edi.client.managers.PresentationManager;
+import com.i2lp.edi.client.presentationElements.CommentPanel;
 import javafx.animation.Animation;
 import javafx.animation.FillTransition;
 import javafx.animation.Interpolator;
@@ -90,31 +91,8 @@ public class TeacherPresentationManager extends PresentationManager {
     }
 
     @Override
-    protected void createCommentEditor() {
-        he.setMaxWidth(Double.MAX_VALUE);
-
-        Button saveButton = new Button("Save Locally");
-        saveButton.getStyleClass().setAll("btn", "btn-default");
-        saveButton.setOnAction(event -> {
-            comment = he.getHtmlText();
-            WebView webV = new WebView();
-            WebEngine webE = webV.getEngine();
-            webE.loadContent(comment);
-            commentView.setBody(webV);
-        });
-
-        HBox controlBox = new HBox();
-        controlBox.setStyle("-fx-background-color: #34495e;");
-        controlBox.setPadding(new Insets(5, 12, 5, 12));
-        controlBox.setSpacing(12);
-        controlBox.setMaxWidth(Double.MAX_VALUE);
-        controlBox.getChildren().add(saveButton);
-
-        commentEditor = new VBox();
-        commentEditor.setMaxSize(600, 600);
-        commentEditor.getChildren().addAll(he, controlBox);
+    protected void createCommentPanel() {
+        commentPanel = new CommentPanel(false);
     }
-
-
 
 }

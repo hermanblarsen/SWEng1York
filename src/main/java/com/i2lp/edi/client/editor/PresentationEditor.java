@@ -1,13 +1,22 @@
 package com.i2lp.edi.client.editor;
 
 import com.i2lp.edi.client.managers.PresentationManager;
+import com.i2lp.edi.client.utilities.Status;
+import javafx.event.EventHandler;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,6 +36,8 @@ public class PresentationEditor {
     private VBox vbox;
     private Stage stage;
 
+    private Text statusText;
+
     public PresentationEditor(String path) {
         presentationPath = path;
 
@@ -42,6 +53,7 @@ public class PresentationEditor {
         border = new BorderPane();
         border.setTop(addMenuBar());
         border.setCenter(scroll);
+        border.setBottom(addStatusBar());
 
         scene = new Scene(border, 700, 600);
         scene.getStylesheets().add("bootstrapfx.css");
@@ -67,7 +79,46 @@ public class PresentationEditor {
         return menuBar;
     }
 
+    private HBox addStatusBar() {
+        statusText = new Text();
+        statusText.setFill(Color.WHITESMOKE);
+        statusText.setFont(Font.font(15));
+
+        HBox statusBar = new HBox();
+        statusBar.setStyle("-fx-background-color: #34495e;");
+        statusBar.setPadding(new Insets(5, 12, 5, 12));
+        statusBar.setSpacing(5);
+        statusBar.setAlignment(Pos.BASELINE_RIGHT);
+        statusBar.getChildren().add(statusText);
+
+        return statusBar;
+    }
+
+    private void updateStatusBar(Status status) {
+        String statusString = new String();
+
+        if(!status.getxName().isEmpty())
+            statusString = status.getxName() + ": " + status.getxValue();
+        if(!status.getyName().isEmpty())
+            statusString += " | " + status.getyName() + ": " + status.getyValue();
+        if(!status.getzName().isEmpty())
+            statusString += " | " + status.getzName() + ": " + status.getzValue();
+
+        statusText.setText(statusString);
+    }
+
     private void addPoll() {
-        vbox.getChildren().add(new PollEditorPanel(vbox));
+        PollEditorPanel pePanel = new PollEditorPanel(vbox);
+
+        EventHandler eventHandler = event -> {
+            Status status = new Status(
+                    "Number of Answers", Integer.toString(pePanel.getAnswerNumber()),
+                    "", "",
+                    "","");
+            updateStatusBar(status);
+        };
+        pePanel.addEventHandler(MouseEvent.MOUSE_MOVED, eventHandler);
+
+        vbox.getChildren().add(pePanel);
     }
 }

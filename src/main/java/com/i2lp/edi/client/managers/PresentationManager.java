@@ -2,6 +2,7 @@ package com.i2lp.edi.client.managers;
 
 import com.i2lp.edi.client.exceptions.SequenceNotFoundException;
 import com.i2lp.edi.client.Animation.Animation;
+import com.i2lp.edi.client.presentationElements.CommentPanel;
 import com.i2lp.edi.client.presentationElements.Presentation;
 import com.i2lp.edi.client.presentationElements.Slide;
 import com.i2lp.edi.client.presentationElements.SlideElement;
@@ -9,9 +10,7 @@ import com.i2lp.edi.client.presentationViewer.TeacherPresentationManager;
 import com.i2lp.edi.client.utilities.ParserXML;
 import javafx.animation.FadeTransition;
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.image.Image;
@@ -22,10 +21,6 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.text.Text;
-import javafx.scene.web.HTMLEditor;
-import javafx.scene.web.WebEngine;
-import javafx.scene.web.WebView;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import org.kordamp.bootstrapfx.scene.layout.Panel;
@@ -52,10 +47,8 @@ public abstract class PresentationManager {
     protected Boolean commentActive = false;
     protected Stage presentationStage;
     protected Boolean elementClicked = false;
-    protected HTMLEditor he = new HTMLEditor();
-    protected VBox commentEditor;
-    protected Panel commentView;
-    protected String comment = "";
+    protected VBox bottomPane = new VBox();
+    protected Panel commentPanel;
 
     public int currentSlideNumber = 0; //Current slide number in presentation
 
@@ -96,10 +89,8 @@ public abstract class PresentationManager {
         pb = new ProgressBar(0);
         slideNumber = new Label("Slide 1 of " + myPresentationElement.getSlideList().size());
 
-        createCommentView();
-        createCommentEditor();
-        VBox bottomPane = new VBox();
-        bottomPane.getChildren().addAll(commentView, addPresentationControls(presentationStage));
+        createCommentPanel();
+        bottomPane.getChildren().add(0, addPresentationControls(presentationStage));
         border.setBottom(bottomPane);
     }
 
@@ -148,27 +139,16 @@ public abstract class PresentationManager {
 
     protected void commentFunction() {
         if(!elementClicked) {
-            border.setRight(commentEditor);
+            bottomPane.getChildren().add(0, commentPanel);
             elementClicked = true;
         }else{
-            border.getChildren().remove(commentEditor);
+            bottomPane.getChildren().remove(commentPanel);
             elementClicked = false;
         }
     }
 
-    protected void createCommentView() {
-        WebView webV = new WebView();
-        WebEngine webE = webV.getEngine();
-        webE.loadContent(comment);
-
-        commentView = new Panel("Comments");
-        commentView.getStyleClass().add("panel-primary");
-        commentView.setBody(webV);
-        commentView.setMaxHeight(150);
-    }
-
-    protected void createCommentEditor() {
-
+    protected void createCommentPanel() {
+        commentPanel = new CommentPanel(true);
     }
 
     public HBox addPresentationControls(Stage primaryStage) {

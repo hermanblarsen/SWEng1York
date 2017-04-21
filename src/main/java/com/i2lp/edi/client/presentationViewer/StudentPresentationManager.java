@@ -27,7 +27,6 @@ import javafx.stage.Stage;
  */
 public class StudentPresentationManager extends PresentationManager {
     protected Boolean elementClicked = false;
-    protected HTMLEditor he = new HTMLEditor();
 
     @Override
     protected void questionQueueFunction() {
@@ -72,38 +71,5 @@ public class StudentPresentationManager extends PresentationManager {
         questionQueueStage.show();
     }
 
-    @Override
-    protected void createCommentEditor() {
-        he.setMaxWidth(Double.MAX_VALUE);
-
-        Button saveButton = new Button("Save Locally");
-        saveButton.getStyleClass().setAll("btn", "btn-default");
-        saveButton.setOnAction(event -> {
-            comment = he.getHtmlText();
-            WebView webV = new WebView();
-            WebEngine webE = webV.getEngine();
-            webE.loadContent(comment);
-            commentView.setBody(webV);
-        });
-
-        Button submitButton = new Button("Submit To Lecturer");
-        submitButton.getStyleClass().setAll("btn", "btn-default");
-        submitButton.setOnAction(event -> commentSubmitFunction());
-
-        HBox controlBox = new HBox();
-        controlBox.setStyle("-fx-background-color: #34495e;");
-        controlBox.setPadding(new Insets(5, 12, 5, 12));
-        controlBox.setSpacing(12);
-        controlBox.setMaxWidth(Double.MAX_VALUE);
-        controlBox.getChildren().addAll(saveButton, submitButton);
-
-        commentEditor = new VBox();
-        commentEditor.setMaxSize(600, 600);
-        commentEditor.getChildren().addAll(he, controlBox);
-    }
-
-    protected void commentSubmitFunction(){
-        System.out.print("Not yet implemented");
-    }
 }
 
