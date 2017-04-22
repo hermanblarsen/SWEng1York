@@ -1,5 +1,8 @@
 package com.i2lp.edi.client.login;
 
+import com.i2lp.edi.client.managers.EdiManager;
+import com.i2lp.edi.server.SocketClient;
+import com.i2lp.edi.server.packets.UserAuth;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
@@ -8,25 +11,18 @@ import javafx.geometry.Side;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
 import javafx.scene.control.PasswordField;
+import javafx.scene.control.TextField;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
-import com.i2lp.edi.client.managers.EdiManager;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.i2lp.edi.server.packets.UserAuth;
-import com.i2lp.edi.server.SocketClient;
 
 import java.util.ArrayList;
-import java.util.List;
 
 
 public class Login extends Application {
@@ -43,6 +39,9 @@ public class Login extends Application {
 
     protected boolean loginSuccessful = false;
     protected boolean offline = false;
+
+    protected boolean developer = true;
+    protected static final String DEVELOPMENT_MODE = "teacher";
 
     @Override
     public void start(Stage loginStage) {
@@ -153,8 +152,13 @@ public class Login extends Application {
     private void login() {
         //TODO: Store this userauth object instead of keeping anonymous.
 
-        String userType = this.verifyLogin(new UserAuth(usernameField.getCharacters().toString(),
-                passwordField.getCharacters().toString()));
+        String userType;
+        if(developer){
+           userType = DEVELOPMENT_MODE;
+           logger.info("Bypassing Server");
+        } else {
+            userType= this.verifyLogin(new UserAuth(usernameField.getCharacters().toString(), passwordField.getCharacters().toString()));
+        }
 
         //Run different dashboards based on user type returned from DB
         boolean isTeacher = false;

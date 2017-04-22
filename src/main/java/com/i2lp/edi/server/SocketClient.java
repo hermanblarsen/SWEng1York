@@ -36,7 +36,6 @@ public class SocketClient {
 
     //PostgreSQL database connection
     PGDataSource dataSource;
-
     Socket socket;
 
     public static void main(String[] args) {
