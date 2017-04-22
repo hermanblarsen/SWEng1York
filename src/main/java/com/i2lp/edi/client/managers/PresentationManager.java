@@ -9,20 +9,25 @@ import com.i2lp.edi.client.presentationElements.SlideElement;
 import com.i2lp.edi.client.presentationViewer.TeacherPresentationManager;
 import com.i2lp.edi.client.utilities.ParserXML;
 import javafx.animation.FadeTransition;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
+import javafx.scene.Cursor;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
-import javafx.scene.control.Label;
-import javafx.scene.control.ProgressBar;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Screen;
+import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import org.kordamp.bootstrapfx.scene.layout.Panel;
@@ -30,6 +35,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
 
 
 /**
@@ -51,6 +58,11 @@ public abstract class PresentationManager {
     protected Boolean elementClicked = false;
     protected VBox bottomPane = new VBox();
     protected Panel commentPanel;
+    private boolean isShowBlack = false;
+    private boolean mouseMoved = true;
+    private EventHandler<MouseEvent> disabledCursorFilter;
+
+    private boolean isCursorHidden = false;
     protected double slideWidth = 0;
     protected double slideHeight = 0;
 
@@ -86,11 +98,115 @@ public abstract class PresentationManager {
         presentationStage.setTitle("Edi");
 
         border = new BorderPane();
+        StackPane stackPane = new StackPane();
+        Region blackRegion = new Region();
+        blackRegion.setBackground(new Background(new BackgroundFill(Color.BLACK, null, null)));
+        stackPane.getChildren().add(border);
         Rectangle2D primaryScreenBounds = Screen.getPrimary().getVisualBounds();
         slideWidth = primaryScreenBounds.getWidth() * 0.75;
         slideHeight = primaryScreenBounds.getHeight() * 0.75;
-        scene = new Scene(border, slideWidth, slideHeight); //1000x600
+        scene = new Scene(stackPane, slideWidth, slideHeight); //1000x600
         scene.getStylesheets().add("bootstrapfx.css");
+
+        //Listeners for moving through presentation
+        scene.setOnKeyPressed(key -> {
+            if (key.getCode().equals(KeyCode.ENTER) ||
+                    key.getCode().equals(KeyCode.SPACE) ||
+                    key.getCode().equals(KeyCode.PAGE_UP) ||
+                    key.getCode().equals(KeyCode.RIGHT) ||
+                    key.getCode().equals(KeyCode.UP)) {
+                controlPresentation(Slide.SLIDE_FORWARD);
+                slideProgress(myPresentationElement);
+            } else if (key.getCode().equals(KeyCode.LEFT) ||
+                    key.getCode().equals(KeyCode.BACK_SPACE) ||
+                    key.getCode().equals(KeyCode.PAGE_DOWN) ||
+                    key.getCode().equals(KeyCode.DOWN)) {
+                controlPresentation(Slide.SLIDE_BACKWARD);
+                slideProgress(myPresentationElement);
+            } else if(key.getCode().equals(KeyCode.F5)) {
+                presentationStage.setFullScreen(true);
+            } else if(key.getCode().equals(KeyCode.B)) {
+                if(isShowBlack) {
+                    stackPane.getChildren().remove(blackRegion);
+                    isShowBlack = false;
+                } else {
+                    stackPane.getChildren().add(blackRegion);
+                    isShowBlack = true;
+                }
+            } else if(key.getCode().equals(KeyCode.HOME)) {
+                while (slideAdvance(myPresentationElement, Slide.SLIDE_BACKWARD) != Presentation.PRESENTATION_START);
+            } else if(key.getCode().equals(KeyCode.END)) {
+                while (slideAdvance(myPresentationElement, Slide.SLIDE_FORWARD) != Presentation.PRESENTATION_FINISH);
+            }
+        });
+
+        scene.setOnMouseClicked(mouseEvent -> {
+            if(mouseEvent.getButton().equals(MouseButton.SECONDARY)) {
+                ContextMenu cMenu = new ContextMenu();
+
+                MenuItem nextSequence = new MenuItem("Next sequence");
+                nextSequence.setOnAction(nextEvent -> {
+                    controlPresentation(Slide.SLIDE_FORWARD);
+                    slideProgress(myPresentationElement);
+                });
+                cMenu.getItems().add(nextSequence);
+
+                MenuItem prevSequence = new MenuItem("Previous sequence");
+                prevSequence.setOnAction(prevEvent -> {
+                    controlPresentation(Slide.SLIDE_BACKWARD);
+                    slideProgress(myPresentationElement);
+                });
+                cMenu.getItems().add(prevSequence);
+
+                MenuItem firstSequence = new MenuItem("First sequence");
+                firstSequence.setOnAction(firstEvent -> {
+                    while (slideAdvance(myPresentationElement, Slide.SLIDE_BACKWARD) != Presentation.PRESENTATION_START);
+                });
+                cMenu.getItems().add(firstSequence);
+
+                MenuItem lastSequence = new MenuItem("Last sequence");
+                lastSequence.setOnAction(lastEvent -> {
+                    while (slideAdvance(myPresentationElement, Slide.SLIDE_FORWARD) != Presentation.PRESENTATION_FINISH);
+                });
+                cMenu.getItems().add(lastSequence);
+
+                cMenu.show(presentationStage, mouseEvent.getScreenX(), mouseEvent.getScreenY());
+            }
+        });
+
+        scene.setOnScroll(event -> {
+            if(event.getDeltaY()>0) {
+                controlPresentation(Slide.SLIDE_BACKWARD);
+                slideProgress(myPresentationElement);
+            } else {
+                controlPresentation(Slide.SLIDE_FORWARD);
+                slideProgress(myPresentationElement);
+            }
+        });
+
+        disabledCursorFilter = event -> {
+            controlPresentation(Slide.SLIDE_FORWARD);
+            slideProgress(myPresentationElement);
+            event.consume();
+        };
+
+        Timer cursorHideTimer = new Timer(true);
+        cursorHideTimer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                if(!mouseMoved && !isCursorHidden())
+                    setCursorHidden(true);
+
+                mouseMoved = false;
+            }
+        }, 0, 2000);
+
+        scene.addEventHandler(MouseEvent.MOUSE_MOVED, event -> {
+            mouseMoved = true;
+            if(isCursorHidden())
+                setCursorHidden(false);
+        });
+
         presentationStage.setScene(scene);
         presentationStage.show();
         loadPresentation(border, path);
@@ -112,17 +228,6 @@ public abstract class PresentationManager {
 
         assignAttributes(myPresentationElement);
         mainUI.setCenter(myPresentationElement.getSlide(currentSlideNumber));
-
-        //Keyboard listener for moving through presentation
-        scene.setOnKeyPressed(key -> {
-            if (key.getCode().equals(KeyCode.RIGHT)) {
-                controlPresentation(Slide.SLIDE_FORWARD);
-                slideProgress(myPresentationElement);
-            } else if (key.getCode().equals(KeyCode.LEFT)) {
-                controlPresentation(Slide.SLIDE_BACKWARD);
-                slideProgress(myPresentationElement);
-            }
-        });
     }
 
     @SuppressWarnings("ConstantConditions")
@@ -198,7 +303,6 @@ public abstract class PresentationManager {
                 slideWidth = primaryScreenBounds.getWidth() * 0.75;
                 slideHeight = primaryScreenBounds.getHeight() * 0.75;
             }
-
         });
 
         Image questionBubble = new Image("file:projectResources/icons/QM_Filled.png", 30, 30, true, true);
@@ -211,7 +315,6 @@ public abstract class PresentationManager {
             } else {
                 questionQueueFunction();
                 questionQueueActive = false;
-
             }
         });
 
@@ -377,6 +480,19 @@ public abstract class PresentationManager {
             finalize();
         } catch (Throwable throwable) {
             logger.error("Couldnt finalize PresMan");
+        }
+    }
+
+    public boolean isCursorHidden() { return isCursorHidden;}
+
+    public void setCursorHidden(boolean cursorHidden) {
+        isCursorHidden = cursorHidden;
+        if(cursorHidden) {
+            scene.getRoot().setCursor(Cursor.NONE); //TODO: Doesn't seem to work on webviews?
+            border.getCenter().addEventFilter(MouseEvent.MOUSE_CLICKED, disabledCursorFilter);
+        } else {
+            scene.getRoot().setCursor(Cursor.DEFAULT);
+            border.getCenter().removeEventFilter(MouseEvent.MOUSE_CLICKED, disabledCursorFilter);
         }
     }
 }

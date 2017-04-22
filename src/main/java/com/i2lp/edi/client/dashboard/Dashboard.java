@@ -85,17 +85,22 @@ public abstract class Dashboard extends Application {
                         selectedPresID = previewPanel.getPresentationID();
                         border.setRight(addBorderRight());
                     }
-                } else if (event.getButton() == MouseButton.SECONDARY && this instanceof TeacherDashboard) {
+                } else if (event.getButton() == MouseButton.SECONDARY) {
                     ContextMenu cMenu = new ContextMenu();
 
-                    MenuItem edit = new MenuItem("Edit");
-                    edit.setOnAction(editEvent -> showPresentationEditor(previewPanel.getPresentationPath()));
-                    cMenu.getItems().add(edit);
+                    MenuItem open = new MenuItem("Open");
+                    open.setOnAction(openEvent -> launchPresentation(previewPanel.getPresentationPath()));
+                    cMenu.getItems().add(open);
 
-                    MenuItem schedule = new MenuItem("Schedule");
-                    schedule.setOnAction(ScheduleEvent -> showScheduler(event.getScreenX(), event.getScreenY()));
-                    cMenu.getItems().add(schedule);
+                    if(this instanceof  TeacherDashboard) {
+                        MenuItem edit = new MenuItem("Edit");
+                        edit.setOnAction(editEvent -> showPresentationEditor(previewPanel.getPresentationPath()));
+                        cMenu.getItems().add(edit);
 
+                        MenuItem schedule = new MenuItem("Schedule");
+                        schedule.setOnAction(scheduleEvent -> showScheduler(event.getScreenX(), event.getScreenY()));
+                        cMenu.getItems().add(schedule);
+                    }
                     cMenu.show(primaryStage, event.getScreenX(), event.getScreenY());
                 }
 

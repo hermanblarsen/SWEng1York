@@ -57,7 +57,7 @@ public class Login extends Application {
         gridPane.setVgap(10);
         gridPane.setPadding(new Insets(25, 25, 25, 25));
 
-        ArrayList<BackgroundImage> backgroundImageList = new ArrayList<BackgroundImage>();
+        ArrayList<BackgroundImage> backgroundImageList = new ArrayList<>();
         Image ediLogo = new Image("file:projectResources/general/EdiLogo.png");
         Image i2lpLogo = new Image("file:projectResources/general/I2LPLogo.png");
         backgroundImageList.add(new BackgroundImage(ediLogo,
@@ -73,7 +73,7 @@ public class Login extends Application {
                 new BackgroundSize(BackgroundSize.AUTO, BackgroundSize.AUTO,
                         false, false,
                         true, false)));
-        ArrayList<BackgroundFill> backgroundFillList = new ArrayList<BackgroundFill>();
+        ArrayList<BackgroundFill> backgroundFillList = new ArrayList<>();
         backgroundFillList.add(new BackgroundFill(Color.GRAY, CornerRadii.EMPTY, Insets.EMPTY));
         gridPane.setBackground(new Background(backgroundFillList, backgroundImageList));
 
