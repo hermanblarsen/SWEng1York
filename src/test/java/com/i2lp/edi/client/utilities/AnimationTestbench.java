@@ -15,6 +15,8 @@ import javafx.stage.Stage;
 
 /**
  * Created by zain on 15/04/2017.
+ *
+ * See tests report for extected results.
  */
 public class AnimationTestbench extends Application {
     BorderPane mainPane;

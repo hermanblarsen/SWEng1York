@@ -1,9 +1,6 @@
 package com.i2lp.edi.client.presentationElements;
 
 
-import com.i2lp.edi.client.presentationViewer.TeacherPresentationManager;
-import com.i2lp.edi.client.utilities.OvalBuilder;
-import com.i2lp.edi.client.utilities.PolygonBuilder;
 import com.i2lp.edi.client.utilities.Theme;
 import javafx.scene.layout.Pane;
 import javafx.util.Duration;
@@ -212,12 +209,12 @@ public class Presentation extends Pane {
         myGraphicElement2.setEndSequence(5);
         myGraphicElement2.setFillColour("#00000000");
         myGraphicElement2.setLineColour("#00FF00FF");
-        myGraphicElement2.setShape(new PolygonBuilder(
-                        new float[]{100, 100, 200},
-                        new float[]{100, 200, 200},
-                        false
-                ).build()
-        );
+        myGraphicElement2.setOvalYPosition(0.5f);
+        myGraphicElement2.setOvalXPosition(0.5f);
+        myGraphicElement2.setrHorizontal(0.2f);
+        myGraphicElement2.setrVertical(0.1f);
+        myGraphicElement2.setRotation(0);
+        myGraphicElement2.setPolygon(false);
         myGraphicElement2.setSlideCanvas(slide1);
         slideElementsSlide1.add(myGraphicElement2);
 
@@ -225,16 +222,12 @@ public class Presentation extends Pane {
         myGraphicElement.setLayer(2);
         myGraphicElement.setStartSequence(2);
         myGraphicElement.setEndSequence(5);
-        myGraphicElement.setFillColour("#00000000");
+        myGraphicElement.setFillColour("#EEFFFFFF");
         myGraphicElement.setLineColour("#0000FFFF");
-        myGraphicElement.setShape(new OvalBuilder(
-                        500.0f,
-                        100.0f,
-                        30.0f,
-                        30.0f,
-                        0
-                ).build()
-        );
+        myGraphicElement.polySetXPoints(new float[] {0.1f, 0.5f, 0.5f});
+        myGraphicElement.polySetYPoints(new float[] {0.1f, 0.1f, 0.6f});
+        myGraphicElement.setPolygon(true);
+        myGraphicElement.setClosed(true);
         myGraphicElement.setSlideCanvas(slide1);
         slideElementsSlide1.add(myGraphicElement);
 
@@ -245,12 +238,10 @@ public class Presentation extends Pane {
         myGraphicElement3.setEndSequence(8);
         myGraphicElement3.setFillColour("#FF0000FF");
         myGraphicElement3.setLineColour("#0000FFFF");
-        myGraphicElement3.setShape(new PolygonBuilder(
-                        new float[]{500, 100, 200, 200},
-                        new float[]{100, 200, 200, 100},
-                        true
-                ).build()
-        );
+        myGraphicElement3.polySetXPoints(new float[] {0.5f, 0.5f, 0.4f});
+        myGraphicElement3.polySetYPoints(new float[] {0.2f, 0.8f, 0.3f});
+        myGraphicElement3.setPolygon(true);
+        myGraphicElement3.setClosed(true);
         myGraphicElement3.setSlideCanvas(slide1);
         slideElementsSlide1.add(myGraphicElement3);
 

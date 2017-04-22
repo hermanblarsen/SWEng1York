@@ -1,10 +1,10 @@
 package com.i2lp.edi.client.presentationElements;
 
-import com.i2lp.edi.client.utilities.OvalBuilder;
-import com.i2lp.edi.client.utilities.PolygonBuilder;
 import javafx.scene.Node;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Ellipse;
+import javafx.scene.shape.Polyline;
 import javafx.scene.shape.Shape;
 
 
@@ -23,9 +23,20 @@ public class GraphicElement extends SlideElement {
     private static final double LINE_THICKNESS = 3;
 
     protected Shape graphicShape;
-    protected OvalBuilder oval;
-    protected PolygonBuilder polygon;
+
+    //Polygon Properties
     protected boolean isPolygon;
+    protected boolean isClosed;
+    protected float[] polygonXPoints = {};
+    protected float[] polygonYPoints = {};
+
+    //Oval properties
+    protected float[] ovalPos = {0,0};//xPos, Ypos
+    protected float[] ovalRadii = {0,0};//rVertical, rHorizontal
+    protected float rotation;
+
+    protected boolean firstInstance = true; //Is this teh first time we're rendering this elememt?
+
 
     private Pane wrapperPane;//Wrap the graphics within its own pane so that absolute positioning works properly.
 
@@ -35,7 +46,31 @@ public class GraphicElement extends SlideElement {
 
     @Override
     public void doClassSpecificRender() {
+        if(firstInstance) {
+            if (isPolygon) {
+                denormalisePolygonPoints((float) slideWidth, (float) slideHeight);
+                graphicShape = setupPolygon();
+            } else {
+                ovalPos[0] *= slideWidth;
+                ovalPos[1] *= slideHeight;
+                ovalRadii[1] *= slideWidth;
+                ovalRadii[0] *= slideHeight;
 
+
+                graphicShape = setupOval();
+                graphicShape.setRotate(rotation);
+            }
+
+            graphicShape.setFill(parseRGBAString(fillColour));
+            graphicShape.setStroke(parseRGBAString(lineColour));
+            graphicShape.setStrokeWidth(LINE_THICKNESS);
+
+            wrapperPane.getChildren().add(graphicShape);
+            getCoreNode().setPickOnBounds(false);
+            firstInstance = false;
+        } else {
+            //Nothing new to do if this isn't the first render of the element .
+        }
     }
 
     @Override
@@ -47,12 +82,38 @@ public class GraphicElement extends SlideElement {
     public void setupElement() {
         wrapperPane = new Pane();
 
-        graphicShape.setFill(parseRGBAString(fillColour));
-        graphicShape.setStroke(parseRGBAString(lineColour));
-        graphicShape.setStrokeWidth(LINE_THICKNESS);
 
-        wrapperPane.getChildren().add(graphicShape);
-        getCoreNode().setPickOnBounds(false);
+    }
+
+    private Shape setupPolygon(){
+        if (isClosed){
+            return new javafx.scene.shape.Polygon(generateSinglePointsArray());
+        } else {
+            return new Polyline(generateSinglePointsArray());
+        }
+    }
+
+    private Shape setupOval(){
+        return new Ellipse(ovalPos[0], ovalPos[1], ovalRadii[1], ovalRadii[0]);
+    }
+
+    private void denormalisePolygonPoints(float width, float height){
+        for (int i=0; i<polygonYPoints.length; i++){
+            polygonYPoints[i] *= height;
+            polygonXPoints[i] *= width;
+        }
+    }
+
+    private double[] generateSinglePointsArray(){
+        if(polygonXPoints.length != polygonYPoints.length){
+            throw new IllegalStateException("Number of x positions does not match the number of y positions.");
+        }
+        double[] pointsArray = new double[polygonXPoints.length + polygonYPoints.length];
+        for(int i=0; i< polygonXPoints.length; i++){
+            pointsArray[i*2]= polygonXPoints[i];
+            pointsArray[i*2+1] = polygonYPoints[i];
+        }
+        return pointsArray;
     }
 
     @Override
@@ -95,23 +156,6 @@ public class GraphicElement extends SlideElement {
         return this;
     }
 
-    public GraphicElement setShape(Shape shape) { //TODO Why does this return the GraphicsElement? -Herman
-        this.graphicShape = shape;
-        return this;
-    }
-
-    public void setOval(OvalBuilder oval) {
-        this.oval = oval;
-        isPolygon = false;
-        setShape(oval.build());
-    }
-
-    public void setPolygon(PolygonBuilder polygon) {
-        this.polygon = polygon;
-        isPolygon = true;
-        setShape(polygon.build());
-    }
-
     public Shape getGraphicShape() {
         return graphicShape;
     }
@@ -125,11 +169,63 @@ public class GraphicElement extends SlideElement {
        return Color.web(rgb, alpha);
     }
 
-    public OvalBuilder getOval() {
-        return oval;
+    public void polySetXPoints(float[] points){
+        this.polygonXPoints = points;
     }
 
-    public PolygonBuilder getPolygon() {
-        return polygon;
+    public void polySetYPoints(float[] points){
+        this.polygonYPoints = points;
+    }
+
+    public float[] getPolyXPositions(){
+        return this.polygonXPoints;
+    }
+
+    public float[] getPolyYPositions(){
+        return this.polygonYPoints;
+    }
+
+    public void setClosed(boolean isClosed){
+        this.isClosed = isClosed;
+    }
+
+    public boolean isClosed(){
+        return isClosed;
+    }
+
+    public void setOvalXPosition(float x){
+        this.ovalPos[0] = x;
+    }
+
+    public void setOvalYPosition(float y){
+        this.ovalPos[1] = y;
+    }
+
+    public void setrHorizontal(float r){
+        this.ovalRadii[1] = r;
+    }
+
+    public double getrHorizontal() {
+        return ovalRadii[1];
+    }
+
+    public void setrVertical(float r){
+        this.ovalRadii[0] = r;
+    }
+
+    public double getrVertical() {
+        return ovalRadii[0];
+    }
+
+    public void setRotation(float rotation){
+        this.rotation = rotation;
+    }
+
+    public float getRotation() {
+        return rotation;
+    }
+
+    public void setPolygon(boolean isPolygon){
+        this.isPolygon = isPolygon;
     }
 }

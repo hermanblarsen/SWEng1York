@@ -432,7 +432,6 @@ public class ParserXML {
                         graphicElement.setFillColour(elementContent);
                         break;
                     case "polygon":
-                        PolygonBuilder polygon = new PolygonBuilder();
                         NodeList polygonNodeChildrenList = elementNode.getChildNodes();
 
                         for (int j = 0; j < polygonNodeChildrenList.getLength(); j++) {
@@ -448,7 +447,7 @@ public class ParserXML {
                                         for (int k = 0; k < xPositionsStringArray.length; k++) {
                                             xPositionsArray[k] = Float.valueOf(xPositionsStringArray[k]);
                                         }
-                                        polygon.setxPositions(xPositionsArray);
+                                        graphicElement.polySetXPoints(xPositionsArray);
                                         break;
                                     case "ypositions":
                                         String[] yPositionsStringArray = polygonElementContent.trim().split(",");
@@ -457,10 +456,10 @@ public class ParserXML {
                                         for (int k = 0; k < yPositionsStringArray.length; k++) {
                                             yPositionsArray[k] = Float.valueOf(yPositionsStringArray[k]);
                                         }
-                                        polygon.setyPositions(yPositionsArray);
+                                        graphicElement.polySetYPoints(yPositionsArray);
                                         break;
                                     case "isclosed":
-                                        polygon.setClosed(Boolean.valueOf(polygonElementContent));
+                                        graphicElement.setClosed(Boolean.valueOf(polygonElementContent));
                                         break;
                                     default:
                                         logger.info("Polygon Element Property Not Recognised! Name: " + polygonElementName +
@@ -468,10 +467,9 @@ public class ParserXML {
                                 }
                             }
                         }
-                        graphicElement.setPolygon(polygon);
+                        graphicElement.setPolygon(true);
                         break;
                     case "oval":
-                        OvalBuilder oval = new OvalBuilder();
                         NodeList ovalNodeChildrenList = elementNode.getChildNodes();
 
                         for (int j = 0; j < ovalNodeChildrenList.getLength(); j++) {
@@ -481,19 +479,19 @@ public class ParserXML {
                                 String ovalElementContent = ovalElementNode.getTextContent();
                                 switch (ovalElementName) {
                                     case "xposition":
-                                        oval.setxPosition(Float.valueOf(ovalElementContent));
+                                        graphicElement.setOvalXPosition(Float.valueOf(ovalElementContent));
                                         break;
                                     case "yposition":
-                                        oval.setyPosition(Float.valueOf(ovalElementContent));
+                                        graphicElement.setOvalYPosition(Float.valueOf(ovalElementContent));
                                         break;
                                     case "rvertical":
-                                        oval.setrVertical(Float.valueOf(ovalElementContent));
+                                        graphicElement.setrVertical(Float.valueOf(ovalElementContent));
                                         break;
                                     case "rhorizontal":
-                                        oval.setrHorizontal(Float.valueOf(ovalElementContent));
+                                        graphicElement.setrHorizontal(Float.valueOf(ovalElementContent));
                                         break;
                                     case "rotation":
-                                        oval.setRotation(Float.valueOf(ovalElementContent));
+                                        graphicElement.setRotation(Float.valueOf(ovalElementContent));
                                         break;
                                     default:
                                         logger.info("Oval Element Property Not Recognised! Name: " + ovalElementName +
@@ -501,7 +499,7 @@ public class ParserXML {
                                 }
                             }
                         }
-                        graphicElement.setOval(oval);
+                        graphicElement.setPolygon(false);
                         break;
                     default:
                         logger.warn("Graphics Property Name Not Recognised! Name: " + elementName +

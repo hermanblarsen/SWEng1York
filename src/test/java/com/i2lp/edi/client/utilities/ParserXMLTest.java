@@ -153,18 +153,18 @@ public class ParserXMLTest {
         assertEquals(1, polygonGraphic.getStartSequence());
         Float[] xPositions = {0.12f, 0.02f, 0.02f};
         for (int i = 0; i < xPositions.length; i++) {
-            assertEquals(xPositions[i], polygonGraphic.getPolygon().getxPositions()[i], ERROR_MARGIN);
+            assertEquals(xPositions[i], polygonGraphic.getPolyXPositions()[i], ERROR_MARGIN);
         }
         Float[] y = {0.3f, 0.1f, 0.04f};
         for (int i = 0; i < y.length; i++) {
-            assertEquals(y[i], polygonGraphic.getPolygon().getyPositions()[i], ERROR_MARGIN);
+            assertEquals(y[i], polygonGraphic.getPolyYPositions()[i], ERROR_MARGIN);
         }
-        assertEquals(Boolean.TRUE, polygonGraphic.getPolygon().isClosed());
+        assertEquals(Boolean.TRUE, polygonGraphic.isClosed());
 
         GraphicElement ovalGraphic = slide2.getGraphicElementList().get(1);
-        assertEquals(0.05, ovalGraphic.getOval().getrHorizontal(), ERROR_MARGIN);
-        assertEquals(0.1, ovalGraphic.getOval().getrVertical(), ERROR_MARGIN);
-        assertEquals(45f, ovalGraphic.getOval().getRotation(), ERROR_MARGIN);
+        assertEquals(0.05, ovalGraphic.getrHorizontal(), ERROR_MARGIN);
+        assertEquals(0.1, ovalGraphic.getrVertical(), ERROR_MARGIN);
+        assertEquals(45f, ovalGraphic.getRotation(), ERROR_MARGIN);
 
         AudioElement audioElement = slide2.getAudioElementList().get(0);
         assertEquals("audio.mp3", audioElement.getPath());
