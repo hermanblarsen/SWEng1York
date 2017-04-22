@@ -30,7 +30,6 @@ public final class CustomWebView extends Region {
 
         widthProperty().addListener((observable, oldValue, newValue) -> {
             Double width = (Double)newValue;
-            logger.info("WIDTH CHANGE!" + width);
             webview.setPrefWidth(width);
             adjustHeight();
         });

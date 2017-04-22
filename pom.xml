@@ -17,7 +17,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.I2LP</groupId>
-    <artifactId>edi</artifactId><version>0.26</version>
+    <artifactId>edi</artifactId><version>0.28</version>
 
     <name>Edi</name>
     <description>
@@ -170,6 +170,15 @@
     </build>
 
     <dependencies>
+        <!-- Local TimePicker jar file -->
+        <dependency>
+            <groupId>iilp</groupId>
+            <artifactId>timepicker-jar</artifactId>
+            <version>0.0.1</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/lib/datetime-picker-0.0.1.jar</systemPath>
+        </dependency>
+
         <!-- Clear XREF Surefire Report Warning -->
         <dependency>
             <groupId>org.apache.maven.plugins</groupId>

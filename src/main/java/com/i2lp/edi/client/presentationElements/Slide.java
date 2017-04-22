@@ -53,6 +53,10 @@ public class Slide extends Pane {
     public Slide() {
         slideElementList = new ArrayList<>();
         visibleSlideElementList = new ArrayList<>();
+
+        //Add
+        this.widthProperty().addListener((observableValue, oldSceneWidth, newSceneWidth) -> System.out.println("Width: " + newSceneWidth));
+        this.heightProperty().addListener((observableValue, oldSceneHeight, newSceneHeight) -> System.out.println("Height: " + newSceneHeight));
     }
 
     public void addElement(int elementIndex, SlideElement newElement) {

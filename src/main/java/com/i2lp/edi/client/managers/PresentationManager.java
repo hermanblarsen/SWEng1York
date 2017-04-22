@@ -1,7 +1,7 @@
 package com.i2lp.edi.client.managers;
 
-import com.i2lp.edi.client.exceptions.SequenceNotFoundException;
 import com.i2lp.edi.client.Animation.Animation;
+import com.i2lp.edi.client.exceptions.SequenceNotFoundException;
 import com.i2lp.edi.client.presentationElements.CommentPanel;
 import com.i2lp.edi.client.presentationElements.Presentation;
 import com.i2lp.edi.client.presentationElements.Slide;
@@ -11,23 +11,21 @@ import com.i2lp.edi.client.utilities.ParserXML;
 import javafx.animation.FadeTransition;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
-import javafx.scene.Cursor;
 import javafx.geometry.Rectangle2D;
+import javafx.scene.Cursor;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.Label;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
-import javafx.stage.Screen;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import org.kordamp.bootstrapfx.scene.layout.Panel;
@@ -223,11 +221,20 @@ public abstract class PresentationManager {
         logger.info("Attempting to load presentation located at: " + path);
 
         ParserXML readPresentationParser = new ParserXML(path);
-        //myPresentationElement = readPresentationParser.parsePresentation();
-        myPresentationElement = Presentation.generateTestPresentation();     //TEST
+        myPresentationElement = readPresentationParser.parsePresentation();
+        //myPresentationElement = Presentation.generateTestPresentation();     //TEST
 
         assignAttributes(myPresentationElement);
         mainUI.setCenter(myPresentationElement.getSlide(currentSlideNumber));
+    }
+
+    private void redraw(){
+        for (Slide toAssign : myPresentationElement.getSlideList()) {
+            for (SlideElement toBeAssigned : toAssign.getSlideElementList()) {
+                //TODO: Swap for Resize methoda
+                toBeAssigned.setupElement();
+            }
+        }
     }
 
     @SuppressWarnings("ConstantConditions")

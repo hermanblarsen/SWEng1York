@@ -1,14 +1,12 @@
 package com.i2lp.edi.client.presentationElements;
 
-import com.i2lp.edi.client.Animation.Animation;
-import com.i2lp.edi.client.Animation.OpacityAnimation;
-import com.i2lp.edi.client.Animation.ScaleAnimation;
-import com.i2lp.edi.client.Animation.TranslationAnimation;
 import com.i2lp.edi.client.utilities.Utils;
+import javafx.concurrent.Worker;
 import javafx.scene.Node;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.web.WebEngine;
+import javafx.scene.web.WebView;
 
 /**
  * Created by habl on 26/02/2017.
@@ -34,9 +32,10 @@ public class TextElement extends SlideElement {
     protected boolean aspectRatioLock;
     protected float elementAspectRatio;
 
-    protected CustomWebView browser;
+    protected WebView browser;
     public WebEngine webEngine;
     String cssFilePath;
+    private boolean isReady; //State for Webview
 
     public TextElement() {
 
@@ -44,12 +43,22 @@ public class TextElement extends SlideElement {
 
     @Override
     public void setupElement() {
-        browser = new CustomWebView(textContent);
-        webEngine = browser.webEngine;
+        browser = new WebView();
+        webEngine = browser.getEngine();
+
+        //Put HTML into WebView
+        webEngine.loadContent(textContent);
 
         //Apply Dynamically created CSS to TextElement
         //TODO: Ensure these match what we read in from XML (correct format). Add Getters and setters for Presentation GUID, SlideID then hook into this method call
         cssFilePath = Utils.cssGen(presentationID, slideID, elementID, fontSize, font, fontColour, bgColour, borderColour, borderSize);
+
+        //If done rendering, adjust height to fit content, set isReady variable for thumbnail generation
+        browser.getEngine().getLoadWorker().stateProperty().addListener((arg0, oldState, newState) -> {
+            if (newState == Worker.State.SUCCEEDED) {
+                isReady = true;
+            }
+        });
 
         webEngine.setUserStyleSheetLocation(cssFilePath);
 
@@ -58,6 +67,7 @@ public class TextElement extends SlideElement {
 
         getCoreNode().addEventHandler(MouseEvent.MOUSE_CLICKED, event -> logger.info("Clicked textElement!"));
         getCoreNode().setPickOnBounds(false);
+
     }
 
     @Override
@@ -68,6 +78,13 @@ public class TextElement extends SlideElement {
     public void doClassSpecificRender() {
         //Refresh Browser
         browser.requestLayout();
+
+
+
+
+        //Update Location
+        getCoreNode().setTranslateY(xPosition/100);
+        getCoreNode().setTranslateX(xPosition);
     }
 
     public Pane getSlideCanvas() {
@@ -195,7 +212,7 @@ public class TextElement extends SlideElement {
     }
 
     public boolean isRendered() {
-        return browser.isReady;
+        return isReady;
     }
 
     @Override
