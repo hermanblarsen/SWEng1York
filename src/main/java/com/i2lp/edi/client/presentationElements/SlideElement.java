@@ -27,7 +27,8 @@ public abstract class SlideElement {
     protected Pane slideCanvas;
     Animation startAnimation, endAnimation;
     boolean onCanvas = false;
-
+    protected double slideWidth = 0;
+    protected double slideHeight = 0;
     protected boolean teacher;
 
     public abstract void doClassSpecificRender();
@@ -173,4 +174,21 @@ public abstract class SlideElement {
     public void setTeacher(boolean teacher) {
         this.teacher = teacher;
     }
+
+    public double getSlideWidth() {
+        return slideWidth;
+    }
+
+    public void setSlideWidth(double slideWidth) {
+        this.slideWidth = slideWidth;
+    }
+
+    public double getSlideHeight() {
+        return slideHeight;
+    }
+
+    public void setSlideHeight(double slideHeight) {
+        this.slideHeight = slideHeight;
+    }
+
 }

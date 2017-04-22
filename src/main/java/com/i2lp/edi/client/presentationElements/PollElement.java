@@ -49,7 +49,41 @@ public class PollElement extends InteractiveElement {
 
     @Override
     public void doClassSpecificRender() {
+        Label remainingTime = new Label("Time Remaining: "+ timeLimit);
+        final IntegerProperty i = new SimpleIntegerProperty(timeLimit);
+        timeline = new Timeline(
+                new KeyFrame(
+                        Duration.seconds(1),
+                        evt->{
+                            i.set(i.get()-1);
+                            remainingTime.setText("Time Remaining: "+i.get());
+                        }
+                )
+        );
+        timeline.setCycleCount(timeLimit);
+        timeline.setOnFinished(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                pollPane.getChildren().remove(pollOptions);
+                Label done = new Label("DONE");
+                pollPane.setCenter(done);
+            }
+        });
+        if(teacher){
+            System.out.println("Teacher State"+ teacher);
+            Button startTimer = new Button("START");
+            startTimer.getStyleClass().setAll("btn", "btn-default");
+            startTimer.addEventHandler(MouseEvent.MOUSE_CLICKED,evt->{
+                timerStart = true;
+                pollOptions= new HBox();
+                pollOptions.getChildren().addAll(setUpQuestions(),remainingTime);
+                pollPane.setCenter(pollOptions);
+                //delay.play();
+                timeline.play();
+            });
+            pollPane.setCenter(startTimer);
 
+        }
     }
 
     @Override
@@ -72,41 +106,9 @@ public class PollElement extends InteractiveElement {
 //            pollPane.getChildren().remove(answerSelection);
 
 //        });
-        Label remainingTime = new Label("Time Remaining: "+ timeLimit);
-        final IntegerProperty i = new SimpleIntegerProperty(timeLimit);
-        timeline = new Timeline(
-            new KeyFrame(
-                    Duration.seconds(1),
-                    evt->{
-                        i.set(i.get()-1);
-                        remainingTime.setText("Time Remaining: "+i.get());
-                    }
-            )
-        );
-        timeline.setCycleCount(timeLimit);
-        timeline.setOnFinished(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                pollPane.getChildren().remove(pollOptions);
-                Label done = new Label("DONE");
-                pollPane.setCenter(done);
-            }
-        });
 
-        if(teacher){
-            Button startTimer = new Button("START");
-            startTimer.getStyleClass().setAll("btn", "btn-default");
-            startTimer.addEventHandler(MouseEvent.MOUSE_CLICKED,evt->{
-                timerStart = true;
-                pollOptions= new HBox();
-                pollOptions.getChildren().addAll(setUpQuestions(),remainingTime);
-                pollPane.setCenter(pollOptions);
-                //delay.play();
-                timeline.play();
-            });
-            pollPane.setCenter(startTimer);
 
-        }
+
         pollPane.setTop(question);
 
 

@@ -10,6 +10,7 @@ import com.i2lp.edi.client.presentationViewer.TeacherPresentationManager;
 import com.i2lp.edi.client.utilities.ParserXML;
 import javafx.animation.FadeTransition;
 import javafx.geometry.Insets;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
@@ -21,6 +22,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import org.kordamp.bootstrapfx.scene.layout.Panel;
@@ -49,6 +51,8 @@ public abstract class PresentationManager {
     protected Boolean elementClicked = false;
     protected VBox bottomPane = new VBox();
     protected Panel commentPanel;
+    protected double slideWidth = 0;
+    protected double slideHeight = 0;
 
     public int currentSlideNumber = 0; //Current slide number in presentation
 
@@ -71,6 +75,8 @@ public abstract class PresentationManager {
                 }else{
                     toBeAssigned.setTeacher(false);
                 }
+                toBeAssigned.setSlideWidth(slideWidth);
+                toBeAssigned.setSlideHeight(slideHeight);
             }
         }
     }
@@ -80,7 +86,10 @@ public abstract class PresentationManager {
         presentationStage.setTitle("Edi");
 
         border = new BorderPane();
-        scene = new Scene(border, 1000, 600);
+        Rectangle2D primaryScreenBounds = Screen.getPrimary().getVisualBounds();
+        slideWidth = primaryScreenBounds.getWidth() * 0.75;
+        slideHeight = primaryScreenBounds.getHeight() * 0.75;
+        scene = new Scene(border, slideWidth, slideHeight); //1000x600
         scene.getStylesheets().add("bootstrapfx.css");
         presentationStage.setScene(scene);
         presentationStage.show();
@@ -98,8 +107,8 @@ public abstract class PresentationManager {
         logger.info("Attempting to load presentation located at: " + path);
 
         ParserXML readPresentationParser = new ParserXML(path);
-        myPresentationElement = readPresentationParser.parsePresentation();
-        //myPresentationElement = Presentation.generateTestPresentation();     //TEST
+        //myPresentationElement = readPresentationParser.parsePresentation();
+        myPresentationElement = Presentation.generateTestPresentation();     //TEST
 
         assignAttributes(myPresentationElement);
         mainUI.setCenter(myPresentationElement.getSlide(currentSlideNumber));
@@ -176,13 +185,18 @@ public abstract class PresentationManager {
         ImageView fullScreenButton = new ImageView(fullScreen);
 
         fullScreenButton.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
-
+            Rectangle2D primaryScreenBounds = Screen.getPrimary().getVisualBounds();
             if (!isFullscreen) {
                 primaryStage.setFullScreen(true);
                 isFullscreen = true;
+                slideWidth = primaryScreenBounds.getWidth();
+                slideHeight = primaryScreenBounds.getHeight();
+
             } else {
                 primaryStage.setFullScreen(false);
                 isFullscreen = false;
+                slideWidth = primaryScreenBounds.getWidth() * 0.75;
+                slideHeight = primaryScreenBounds.getHeight() * 0.75;
             }
 
         });
