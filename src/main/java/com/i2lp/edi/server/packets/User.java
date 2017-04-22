@@ -6,18 +6,16 @@ package com.i2lp.edi.server.packets;
 public class User {
 
 
-    public String firstName;
-    public String secondName;
-    public String password;
-    public String userType;
-    public String emailAddress;
+    protected String firstName;
+    protected String secondName;
+    protected String password;
+    protected String userType;
+    protected String emailAddress;
+    protected boolean teacher;
 
     public User(){
 
     }
-
-
-
 
     public User(String firstName, String secondName, String emailAddress, String password, String userType) {
         super();
@@ -26,6 +24,7 @@ public class User {
         this.emailAddress = emailAddress;
         this.password = password;
         this.userType = userType;
+        if(userType.equals("teacher")) this.teacher=true;
     }
 
     public String getFirstName() {

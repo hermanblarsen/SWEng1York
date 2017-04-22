@@ -47,44 +47,37 @@ public class Login extends Application {
     public void start(Stage loginStage) {
         this.loginStage = loginStage;
         loginStage.setTitle("Edi Login Dialog");
-        Image ediLogoSmall = new Image("file:projectResources/general/EdiLogo.png"); //TODO make a smaller version (16x16, 32x32, 64x64
+        Image ediLogoSmall = new Image("file:projectResources/logos/ediLogo32x32.png");
         loginStage.getIcons().add(ediLogoSmall);
 
 
         gridPane = new GridPane();
-        gridPane.setAlignment(Pos.CENTER);
+        gridPane.setAlignment(Pos.CENTER_RIGHT);
         gridPane.setHgap(10);
         gridPane.setVgap(10);
         gridPane.setPadding(new Insets(25, 25, 25, 25));
 
         ArrayList<BackgroundImage> backgroundImageList = new ArrayList<>();
-        Image ediLogo = new Image("file:projectResources/general/EdiLogo.png");
-        Image i2lpLogo = new Image("file:projectResources/general/I2LPLogo.png");
+        Image ediLogo = new Image("file:projectResources/logos/ediLogo400x400.png");
+
         backgroundImageList.add(new BackgroundImage(ediLogo,
                 BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT,
-                new BackgroundPosition(Side.RIGHT, 0, true,
-                                        Side.TOP, 0.5, true),
-                new BackgroundSize(BackgroundSize.AUTO, BackgroundSize.AUTO,
-                                false, false,
-                                true, false)));
-        backgroundImageList.add(new BackgroundImage(i2lpLogo,
-                BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT,
-                BackgroundPosition.DEFAULT,
+                new BackgroundPosition(Side.LEFT, -0.05, true,
+                        Side.TOP, 0.5, true),
                 new BackgroundSize(BackgroundSize.AUTO, BackgroundSize.AUTO,
                         false, false,
                         true, false)));
         ArrayList<BackgroundFill> backgroundFillList = new ArrayList<>();
-        backgroundFillList.add(new BackgroundFill(Color.GRAY, CornerRadii.EMPTY, Insets.EMPTY));
+        backgroundFillList.add(new BackgroundFill(Color.GHOSTWHITE, CornerRadii.EMPTY, Insets.EMPTY));
         gridPane.setBackground(new Background(backgroundFillList, backgroundImageList));
 
-        Scene scene = new Scene(gridPane, 800, 275); //TODO originally: 350, 275
+        Scene scene = new Scene(gridPane, 550, 275); //TODO originally: 350, 275
 
         //sets the stylesheet to https://github.com/aalmiray/bootstrapfx, giving us access to various premade CSS styles.
         //More available on https://docs.oracle.com/javase/8/javafx/api/javafx/scene/doc-files/cssref.html
         //IMprove looks: https://docs.oracle.com/javase/8/javafx/visual-effects-tutorial/effect-types.htm
-
+        //Another styling alternative, java internal: setUserAgentStylesheet(STYLESHEET_MODENA);
         scene.getStylesheets().add("bootstrapfx.css");
-        //setUserAgentStylesheet(STYLESHEET_MODENA); //TODO remove? -herman
         loginStage.setScene(scene);
         loginStage.setResizable(false); //Do after setting scene
 

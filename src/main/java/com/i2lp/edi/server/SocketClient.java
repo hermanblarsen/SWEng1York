@@ -303,7 +303,7 @@ public class SocketClient {
             obj.put("secondName", toAdd.getSecondName());
             obj.put("emailAddress", toAdd.getEmailAddress());
             obj.put("password", toAdd.getPassword());
-            obj.put("userType", toAdd.userType);
+            obj.put("userType", toAdd.getUserType());
 
             //TODO: If failed, throw custom userAdd exception
             socket.emit("AddUser", obj);
