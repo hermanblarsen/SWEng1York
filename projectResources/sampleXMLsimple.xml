@@ -50,6 +50,26 @@
                 <fontcolour>#EEEEEEFF</fontcolour>
                 <bgcolour>#000000FF</bgcolour>
                 <bordercolour>#ABCDEFFF</bordercolour>
+                <bordersize>2</bordersize>
+                <onclickaction>gotoslide</onclickaction>
+                <onclickinfo>3</onclickinfo>
+                <aspectratiolock>true</aspectratiolock>
+                <elementaspectratio>2</elementaspectratio>
+            </text>
+            <text elementid ="3" layer="3" visibility="true" startsequence="3" endsequence="-1">
+                <textcontent>
+                    <h1><b>Slide 1 Text Element 3 Text</b></h1>
+                </textcontent>
+                <xposition>30</xposition>
+                <yposition>200</yposition>
+                <xsize>0.1</xsize>
+                <ysize>0.4</ysize>
+                <font>Arial</font>
+                <fontsize>12</fontsize>
+                <fontcolour>#EEEEEEFF</fontcolour>
+                <bgcolour>#000000FF</bgcolour>
+                <bordercolour>#ABCDEFFF</bordercolour>
+                <bordersize>2</bordersize>
                 <onclickaction>gotoslide</onclickaction>
                 <onclickinfo>3</onclickinfo>
                 <aspectratiolock>true</aspectratiolock>
@@ -57,7 +77,7 @@
             </text>
         </slide>
         <slide slideid="2">
-            <text elementid ="1" layer="1" visibility="true" startsequence="1" endsequence="-1">
+            <text elementid ="1" layer="1" visibility="true" startsequence="3" endsequence="-1">
                 <textcontent>
                     <h1>Poop</h1>
                 </textcontent>

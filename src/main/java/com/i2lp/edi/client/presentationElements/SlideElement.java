@@ -1,6 +1,7 @@
 package com.i2lp.edi.client.presentationElements;
 
 import com.i2lp.edi.client.Animation.Animation;
+import javafx.geometry.Point2D;
 import javafx.scene.Node;
 import javafx.scene.layout.Pane;
 import org.slf4j.Logger;
@@ -189,6 +190,11 @@ public abstract class SlideElement {
 
     public void setSlideHeight(double slideHeight) {
         this.slideHeight = slideHeight;
+    }
+
+    protected Point2D scaleDimensions(int xPosition, int yPosition){
+        //Convert position percentages to multipliers against canvas size
+        return new Point2D((xPosition/100)* slideCanvas.getScaleX(),  (yPosition/100)*  slideCanvas.getScaleY());
     }
 
 }
