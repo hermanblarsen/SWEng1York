@@ -41,6 +41,7 @@ import java.util.TimerTask;
  * Created by kma517 on 16/03/2017.
  */
 public abstract class PresentationManager {
+    private static final float SLIDE_SIZE = 0.5f;
     Logger logger = LoggerFactory.getLogger(PresentationManager.class);
 
     protected Scene scene;
@@ -64,6 +65,7 @@ public abstract class PresentationManager {
     protected double slideWidth = 0;
     protected double slideHeight = 0;
 
+    protected StackPane stackPane;
     public int currentSlideNumber = 0; //Current slide number in presentation
 
 
@@ -96,13 +98,14 @@ public abstract class PresentationManager {
         presentationStage.setTitle("Edi");
 
         border = new BorderPane();
-        StackPane stackPane = new StackPane();
+        loadPresentation(border, path);
+        stackPane = new StackPane();
         Region blackRegion = new Region();
         blackRegion.setBackground(new Background(new BackgroundFill(Color.BLACK, null, null)));
         stackPane.getChildren().add(border);
         Rectangle2D primaryScreenBounds = Screen.getPrimary().getVisualBounds();
-        slideWidth = primaryScreenBounds.getWidth() * 0.75;
-        slideHeight = primaryScreenBounds.getHeight() * 0.75;
+        slideWidth = primaryScreenBounds.getWidth() * SLIDE_SIZE;
+        slideHeight = slideWidth / myPresentationElement.getTheme().getPresentationAspectRatio();
         scene = new Scene(stackPane, slideWidth, slideHeight); //1000x600
         scene.getStylesheets().add("bootstrapfx.css");
 
@@ -207,7 +210,7 @@ public abstract class PresentationManager {
 
         presentationStage.setScene(scene);
         presentationStage.show();
-        loadPresentation(border, path);
+
 
         pb = new ProgressBar(0);
         slideNumber = new Label("Slide 1 of " + myPresentationElement.getSlideList().size());
@@ -256,7 +259,9 @@ public abstract class PresentationManager {
         }
     }
 
-    protected abstract void questionQueueFunction();
+    //protected abstract void questionQueueFunction();
+
+    protected abstract void loadSpecificFeatures();
 
     protected void commentFunction() {
         if(!elementClicked) {
@@ -316,11 +321,11 @@ public abstract class PresentationManager {
         ImageView questionQ = new ImageView(questionBubble);
         questionQ.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
             if (!questionQueueActive) {
-                questionQueueFunction();
+                loadSpecificFeatures();
                 questionQueueActive = true;
 
             } else {
-                questionQueueFunction();
+                loadSpecificFeatures();
                 questionQueueActive = false;
             }
         });

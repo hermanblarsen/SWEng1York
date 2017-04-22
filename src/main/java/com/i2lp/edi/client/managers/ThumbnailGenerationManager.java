@@ -47,11 +47,11 @@ public class ThumbnailGenerationManager extends PresentationManager {
         mainUI.setCenter(myPresentationElement.getSlide(currentSlideNumber));
     }
 
-
     @Override
-    protected void questionQueueFunction() {
+    protected void loadSpecificFeatures() {
 
     }
+
 
     @Override
     protected void commentFunction() {

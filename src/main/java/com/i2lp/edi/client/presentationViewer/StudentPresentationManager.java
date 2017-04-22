@@ -28,7 +28,7 @@ import javafx.stage.Stage;
 public class StudentPresentationManager extends PresentationManager {
     protected Boolean elementClicked = false;
 
-    @Override
+
     protected void questionQueueFunction() {
         Stage questionQueueStage = new Stage();
         questionQueueStage.setTitle("Send a Question");
@@ -71,5 +71,9 @@ public class StudentPresentationManager extends PresentationManager {
         questionQueueStage.show();
     }
 
+    @Override
+    protected void loadSpecificFeatures() {
+        questionQueueFunction();
+    }
 }
 

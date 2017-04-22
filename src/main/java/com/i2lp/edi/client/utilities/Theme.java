@@ -13,6 +13,7 @@ public class Theme {
     private int borderThickness;
     private boolean isBorder;
     private String borderColour;
+    private float presentationAspectRatio;
 
 
     public Theme () {
@@ -25,6 +26,7 @@ public class Theme {
         this.borderThickness = 0;
         this.isBorder = true;
         this.borderColour = "";
+        this.presentationAspectRatio = 1.33f;
     }
 
     public String getBackgroundColour() {
@@ -89,5 +91,13 @@ public class Theme {
 
     public void setFontColour(String fontColour) {
         this.fontColour = fontColour;
+    }
+
+    public float getPresentationAspectRatio() {
+        return presentationAspectRatio;
+    }
+
+    public void setPresentationAspectRatio(float presentationAspectRatio) {
+        this.presentationAspectRatio = presentationAspectRatio;
     }
 }
