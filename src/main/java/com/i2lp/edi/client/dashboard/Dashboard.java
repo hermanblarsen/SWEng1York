@@ -9,7 +9,6 @@ import com.i2lp.edi.client.presentationElements.Presentation;
 import com.i2lp.edi.client.presentationViewer.StudentPresentationManager;
 import com.i2lp.edi.client.presentationViewer.TeacherPresentationManager;
 import javafx.application.Application;
-import javafx.event.EventType;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
@@ -34,7 +33,10 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
+
+import static javafx.scene.layout.BorderPane.*;
 
 
 /**
@@ -82,7 +84,7 @@ public abstract class Dashboard extends Application {
                             previewPanels.get(j).setSelected(false);
 
                         previewPanel.setSelected(true);
-                        selectedPresID = previewPanel.getPresentationID();
+                        selectedPresID = previewPanel.getPresentation().getDocumentID();
                         border.setRight(addBorderRight());
                     }
                 } else if (event.getButton() == MouseButton.SECONDARY) {
@@ -173,7 +175,7 @@ public abstract class Dashboard extends Application {
         ediLogoImageView.setCache(true);
         Label aboutLabel = new Label("Edi by I2LP, " + Constants.BUILD_STRING);
         aboutBorder.setBottom(aboutLabel);
-        aboutBorder.setAlignment(aboutLabel, Pos.CENTER);
+        setAlignment(aboutLabel, Pos.CENTER);
         aboutBorder.setCenter(ediLogoImageView);
 
         aboutPopup.setAutoHide(true);
@@ -230,9 +232,16 @@ public abstract class Dashboard extends Application {
     }
 
     private VBox addBorderLeft() {
-        VBox controlsVBox = new VBox();
+        VBox controlsVBox = new VBox(8);
         controlsVBox.setPadding(new Insets(10));
-        controlsVBox.setSpacing(8);
+
+        Panel searchPanel = new Panel("Search");
+        controlsVBox.getChildren().add(searchPanel);
+        searchPanel.getStyleClass().add("panel-primary");
+        TextField searchField = new TextField();
+        searchField.setOnAction(event -> search(searchField.getText()));
+        searchField.textProperty().addListener(observable -> search(searchField.getText()));
+        searchPanel.setBody(searchField);
 
         VBox subjectsVBox = new VBox();
         subjectsVBox.setPadding(new Insets(3, 0, 3, 0));
@@ -283,6 +292,23 @@ public abstract class Dashboard extends Application {
         return controlsVBox;
     }
 
+    private void search(String text) {
+        logger.info("Searching for " + text);
+
+        for (PresentationPreviewPanel panel : previewPanels) {
+            if(!panel.getPresentation().getDocumentID().contains(text) &&
+                    !panel.getPresentation().getTags().contains(text) &&
+                    !panel.getPresentation().getAuthor().contains(text) &&
+                    !panel.isHidden()) {
+                panel.setHidden(true);
+            } else if ((panel.getPresentation().getDocumentID().contains(text) ||
+                    panel.getPresentation().getTags().contains(text) ||
+                    panel.getPresentation().getAuthor().contains(text)) && panel.isHidden()) {
+                panel.setHidden(false);
+            }
+        }
+    }
+
     private ScrollPane addBorderRight() {
         ScrollPane scroll = new ScrollPane();
 
@@ -295,11 +321,13 @@ public abstract class Dashboard extends Application {
 
         int numSlides = 20; //TODO: Obtain number of slides from XML
 
-        Panel[] slides = new Panel[numSlides];
+        VBox[] slides = new VBox[numSlides];
 
         for (int i = 0; i < numSlides; i++) {
-            slides[i] = new Panel("Slide " + i);
-            slides[i].getStyleClass().add("panel-primary");
+            slides[i] = new VBox(3);
+            slides[i].setBorder(new Border(new BorderStroke(Color.GRAY, BorderStrokeStyle.SOLID, new CornerRadii(5), BorderStroke.DEFAULT_WIDTHS)));
+            slides[i].setAlignment(Pos.CENTER);
+            slides[i].setPadding(new Insets(5));
 
             ImageView preview;
             try {
@@ -309,16 +337,15 @@ public abstract class Dashboard extends Application {
                 preview = new ImageView("file:projectResources/emptyThumbnail.png");
             }
 
-            preview.setFitWidth(150);
+            preview.setFitWidth(170);
             preview.setPreserveRatio(true);
             preview.setSmooth(true);
             preview.setCache(true);
 
-            slides[i].setBody(preview);
-            slides[i].setPrefWidth(170);//Dynamic resizing of panel width possible?
+            slides[i].getChildren().add(preview);
+            slides[i].getChildren().add(new Label(Integer.toString(i)));
             flow.getChildren().add(slides[i]);
             FlowPane.setMargin(slides[i], new Insets(0, 20, 0, 5));
-
         }
 
         scroll.setContent(flow);
@@ -346,15 +373,18 @@ public abstract class Dashboard extends Application {
     //The sorting method is pretty ghetto for now, will have to refactor depending on what sorting key we'll allow
     private void sortBy(String sortKey) {
         previewPanels.sort((p1, p2) -> {
-            if(sortKey.equals("Name A-Z"))
-                return p1.getPresentationID().compareTo(p2.getPresentationID());
-            else if(sortKey.equals("Name Z-A"))
-                return -p1.getPresentationID().compareTo(p2.getPresentationID());
-            else if(sortKey.equals("Subject A-Z"))
-                return p1.getPresentationSubject().compareTo(p2.getPresentationSubject());
-            else if(sortKey.equals("Subject Z-A"))
-                return -p1.getPresentationSubject().compareTo(p2.getPresentationSubject());
-            else return 0;
+            switch (sortKey) {
+                case "Name A-Z":
+                    return p1.getPresentation().getDocumentID().compareTo(p2.getPresentation().getDocumentID());
+                case "Name Z-A":
+                    return -p1.getPresentation().getDocumentID().compareTo(p2.getPresentation().getDocumentID());
+                case "Subject A-Z":
+                    return p1.getPresentationSubject().compareTo(p2.getPresentationSubject());
+                case "Subject Z-A":
+                    return -p1.getPresentationSubject().compareTo(p2.getPresentationSubject());
+                default:
+                    return 0;
+            }
         });
 
         presentationPreviewsFlowPane.getChildren().clear();
@@ -366,24 +396,34 @@ public abstract class Dashboard extends Application {
 
     private void showScheduler(double x, double y) {
         Popup schedulerPopup = new Popup();
-        BorderPane popupBorder = new BorderPane();
+        VBox popupVBox = new VBox();
+        VBox popupVBoxTop = new VBox(5);
+        popupVBoxTop.setPadding(new Insets(0, 0, 5, 0));
+        popupVBoxTop.setBackground(new Background(new BackgroundFill(Color.WHITE, new CornerRadii(5), null)));
+        popupVBoxTop.setBorder(new Border(new BorderStroke(Color.GRAY, BorderStrokeStyle.SOLID, new CornerRadii(5), BorderStroke.DEFAULT_WIDTHS)));
 
         DatePicker datePicker = new DatePicker(LocalDate.now());
-        popupBorder.setCenter(datePicker);
+        popupVBoxTop.getChildren().add(datePicker);
+
+        TimePicker timePicker = new TimePicker();
+        popupVBoxTop.getChildren().add(timePicker);
 
         Button scheduleButton = new Button("Schedule");
         scheduleButton.getStyleClass().setAll("btn", "btn-default");
         scheduleButton.setOnAction(event -> {
             LocalDate date = datePicker.getValue();
+            LocalTime time = timePicker.getValue();
             logger.info("Selected Date: " + date);
+            logger.info("Selected Time: " + time);
             schedulerPopup.hide();
         });
-        popupBorder.setBottom(scheduleButton);
-        popupBorder.setAlignment(scheduleButton, Pos.CENTER);
+        popupVBoxTop.setAlignment(Pos.CENTER);
+        popupVBox.getChildren().add(popupVBoxTop);
+        popupVBox.getChildren().add(scheduleButton);
+        popupVBox.setAlignment(Pos.CENTER);
 
-        //TODO: JavaFX has no native time picker, we need to find one made by someone or implement one ourselves
-
-        schedulerPopup.getContent().add(popupBorder);
+        schedulerPopup.setAutoHide(true);
+        schedulerPopup.getContent().add(popupVBox);
         schedulerPopup.show(primaryStage, x, y);
     }
 

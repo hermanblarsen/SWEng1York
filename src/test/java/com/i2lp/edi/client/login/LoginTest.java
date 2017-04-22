@@ -108,10 +108,10 @@ public class LoginTest extends ApplicationTest{ //With TestFX environment
     }
 
     // A shortcut to retrieve widgets in the GUI.
-    public <T extends Node> T find(final String query) {
-        // TestFX provides many operations to retrieve elements from the loaded GUI.
-        return lookup(query).query();
-    }
+//    public <T extends Node> T find(final String query) {
+//        // TestFX provides many operations to retrieve elements from the loaded GUI.
+//        return lookup(query).query();
+//    }
 
     @Before
     public void setUp() {

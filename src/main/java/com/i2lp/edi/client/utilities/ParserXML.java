@@ -661,20 +661,6 @@ public class ParserXML {
         }
     }
 
-    public String getPresentationId() {
-
-        //Store the documentID:
-        // Find all (root)elements named "document"
-        NodeList presentationDocumentList = xmlDocument.getElementsByTagName("document");
-
-        //there is only one (root) element "document", hence choose the first index.
-        Node presentationDocumentNode = presentationDocumentList.item(0);
-
-        logger.info("PresentationID acquired...");
-        //return the attribute of the document node, the presentationID
-        return  presentationDocumentNode.getAttributes().item(0).getNodeValue();
-    }
-
     public Boolean validateExtension(String path) {
         Boolean validated = false;
         if(path.lastIndexOf(".") != -1 && path.lastIndexOf(".") != 0) {

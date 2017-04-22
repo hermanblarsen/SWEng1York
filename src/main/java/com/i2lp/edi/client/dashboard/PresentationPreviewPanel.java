@@ -1,7 +1,9 @@
 package com.i2lp.edi.client.dashboard;
 
+import com.i2lp.edi.client.presentationElements.Presentation;
 import com.i2lp.edi.client.utilities.ParserXML;
 import javafx.scene.control.Label;
+import javafx.scene.control.Tooltip;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import org.kordamp.bootstrapfx.scene.layout.Panel;
@@ -18,8 +20,8 @@ public class PresentationPreviewPanel extends Panel {
     protected static Logger logger = LoggerFactory.getLogger(Dashboard.class);
     private final Pane parentPane;
     private final String presentationPath;
-    private final String presentationID;
     private final String presentationSubject;
+    private final Presentation presentation;
     private boolean isSelected;
     private boolean isHidden;
 
@@ -32,15 +34,15 @@ public class PresentationPreviewPanel extends Panel {
         this.getStyleClass().add("panel-primary");
 
         ParserXML parser = new ParserXML(presentationPath);
-        presentationID = parser.getPresentationId();
+        presentation = parser.parsePresentation();
         Random random = new Random();
         presentationSubject = new String("Subject " + random.nextInt(3)); //TODO: Get presentation subject from XML
 
-        this.setText("ID: " + presentationID);
+        this.setText("ID: " + getPresentation().getDocumentID());
 
         ImageView preview;
         try {
-            preview = new ImageView("file:"+ System.getProperty("java.io.tmpdir") + "Edi/Thumbnails/" + presentationID + "_slide0_thumbnail.png");
+            preview = new ImageView("file:"+ System.getProperty("java.io.tmpdir") + "Edi/Thumbnails/" + getPresentation().getDocumentID() + "_slide0_thumbnail.png");
         } catch(NullPointerException | IllegalArgumentException e) {
             preview = new ImageView("file:projectResources/emptyThumbnail.png");
         }
@@ -51,6 +53,13 @@ public class PresentationPreviewPanel extends Panel {
         preview.setCache(true);
         this.setBody(preview);
         this.setFooter(new Label("Subject: " + presentationSubject));
+
+        Tooltip tooltip = new Tooltip("Title: " + getPresentation().getTitle() + "\n" +
+                                        "Author: " + getPresentation().getAuthor() + "\n" +
+                                        "Subject: " + getPresentation().getSubject() + "\n" +
+                                        "Description: " + getPresentation().getDescription() + "\n" +
+                                        "Tags: " + getPresentation().getTags());
+        Tooltip.install(this, tooltip);
     }
 
     public PresentationPreviewPanel(Pane parentPane){
@@ -81,9 +90,11 @@ public class PresentationPreviewPanel extends Panel {
         }
     }
 
-    public String getPresentationID() { return presentationID; }
+    //public String getPresentationID() { return presentation.getDocumentID(); }
 
     public String getPresentationSubject() { return presentationSubject; }
+
+    public Presentation  getPresentation() { return presentation; }
 
     public boolean isHidden() { return isHidden; }
 

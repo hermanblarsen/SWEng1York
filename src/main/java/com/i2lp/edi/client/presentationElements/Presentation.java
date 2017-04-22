@@ -13,6 +13,8 @@ import java.util.List;
  */
 @SuppressWarnings({"WeakerAccess", "unused"})
 public class Presentation extends Pane {
+
+    private String title;
     private String documentID;
     private String author;
     private Float version;
@@ -20,6 +22,7 @@ public class Presentation extends Pane {
     private String description;
     private String tags;
     private Theme theme;
+    private String subject;
     private boolean isI2lpFormat;
     private ArrayList<String> xmlFaults = null;
 
@@ -159,6 +162,14 @@ public class Presentation extends Pane {
     public void setDescription(String description) {
         this.description = description;
     }
+
+    public String getTitle() { return title; }
+
+    public void setTitle(String title) { this.title = title; }
+
+    public String getSubject() { return subject; }
+
+    public void setSubject(String subject) { this.subject = subject; }
 
     public static Presentation generateTestPresentation() {
         ArrayList<Slide> slides = new ArrayList<>();
