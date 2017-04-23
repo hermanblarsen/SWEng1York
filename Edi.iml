@@ -15,15 +15,6 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="AudioElementRemove" level="project" />
-    <orderEntry type="module-library">
-      <library name="Maven: iilp:timepicker-jar:0.0.1">
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/datetime-picker-0.0.1.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
     <orderEntry type="library" name="Maven: org.apache.maven.plugins:maven-jxr-plugin:2.5" level="project" />
     <orderEntry type="library" name="Maven: org.apache.velocity:velocity:1.5" level="project" />
     <orderEntry type="library" name="Maven: commons-collections:commons-collections:3.1" level="project" />

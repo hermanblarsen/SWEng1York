@@ -170,15 +170,6 @@
     </build>
 
     <dependencies>
-        <!-- Local TimePicker jar file -->
-        <dependency>
-            <groupId>iilp</groupId>
-            <artifactId>timepicker-jar</artifactId>
-            <version>0.0.1</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/lib/datetime-picker-0.0.1.jar</systemPath>
-        </dependency>
-
         <!-- Clear XREF Surefire Report Warning -->
         <dependency>
             <groupId>org.apache.maven.plugins</groupId>

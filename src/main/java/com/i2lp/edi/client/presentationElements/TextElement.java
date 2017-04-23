@@ -46,6 +46,7 @@ public class TextElement extends SlideElement {
         browser = new WebView();
         webEngine = browser.getEngine();
 
+
         //Put HTML into WebView
         webEngine.loadContent(textContent);
 
@@ -65,9 +66,11 @@ public class TextElement extends SlideElement {
         getCoreNode().setTranslateY(xPosition);
         getCoreNode().setTranslateX(xPosition);
 
+        browser.setPrefWidth(xSize);
+        browser.setPrefHeight(ySize);
+
         getCoreNode().addEventHandler(MouseEvent.MOUSE_CLICKED, event -> logger.info("Clicked textElement!"));
         getCoreNode().setPickOnBounds(false);
-
     }
 
     @Override
@@ -78,13 +81,8 @@ public class TextElement extends SlideElement {
     public void doClassSpecificRender() {
         //Refresh Browser
         browser.requestLayout();
-
-
-
-
-        //Update Location
-        getCoreNode().setTranslateY(xPosition/100);
-        getCoreNode().setTranslateX(xPosition);
+        //TODO: Enforce every element
+        scaleDimensions(xPosition, yPosition);
     }
 
     public Pane getSlideCanvas() {

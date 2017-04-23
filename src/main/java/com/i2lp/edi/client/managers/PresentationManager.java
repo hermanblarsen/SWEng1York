@@ -229,14 +229,17 @@ public abstract class PresentationManager {
 
         assignAttributes(myPresentationElement);
         mainUI.setCenter(myPresentationElement.getSlide(currentSlideNumber));
+
+
+        //Automatic resize of SlideElements
+        scene.widthProperty().addListener((observableValue, oldSceneWidth, newSceneWidth) -> {redraw();});
+        scene.heightProperty().addListener((observableValue, oldSceneHeight, newSceneHeight) -> redraw());
     }
 
     private void redraw(){
-        for (Slide toAssign : myPresentationElement.getSlideList()) {
-            for (SlideElement toBeAssigned : toAssign.getSlideElementList()) {
-                //TODO: Swap for Resize methoda
-                toBeAssigned.setupElement();
-            }
+        logger.trace("Resizing slide Elements");
+        for (SlideElement toResize : myPresentationElement.getSlide(currentSlideNumber).getVisibleSlideElementList()) {
+                toResize.doClassSpecificRender();
         }
     }
 

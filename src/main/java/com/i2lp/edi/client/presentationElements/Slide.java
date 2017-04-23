@@ -16,11 +16,6 @@ public class Slide extends Pane {
     Logger logger = LoggerFactory.getLogger(Slide.class);
 
     protected List<SlideElement> slideElementList;
-
-    public List<SlideElement> getVisibleSlideElementList() {
-        return visibleSlideElementList;
-    }
-
     protected List<SlideElement> visibleSlideElementList;
     protected List<TextElement> textElementList = new ArrayList<>();
     protected List<GraphicElement> graphicElementList = new ArrayList<>();
@@ -49,14 +44,9 @@ public class Slide extends Pane {
     int maxSequenceNumber = 0;
 
 
-
     public Slide() {
         slideElementList = new ArrayList<>();
         visibleSlideElementList = new ArrayList<>();
-
-        //Add
-        this.widthProperty().addListener((observableValue, oldSceneWidth, newSceneWidth) -> System.out.println("Width: " + newSceneWidth));
-        this.heightProperty().addListener((observableValue, oldSceneHeight, newSceneHeight) -> System.out.println("Height: " + newSceneHeight));
     }
 
     public void addElement(int elementIndex, SlideElement newElement) {
@@ -68,8 +58,6 @@ public class Slide extends Pane {
         logger.debug("Adding new element to SlideID: %d, slideID");
         this.slideElementList.add(this.slideElementList.size(), newElement);
     }
-
-
 
 
     public void deleteElementWithIndex(int elementIndex) {
@@ -148,8 +136,8 @@ public class Slide extends Pane {
      * Searches for currentSequence number in either start sequence or end sequence field. Used to determine whether to add elements to the visible
      * set. Throws not found exception if cant find elements with a start or end sequence that matches.
      *
-     * @param toSearch   List of Slide elements to search
-     * @param sequence   Sequence number to search for in list (start or end)
+     * @param toSearch List of Slide elements to search
+     * @param sequence Sequence number to search for in list (start or end)
      * @return Returns ArrayList of slideElements corresponding to elements with desired sequence number
      * @throws SequenceNotFoundException If a sequence number cant be found, there is most likely an error
      */
@@ -158,7 +146,7 @@ public class Slide extends Pane {
 
         //Search simulateously for start and end sequence elements
         for (SlideElement slideElement : toSearch) {
-            if (slideElement.getStartSequence() ==sequence  || slideElement.getEndSequence() == sequence) {
+            if (slideElement.getStartSequence() == sequence || slideElement.getEndSequence() == sequence) {
                 toReturn.add(slideElement);
             }
         }
@@ -211,4 +199,9 @@ public class Slide extends Pane {
     public void setAudioElementList(List<AudioElement> audioElementList) {
         this.audioElementList = audioElementList;
     }
+
+    public List<SlideElement> getVisibleSlideElementList() {
+        return visibleSlideElementList;
+    }
 }
+
