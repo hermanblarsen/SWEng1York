@@ -1,0 +1,37 @@
+<document documentid="VideoTest">
+    <documentdetails>
+        <author>Joe Bloggs</author>
+        <version>1.0</version>
+        <documentaspectratio>1.78</documentaspectratio>
+        <description>Sample XML input</description>
+        <tags>sample,xml,input</tags>
+        <groupformat>2</groupformat>
+    </documentdetails>
+    <slideshow>
+        <defaults>
+            <bgcolour>#FF2304</bgcolour>
+            <font>Arial</font>
+            <fontsize>12</fontsize>
+            <fontcolour>#F00D33FF</fontcolour>
+            <graphicscolour>#F40D33FF</graphicscolour>
+            <autoplaymedia>true</autoplaymedia>
+        </defaults>
+        <slide slideid="1">
+            <video elementid ="1" layer="1" visibility="true" startsequence="1" endsequence="2">
+              <xposition>0.5</xposition>
+              <yposition>0.5</yposition>
+              <ysize>0.3</ysize>
+              <xsize>0.3</xsize>
+              <path>projectResources/prometheus.mp4</path>
+              <onclickaction>openwebsite</onclickaction>
+              <onclickinfo>https://www.google.no/</onclickinfo>
+              <loop>false</loop>
+              <autoplay>false</autoplay>
+              <aspectratiolock>true</aspectratiolock>
+              <elementaspectratio>1.333f</elementaspectratio>
+              <starttime>0</starttime>
+              <endtime>30000</endtime>
+            </video>
+        </slide>
+    </slideshow>
+</document>

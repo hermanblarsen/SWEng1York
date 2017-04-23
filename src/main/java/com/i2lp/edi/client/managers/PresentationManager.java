@@ -88,6 +88,13 @@ public abstract class PresentationManager {
                 }else{
                     toBeAssigned.setTeacher(false);
                 }
+            }
+        }
+    }
+
+    protected void assignSizeProperties(Presentation myPresentationElement){
+        for (Slide toAssign : myPresentationElement.getSlideList()) {
+            for (SlideElement toBeAssigned : toAssign.getSlideElementList()) {
                 toBeAssigned.setSlideWidth(slideWidth);
                 toBeAssigned.setSlideHeight(slideHeight);
             }
@@ -105,6 +112,7 @@ public abstract class PresentationManager {
         Rectangle2D primaryScreenBounds = Screen.getPrimary().getVisualBounds();
         slideWidth = primaryScreenBounds.getWidth() * SLIDE_SIZE;
         slideHeight = slideWidth / myPresentationElement.getTheme().getPresentationAspectRatio();
+        assignSizeProperties(myPresentationElement);
         scene = new Scene(stackPane, slideWidth, slideHeight); //1000x600
         scene.getStylesheets().add("bootstrapfx.css");
 
@@ -252,7 +260,7 @@ public abstract class PresentationManager {
         assignAttributes(myPresentationElement);
         mainUI.setCenter(myPresentationElement.getSlide(currentSlideNumber));
     }
-    
+
     private void redraw(){
         logger.trace("Resizing slide Elements");
         for (SlideElement toResize : myPresentationElement.getSlide(currentSlideNumber).getVisibleSlideElementList()) {

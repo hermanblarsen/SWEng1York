@@ -15,8 +15,10 @@ import javafx.scene.control.ToggleGroup;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.util.Duration;
+import org.kordamp.bootstrapfx.scene.layout.Panel;
 
 import java.util.List;
 
@@ -32,6 +34,7 @@ public class PollElement extends InteractiveElement {
     protected int timeLimit = 20;
     protected HBox pollOptions;
     protected Timeline timeline;
+    protected Panel questionPane;
 
     public PollElement() {
 
@@ -64,24 +67,27 @@ public class PollElement extends InteractiveElement {
         timeline.setOnFinished(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                pollPane.getChildren().remove(pollOptions);
+                //pollPane.getChildren().remove(pollOptions);
+                questionPane.getChildren().remove(pollOptions);
                 Label done = new Label("DONE");
-                pollPane.setCenter(done);
+                //pollPane.setCenter(done);
+                questionPane.setBody(done);
             }
         });
         if(teacher){
-            System.out.println("Teacher State"+ teacher);
             Button startTimer = new Button("START");
             startTimer.getStyleClass().setAll("btn", "btn-default");
             startTimer.addEventHandler(MouseEvent.MOUSE_CLICKED,evt->{
                 timerStart = true;
                 pollOptions= new HBox();
                 pollOptions.getChildren().addAll(setUpQuestions(),remainingTime);
-                pollPane.setCenter(pollOptions);
+                //pollPane.setCenter(pollOptions);
+                questionPane.setBody(pollOptions);
                 //delay.play();
                 timeline.play();
             });
-            pollPane.setCenter(startTimer);
+            //pollPane.setCenter(startTimer);
+            questionPane.setBody(startTimer);
 
         }
     }
@@ -95,7 +101,10 @@ public class PollElement extends InteractiveElement {
     public void setupElement() {
         pollPane = new BorderPane();
         pollPane.getStylesheets().add("bootstrapfx.css");
-        Label question = new Label(pollQuestion);
+        //Label question = new Label(pollQuestion);
+        questionPane = new Panel(pollQuestion);
+
+        questionPane.getStyleClass().add("panel-primary");
         //question.setMinWidth(Double.MAX_VALUE);
 
 
@@ -107,9 +116,9 @@ public class PollElement extends InteractiveElement {
 
 //        });
 
+        questionPane.setPrefSize(slideWidth,slideHeight);
 
-
-        pollPane.setTop(question);
+        pollPane.setTop(questionPane);
 
 
     }

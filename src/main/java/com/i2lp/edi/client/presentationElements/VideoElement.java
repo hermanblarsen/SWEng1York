@@ -46,6 +46,23 @@ public class VideoElement extends SlideElement{
 
     @Override
     public void doClassSpecificRender() {
+
+        if (xSize == 0 || ySize == 0) {
+            mv.fitWidthProperty().bind(slideCanvas.widthProperty());
+            mv.fitHeightProperty().bind(slideCanvas.heightProperty());
+        } else {
+            xSize = (float)slideWidth*(xSize);
+            ySize = xSize/elementAspectRatio;
+            mv.setFitHeight(ySize);
+            mv.setFitWidth(xSize);
+        }
+
+        xPosition = (float) (slideWidth * (xPosition));
+        yPosition = (float) slideHeight * (yPosition);
+
+        mediaPane.setTranslateX(xPosition);
+        mediaPane.setTranslateY(yPosition);
+        System.out.println("CURRENT PATH: "+ media.getSource());
         if(autoplay){
             mp.play();
         }
@@ -68,6 +85,7 @@ public class VideoElement extends SlideElement{
             media = new Media(mediaPath);
         }
 
+        System.out.println("media 2:" + media);
         mp = new MediaPlayer(media);
         mv = new MediaView(mp);
         //mediaPane.getChildren().add(mv);
@@ -88,15 +106,7 @@ public class VideoElement extends SlideElement{
         }
 
         mv.setPreserveRatio(aspectRatioLock);
-        mv.setTranslateX(xPosition);
-        mv.setTranslateY(yPosition);
-        if (xSize == 0 || ySize == 0) {
-            mv.fitWidthProperty().bind(slideCanvas.widthProperty());
-            mv.fitHeightProperty().bind(slideCanvas.heightProperty());
-        } else {
-            mv.setFitHeight(ySize);
-            mv.setFitWidth(xSize);
-        }
+
         mediaPane.getChildren().add(mv);
         mediaPane.setStyle("-fx-background-color: black");
         if (mediaControl) {
@@ -325,12 +335,16 @@ public class VideoElement extends SlideElement{
         fullscreenButton.addEventHandler(MouseEvent.MOUSE_CLICKED,(event) -> {
             // TODO: Implement this properly
             if (!fullscreen) {
+                mediaPane.setTranslateX(0);
+                mediaPane.setTranslateY(0);
                 mv.setFitHeight(slideCanvas.getHeight());
                 mv.setFitWidth(slideCanvas.getWidth());
                 fullscreen = true;
             } else {
-                mv.setFitHeight(initialBounds.getHeight());
-                mv.setFitWidth(initialBounds.getWidth());
+                mediaPane.setTranslateX(xPosition);
+                mediaPane.setTranslateY(yPosition);
+                mv.setFitHeight(ySize);
+                mv.setFitWidth(xSize);
                 fullscreen = false;
             }
         });
