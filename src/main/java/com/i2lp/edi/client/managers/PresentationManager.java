@@ -67,6 +67,7 @@ public abstract class PresentationManager {
 
     protected StackPane stackPane;
     public int currentSlideNumber = 0; //Current slide number in presentation
+    private boolean isMouseOverSlide = true;
 
 
     /**
@@ -100,8 +101,6 @@ public abstract class PresentationManager {
         border = new BorderPane();
         loadPresentation(border, path);
         stackPane = new StackPane();
-        Region blackRegion = new Region();
-        blackRegion.setBackground(new Background(new BackgroundFill(Color.BLACK, null, null)));
         stackPane.getChildren().add(border);
         Rectangle2D primaryScreenBounds = Screen.getPrimary().getVisualBounds();
         slideWidth = primaryScreenBounds.getWidth() * SLIDE_SIZE;
@@ -110,6 +109,26 @@ public abstract class PresentationManager {
         scene.getStylesheets().add("bootstrapfx.css");
 
         //Listeners for moving through presentation
+        addKeyboardListeners();
+        addMouseListeners();
+        addResizeListeners();
+
+        presentationStage.setScene(scene);
+        presentationStage.show();
+
+
+        pb = new ProgressBar(0);
+        slideNumber = new Label("Slide 1 of " + myPresentationElement.getSlideList().size());
+
+        createCommentPanel();
+        bottomPane.getChildren().add(0, addPresentationControls(presentationStage));
+        border.setBottom(bottomPane);
+    }
+
+    private void addKeyboardListeners() {
+        Region blackRegion = new Region();
+        blackRegion.setBackground(new Background(new BackgroundFill(Color.BLACK, null, null)));
+
         scene.setOnKeyPressed(key -> {
             if (key.getCode().equals(KeyCode.ENTER) ||
                     key.getCode().equals(KeyCode.SPACE) ||
@@ -140,7 +159,9 @@ public abstract class PresentationManager {
                 while (slideAdvance(myPresentationElement, Slide.SLIDE_FORWARD) != Presentation.PRESENTATION_FINISH);
             }
         });
+    }
 
+    private void addMouseListeners() {
         scene.setOnMouseClicked(mouseEvent -> {
             if(mouseEvent.getButton().equals(MouseButton.SECONDARY)) {
                 ContextMenu cMenu = new ContextMenu();
@@ -195,29 +216,30 @@ public abstract class PresentationManager {
         cursorHideTimer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
-                if(!mouseMoved && !isCursorHidden())
+                if(!mouseMoved && !isCursorHidden && isMouseOverSlide)
                     setCursorHidden(true);
 
                 mouseMoved = false;
             }
         }, 0, 2000);
 
-        scene.addEventHandler(MouseEvent.MOUSE_MOVED, event -> {
-            mouseMoved = true;
-            if(isCursorHidden())
-                setCursorHidden(false);
+        border.getCenter().addEventHandler(MouseEvent.ANY, event -> {
+            if(event.getEventType().equals(MouseEvent.MOUSE_ENTERED)) {
+                isMouseOverSlide = true;
+            } else if(event.getEventType().equals(MouseEvent.MOUSE_EXITED)) {
+                isMouseOverSlide = false;
+            } else if(event.getEventType().equals(MouseEvent.MOUSE_MOVED)) {
+                mouseMoved = true;
+                if(isCursorHidden)
+                    setCursorHidden(false);
+            }
         });
+    }
 
-        presentationStage.setScene(scene);
-        presentationStage.show();
-
-
-        pb = new ProgressBar(0);
-        slideNumber = new Label("Slide 1 of " + myPresentationElement.getSlideList().size());
-
-        createCommentPanel();
-        bottomPane.getChildren().add(0, addPresentationControls(presentationStage));
-        border.setBottom(bottomPane);
+    private void addResizeListeners() {
+        //Automatic resize of SlideElements
+        scene.widthProperty().addListener((observableValue, oldSceneWidth, newSceneWidth) -> redraw());
+        scene.heightProperty().addListener((observableValue, oldSceneHeight, newSceneHeight) -> redraw());
     }
 
     public void loadPresentation(BorderPane mainUI, String path) {
@@ -229,11 +251,6 @@ public abstract class PresentationManager {
 
         assignAttributes(myPresentationElement);
         mainUI.setCenter(myPresentationElement.getSlide(currentSlideNumber));
-
-
-        //Automatic resize of SlideElements
-        scene.widthProperty().addListener((observableValue, oldSceneWidth, newSceneWidth) -> {redraw();});
-        scene.heightProperty().addListener((observableValue, oldSceneHeight, newSceneHeight) -> redraw());
     }
 
     private void redraw(){
@@ -497,8 +514,6 @@ public abstract class PresentationManager {
             logger.error("Couldnt finalize PresMan");
         }
     }
-
-    public boolean isCursorHidden() { return isCursorHidden;}
 
     public void setCursorHidden(boolean cursorHidden) {
         isCursorHidden = cursorHidden;

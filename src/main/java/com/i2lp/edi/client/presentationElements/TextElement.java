@@ -66,8 +66,8 @@ public class TextElement extends SlideElement {
         getCoreNode().setTranslateY(xPosition);
         getCoreNode().setTranslateX(xPosition);
 
-        browser.setPrefWidth(xSize);
-        browser.setPrefHeight(ySize);
+//        browser.setPrefWidth(xSize);
+//        browser.setPrefHeight(ySize);
 
         getCoreNode().addEventHandler(MouseEvent.MOUSE_CLICKED, event -> logger.info("Clicked textElement!"));
         getCoreNode().setPickOnBounds(false);
