@@ -20,8 +20,8 @@ CREATE TABLE "modules" (
 	"presentation_ids" integer,
 	"description" varchar(255),
 	"subject" varchar(255),
-	"time_last_updated" TIME,
-	"time_created" TIME,
+	"time_last_updated"  TIME,
+	"time_created"  TIME DEFAULT CURRENT_TIME,
 	CONSTRAINT modules_pk PRIMARY KEY ("module_id")
 ) WITH (
   OIDS=FALSE
@@ -48,8 +48,8 @@ VALUES (1);
 CREATE TABLE "questions" (
 	"question_id" SERIAL,
 	"user_id" integer,
-	"time_created" TIME,
-	"time_answered" TIME,
+	"time_created"  TIME DEFAULT CURRENT_TIME,
+	"time_answered"  TIME,
 	"question_data" varchar(255),
 	"slide_number" integer,
 	CONSTRAINT questions_pk PRIMARY KEY ("question_id")
@@ -78,7 +78,7 @@ CREATE TABLE "interactions" (
 	"interaction_id" SERIAL,
 	"user_id" integer,
 	"interaction_data" varchar(255),
-	"time_created" TIME,
+	"time_created"  TIME DEFAULT CURRENT_TIME,
 	CONSTRAINT interactions_pk PRIMARY KEY ("interaction_id")
 ) WITH (
   OIDS=FALSE
