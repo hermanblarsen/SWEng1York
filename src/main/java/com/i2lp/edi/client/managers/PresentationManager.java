@@ -141,6 +141,7 @@ public abstract class PresentationManager {
 
         createCommentPanel();
         bottomPane.getChildren().add(0, addPresentationControls(presentationStage));
+        resize();
     }
 
     private void addKeyboardListeners() {
@@ -164,7 +165,7 @@ public abstract class PresentationManager {
             } else if(key.getCode().equals(KeyCode.F5)) {
                 presentationStage.setFullScreen(true);
             } else if(key.getCode().equals(KeyCode.B)) {
-                if(isShowBlack) {
+                if(isShowBlack) { //TODO: Make put black on top after slide has changed (in displaySlide())
                     displayPane.getChildren().remove(blackRegion);
                     isShowBlack = false;
                 } else {
@@ -349,12 +350,8 @@ public abstract class PresentationManager {
             slideProgress(myPresentationElement);
 
         });
-        nextButton.addEventHandler(MouseEvent.MOUSE_ENTERED, evt->{
-            nextButton.setEffect(shadow);
-        });
-        nextButton.addEventHandler(MouseEvent.MOUSE_EXITED,evt->{
-            nextButton.setEffect(null);
-        });
+        nextButton.addEventHandler(MouseEvent.MOUSE_ENTERED, evt-> nextButton.setEffect(shadow));
+        nextButton.addEventHandler(MouseEvent.MOUSE_EXITED,evt-> nextButton.setEffect(null));
 
         Image back = new Image("file:projectResources/icons/Left_NEW.png", 30, 30, true, true);
         ImageView backButton = new ImageView(back);
@@ -362,12 +359,8 @@ public abstract class PresentationManager {
             controlPresentation(Slide.SLIDE_BACKWARD);
             slideProgress(myPresentationElement);
         });
-        backButton.addEventHandler(MouseEvent.MOUSE_ENTERED, evt->{
-            backButton.setEffect(shadow);
-        });
-        backButton.addEventHandler(MouseEvent.MOUSE_EXITED,evt->{
-            backButton.setEffect(null);
-        });
+        backButton.addEventHandler(MouseEvent.MOUSE_ENTERED, evt-> backButton.setEffect(shadow));
+        backButton.addEventHandler(MouseEvent.MOUSE_EXITED,evt-> backButton.setEffect(null));
 
 
         Image fullScreen = new Image("file:projectResources/icons/Fullscreen_NEW.png", 30, 30, true, true);
@@ -389,12 +382,8 @@ public abstract class PresentationManager {
                 slideHeight = primaryScreenBounds.getHeight() * 0.75;
             }
         });
-        fullScreenButton.addEventHandler(MouseEvent.MOUSE_ENTERED, evt->{
-            fullScreenButton.setEffect(shadow);
-        });
-        fullScreenButton.addEventHandler(MouseEvent.MOUSE_EXITED,evt->{
-            fullScreenButton.setEffect(null);
-        });
+        fullScreenButton.addEventHandler(MouseEvent.MOUSE_ENTERED, evt-> fullScreenButton.setEffect(shadow));
+        fullScreenButton.addEventHandler(MouseEvent.MOUSE_EXITED,evt-> fullScreenButton.setEffect(null));
         ImageView specificFeats;
         if(this instanceof StudentPresentationManager) {
             Image questionBubble = new Image("file:projectResources/icons/QM_Filled.png", 30, 30, true, true);
@@ -409,12 +398,8 @@ public abstract class PresentationManager {
                     questionQueueActive = false;
                 }
             });
-            questionQ.addEventHandler(MouseEvent.MOUSE_ENTERED, evt -> {
-                questionQ.setEffect(shadow);
-            });
-            questionQ.addEventHandler(MouseEvent.MOUSE_EXITED, evt -> {
-                questionQ.setEffect(null);
-            });
+            questionQ.addEventHandler(MouseEvent.MOUSE_ENTERED, evt -> questionQ.setEffect(shadow));
+            questionQ.addEventHandler(MouseEvent.MOUSE_EXITED, evt -> questionQ.setEffect(null));
             specificFeats = questionQ;
         } else {
             Image checkList = new Image("file:projectResources/icons/TeacherToolKit.png",30,30,true,true);
@@ -429,12 +414,8 @@ public abstract class PresentationManager {
                     questionQueueActive = false;
                 }
             });
-            teacherToolKit.addEventHandler(MouseEvent.MOUSE_ENTERED, evt -> {
-                teacherToolKit.setEffect(shadow);
-            });
-            teacherToolKit.addEventHandler(MouseEvent.MOUSE_EXITED, evt -> {
-                teacherToolKit.setEffect(null);
-            });
+            teacherToolKit.addEventHandler(MouseEvent.MOUSE_ENTERED, evt -> teacherToolKit.setEffect(shadow));
+            teacherToolKit.addEventHandler(MouseEvent.MOUSE_EXITED, evt -> teacherToolKit.setEffect(null));
 
             specificFeats = teacherToolKit;
         }
@@ -452,12 +433,8 @@ public abstract class PresentationManager {
             }
 
         });
-        commentButton.addEventHandler(MouseEvent.MOUSE_ENTERED, evt->{
-            commentButton.setEffect(shadow);
-        });
-        commentButton.addEventHandler(MouseEvent.MOUSE_EXITED,evt->{
-            commentButton.setEffect(null);
-        });
+        commentButton.addEventHandler(MouseEvent.MOUSE_ENTERED, evt-> commentButton.setEffect(shadow));
+        commentButton.addEventHandler(MouseEvent.MOUSE_EXITED,evt-> commentButton.setEffect(null));
 
 
         StackPane progressBar = new StackPane();

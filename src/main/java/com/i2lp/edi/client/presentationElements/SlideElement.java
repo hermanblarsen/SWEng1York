@@ -202,8 +202,15 @@ public abstract class SlideElement {
     protected void performOnClickAction(){
         logger.info("Performing onClick action: " + onClickAction + " with onClick info: " + onClickInfo);
         switch(onClickAction){
-            case "lol":
+            case "openwebsite":
+                //onclickinfo=”URL”
+                break;
+            case "gotoslide":
+                //onClickInfo = slideID
+                break;
 
+            case "dynamicmediatoggle":
+                //onclickinfo = elementid
                 break;
         }
     }

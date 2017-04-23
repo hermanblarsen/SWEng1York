@@ -55,9 +55,8 @@ public class TextElement extends SlideElement {
         cssFilePath = Utils.cssGen(presentationID, slideID, elementID, fontSize, font, fontColour, bgColour, borderColour, borderSize);
         webEngine.setUserStyleSheetLocation(cssFilePath);
 
-        //Stage 3 Setup: DoClassSpecificRender for resizing, register State Handlers
+        //Stage 3 Setup: DoClassSpecificRender for resizing, register State Handlers, register onClickAction method in superclass
         doClassSpecificRender();
-
         getCoreNode().addEventHandler(MouseEvent.MOUSE_CLICKED, event -> performOnClickAction());
 
         //If done rendering, adjust height to fit content, set isReady variable for thumbnail generation

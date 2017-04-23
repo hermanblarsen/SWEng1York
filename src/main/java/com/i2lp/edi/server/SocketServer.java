@@ -79,7 +79,7 @@ public class SocketServer {
 
                 //Attempt to add a user using stored procedure
                 try (PGConnection connection = (PGConnection) dataSource.getConnection()) {
-                    PreparedStatement statement = connection.prepareStatement("select edi.public.sp_adduser(?, ?, ?, ?, ?, ?);");
+                    PreparedStatement statement = connection.prepareStatement("select edi.public.sp_adduser(?, ?, ?, ?, ?);");
 
                     //Fill prepared statements to avoid SQL injection
                     statement.setString(1, data.getFirstName());
@@ -87,7 +87,6 @@ public class SocketServer {
                     statement.setString(3, data.getEmailAddress());
                     statement.setString(4, data.getPassword());
                     statement.setString(5, data.getUserType());
-                    statement.setInt(6, 1);//TODO: Add proper classID
 
                     //Call stored procedure on database
                     ResultSet rs = statement.executeQuery();
@@ -119,6 +118,8 @@ public class SocketServer {
                     //Fill prepared statements to avoid SQL injection
                     statement.setString(1, data.getUserToLogin());
                     statement.setString(2, data.getPassword());
+
+
 
                     //Call stored procedure on database
                     ResultSet authStatus = statement.executeQuery();

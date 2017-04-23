@@ -2,20 +2,18 @@ package com.i2lp.edi.client.presentationViewer;
 import com.i2lp.edi.client.managers.PresentationManager;
 import com.i2lp.edi.client.presentationElements.CommentPanel;
 import javafx.animation.Animation;
-import javafx.animation.FillTransition;
 import javafx.animation.Interpolator;
 import javafx.animation.Transition;
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
-import javafx.scene.web.WebEngine;
-import javafx.scene.web.WebView;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.stage.WindowEvent;
@@ -24,6 +22,7 @@ import org.kordamp.bootstrapfx.scene.layout.Panel;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 
 /**
@@ -109,7 +108,7 @@ public class TeacherPresentationManager extends PresentationManager {
                     displayPane.getChildren().addAll(slidePane);
                     questionClicked = true;
                 }else{
-                    if(lab.getText() == setText) {
+                    if(Objects.equals(lab.getText(), setText)) {
                         displayPane.getChildren().remove(slidePane);
                         slidePane.getChildren().removeAll(backgroundRegion, lab);
                         questionClicked = false;
@@ -181,9 +180,7 @@ public class TeacherPresentationManager extends PresentationManager {
             tp.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
             toolkitOpen = true;
 
-            teacherToolKit.addEventHandler(WindowEvent.WINDOW_CLOSE_REQUEST,evt->{
-                toolkitOpen = false;
-            });
+            teacherToolKit.addEventHandler(WindowEvent.WINDOW_CLOSE_REQUEST,evt-> toolkitOpen = false);
         }
 
     }

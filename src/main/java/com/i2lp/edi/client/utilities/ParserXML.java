@@ -11,6 +11,10 @@ import java.io.IOException;
 import java.nio.file.InvalidPathException;
 import java.util.ArrayList;
 
+import static com.i2lp.edi.client.utilities.Utils.checkValidColour;
+import static com.i2lp.edi.client.utilities.Utils.checkValidFont;
+import static com.i2lp.edi.client.utilities.Utils.checkValidFontSize;
+
 /**
  * Created by habl on 23/02/2017.
  */
@@ -170,19 +174,19 @@ public class ParserXML {
 
                     switch (elementName) {
                         case "bgcolour":
-                            theme.setBackgroundColour(elementContent);
+                            theme.setBackgroundColour(checkValidColour(elementContent, null));
                             break;
                         case "font":
-                            theme.setFont(elementContent);
+                            theme.setFont(checkValidFont(elementContent, null));
                             break;
                         case "fontsize":
-                            theme.setFontSize(Integer.valueOf(elementContent));
+                            theme.setFontSize(checkValidFontSize(Integer.parseInt(elementContent), null));
                             break;
                         case "fontcolour":
-                            theme.setFontColour(elementContent);
+                            theme.setFontColour(checkValidColour(elementContent, null));
                             break;
                         case "graphicscolour":
-                            theme.setGraphicsColour(elementContent);
+                            theme.setGraphicsColour(checkValidColour(elementContent, null));
                             break;
                         case "autoplaymedia":
                             myPresentation.setAutoplayMedia(Boolean.valueOf(elementContent));
@@ -361,19 +365,19 @@ public class ParserXML {
                         textElement.setySize(Float.valueOf(elementContent));
                         break;
                     case "font":
-                        textElement.setFont(elementContent);
+                        textElement.setFont(checkValidFont(elementContent, myPresentation.getTheme()));
                         break;
                     case "fontsize":
-                        textElement.setFontSize(Integer.valueOf(elementContent));
+                        textElement.setFontSize(checkValidFontSize(Integer.valueOf(elementContent), myPresentation.getTheme()));
                         break;
                     case "fontcolour":
-                        textElement.setFontColour(elementContent);
+                        textElement.setFontColour(checkValidColour(elementContent, myPresentation.getTheme()));
                         break;
                     case "bgcolour":
-                        textElement.setBgColour(elementContent);
+                        textElement.setBgColour(checkValidColour(elementContent, myPresentation.getTheme()));
                         break;
                     case "bordercolour":
-                        textElement.setBorderColour(elementContent);
+                        textElement.setBorderColour(checkValidColour(elementContent, myPresentation.getTheme()));
                         break;
                     case "onclickaction":
                         textElement.setOnClickAction(elementContent);
@@ -426,10 +430,10 @@ public class ParserXML {
                         graphicElement.setElementAspectRatio(Float.valueOf(elementContent));
                         break;
                     case "linecolour":
-                        graphicElement.setLineColour(elementContent);
+                        graphicElement.setLineColour(checkValidColour(elementContent, myPresentation.getTheme()));
                         break;
                     case "fillcolour":
-                        graphicElement.setFillColour(elementContent);
+                        graphicElement.setFillColour(checkValidColour(elementContent, myPresentation.getTheme()));
                         break;
                     case "polygon":
                         NodeList polygonNodeChildrenList = elementNode.getChildNodes();

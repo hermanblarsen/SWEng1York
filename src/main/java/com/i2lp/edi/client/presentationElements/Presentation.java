@@ -347,9 +347,7 @@ public class Presentation extends Pane {
         myTextElementNewSlide2.setSlideCanvas(slide3);
         slideElementsSlide3.add(myTextElementNewSlide2);
 
-
         slide3.setSlideElementList(slideElementsSlide3);
-
 
         Presentation myPresentation = new Presentation();
         myPresentation.setSlideList(slides);

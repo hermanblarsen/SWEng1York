@@ -1,6 +1,5 @@
 package com.i2lp.edi.client.presentationElements;
 
-import com.i2lp.edi.client.Animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.beans.property.IntegerProperty;
@@ -15,7 +14,6 @@ import javafx.scene.control.ToggleGroup;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.util.Duration;
 import org.kordamp.bootstrapfx.scene.layout.Panel;
@@ -139,9 +137,7 @@ public class PollElement extends InteractiveElement {
             answerButton[i] = new ToggleButton(possibleAnswers.get(i));
             //answerButton[i].setMinWidth(slideCanvas.getWidth());
             answerButton[i].getStyleClass().setAll("btn","btn-default");
-            answerButton[i].addEventHandler(MouseEvent.MOUSE_CLICKED, evt -> {
-                System.out.println("Button " + number + " clicked!");
-            });
+            answerButton[i].addEventHandler(MouseEvent.MOUSE_CLICKED, evt -> System.out.println("Button " + number + " clicked!"));
             answerSelection.getChildren().add(answerButton[i]);
             answerButton[i].setToggleGroup(group);
         }

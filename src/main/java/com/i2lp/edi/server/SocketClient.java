@@ -97,9 +97,7 @@ public class SocketClient {
             logger.error("Couldn't create client port: May be in use by other program!");
         }
 
-        socket.on(Socket.EVENT_CONNECT, args -> {
-            logger.info("Client successfully connected to Edi Server");
-        });
+        socket.on(Socket.EVENT_CONNECT, args -> logger.info("Client successfully connected to Edi Server"));
 
         socket.on("DB_Update", args -> {
             logger.info("Client knows DB has updated:  " + args[0]);

@@ -7,7 +7,13 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static com.i2lp.edi.client.Constants.FALLBACK_COLOUR;
+import static com.i2lp.edi.client.Constants.MAX_FONT_SIZE;
+import static com.i2lp.edi.client.Constants.VALID_FONTS;
 
 /**
  * Created by amriksadhra on 21/03/2017.
@@ -20,6 +26,7 @@ public class Utils {
 
     /**
      * Simple regex to determine if IP address is valid
+     *
      * @param ip IP address to parse
      * @return Boolean corresponding to IP address validity
      * @author Amrik Sadhra
@@ -31,20 +38,14 @@ public class Utils {
 
     /**
      * Builds string for socket.IO connection
-     * @param serverIP Socket.IO com.i2lp.edi.server IP address to connect to
+     *
+     * @param serverIP   Socket.IO com.i2lp.edi.server IP address to connect to
      * @param serverPort Socket.IO com.i2lp.edi.server port to connect to
      * @return String containing concatenated result of serverIP and serverPort
      * @author Amrik Sadhra
      */
     public static String buildIPAddress(String serverIP, int serverPort) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("http://");
-        sb.append(serverIP);
-        sb.append(":");
-        sb.append(serverPort);
-        sb.append("/");
-
-        return sb.toString();
+        return "http://" + serverIP + ":" + serverPort + "/";
     }
 
     /**
@@ -52,8 +53,8 @@ public class Utils {
      *
      * @param fontSize   Font size in px
      * @param font       Desired font for text
-     * @param fontColour Desired font colour provided as ARGB hex
-     * @param bgColor    Desired background colour provided as ARGB hex
+     * @param fontColour Desired font colour provided as RGBA hex
+     * @param bgColor    Desired background colour provided as RGBA hex
      * @return Filename of CSS file that stores the CSS for a given TextElement
      */
     public static String cssGen(String presentationID, int slideID, int elementID, int fontSize, String font, String fontColour, String bgColor, String borderColour, int borderSize) {
@@ -68,20 +69,20 @@ public class Utils {
         ArrayList<String> lines = new ArrayList<>();
 
         lines.add("body{");
-        //TODO: Check validity of each passed in parameter? This would take a while, would ensure we keep program sanity when XML is invalid. But does our development assume perfect XML?
-        //This is the perfect place for default adding for element
-        if(bgColor != null) lines.add("   background-color: " + bgColor + ";");
-        if(fontColour != null) lines.add("   color: " + fontColour + ";");
-        if(font != null) lines.add("   font-family: " + font + ";");
-        if(fontSize != 0) lines.add("   font-size: " + fontSize + "px;");
 
-        if(borderSize != 0){
+        //Assume validity as XML parser has ensured is valid
+        //This is the perfect place for default adding for element
+        if (bgColor != null) lines.add("   background-color: " + bgColor + ";");
+        if (fontColour != null) lines.add("   color: " + fontColour + ";");
+        if (font != null) lines.add("   font-family: " + font + ";");
+        if (fontSize != 0) lines.add("   font-size: " + fontSize + "px;");
+
+        if (borderSize != 0) {
             lines.add("   border-style: solid;");
             lines.add("   border-width: " + borderSize + "px;");
-            if(borderColour != null) lines.add("   border-color: " + borderColour + ";");
+            if (borderColour != null) lines.add("   border-color: " + borderColour + ";");
         }
-        lines.add( "}");
-
+        lines.add("}");
 
         logger.info("Writing runtime created CSS to " + cssFilePath);
 
@@ -93,4 +94,81 @@ public class Utils {
 
         return "file:" + cssFilePath;
     }
+
+    /**
+     * Check font size is valid and return it if it is. Else return XML default.
+     *
+     * @param size Font size string parsed from XML to check for validity
+     * @return Default/Valid slide for presentation
+     * @author Amrik Sadhra
+     */
+    public static int checkValidFontSize(int size, Theme presentationDefaults) {
+        if ((size <= MAX_FONT_SIZE) && (size > 0)) return size;
+        if (presentationDefaults == null) {
+            if (size > MAX_FONT_SIZE) {
+                logger.warn("Invalid default font size specified in XML (Exceeds " + MAX_FONT_SIZE + "), defaulting to 12");
+                return 12;
+            } else {//Size smaller or equal to 0
+                logger.warn("Invalid default font size specified in XML (Less than 0), defaulting to 12");
+                return 12;
+            }
+        } else {
+            if (size > MAX_FONT_SIZE) {
+                logger.warn("Invalid font size specified in XML (Exceeds " + MAX_FONT_SIZE + "), defaulting to XML Default");
+                return presentationDefaults.getFontSize();
+            } else {//Size smaller or equal to 0
+                logger.warn("Invalid font size specified in XML (Less than 0), defaulting to XML Default");
+                return presentationDefaults.getFontSize();
+            }
+
+        }
+    }
+
+    /**
+     * Validate hex with regular expression
+     *
+     * @param colour Hex colour for validation
+     * @return true valid hex, false invalid hex
+     * @author Amrik Sadhra
+     */
+    public static String checkValidColour(String colour, Theme presentationDefaults) {
+        String HEX_PATTERN = "^#([A-Fa-f0-9]{8})$";
+        Pattern pattern = Pattern.compile(HEX_PATTERN);
+        Matcher matcher = pattern.matcher(colour);
+
+        //If valid, return colour
+        if (matcher.matches()) return colour;
+
+        //If we're checking presentation default, and its invalid
+        if (presentationDefaults == null) {
+            logger.warn("Invalid default RGBA Colour specified in XML, defaulting to: " + FALLBACK_COLOUR);
+            return FALLBACK_COLOUR;
+        } else {
+            logger.warn("Invalid RGBA Colour specified in XML, defaulting to XML Default");
+            return presentationDefaults.getFontColour();
+        }
+    }
+
+    /**
+     * Check font is valid (CSS-able) and return it if it is. If invalid, use theme defaults.
+     *
+     * @param font                 Font string parsed from XML to check for validity
+     * @param presentationDefaults Signify whether we are checking the validity of the default field. If invalid, return NO_DEFAULT_FONT_SIZE constant.
+     * @return Valid font
+     * @author Amrik Sadhra
+     */
+    public static String checkValidFont(String font, Theme presentationDefaults) {
+        //If font valid, return font
+        if (Arrays.asList(VALID_FONTS).contains(font)) return font;
+
+        //If checking presentation defaults and font invalid, return Comic Sans
+        if (presentationDefaults == null) {
+            logger.warn("Invalid default Font specified in XML, defaulting to " + VALID_FONTS[0]);
+            return VALID_FONTS[0]; //Return comic sans xD
+        } else {
+            logger.warn("Invalid Font specified in XML, defaulting to " + presentationDefaults.getFont());
+            return presentationDefaults.getFont(); //Return default presentation font
+        }
+    }
 }
+
