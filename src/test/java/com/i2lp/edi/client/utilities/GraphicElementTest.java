@@ -8,10 +8,9 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
-import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 
 public class GraphicElementTest extends Application {
@@ -39,6 +38,8 @@ public class GraphicElementTest extends Application {
         myPolygon.polySetYPoints(new float[] {0.1f, 0.1f, 0.6f});
         myPolygon.setPolygon(true);
         myPolygon.setClosed(true);
+        myPolygon.setSlideWidth(scene.getWidth());
+        myPolygon.setSlideHeight(scene.getHeight());
 
         //Fill in for a presentaiton
         myPolygon.setSlideCanvas(root);
@@ -49,14 +50,16 @@ public class GraphicElementTest extends Application {
         myOval.setLayer(1);
         myOval.setStartSequence(1);
         myOval.setEndSequence(2);
-        myOval.setFillColour("#FF0000FF");
+        myOval.setFillColour("#FF00008F");
         myOval.setLineColour("#00FF00FF");
-        myOval.setOvalYPosition(0.5f);
-        myOval.setOvalXPosition(0.8f);
-        myOval.setrHorizontal(1f);
-        myOval.setrVertical(1f);
+        myOval.setOvalYPosition(0.4f);
+        myOval.setOvalXPosition(0.5f);
+        myOval.setrHorizontal(0.1f);
+        myOval.setrVertical(0.3f);
         myOval.setRotation(45);
         myOval.setPolygon(false);
+        myOval.setSlideWidth(scene.getWidth());
+        myOval.setSlideHeight(scene.getHeight());
 
         //Fill in for a presentaiton
         myOval.setSlideCanvas(root);

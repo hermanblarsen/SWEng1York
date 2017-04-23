@@ -27,16 +27,18 @@ public class GraphicElement extends SlideElement {
     //Polygon Properties
     protected boolean isPolygon;
     protected boolean isClosed;
+    protected float[] normalisedPolygonXPoints = {};
+    protected float[] normalisedPolygonYPoints = {};
     protected float[] polygonXPoints = {};
     protected float[] polygonYPoints = {};
 
     //Oval properties
+    protected float[] normalisedOvalPos = {0,0};//xPos, Ypos
     protected float[] ovalPos = {0,0};//xPos, Ypos
+    protected float[] normalisedOvalRadii = {0,0};//rVertical, rHorizontal
     protected float[] ovalRadii = {0,0};//rVertical, rHorizontal
+
     protected float rotation;
-
-    protected boolean firstInstance = true; //Is this teh first time we're rendering this elememt?
-
 
     private Pane wrapperPane;//Wrap the graphics within its own pane so that absolute positioning works properly.
 
@@ -46,15 +48,14 @@ public class GraphicElement extends SlideElement {
 
     @Override
     public void doClassSpecificRender() {
-        if(firstInstance) {
             if (isPolygon) {
                 denormalisePolygonPoints((float) getSlideWidth(), (float) getSlideHeight());
                 graphicShape = setupPolygon();
             } else {
-                ovalPos[0] *= getSlideWidth();
-                ovalPos[1] *= getSlideHeight();
-                ovalRadii[1] *= getSlideWidth();
-                ovalRadii[0] *= getSlideHeight();
+                ovalPos[0] = normalisedOvalPos[0] * (float) getSlideWidth();
+                ovalPos[1] = normalisedOvalPos[1] * (float) getSlideHeight();
+                ovalRadii[1] = normalisedOvalRadii[1] * (float) getSlideWidth();
+                ovalRadii[0] = normalisedOvalRadii[0] * (float) getSlideHeight();
 
 
                 graphicShape = setupOval();
@@ -67,10 +68,6 @@ public class GraphicElement extends SlideElement {
 
             wrapperPane.getChildren().add(graphicShape);
             getCoreNode().setPickOnBounds(false);
-            firstInstance = false;
-        } else {
-            //Nothing new to do if this isn't the first render of the element .
-        }
     }
 
     @Override
@@ -98,9 +95,12 @@ public class GraphicElement extends SlideElement {
     }
 
     private void denormalisePolygonPoints(float width, float height){
-        for (int i=0; i<polygonYPoints.length; i++){
-            polygonYPoints[i] *= height;
-            polygonXPoints[i] *= width;
+        //Initialise the denormalised arrays before processing.
+        polygonXPoints = new float[normalisedPolygonXPoints.length];
+        polygonYPoints = new float[normalisedPolygonYPoints.length];
+        for (int i=0; i<normalisedPolygonYPoints.length; i++){
+            polygonXPoints[i] = normalisedPolygonXPoints[i] * height;
+            polygonYPoints[i] = normalisedPolygonYPoints[i] * width;
         }
     }
 
@@ -170,19 +170,19 @@ public class GraphicElement extends SlideElement {
     }
 
     public void polySetXPoints(float[] points){
-        this.polygonXPoints = points;
+        this.normalisedPolygonXPoints = points;
     }
 
     public void polySetYPoints(float[] points){
-        this.polygonYPoints = points;
+        this.normalisedPolygonYPoints = points;
     }
 
     public float[] getPolyXPositions(){
-        return this.polygonXPoints;
+        return this.normalisedPolygonXPoints;
     }
 
     public float[] getPolyYPositions(){
-        return this.polygonYPoints;
+        return this.normalisedPolygonYPoints;
     }
 
     public void setClosed(boolean isClosed){
@@ -194,27 +194,27 @@ public class GraphicElement extends SlideElement {
     }
 
     public void setOvalXPosition(float x){
-        this.ovalPos[0] = x;
+        this.normalisedOvalPos[0] = x;
     }
 
     public void setOvalYPosition(float y){
-        this.ovalPos[1] = y;
+        this.normalisedOvalPos[1] = y;
     }
 
     public void setrHorizontal(float r){
-        this.ovalRadii[1] = r;
+        this.normalisedOvalRadii[1] = r;
     }
 
     public double getrHorizontal() {
-        return ovalRadii[1];
+        return normalisedOvalRadii[1];
     }
 
     public void setrVertical(float r){
-        this.ovalRadii[0] = r;
+        this.normalisedOvalRadii[0] = r;
     }
 
     public double getrVertical() {
-        return ovalRadii[0];
+        return normalisedOvalRadii[0];
     }
 
     public void setRotation(float rotation){
