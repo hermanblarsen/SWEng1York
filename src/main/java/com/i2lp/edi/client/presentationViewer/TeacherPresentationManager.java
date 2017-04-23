@@ -17,8 +17,13 @@ import javafx.scene.text.Font;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
+import javafx.stage.WindowEvent;
 import javafx.util.Duration;
 import org.kordamp.bootstrapfx.scene.layout.Panel;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -26,9 +31,44 @@ import org.kordamp.bootstrapfx.scene.layout.Panel;
  */
 public class TeacherPresentationManager extends PresentationManager {
     protected boolean questionClicked = false;
+    protected boolean toolkitOpen = false;
     protected String setText;
+    protected List<String> questionList;
+    protected List<Student> studentList;
+    protected Stage teacherToolKit;
+    private int numberOfTestQuestions = 10;
+    private int numberOnline = 0;
 
-    protected BorderPane questionQueueFunction() {
+    protected List<String> generateTestQuestions(){
+        ArrayList<String> questions = new ArrayList<String>();
+        questions.add("Why should I use Edi?");
+        questions.add("What is 2+2?");
+        questions.add("Why is the sky blue?");
+        questions.add("What is the time in Tokyo?");
+        questions.add("WHYYYYYYYYYYYYYYYYY?");
+
+        return questions;
+    }
+
+    protected List<Student> generateTestStudents(){
+        ArrayList<Student> studentList = new ArrayList<Student>();
+
+        Student stu1 = new Student("Koen Arroo",4,true);
+        studentList.add(stu1);
+        Student stu2 = new Student("Herman Larsen",10,true);
+        studentList.add(stu2);
+        Student stu3 = new Student("Amrik Sadhra",2,true);
+        studentList.add(stu3);
+        Student stu4 = new Student("Kacper Sagnowski",7,true);
+        studentList.add(stu4);
+        Student stu5 = new Student("Zain Rajput",8,false);
+        studentList.add(stu5);
+
+
+        return studentList;
+    }
+
+    protected BorderPane questionQueueFunction(List<String> questions) {
         BorderPane bp = new BorderPane();
         bp.setStyle("-fx-background-color: #34495e");
         bp.setPadding(new Insets(0,10,10,10));
@@ -42,14 +82,14 @@ public class TeacherPresentationManager extends PresentationManager {
         fp.setVgap(4);
         fp.setHgap(4);
         fp.setStyle("-fx-background-color: whitesmoke");
+        sp.setStyle("-fx-background-color: whitesmoke");
 
-        int numTestCases = 10;
 
-        Panel[] slides = new Panel[numTestCases];
+        Panel[] slides = new Panel[questions.size()];
         StackPane slidePane = new StackPane();
 
-        for(int i = 0;i< numTestCases;i++){
-            slides[i] = new Panel("This is test question: "+i);
+        for(int i = 0;i< questions.size();i++){
+            slides[i] = new Panel(questions.get(i));
             //slides[i].getStyleClass().add("panel-primary");
             slides[i].setMinWidth(400);
             fp.getChildren().add(slides[i]);
@@ -87,6 +127,12 @@ public class TeacherPresentationManager extends PresentationManager {
                 }
             });
 
+            teacherToolKit.addEventHandler(WindowEvent.WINDOW_CLOSE_REQUEST, evt->{
+                stackPane.getChildren().remove(slidePane);
+                slidePane.getChildren().removeAll(backgroundRegion, lab);
+                questionClicked = false;
+            });
+
             int finalI = i;
             Animation animation = new Transition() {
                 {
@@ -109,29 +155,40 @@ public class TeacherPresentationManager extends PresentationManager {
 
     @Override
     protected void loadSpecificFeatures() {
-        Stage teacherToolKit = new Stage();
-        teacherToolKit.setTitle("Teacher toolkit");
-        TabPane tp = new TabPane();
-        tp.setStyle("-fx-background-color: #34495e");
-        scene = new Scene(tp, 450, 450);
-        scene.getStylesheets().add("bootstrapfx.css");
-        Tab questions = new Tab();
-        questions.setText("Question Queue");
-        questions.setContent(questionQueueFunction());
-        tp.getTabs().add(questions);
+        if(!toolkitOpen) {
+            teacherToolKit = new Stage();
+            teacherToolKit.initStyle(StageStyle.UTILITY);
+            teacherToolKit.initOwner(presentationStage);
+            teacherToolKit.setTitle("Teacher toolkit");
+            TabPane tp = new TabPane();
+            tp.setStyle("-fx-background-color: #34495e");
+            scene = new Scene(tp, 450, 450);
+            scene.getStylesheets().add("bootstrapfx.css");
+            Tab questions = new Tab();
+            questions.setText("Question Queue");
+            questionList = generateTestQuestions();
+            questions.setContent(questionQueueFunction(questionList));
+            tp.getTabs().add(questions);
 
-        Tab studentStats = new Tab();
-        studentStats.setText("Students");
-        studentStats.setContent(studentStats());
-        tp.getTabs().add(studentStats);
+            Tab studentStats = new Tab();
+            studentStats.setText("Students");
+            studentList = generateTestStudents();
+            studentStats.setContent(studentStats(studentList));
+            tp.getTabs().add(studentStats);
 
-        teacherToolKit.setScene(scene);
-        teacherToolKit.show();
-        tp.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
+            teacherToolKit.setScene(scene);
+            teacherToolKit.show();
+            tp.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
+            toolkitOpen = true;
+
+            teacherToolKit.addEventHandler(WindowEvent.WINDOW_CLOSE_REQUEST,evt->{
+                toolkitOpen = false;
+            });
+        }
 
     }
 
-    protected BorderPane studentStats(){
+    protected BorderPane studentStats(List<Student> studentList){
         BorderPane bp = new BorderPane();
         bp.setStyle("-fx-background-color: #34495e");
         bp.setPadding(new Insets(0,10,10,10));
@@ -145,22 +202,54 @@ public class TeacherPresentationManager extends PresentationManager {
         fp.setVgap(4);
         fp.setHgap(4);
         fp.setStyle("-fx-background-color: whitesmoke");
+        sp.setStyle("-fx-background-color: whitesmoke");
 
-        int numTestCases = 15;
 
-        Panel[] slides = new Panel[numTestCases];
+        Panel[] slides = new Panel[studentList.size()];
 
-        for(int i = 0;i< numTestCases;i++){
-            slides[i] = new Panel("Stu Dent");
-            //Label stuLab = new Label();
-            Label tasksCompleted = new Label("Completed 5/6 Tasks");
+        for(int i = 0;i< studentList.size();i++){
+            slides[i] = new Panel(studentList.get(i).getName());
+            if(studentList.get(i).isOnline()){
+                numberOnline++;
+            }
+            Label tasksCompleted = new Label("Completed "+ studentList.get(i).getQuestionsAnswered()+"/"+ numberOfTestQuestions);
             VBox studentDetails = new VBox();
             studentDetails.getChildren().addAll(tasksCompleted);
             slides[i].setBody(studentDetails);
-            slides[i].getStyleClass().add("panel-primary");
+            //slides[i].getStyleClass().add("panel-primary");
             slides[i].setMinWidth(400);
+
+            double questionPercentage = (studentList.get(i).getQuestionsAnswered()/(double)numberOfTestQuestions);
+            System.out.println(questionPercentage);
+            if(questionPercentage < 0.25){
+                slides[i].setStyle("-fx-background-color: red");
+            }else if (questionPercentage < 0.5){
+                slides[i].setStyle("-fx-background-color: orange");
+            }else if (questionPercentage < 0.75){
+                slides[i].setStyle("-fx-background-color: gold");
+            }else{
+                slides[i].setStyle("-fx-background-color: yellowgreen");
+            }
+            if(!studentList.get(i).isOnline()){
+                slides[i].setStyle("-fx-background-color: grey");
+            }
+        }
+
+        Panel generalStats = new Panel ("General Stats");
+        generalStats.getStyleClass().add("panel-primary");
+        Label online = new Label("Students Online: "+numberOnline);
+        int numberOffline = studentList.size()-numberOnline;
+        Label offline = new Label("Students Offline: "+ numberOffline);
+        VBox stats = new VBox();
+        stats.getChildren().addAll(online,offline);
+        generalStats.setBody(stats);
+        generalStats.setMinWidth(400);
+        fp.getChildren().add(generalStats);
+        for(int i = 0;i<studentList.size();i++){
+
             fp.getChildren().add(slides[i]);
         }
+
         sp.setContent(fp);
         bp.setCenter(sp);
         return bp;
@@ -171,4 +260,50 @@ public class TeacherPresentationManager extends PresentationManager {
         commentPanel = new CommentPanel(false);
     }
 
+    public List<String> getQuestionList() {
+        return questionList;
+    }
+
+    public void setQuestionList(List<String> questionList) {
+        this.questionList = questionList;
+    }
+
+    private class Student{
+        private String name;
+        private int questionsAnswered;
+        private boolean online;
+
+        public Student(String name, int questionsAnswered, boolean online) {
+            this.name = name;
+            this.questionsAnswered = questionsAnswered;
+            this.online = online;
+        }
+
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public int getQuestionsAnswered() {
+            return questionsAnswered;
+        }
+
+        public void setQuestionsAnswered(int questionsAnswered) {
+            this.questionsAnswered = questionsAnswered;
+        }
+
+        public boolean isOnline() {
+            return online;
+        }
+
+        public void setOnline(boolean online) {
+            this.online = online;
+        }
+
+
+    }
 }
