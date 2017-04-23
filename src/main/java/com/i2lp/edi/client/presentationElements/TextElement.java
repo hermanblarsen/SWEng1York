@@ -43,16 +43,22 @@ public class TextElement extends SlideElement {
 
     @Override
     public void setupElement() {
+        //Stage 1 Setup: Instantiate Core Node
         browser = new WebView();
         webEngine = browser.getEngine();
 
-
+        //Stage 2 Setup: Load Content into Core Node
         //Put HTML into WebView
         webEngine.loadContent(textContent);
 
         //Apply Dynamically created CSS to TextElement
-        //TODO: Ensure these match what we read in from XML (correct format). Add Getters and setters for Presentation GUID, SlideID then hook into this method call
         cssFilePath = Utils.cssGen(presentationID, slideID, elementID, fontSize, font, fontColour, bgColour, borderColour, borderSize);
+        webEngine.setUserStyleSheetLocation(cssFilePath);
+
+        //Stage 3 Setup: DoClassSpecificRender for resizing, register State Handlers
+        doClassSpecificRender();
+
+        getCoreNode().addEventHandler(MouseEvent.MOUSE_CLICKED, event -> performOnClickAction());
 
         //If done rendering, adjust height to fit content, set isReady variable for thumbnail generation
         browser.getEngine().getLoadWorker().stateProperty().addListener((arg0, oldState, newState) -> {
@@ -60,29 +66,28 @@ public class TextElement extends SlideElement {
                 isReady = true;
             }
         });
-
-        webEngine.setUserStyleSheetLocation(cssFilePath);
-
-        getCoreNode().setTranslateY(xPosition);
-        getCoreNode().setTranslateX(xPosition);
-
-//        browser.setPrefWidth(xSize);
-//        browser.setPrefHeight(ySize);
-
-        getCoreNode().addEventHandler(MouseEvent.MOUSE_CLICKED, event -> logger.info("Clicked textElement!"));
-        getCoreNode().setPickOnBounds(false);
     }
 
     @Override
     public void destroyElement() {
+
     }
 
     @Override
     public void doClassSpecificRender() {
+        //Stage 1 DoClassSpecificRender: Resize width and height, then X and Y positions based on canvas size
+        //Rescale X and Y sizes of text box
+        if (slideCanvas.getScene() != null) {
+            browser.setPrefWidth(xSize * slideCanvas.getScene().getWindow().getWidth());
+            browser.setPrefHeight(ySize * slideCanvas.getScene().getWindow().getHeight());
+
+            //Rescale positioning of elements
+            scaleDimensions(xPosition, yPosition);
+        }
+
+        //Stage 2 DoClassSpecificRender: Refresh content inside Core Node
         //Refresh Browser
         browser.requestLayout();
-        //TODO: Enforce every element
-        scaleDimensions(xPosition, yPosition);
     }
 
     public Pane getSlideCanvas() {
@@ -118,7 +123,15 @@ public class TextElement extends SlideElement {
     }
 
     public void setxPosition(float xPosition) {
-        this.xPosition = xPosition;
+        if (xPosition > 1) {
+            logger.warn("Malformed XML. X Position for ElementID: " + elementID + " is larger than 100% of slide width. Defaulting to 50%.");
+            this.xPosition = 0.5f;
+        } else if (xPosition < 0) {
+            logger.warn("Malformed XML. X Position for ElementID: " + elementID + " is smaller than 0% of slide width. Defaulting to 50%.");
+            this.xPosition = 0.5f;
+        } else {
+            this.xPosition = xPosition;
+        }
     }
 
     public float getyPosition() {
@@ -126,7 +139,15 @@ public class TextElement extends SlideElement {
     }
 
     public void setyPosition(float yPosition) {
-        this.yPosition = yPosition;
+        if (yPosition > 1) {
+            logger.warn("Malformed XML. Y Position for ElementID: " + elementID + " is larger than 100% of slide height. Defaulting to 50%.");
+            this.yPosition = 0.5f;
+        } else if (yPosition < 0) {
+            logger.warn("Malformed XML. Y Position for ElementID: " + elementID + " is smaller than 0% of slide height. Defaulting to 50%.");
+            this.yPosition = 0.5f;
+        } else {
+            this.yPosition = yPosition;
+        }
     }
 
     public float getxSize() {
@@ -134,7 +155,15 @@ public class TextElement extends SlideElement {
     }
 
     public void setxSize(float xSize) {
-        this.xSize = xSize;
+        if (xSize > 1) {
+            logger.warn("Malformed XML. X Size for ElementID: " + elementID + " is larger than 100% of slide width. Defaulting to 50%.");
+            this.xSize = 0.5f;
+        } else if (xSize < 0) {
+            logger.warn("Malformed XML. X Size for ElementID: " + elementID + " is smaller than 0% of slide width. Defaulting to 50%.");
+            this.xSize = 0.5f;
+        } else {
+            this.xSize = xSize;
+        }
     }
 
     public float getySize() {
@@ -142,7 +171,15 @@ public class TextElement extends SlideElement {
     }
 
     public void setySize(float ySize) {
-        this.ySize = ySize;
+        if (ySize > 1) {
+            logger.warn("Malformed XML. Y Size for ElementID: " + elementID + " is larger than 100% of slide height. Defaulting to 50%.");
+            this.ySize = 0.5f;
+        } else if (ySize < 0) {
+            logger.warn("Malformed XML. Y Size for ElementID: " + elementID + " is smaller than 0% of slide height. Defaulting to 50%.");
+            this.ySize = 0.5f;
+        } else {
+            this.ySize = ySize;
+        }
     }
 
     public String getFont() {

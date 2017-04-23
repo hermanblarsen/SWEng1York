@@ -252,7 +252,7 @@ public abstract class PresentationManager {
         assignAttributes(myPresentationElement);
         mainUI.setCenter(myPresentationElement.getSlide(currentSlideNumber));
     }
-
+    
     private void redraw(){
         logger.trace("Resizing slide Elements");
         for (SlideElement toResize : myPresentationElement.getSlide(currentSlideNumber).getVisibleSlideElementList()) {
@@ -460,7 +460,7 @@ public abstract class PresentationManager {
                     }
                 }
             } catch (SequenceNotFoundException e) {
-                logger.error("Failed to find Element with Sequence number of " + slideToAdvance.getCurrentSequenceNumber() + " in slideElementList.");
+                logger.warn("Failed to find Element with Sequence number of " + slideToAdvance.getCurrentSequenceNumber() + " in slideElementList.");
             }
         } else if ((slideToAdvance.getCurrentSequenceNumber() > 0) && (direction == Slide.SLIDE_BACKWARD)) {  //If we're going backwards and still elements left
             try {
@@ -472,7 +472,7 @@ public abstract class PresentationManager {
                     }
                 }
             } catch (SequenceNotFoundException e) {
-                logger.error("Failed to find Element with Sequence number of " + slideToAdvance.getCurrentSequenceNumber() + " in slideElementList.");
+                logger.warn("Failed to find Element with Sequence number of " + slideToAdvance.getCurrentSequenceNumber() + " in slideElementList.");
             }
             slideToAdvance.setCurrentSequenceNumber(slideToAdvance.getCurrentSequenceNumber() - 1);
         } else {

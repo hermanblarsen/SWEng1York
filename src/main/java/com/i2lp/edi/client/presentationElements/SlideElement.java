@@ -193,8 +193,16 @@ public abstract class SlideElement {
 
     protected void scaleDimensions(float xPosition, float yPosition){
         //Convert position percentages to multipliers against canvas size and update location
-        getCoreNode().setTranslateX((xPosition/100)* slideCanvas.getScene().getWindow().getWidth());
-        getCoreNode().setTranslateY((yPosition/100)*  slideCanvas.getScene().getWindow().getHeight());
+        getCoreNode().setTranslateX(xPosition * slideCanvas.getScene().getWindow().getWidth());
+        getCoreNode().setTranslateY(yPosition * slideCanvas.getScene().getWindow().getHeight());
     }
 
+    protected void performOnClickAction(){
+        logger.info("Performing onClick action: " + onClickAction + " with onClick info: " + onClickInfo);
+        switch(onClickAction){
+            case "lol":
+
+                break;
+        }
+    }
 }

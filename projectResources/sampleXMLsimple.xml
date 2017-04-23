@@ -22,10 +22,10 @@
                     <p>This is a paragraph.</p>&#13;&#10;
                     <p>This is another paragraph.</p>
                 </textcontent>
-                <xposition>11</xposition>
-                <yposition>12</yposition>
-                <xsize>0.05</xsize>
-                <ysize>0.6</ysize>
+                <xposition>0.11</xposition>
+                <yposition>0.12</yposition>
+                <xsize>0.40</xsize>
+                <ysize>1</ysize>
                 <font>Comic Sans</font>
                 <fontsize>12</fontsize>
                 <fontcolour>#EEEEEEFF</fontcolour>
@@ -41,10 +41,10 @@
                 <textcontent>
                     <h1><b>Slide 1 Text Element 2 Text</b></h1>
                 </textcontent>
-                <xposition>0.12</xposition>
-                <yposition>0.3</yposition>
-                <xsize>0.1</xsize>
-                <ysize>0.4</ysize>
+                <xposition>0.10</xposition>
+                <yposition>0.30</yposition>
+                <xsize>0.2</xsize>
+                <ysize>0.40</ysize>
                 <font>Arial</font>
                 <fontsize>12</fontsize>
                 <fontcolour>#EEEEEEFF</fontcolour>
@@ -60,10 +60,10 @@
                 <textcontent>
                     <h1><b>Slide 1 Text Element 3 Text</b></h1>
                 </textcontent>
-                <xposition>30</xposition>
-                <yposition>200</yposition>
-                <xsize>0.1</xsize>
-                <ysize>0.4</ysize>
+                <xposition>0.30</xposition>
+                <yposition>0.90</yposition>
+                <xsize>0.20</xsize>
+                <ysize>0.15</ysize>
                 <font>Arial</font>
                 <fontsize>12</fontsize>
                 <fontcolour>#EEEEEEFF</fontcolour>
@@ -77,14 +77,14 @@
             </text>
         </slide>
         <slide slideid="2">
-            <text elementid ="1" layer="1" visibility="true" startsequence="3" endsequence="-1">
+            <text elementid ="1" layer="1" visibility="true" startsequence="1" endsequence="-1">
                 <textcontent>
                     <h1>Poop</h1>
                 </textcontent>
-                <xposition>0.12</xposition>
-                <yposition>0.3</yposition>
-                <xsize>0.1</xsize>
-                <ysize>0.4</ysize>
+                <xposition>0.45</xposition>
+                <yposition>0.20</yposition>
+                <xsize>0.60</xsize>
+                <ysize>0.50</ysize>
                 <font>Arial</font>
                 <fontsize>12</fontsize>
                 <fontcolour>#EEEEEEFF</fontcolour>
@@ -99,10 +99,10 @@
                 <textcontent>
                     <h1>On the floor</h1>
                 </textcontent>
-                <xposition>0.12</xposition>
-                <yposition>0.3</yposition>
-                <xsize>0.1</xsize>
-                <ysize>0.4</ysize>
+                <xposition>0.65</xposition>
+                <yposition>0.30</yposition>
+                <xsize>0.80</xsize>
+                <ysize>0.60</ysize>
                 <font>Arial</font>
                 <fontsize>12</fontsize>
                 <fontcolour>#EEEEEEFF</fontcolour>
@@ -119,10 +119,10 @@
                 <textcontent>
                     <h1>Slide 3</h1>
                 </textcontent>
-                <xposition>0.12</xposition>
-                <yposition>0.3</yposition>
-                <xsize>0.1</xsize>
-                <ysize>0.4</ysize>
+                <xposition>0.75</xposition>
+                <yposition>0.80</yposition>
+                <xsize>0.20</xsize>
+                <ysize>0.18</ysize>
                 <font>Arial</font>
                 <fontsize>12</fontsize>
                 <fontcolour>#EEEEEEFF</fontcolour>
@@ -137,10 +137,10 @@
                 <textcontent>
                     <h1>Finally</h1>
                 </textcontent>
-                <xposition>0.12</xposition>
-                <yposition>0.3</yposition>
-                <xsize>0.1</xsize>
-                <ysize>0.4</ysize>
+                <xposition>0.65</xposition>
+                <yposition>0.30</yposition>
+                <xsize>0.20</xsize>
+                <ysize>0.10</ysize>
                 <font>Arial</font>
                 <fontsize>12</fontsize>
                 <fontcolour>#EEEEEEFF</fontcolour>
