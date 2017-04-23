@@ -3,17 +3,16 @@
  */
 package com.i2lp.edi.client.utilities;
 import com.i2lp.edi.client.presentationElements.*;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.nio.file.InvalidPathException;
 import java.util.ArrayList;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import static org.junit.Assert.*;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
 
 public class ParserXMLTest {
     private static final double ERROR_MARGIN = 0.01;
@@ -96,8 +95,8 @@ public class ParserXMLTest {
     @Test
     public void verifyPresentationDefaults() {
         assertNotNull(theme);
-        assertEquals("#FF2304", theme.getBackgroundColour());
-        assertEquals("Arial", theme.getFont());
+        assertEquals("#FF2304FF", theme.getBackgroundColour());
+        assertEquals("Arial, Helvetica, sans-serif", theme.getFont());
         assertEquals(12, theme.getFontSize(), ERROR_MARGIN);
         assertEquals("#F00D33FF", theme.getFontColour() );
         assertEquals("#F40D33FF", theme.getGraphicsColour());

@@ -1,6 +1,8 @@
 package com.i2lp.edi.server;
 
 import com.i2lp.edi.client.utilities.Utils;
+import com.i2lp.edi.server.packets.User;
+import com.i2lp.edi.server.packets.UserAuth;
 import com.impossibl.postgres.api.jdbc.PGConnection;
 import com.impossibl.postgres.jdbc.PGDataSource;
 import io.socket.client.IO;
@@ -9,8 +11,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.i2lp.edi.server.packets.User;
-import com.i2lp.edi.server.packets.UserAuth;
 
 import java.net.URISyntaxException;
 import java.sql.ResultSet;
@@ -358,5 +358,18 @@ public class SocketClient {
             logger.info("Failed to close com.i2lp.edi.client connection to DB. Non-fatal, still terminating.");
         }
         socket.close();
+    }
+
+    public void sendLocalThumbnailList(){
+       /* getFilesInFolder();
+        // Use Apache commons library to get difference between server thumbnails and client thumbnails
+        List difference = ListUtils.subtract(Arrays.asList(filesOnServer), Arrays.asList(clientFiles));
+
+        // If no difference between client and server, dont send request data packet
+        if (difference.size() == 0) {
+            return;
+        } else {
+            socket.emit("ClientThumbnails");
+        }*/
     }
 }

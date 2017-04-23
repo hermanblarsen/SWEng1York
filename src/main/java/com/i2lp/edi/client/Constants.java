@@ -8,7 +8,7 @@ public class Constants {
      // see https://docs.oracle.com/middleware/1212/core/MAVEN/maven_version.htm#MAVEN8903
 
     //Build number and string for use in About dialogues.
-    private static final String BUILD_NUMBER = "28";
+    private static final String BUILD_NUMBER = "29";
     public static final String BUILD_STRING = "Version: v0." + Constants.BUILD_NUMBER;
 
     /* XML Input validation */
@@ -18,4 +18,6 @@ public class Constants {
     public static final String[] VALID_ONCLICK_INFO = {};
     public static final int MAX_FONT_SIZE = 100;
     public static final String FALLBACK_COLOUR = "#000000FF"; //Used as default colour when Presentation defaults are invalid
+
+    public static final String BASE_PATH = System.getProperty("java.io.tmpdir") + "Edi/";
 }

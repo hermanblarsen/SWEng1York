@@ -11,7 +11,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Random;
-import java.util.function.Predicate;
+
+import static com.i2lp.edi.client.Constants.BASE_PATH;
 
 /**
  * Created by Kacper on 2017-04-08.
@@ -42,7 +43,7 @@ public class PresentationPreviewPanel extends Panel {
 
         ImageView preview;
         try {
-            preview = new ImageView("file:"+ System.getProperty("java.io.tmpdir") + "Edi/Thumbnails/" + getPresentation().getDocumentID() + "_slide0_thumbnail.png");
+            preview = new ImageView("file:"+ BASE_PATH + "Thumbnails/" + getPresentation().getDocumentID() + "_slide0_thumbnail.png");
         } catch(NullPointerException | IllegalArgumentException e) {
             preview = new ImageView("file:projectResources/emptyThumbnail.png");
         }

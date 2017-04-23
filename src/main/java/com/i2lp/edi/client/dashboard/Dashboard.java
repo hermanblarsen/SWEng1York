@@ -36,6 +36,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
 
+import static com.i2lp.edi.client.Constants.BASE_PATH;
 import static javafx.scene.layout.BorderPane.*;
 
 
@@ -331,7 +332,7 @@ public abstract class Dashboard extends Application {
 
             ImageView preview;
             try {
-                preview = new ImageView("file:" + System.getProperty("java.io.tmpdir") + "Edi/Thumbnails/" + selectedPresID + "_slide" + i + "_thumbnail.png");
+                preview = new ImageView("file:" + BASE_PATH + "Thumbnails/" + selectedPresID + "_slide" + i + "_thumbnail.png");
             } catch (NullPointerException | IllegalArgumentException e) {
                 logger.info("Slide thumbnail not found");
                 preview = new ImageView("file:projectResources/emptyThumbnail.png");

@@ -9,7 +9,7 @@
 	</documentdetails>
 	<slideshow>
 		<defaults>
-			<bgcolour>#FF2304</bgcolour>
+			<bgcolour>#FF2304FF</bgcolour>
 			<font>Arial</font>
 			<fontsize>12</fontsize>
 			<fontcolour>#F00D33FF</fontcolour>

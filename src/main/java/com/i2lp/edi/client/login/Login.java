@@ -1,5 +1,6 @@
 package com.i2lp.edi.client.login;
 
+import com.i2lp.edi.client.Constants;
 import com.i2lp.edi.client.managers.EdiManager;
 import com.i2lp.edi.server.SocketClient;
 import com.i2lp.edi.server.packets.UserAuth;
@@ -23,6 +24,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+
+import static com.i2lp.edi.client.Constants.BASE_PATH;
 
 
 public class Login extends Application {
@@ -49,7 +52,6 @@ public class Login extends Application {
         loginStage.setTitle("Edi Login Dialog");
         Image ediLogoSmall = new Image("file:projectResources/logos/ediLogo32x32.png");
         loginStage.getIcons().add(ediLogoSmall);
-
 
         gridPane = new GridPane();
         gridPane.setAlignment(Pos.CENTER_RIGHT);
@@ -80,6 +82,10 @@ public class Login extends Application {
         scene.getStylesheets().add("bootstrapfx.css");
         loginStage.setScene(scene);
         loginStage.setResizable(false); //Do after setting scene
+
+        //Print useful development information to terminal
+        logger.info("EDI Client " + Constants.BUILD_STRING);
+        logger.info("Scratch Directory: " + BASE_PATH);
 
         populateGUI();
         loginStage.show();

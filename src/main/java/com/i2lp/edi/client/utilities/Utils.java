@@ -11,9 +11,7 @@ import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static com.i2lp.edi.client.Constants.FALLBACK_COLOUR;
-import static com.i2lp.edi.client.Constants.MAX_FONT_SIZE;
-import static com.i2lp.edi.client.Constants.VALID_FONTS;
+import static com.i2lp.edi.client.Constants.*;
 
 /**
  * Created by amriksadhra on 21/03/2017.
@@ -58,7 +56,7 @@ public class Utils {
      * @return Filename of CSS file that stores the CSS for a given TextElement
      */
     public static String cssGen(String presentationID, int slideID, int elementID, int fontSize, String font, String fontColour, String bgColor, String borderColour, int borderSize) {
-        File cssFilePath = new File(System.getProperty("java.io.tmpdir") + "Edi/" + "Presentation" + presentationID + "/" + "Slide" + slideID + "Element" + elementID + "format.css");
+        File cssFilePath = new File(BASE_PATH + "Presentation" + presentationID + "/" + "Slide" + slideID + "Element" + elementID + "format.css");
 
         if (cssFilePath.exists()) {
             return "file:" + cssFilePath.getAbsolutePath();
@@ -169,6 +167,19 @@ public class Utils {
             logger.warn("Invalid Font specified in XML, defaulting to " + presentationDefaults.getFont());
             return presentationDefaults.getFont(); //Return default presentation font
         }
+    }
+
+    public static ArrayList<String> getFilesInFolder(String path){
+        ArrayList<String> filesInFolder = new ArrayList<>();
+        //Set target path to read list of present files from
+        final File folder = new File(path);
+
+        //Generate array of files in folder
+        for (File fileEntry : folder.listFiles()) {
+            filesInFolder.add(fileEntry.getName());
+        }
+
+        return filesInFolder;
     }
 }
 

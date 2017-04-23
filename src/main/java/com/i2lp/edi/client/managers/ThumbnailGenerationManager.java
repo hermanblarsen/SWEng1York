@@ -3,13 +3,11 @@ package com.i2lp.edi.client.managers;
 import com.i2lp.edi.client.presentationElements.Presentation;
 import com.i2lp.edi.client.presentationElements.Slide;
 import com.i2lp.edi.client.presentationElements.TextElement;
-import com.i2lp.edi.client.utilities.ParserXML;
 import javafx.concurrent.Task;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.Scene;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.image.WritableImage;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import org.slf4j.Logger;
@@ -18,6 +16,8 @@ import org.slf4j.LoggerFactory;
 import javax.imageio.ImageIO;
 import java.io.File;
 import java.io.IOException;
+
+import static com.i2lp.edi.client.Constants.BASE_PATH;
 
 /**
  * Created by amriksadhra on 12/04/2017.
@@ -64,7 +64,7 @@ public class ThumbnailGenerationManager extends PresentationManager {
         while (slideGenManager.slideAdvance(presentation, Slide.SLIDE_FORWARD) != Presentation.SLIDE_LAST_ELEMENT);
 
         //If we're in last element of slide, take snapshot
-        File thumbnailFile = new File(System.getProperty("java.io.tmpdir") + "Edi/Thumbnails/" + presentation.getDocumentID() + "_slide" + (slideGenManager.currentSlideNumber) + "_thumbnail.png");
+        File thumbnailFile = new File(BASE_PATH + "Thumbnails/" + presentation.getDocumentID() + "_slide" + (slideGenManager.currentSlideNumber) + "_thumbnail.png");
         if (!thumbnailFile.exists()) {
             logger.debug("Thumbnail at " + thumbnailFile.getAbsolutePath() + " already exists");
             thumbnailFile.getParentFile().mkdirs(); //Create directory structure if not present yet

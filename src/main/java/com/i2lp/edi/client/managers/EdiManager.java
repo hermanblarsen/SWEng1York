@@ -4,19 +4,15 @@ package com.i2lp.edi.client.managers;
 import com.i2lp.edi.client.dashboard.StudentDashboard;
 import com.i2lp.edi.client.dashboard.TeacherDashboard;
 import com.i2lp.edi.client.login.Login;
-
-
+import com.i2lp.edi.server.SocketClient;
 import javafx.application.Application;
-import javafx.scene.image.Image;
 import javafx.stage.Stage;
-
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.i2lp.edi.server.SocketClient;
 
 import java.io.IOException;
-import java.net.*;
+import java.net.InetSocketAddress;
+import java.net.Socket;
 
 /**
  * Created by habl on 11/03/2017.
@@ -50,9 +46,7 @@ public class EdiManager extends Application {
         //Checking for internet connection: //TODO maybe put on a timer and/or in a thread if not connected? Or maybe just bad idea...
         //TODO put recurrent connections tries on timer? -Herman
         verifyInternetAccess();
-
-
-
+        
         loginDialog = new Login();
         Stage loginStage = new Stage();
         loginDialog.setEdiManager(this);
