@@ -10,6 +10,7 @@ import javafx.scene.Scene;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.image.WritableImage;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,24 +28,15 @@ public class ThumbnailGenerationManager extends PresentationManager {
     public void openPresentation(String path) {
         presentationStage = new Stage();
         presentationStage.setTitle("Edi");
-        border = new BorderPane();
+        displayPane = new StackPane();
         //Lower resolution for thumbnails
-        scene = new Scene(border, 320, 240);
+        scene = new Scene(displayPane, 320, 240);
         presentationStage.setScene(scene);
         presentationStage.show();
 
         //Hide the presentation manager
         presentationStage.toBack();
-        loadPresentation(border, path);
-    }
-
-    public void loadPresentation(BorderPane mainUI, String path) {
-        logger.info("Attempting to load presentation located at: " + path);
-
-        ParserXML readPresentationParser = new ParserXML(path);
-        myPresentationElement = readPresentationParser.parsePresentation();
-        assignAttributes(myPresentationElement);
-        mainUI.setCenter(myPresentationElement.getSlide(currentSlideNumber));
+        loadPresentation(path);
     }
 
     @Override

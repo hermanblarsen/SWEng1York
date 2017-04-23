@@ -99,36 +99,36 @@ public class TeacherPresentationManager extends PresentationManager {
             setText = new String();
             slides[i].addEventHandler(MouseEvent.MOUSE_CLICKED,evt->{
                 if(!questionClicked) {
-                    stackPane.getChildren().remove(slidePane);
+                    displayPane.getChildren().remove(slidePane);
                     slidePane.getChildren().removeAll(backgroundRegion,lab);
                     lab.setFont(new Font("Helvetica",50));
                     lab.setTextFill(Color.WHITE);
                     lab.setWrapText(true);
                     setText = lab.getText();
                     slidePane.getChildren().addAll(backgroundRegion,lab);
-                    stackPane.getChildren().addAll(slidePane);
+                    displayPane.getChildren().addAll(slidePane);
                     questionClicked = true;
                 }else{
                     if(lab.getText() == setText) {
-                        stackPane.getChildren().remove(slidePane);
+                        displayPane.getChildren().remove(slidePane);
                         slidePane.getChildren().removeAll(backgroundRegion, lab);
                         questionClicked = false;
                     }else{
-                        stackPane.getChildren().remove(slidePane);
+                        displayPane.getChildren().remove(slidePane);
                         slidePane.getChildren().removeAll(backgroundRegion,lab);
                         lab.setFont(new Font("Helvetica",50));
                         lab.setTextFill(Color.WHITE);
                         lab.setWrapText(true);
                         setText = lab.getText();
                         slidePane.getChildren().addAll(backgroundRegion,lab);
-                        stackPane.getChildren().addAll(slidePane);
+                        displayPane.getChildren().addAll(slidePane);
                         questionClicked = true;
                     }
                 }
             });
 
             teacherToolKit.addEventHandler(WindowEvent.WINDOW_CLOSE_REQUEST, evt->{
-                stackPane.getChildren().remove(slidePane);
+                displayPane.getChildren().remove(slidePane);
                 slidePane.getChildren().removeAll(backgroundRegion, lab);
                 questionClicked = false;
             });

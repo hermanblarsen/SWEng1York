@@ -15,7 +15,6 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Cursor;
-import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
@@ -29,7 +28,6 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.util.Duration;
@@ -47,11 +45,11 @@ import java.util.TimerTask;
  */
 public abstract class PresentationManager {
     private static final float SLIDE_SIZE = 0.5f;
+    private static final double PRES_CONTROLS_HEIGHT = 40;
     Logger logger = LoggerFactory.getLogger(PresentationManager.class);
 
     protected Scene scene;
-    public BorderPane border;
-    private StackPane centerPane;
+    protected StackPane displayPane;
     public Presentation myPresentationElement;
     protected ProgressBar pb;
     protected Label slideNumber;
@@ -66,13 +64,13 @@ public abstract class PresentationManager {
     private boolean isShowBlack = false;
     private boolean mouseMoved = true;
     private EventHandler<MouseEvent> disabledCursorFilter;
+    private HBox presControls;
+    private boolean isPresControlsVisible;
 
     private boolean isCursorHidden = false;
 
     protected double slideWidth;
     protected double slideHeight;
-
-    protected StackPane stackPane;
     public int currentSlideNumber = 0; //Current slide number in presentation
     private boolean isMouseOverSlide = true;
 
@@ -114,21 +112,23 @@ public abstract class PresentationManager {
         presentationStage = new Stage();
         presentationStage.setTitle("Edi");
 
-        border = new BorderPane();
-        centerPane = new StackPane();
-        centerPane.setBackground(new Background(new BackgroundFill(Color.BLACK, null, null)));
-        centerPane.setAlignment(Pos.CENTER);
-        border.setCenter(centerPane);
+        displayPane = new StackPane();
+        displayPane.setBackground(new Background(new BackgroundFill(Color.BLACK, null, null)));
+        displayPane.setAlignment(Pos.CENTER);
+        pb = new ProgressBar(0);
+        slideNumber = new Label();
+        presControls = addPresentationControls(presentationStage);
         loadPresentation(path);
-        stackPane = new StackPane();
-        stackPane.getChildren().add(border);
+        slideNumber.setText("Slide 1 of " + myPresentationElement.getSlideList().size());
+
+
         Rectangle2D primaryScreenBounds = Screen.getPrimary().getVisualBounds();
 
         slideWidth = primaryScreenBounds.getWidth() * SLIDE_SIZE;
         slideHeight = slideWidth / myPresentationElement.getDocumentAspectRatio();
 
         assignSizeProperties(myPresentationElement);
-        scene = new Scene(stackPane, slideWidth, slideHeight); //1000x600
+        scene = new Scene(displayPane, slideWidth, slideHeight); //1000x600
         scene.getStylesheets().add("bootstrapfx.css");
 
         //Listeners for moving through presentation
@@ -139,13 +139,8 @@ public abstract class PresentationManager {
         presentationStage.setScene(scene);
         presentationStage.show();
 
-
-        pb = new ProgressBar(0);
-        slideNumber = new Label("Slide 1 of " + myPresentationElement.getSlideList().size());
-
         createCommentPanel();
         bottomPane.getChildren().add(0, addPresentationControls(presentationStage));
-        border.setBottom(bottomPane);
     }
 
     private void addKeyboardListeners() {
@@ -170,10 +165,10 @@ public abstract class PresentationManager {
                 presentationStage.setFullScreen(true);
             } else if(key.getCode().equals(KeyCode.B)) {
                 if(isShowBlack) {
-                    stackPane.getChildren().remove(blackRegion);
+                    displayPane.getChildren().remove(blackRegion);
                     isShowBlack = false;
                 } else {
-                    stackPane.getChildren().add(blackRegion);
+                    displayPane.getChildren().add(blackRegion);
                     isShowBlack = true;
                 }
             } else if(key.getCode().equals(KeyCode.HOME)) {
@@ -249,7 +244,7 @@ public abstract class PresentationManager {
             }
         }, 0, 2000);
 
-        border.getCenter().addEventHandler(MouseEvent.ANY, event -> {
+        displayPane.addEventHandler(MouseEvent.ANY, event -> {
             if(event.getEventType().equals(MouseEvent.MOUSE_ENTERED)) {
                 isMouseOverSlide = true;
             } else if(event.getEventType().equals(MouseEvent.MOUSE_EXITED)) {
@@ -340,6 +335,7 @@ public abstract class PresentationManager {
         commentPanel = new CommentPanel(true);
     }
 
+    //TODO: Figure out why progressBar is not visible @Koen
     public HBox addPresentationControls(Stage primaryStage) {
         HBox presControls = new HBox();
         presControls.setStyle("-fx-background-color:transparent");//#34495e
@@ -420,7 +416,7 @@ public abstract class PresentationManager {
                 questionQ.setEffect(null);
             });
             specificFeats = questionQ;
-        }else{
+        } else {
             Image checkList = new Image("file:projectResources/icons/TeacherToolKit.png",30,30,true,true);
             ImageView teacherToolKit = new ImageView(checkList);
             teacherToolKit.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
@@ -442,7 +438,6 @@ public abstract class PresentationManager {
 
             specificFeats = teacherToolKit;
         }
-
 
         Image commentIcon = new Image("file:projectResources/icons/SB_filled.png", 30, 30, true, true);
         ImageView commentButton = new ImageView(commentIcon);
@@ -469,7 +464,7 @@ public abstract class PresentationManager {
         pb.setMinSize(200, 10);
         progressBar.getChildren().addAll(pb, slideNumber);
 
-        presControls.getChildren().addAll(backButton, nextButton, fullScreenButton,specificFeats ,commentButton, progressBar);
+        presControls.getChildren().addAll(backButton, nextButton, fullScreenButton, specificFeats, commentButton, progressBar);
         if(this instanceof StudentPresentationManager){
 
         }
@@ -488,9 +483,13 @@ public abstract class PresentationManager {
             ft0.setToValue(0.0);
             ft0.play();
         });
+
+        presControls.setMaxHeight(PRES_CONTROLS_HEIGHT);
+        presControls.setAlignment(Pos.BOTTOM_LEFT);
         return presControls;
     }
 
+    //TODO: move this to controlPresentation()
     protected void slideProgress(Presentation pe) {
         double slideNo = currentSlideNumber + 1;
         double slideMax = pe.getSlideList().size();
@@ -622,19 +621,21 @@ public abstract class PresentationManager {
         isCursorHidden = cursorHidden;
         if(cursorHidden) {
             scene.getRoot().setCursor(Cursor.NONE); //TODO: Doesn't seem to work on webviews?
-            border.getCenter().addEventFilter(MouseEvent.MOUSE_CLICKED, disabledCursorFilter);
+            displayPane.addEventFilter(MouseEvent.MOUSE_CLICKED, disabledCursorFilter);
         } else {
             scene.getRoot().setCursor(Cursor.DEFAULT);
-            border.getCenter().removeEventFilter(MouseEvent.MOUSE_CLICKED, disabledCursorFilter);
+            displayPane.removeEventFilter(MouseEvent.MOUSE_CLICKED, disabledCursorFilter);
         }
     }
 
-    private void displayCurrentSlide() {
+    protected void displayCurrentSlide() {
         resize();
 
-        centerPane.getChildren().clear();
+        displayPane.getChildren().clear();
         Slide slide = myPresentationElement.getSlide(currentSlideNumber);
         slide.setBackground(new Background(new BackgroundFill(Color.valueOf(myPresentationElement.getTheme().getBackgroundColour()), null, null)));
-        centerPane.getChildren().add(slide);
+        displayPane.getChildren().add(slide);
+        displayPane.getChildren().add(presControls);
+        StackPane.setAlignment(presControls, Pos.BOTTOM_CENTER);
     }
 }
