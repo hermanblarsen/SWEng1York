@@ -54,6 +54,7 @@ public class Utils {
      * @param fontColour Desired font colour provided as RGBA hex
      * @param bgColor    Desired background colour provided as RGBA hex
      * @return Filename of CSS file that stores the CSS for a given TextElement
+     * @author Amrik Sadhra
      */
     public static String cssGen(String presentationID, int slideID, int elementID, int fontSize, String font, String fontColour, String bgColor, String borderColour, int borderSize) {
         File cssFilePath = new File(BASE_PATH + "Presentation" + presentationID + "/" + "Slide" + slideID + "Element" + elementID + "format.css");
@@ -66,7 +67,7 @@ public class Utils {
 
         ArrayList<String> lines = new ArrayList<>();
 
-        lines.add("body{");
+        lines.add("body {");
 
         //Assume validity as XML parser has ensured is valid
         //This is the perfect place for default adding for element

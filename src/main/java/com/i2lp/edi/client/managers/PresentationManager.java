@@ -612,7 +612,10 @@ public abstract class PresentationManager {
         Slide slide = myPresentationElement.getSlide(currentSlideNumber);
         slide.setBackground(new Background(new BackgroundFill(Color.valueOf(myPresentationElement.getTheme().getBackgroundColour()), null, null)));
         displayPane.getChildren().add(slide);
-        displayPane.getChildren().add(presControls);
-        StackPane.setAlignment(presControls, Pos.BOTTOM_CENTER);
+
+        if(!(this instanceof ThumbnailGenerationManager)){
+            displayPane.getChildren().add(presControls);
+            StackPane.setAlignment(presControls, Pos.BOTTOM_CENTER);
+        }
     }
 }

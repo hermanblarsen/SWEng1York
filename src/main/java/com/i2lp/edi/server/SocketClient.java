@@ -19,6 +19,9 @@ import java.sql.Statement;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicReference;
 
+import static com.i2lp.edi.client.Constants.BASE_PATH;
+import static com.i2lp.edi.client.utilities.Utils.getFilesInFolder;
+
 /**
  * Created by amriksadhra on 20/03/2017.
  */
@@ -361,9 +364,11 @@ public class SocketClient {
     }
 
     public void sendLocalThumbnailList(){
-       /* getFilesInFolder();
+        //Get presentation names from Server through SQL query
+        //Generate the directory names and build a tree
+        getFilesInFolder(BASE_PATH);
         // Use Apache commons library to get difference between server thumbnails and client thumbnails
-        List difference = ListUtils.subtract(Arrays.asList(filesOnServer), Arrays.asList(clientFiles));
+       /* List difference = ListUtils.subtract(Arrays.asList(filesOnServer), Arrays.asList(clientFiles));
 
         // If no difference between client and server, dont send request data packet
         if (difference.size() == 0) {

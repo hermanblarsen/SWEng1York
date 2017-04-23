@@ -3,6 +3,9 @@ package com.i2lp.edi.client.presentationElements;
 import com.i2lp.edi.client.utilities.Utils;
 import javafx.concurrent.Worker;
 import javafx.scene.Node;
+import javafx.scene.SnapshotParameters;
+import javafx.scene.image.ImageView;
+import javafx.scene.image.WritableImage;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.web.WebEngine;
@@ -34,6 +37,7 @@ public class TextElement extends SlideElement {
 
     protected WebView browser;
     public WebEngine webEngine;
+    protected ImageView browserRaster;
     String cssFilePath;
     private boolean isReady; //State for Webview
 
@@ -63,6 +67,8 @@ public class TextElement extends SlideElement {
         browser.getEngine().getLoadWorker().stateProperty().addListener((arg0, oldState, newState) -> {
             if (newState == Worker.State.SUCCEEDED) {
                 isReady = true;
+                WritableImage thumbnail = browser.snapshot(new SnapshotParameters(), null);
+                browserRaster = new ImageView(thumbnail);
             }
         });
     }
@@ -74,11 +80,17 @@ public class TextElement extends SlideElement {
 
     @Override
     public void doClassSpecificRender() {
-        //Stage 1 DoClassSpecificRender: Resize width and height, then X and Y positions based on canvas size
+        //Stage 1 DoClassSpecificRender: Resize width and height (Check AspectRatioLock), then X and Y positions based on canvas size.
         //Rescale X and Y sizes of text box
         if (slideCanvas.getScene() != null) {
-            browser.setPrefWidth(xSize * slideWidth);
-            browser.setPrefHeight(ySize * slideHeight);
+            //If AspectRatio Locked for element, calculate Y size as product of X size with ElementAspectRatio
+            if(isAspectRatioLock()){
+                browser.setPrefWidth(xSize * slideWidth);
+                browser.setPrefHeight(browser.getPrefWidth() * elementAspectRatio);
+            } else {
+                browser.setPrefWidth(xSize * slideWidth);
+                browser.setPrefHeight(ySize * slideHeight);
+            }
 
             //Rescale positioning of elements
             scaleDimensions(xPosition, yPosition);
@@ -251,6 +263,10 @@ public class TextElement extends SlideElement {
 
     @Override
     public Node getCoreNode() {
+        //Cheekily swap out coreNode for image when image is generated
+       /* if(isReady){
+            return browserRaster;
+        }*/
         return browser;
     }
 }

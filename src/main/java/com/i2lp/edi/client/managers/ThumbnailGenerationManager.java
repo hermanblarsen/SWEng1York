@@ -27,7 +27,6 @@ public class ThumbnailGenerationManager extends PresentationManager {
 
     public void openPresentation(String path) {
         presentationStage = new Stage();
-        presentationStage.setTitle("Edi");
         displayPane = new StackPane();
         //Lower resolution for thumbnails
         scene = new Scene(displayPane, 320, 240);
