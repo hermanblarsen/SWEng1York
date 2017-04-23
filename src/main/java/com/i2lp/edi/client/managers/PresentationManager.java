@@ -12,8 +12,10 @@ import com.i2lp.edi.client.utilities.ParserXML;
 import javafx.animation.FadeTransition;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Cursor;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
@@ -27,6 +29,7 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.util.Duration;
@@ -48,6 +51,7 @@ public abstract class PresentationManager {
 
     protected Scene scene;
     public BorderPane border;
+    private StackPane centerPane;
     public Presentation myPresentationElement;
     protected ProgressBar pb;
     protected Label slideNumber;
@@ -64,8 +68,9 @@ public abstract class PresentationManager {
     private EventHandler<MouseEvent> disabledCursorFilter;
 
     private boolean isCursorHidden = false;
-    protected double slideWidth = 0;
-    protected double slideHeight = 0;
+
+    protected double slideWidth;
+    protected double slideHeight;
 
     protected StackPane stackPane;
     public int currentSlideNumber = 0; //Current slide number in presentation
@@ -90,6 +95,8 @@ public abstract class PresentationManager {
                 }else{
                     toBeAssigned.setTeacher(false);
                 }
+                toBeAssigned.setSlideWidth(slideWidth);
+                toBeAssigned.setSlideHeight(slideHeight);
             }
         }
     }
@@ -108,12 +115,18 @@ public abstract class PresentationManager {
         presentationStage.setTitle("Edi");
 
         border = new BorderPane();
-        loadPresentation(border, path);
+        centerPane = new StackPane();
+        centerPane.setBackground(new Background(new BackgroundFill(Color.BLACK, null, null)));
+        centerPane.setAlignment(Pos.CENTER);
+        border.setCenter(centerPane);
+        loadPresentation(path);
         stackPane = new StackPane();
         stackPane.getChildren().add(border);
         Rectangle2D primaryScreenBounds = Screen.getPrimary().getVisualBounds();
+
         slideWidth = primaryScreenBounds.getWidth() * SLIDE_SIZE;
-        slideHeight = slideWidth / myPresentationElement.getTheme().getPresentationAspectRatio();
+        slideHeight = slideWidth / myPresentationElement.getDocumentAspectRatio();
+
         assignSizeProperties(myPresentationElement);
         scene = new Scene(stackPane, slideWidth, slideHeight); //1000x600
         scene.getStylesheets().add("bootstrapfx.css");
@@ -206,13 +219,16 @@ public abstract class PresentationManager {
             }
         });
 
+        //TODO: Doesn't work when cursor over webview
         scene.setOnScroll(event -> {
-            if(event.getDeltaY()>0) {
-                controlPresentation(Slide.SLIDE_BACKWARD);
-                slideProgress(myPresentationElement);
-            } else {
-                controlPresentation(Slide.SLIDE_FORWARD);
-                slideProgress(myPresentationElement);
+            if(isMouseOverSlide) {
+                if(event.getDeltaY()>0) {
+                    controlPresentation(Slide.SLIDE_BACKWARD);
+                    slideProgress(myPresentationElement);
+                } else {
+                    controlPresentation(Slide.SLIDE_FORWARD);
+                    slideProgress(myPresentationElement);
+                }
             }
         });
 
@@ -248,11 +264,11 @@ public abstract class PresentationManager {
 
     private void addResizeListeners() {
         //Automatic resize of SlideElements
-        scene.widthProperty().addListener((observableValue, oldSceneWidth, newSceneWidth) -> redraw());
-        scene.heightProperty().addListener((observableValue, oldSceneHeight, newSceneHeight) -> redraw());
+        scene.widthProperty().addListener((observableValue, oldSceneWidth, newSceneWidth) -> resize());
+        scene.heightProperty().addListener((observableValue, oldSceneHeight, newSceneHeight) -> resize());
     }
 
-    public void loadPresentation(BorderPane mainUI, String path) {
+    public void loadPresentation(String path) {
         logger.info("Attempting to load presentation located at: " + path);
 
         ParserXML readPresentationParser = new ParserXML(path);
@@ -260,11 +276,28 @@ public abstract class PresentationManager {
         //myPresentationElement = Presentation.generateTestPresentation();     //TEST
 
         assignAttributes(myPresentationElement);
-        mainUI.setCenter(myPresentationElement.getSlide(currentSlideNumber));
+        displayCurrentSlide();
     }
 
-    private void redraw(){
+    //TODO: Currently resizing has only been tested for TextElements.
+    private void resize() {
         logger.trace("Resizing slide Elements");
+
+        double width = presentationStage.getWidth();
+        double height = presentationStage.getHeight();
+        double aspectRatio = myPresentationElement.getDocumentAspectRatio();
+
+        if (width/height > aspectRatio) {
+            slideWidth = height*aspectRatio;
+            slideHeight = height;
+        } else {
+            slideWidth = width;
+            slideHeight = width/aspectRatio;
+        }
+
+        myPresentationElement.getSlideList().get(currentSlideNumber).setMaxSize(slideWidth, slideHeight);
+        assignSizeProperties(myPresentationElement); //TODO: using this is a bit of an overkill, as it applies to all slides
+
         for (SlideElement toResize : myPresentationElement.getSlide(currentSlideNumber).getVisibleSlideElementList()) {
                 toResize.doClassSpecificRender();
         }
@@ -482,7 +515,7 @@ public abstract class PresentationManager {
                         currentSlideNumber++;
                         presentationStatus = Presentation.SLIDE_CHANGE;
                         //Update MainUI panes when changing slides to account for new Slide root pane.
-                        border.setCenter(myPresentationElement.getSlide(currentSlideNumber));
+                        displayCurrentSlide();
                     }
                 } else if (changeStatus == Slide.SLIDE_PRE_CHANGE){
                     //Userful state for Thumbnail generation
@@ -508,7 +541,7 @@ public abstract class PresentationManager {
                     }
                     presentationToAdvance.setCurrentSlide(presentationToAdvance.getSlideList().get(currentSlideNumber));
                     //Update MainUI panes when changing slides to account for new Slide root pane.
-                    border.setCenter(myPresentationElement.getSlide(currentSlideNumber));
+                    displayCurrentSlide();
                 }
             }
         }
@@ -594,5 +627,14 @@ public abstract class PresentationManager {
             scene.getRoot().setCursor(Cursor.DEFAULT);
             border.getCenter().removeEventFilter(MouseEvent.MOUSE_CLICKED, disabledCursorFilter);
         }
+    }
+
+    private void displayCurrentSlide() {
+        resize();
+
+        centerPane.getChildren().clear();
+        Slide slide = myPresentationElement.getSlide(currentSlideNumber);
+        slide.setBackground(new Background(new BackgroundFill(Color.valueOf(myPresentationElement.getTheme().getBackgroundColour()), null, null)));
+        centerPane.getChildren().add(slide);
     }
 }

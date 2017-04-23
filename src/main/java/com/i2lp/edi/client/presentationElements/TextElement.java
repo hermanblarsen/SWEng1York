@@ -78,8 +78,8 @@ public class TextElement extends SlideElement {
         //Stage 1 DoClassSpecificRender: Resize width and height, then X and Y positions based on canvas size
         //Rescale X and Y sizes of text box
         if (slideCanvas.getScene() != null) {
-            browser.setPrefWidth(xSize * slideCanvas.getScene().getWindow().getWidth());
-            browser.setPrefHeight(ySize * slideCanvas.getScene().getWindow().getHeight());
+            browser.setPrefWidth(xSize * slideWidth);
+            browser.setPrefHeight(ySize * slideHeight);
 
             //Rescale positioning of elements
             scaleDimensions(xPosition, yPosition);

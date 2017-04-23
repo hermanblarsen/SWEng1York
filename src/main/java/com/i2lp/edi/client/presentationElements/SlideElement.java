@@ -27,8 +27,8 @@ public abstract class SlideElement {
     protected Pane slideCanvas;
     Animation startAnimation, endAnimation;
     boolean onCanvas = false;
-    protected double slideWidth = 0;
-    protected double slideHeight = 0;
+    protected double slideWidth;
+    protected double slideHeight;
     protected boolean teacher;
 
     public abstract void doClassSpecificRender();
@@ -193,8 +193,10 @@ public abstract class SlideElement {
 
     protected void scaleDimensions(float xPosition, float yPosition){
         //Convert position percentages to multipliers against canvas size and update location
-        getCoreNode().setTranslateX(xPosition * slideCanvas.getScene().getWindow().getWidth());
-        getCoreNode().setTranslateY(yPosition * slideCanvas.getScene().getWindow().getHeight());
+//        getCoreNode().setTranslateX(xPosition * slideCanvas.getScene().getWindow().getWidth());
+        getCoreNode().setTranslateX(xPosition * slideWidth);
+//        getCoreNode().setTranslateY(yPosition * slideCanvas.getScene().getWindow().getHeight());
+        getCoreNode().setTranslateY(yPosition * slideHeight);
     }
 
     protected void performOnClickAction(){
