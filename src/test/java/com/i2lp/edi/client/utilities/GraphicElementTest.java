@@ -71,6 +71,6 @@ public class GraphicElementTest extends Application {
     public void testParseRGBAString(){
         assertEquals(new Color(1, 0, 1, 0), GraphicElement.parseRGBAString("#FF00FF00"));
         assertEquals(new Color(0, 1, 0, 1), GraphicElement.parseRGBAString("#00ff00FF"));
-        assertEquals(new Color(0, 1, 0, 127/255), GraphicElement.parseRGBAString("#00FF007F"));
+        assertEquals(new Color(0, 1, 0, 127f/255f), GraphicElement.parseRGBAString("#00FF007F"));
     }
 }
