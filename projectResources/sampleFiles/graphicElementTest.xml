@@ -1,0 +1,85 @@
+<document documentid="sampleinput">
+	<documentdetails>
+		<author>Joe Bloggs</author>
+		<version>1.0</version>
+		<documentaspectratio>1.78</documentaspectratio>
+		<description>Sample XML input</description>
+		<tags>sample,xml,input</tags>
+		<groupformat>2</groupformat>
+	</documentdetails>
+	<slideshow>
+		<defaults>
+			<bgcolour>#FF2304</bgcolour>
+			<font>Arial</font>
+			<fontsize>12</fontsize>
+			<fontcolour>#F00D33FF</fontcolour>
+			<graphicscolour>#F40D33FF</graphicscolour>
+			<autoplaymedia>true</autoplaymedia>
+		</defaults>
+
+		<slide slideid="1">
+
+			<graphic elementid ="1" layer="2" visibility="false" startsequence="1">
+				<onclickaction>dynamicmediatoggle</onclickaction>
+				<onclickinfo>3</onclickinfo>
+				<aspectratiolock>true</aspectratiolock>
+				<elementaspectratio>1.0</elementaspectratio>
+				<linecolour>#aaffaaFF</linecolour>
+				<fillcolour>#FFaabbFF</fillcolour>
+				<polygon>
+					<xpositions>0.1, 0.2, 0.2, 0.1</xpositions>
+					<ypositions>0.1, 0.1, 0.2, 0.2</ypositions>
+					<isclosed>true</isclosed>
+				</polygon>
+			</graphic>
+
+			<graphic elementid ="2" layer="1" visibility="true" startsequence="2" duration="1">
+				<onclickaction>gotoslide</onclickaction>
+				<onclickinfo>1</onclickinfo>
+				<aspectratiolock>false</aspectratiolock>
+				<elementaspectratio>1.78</elementaspectratio>
+				<linecolour>#EEEEEEFF</linecolour>
+				<fillcolour>#00bb00FF</fillcolour>
+				<oval>
+					<xposition>0.12</xposition>
+					<yposition>0.3</yposition>
+					<rhorizontal>0.05</rhorizontal>
+					<rvertical>0.2</rvertical>
+					<rotation>45</rotation>
+				</oval>
+			</graphic>
+
+		</slide>
+		<slide slideid="2">
+			<graphic elementid ="1" layer="1" visibility="true" startsequence="1" duration="8">
+				<onclickaction>gotoslide</onclickaction>
+				<onclickinfo>1</onclickinfo>
+				<aspectratiolock>false</aspectratiolock>
+				<elementaspectratio>1.78</elementaspectratio>
+				<linecolour>#EEEEEEFF</linecolour>
+				<fillcolour>#00FF00FF</fillcolour>
+				<oval>
+					<xposition>0.1</xposition>
+					<yposition>0.2</yposition>
+					<rhorizontal>0.05</rhorizontal>
+					<rvertical>0.05</rvertical>
+					<rotation>0</rotation>
+				</oval>
+			</graphic>
+
+			<graphic elementid ="2" layer="2" visibility="false" startsequence="2">
+				<onclickaction>dynamicmediatoggle</onclickaction>
+				<onclickinfo>3</onclickinfo>
+				<aspectratiolock>true</aspectratiolock>
+				<elementaspectratio>1.0</elementaspectratio>
+				<linecolour>#aaffaaFF</linecolour>
+				<fillcolour>#FF00008F</fillcolour>
+				<polygon>
+					<xpositions>0, 0.1, 0.3, 0.1, 0.2, 0</xpositions>
+					<ypositions>0, 0.2, 0.2, 0.4, 0.7, 0.5</ypositions>
+					<isclosed>true</isclosed>					
+				</polygon>
+			</graphic>
+		</slide>
+	</slideshow>
+</document>

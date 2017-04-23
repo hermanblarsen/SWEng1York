@@ -48,13 +48,13 @@ public class GraphicElement extends SlideElement {
     public void doClassSpecificRender() {
         if(firstInstance) {
             if (isPolygon) {
-                denormalisePolygonPoints((float) slideWidth, (float) slideHeight);
+                denormalisePolygonPoints((float) getSlideWidth(), (float) getSlideHeight());
                 graphicShape = setupPolygon();
             } else {
-                ovalPos[0] *= slideWidth;
-                ovalPos[1] *= slideHeight;
-                ovalRadii[1] *= slideWidth;
-                ovalRadii[0] *= slideHeight;
+                ovalPos[0] *= getSlideWidth();
+                ovalPos[1] *= getSlideHeight();
+                ovalRadii[1] *= getSlideWidth();
+                ovalRadii[0] *= getSlideHeight();
 
 
                 graphicShape = setupOval();
@@ -163,7 +163,7 @@ public class GraphicElement extends SlideElement {
     public static Color parseRGBAString(String rgba){
        String rgb = rgba.substring(0, 7);
        String alphaString = rgba.substring(7);
-       double alpha = Integer.parseInt(alphaString, 16)/255;
+       double alpha = (float)Integer.parseInt(alphaString, 16)/255f;
        //Clamp alpha at maximum of 1, else Color.web fails
        if(alpha > 1.0) alpha = 1.0;
        return Color.web(rgb, alpha);
