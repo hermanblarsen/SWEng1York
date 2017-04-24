@@ -24,7 +24,6 @@ import java.util.List;
  * Created by Koen on 06/04/2017.
  */
 public class PollElement extends InteractiveElement {
-    protected BorderPane pollPane = new BorderPane();
     protected String pollQuestion;
     protected List<String> possibleAnswers;
     protected boolean answered = false;
@@ -49,36 +48,33 @@ public class PollElement extends InteractiveElement {
     }
 
     @Override
-    public void doClassSpecificRender() {
-        Label remainingTime = new Label("Time Remaining: "+ timeLimit);
+    public void doClassSpecificRender() { //TODO: Needs more cleanup by converting variables to fields and moving more stuff to setupElement()
+        Label remainingTime = new Label("Time Remaining: " + timeLimit);
         final IntegerProperty i = new SimpleIntegerProperty(timeLimit);
         timeline = new Timeline(
                 new KeyFrame(
                         Duration.seconds(1),
-                        evt->{
-                            i.set(i.get()-1);
-                            remainingTime.setText("Time Remaining: "+i.get());
+                        evt -> {
+                            i.set(i.get() - 1);
+                            remainingTime.setText("Time Remaining: " + i.get());
                         }
                 )
         );
         timeline.setCycleCount(timeLimit);
-        timeline.setOnFinished(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                //pollPane.getChildren().remove(pollOptions);
-                questionPane.getChildren().remove(pollOptions);
-                Label done = new Label("DONE");
-                //pollPane.setCenter(done);
-                questionPane.setBody(done);
-            }
+        timeline.setOnFinished(event -> {
+            //pollPane.getChildren().remove(pollOptions);
+            questionPane.getChildren().remove(pollOptions);
+            Label done = new Label("DONE");
+            //pollPane.setCenter(done);
+            questionPane.setBody(done);
         });
-        if(teacher){
+        if(teacher && !timerStart) {
             Button startTimer = new Button("START");
             startTimer.getStyleClass().setAll("btn", "btn-default");
             startTimer.addEventHandler(MouseEvent.MOUSE_CLICKED,evt->{
                 timerStart = true;
                 pollOptions= new HBox();
-                pollOptions.getChildren().addAll(setUpQuestions(),remainingTime);
+                pollOptions.getChildren().addAll(setUpQuestions(), remainingTime);
                 //pollPane.setCenter(pollOptions);
                 questionPane.setBody(pollOptions);
                 //delay.play();
@@ -86,19 +82,16 @@ public class PollElement extends InteractiveElement {
             });
             //pollPane.setCenter(startTimer);
             questionPane.setBody(startTimer);
-
         }
     }
 
     @Override
     public Node getCoreNode() {
-        return pollPane;
+        return questionPane;
     }
 
     @Override
     public void setupElement() {
-        pollPane = new BorderPane();
-        pollPane.getStylesheets().add("bootstrapfx.css");
         //Label question = new Label(pollQuestion);
         questionPane = new Panel(pollQuestion);
 
@@ -114,10 +107,7 @@ public class PollElement extends InteractiveElement {
 
 //        });
 
-        questionPane.setPrefSize(slideWidth,slideHeight);
-
-        pollPane.setTop(questionPane);
-
+        questionPane.setMinSize(slideWidth,slideHeight); //TODO: Need to figure out resizing behaviour
 
     }
 

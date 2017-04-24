@@ -315,7 +315,7 @@ public class Presentation extends Pane {
         myVideoElement.setLoop(false);
         myVideoElement.setStartTime(Duration.seconds(0));
         myVideoElement.setEndTime(Duration.seconds(30));
-        myVideoElement.setElementAspectRatio(1.333f);
+        myVideoElement.setElementAspectRatio(1.777777f);
         myVideoElement.setAspectRatioLock(false);
         myVideoElement.setxSize(0.300f);
         myVideoElement.setySize(0.3f);
@@ -351,6 +351,10 @@ public class Presentation extends Pane {
 
         Presentation myPresentation = new Presentation();
         myPresentation.setSlideList(slides);
+        myPresentation.setDocumentAspectRatio((float) 4/3);
+        Theme theme = new Theme();
+        theme.setBackgroundColour("#FFFFFF");
+        myPresentation.setTheme(theme);
 
         return myPresentation;
     }

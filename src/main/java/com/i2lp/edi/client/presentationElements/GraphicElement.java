@@ -66,6 +66,7 @@ public class GraphicElement extends SlideElement {
             graphicShape.setStroke(parseRGBAString(lineColour));
             graphicShape.setStrokeWidth(LINE_THICKNESS);
 
+            wrapperPane.getChildren().clear();
             wrapperPane.getChildren().add(graphicShape);
             getCoreNode().setPickOnBounds(false);
     }

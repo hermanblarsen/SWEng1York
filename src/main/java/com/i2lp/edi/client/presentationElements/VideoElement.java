@@ -51,18 +51,13 @@ public class VideoElement extends SlideElement{
             mv.fitWidthProperty().bind(slideCanvas.widthProperty());
             mv.fitHeightProperty().bind(slideCanvas.heightProperty());
         } else {
-            xSize = (float)slideWidth*(xSize);
-            ySize = xSize/elementAspectRatio;
-            mv.setFitHeight(ySize);
-            mv.setFitWidth(xSize);
+            mv.setFitWidth(slideWidth * xSize);
+            mv.setFitHeight(slideHeight * ySize);
         }
 
-        xPosition = (float) (slideWidth * (xPosition));
-        yPosition = (float) slideHeight * (yPosition);
-
-        mediaPane.setTranslateX(xPosition);
-        mediaPane.setTranslateY(yPosition);
-        System.out.println("CURRENT PATH: "+ media.getSource());
+        mediaPane.setTranslateX(slideWidth * xPosition);
+        mediaPane.setTranslateY(slideHeight * yPosition);
+        //System.out.println("CURRENT PATH: "+ media.getSource());
         if(autoplay){
             mp.play();
         }
@@ -90,7 +85,6 @@ public class VideoElement extends SlideElement{
         mv = new MediaView(mp);
         //mediaPane.getChildren().add(mv);
 
-
         if (startTime != null) {
             mp.setStartTime(startTime);
         } else {
@@ -109,6 +103,7 @@ public class VideoElement extends SlideElement{
 
         mediaPane.getChildren().add(mv);
         mediaPane.setStyle("-fx-background-color: black");
+
         if (mediaControl) {
             mp.setOnReady(() -> mediaPane.setMaxSize(mv.getFitWidth(), mv.getFitHeight()));
             mediaPane.getChildren().add(mediaControl());
@@ -365,6 +360,8 @@ public class VideoElement extends SlideElement{
             ft.play();
 
         });
+
+        mediaBar.setMinSize(0, 0); //TODO: Figure out what happens when mv is to small to contain mediaBar
         return mediaBar;
     }
 

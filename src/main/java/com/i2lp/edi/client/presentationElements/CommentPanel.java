@@ -1,5 +1,6 @@
 package com.i2lp.edi.client.presentationElements;
 
+import com.sun.javafx.scene.web.skin.HTMLEditorSkin;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.layout.HBox;
@@ -13,7 +14,7 @@ import org.kordamp.bootstrapfx.scene.layout.Panel;
 public class CommentPanel extends Panel {
 
     protected HTMLEditor he = new HTMLEditor();
-    protected String comment = "";
+    protected String comment = new String();
     protected boolean submitEnable;
 
     public CommentPanel(boolean submitEnable) {
@@ -59,7 +60,6 @@ public class CommentPanel extends Panel {
     }
 
     protected void commentSaveFunction(){
-
         comment = he.getHtmlText();
     }
 
