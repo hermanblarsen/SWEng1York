@@ -3,13 +3,13 @@ package com.i2lp.edi.client.presentationElements;
 import com.i2lp.edi.client.utilities.Utils;
 import javafx.concurrent.Worker;
 import javafx.scene.Node;
-import javafx.scene.SnapshotParameters;
-import javafx.scene.image.ImageView;
-import javafx.scene.image.WritableImage;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
+
+import static com.i2lp.edi.client.Constants.SCREEN_WIDTH;
+import static com.i2lp.edi.client.Constants.TEXT_ELEMENT_ZOOM_FACTOR;
 
 /**
  * Created by habl on 26/02/2017.
@@ -37,7 +37,7 @@ public class TextElement extends SlideElement {
 
     protected WebView browser;
     public WebEngine webEngine;
-    protected ImageView browserRaster;
+
     String cssFilePath;
     private boolean isReady; //State for Webview
 
@@ -67,8 +67,6 @@ public class TextElement extends SlideElement {
         browser.getEngine().getLoadWorker().stateProperty().addListener((arg0, oldState, newState) -> {
             if (newState == Worker.State.SUCCEEDED) {
                 isReady = true;
-                WritableImage thumbnail = browser.snapshot(new SnapshotParameters(), null);
-                browserRaster = new ImageView(thumbnail);
             }
         });
     }
@@ -84,7 +82,7 @@ public class TextElement extends SlideElement {
         //Rescale X and Y sizes of text box
         if (slideCanvas.getScene() != null) {
             //If AspectRatio Locked for element, calculate Y size as product of X size with ElementAspectRatio
-            if(isAspectRatioLock()){
+            if (isAspectRatioLock()) {
                 browser.setPrefWidth(xSize * slideWidth);
                 browser.setPrefHeight(browser.getPrefWidth() * elementAspectRatio);
             } else {
@@ -94,6 +92,8 @@ public class TextElement extends SlideElement {
 
             //Rescale positioning of elements
             scaleDimensions(xPosition, yPosition);
+            //Alter Zoom of webview to maintain proportions
+            browser.setZoom((slideWidth/SCREEN_WIDTH) * TEXT_ELEMENT_ZOOM_FACTOR);
         }
 
         //Stage 2 DoClassSpecificRender: Refresh content inside Core Node
@@ -263,10 +263,6 @@ public class TextElement extends SlideElement {
 
     @Override
     public Node getCoreNode() {
-        //Cheekily swap out coreNode for image when image is generated
-       /* if(isReady){
-            return browserRaster;
-        }*/
         return browser;
     }
 }

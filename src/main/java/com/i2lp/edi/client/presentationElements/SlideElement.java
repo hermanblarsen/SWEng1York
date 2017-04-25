@@ -193,9 +193,7 @@ public abstract class SlideElement {
 
     protected void scaleDimensions(float xPosition, float yPosition){
         //Convert position percentages to multipliers against canvas size and update location
-//        getCoreNode().setTranslateX(xPosition * slideCanvas.getScene().getWindow().getWidth());
         getCoreNode().setTranslateX(xPosition * slideWidth);
-//        getCoreNode().setTranslateY(yPosition * slideCanvas.getScene().getWindow().getHeight());
         getCoreNode().setTranslateY(yPosition * slideHeight);
     }
 
@@ -211,6 +209,10 @@ public abstract class SlideElement {
 
             case "dynamicmediatoggle":
                 //onclickinfo = elementid
+                break;
+
+            case "none":
+                logger.info("No OnClickAction for ElementID: " + getElementID());
                 break;
         }
     }

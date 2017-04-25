@@ -11,9 +11,7 @@ import java.io.IOException;
 import java.nio.file.InvalidPathException;
 import java.util.ArrayList;
 
-import static com.i2lp.edi.client.utilities.Utils.checkValidColour;
-import static com.i2lp.edi.client.utilities.Utils.checkValidFont;
-import static com.i2lp.edi.client.utilities.Utils.checkValidFontSize;
+import static com.i2lp.edi.client.utilities.Utils.*;
 
 /**
  * Created by habl on 23/02/2017.
@@ -380,7 +378,7 @@ public class ParserXML {
                         textElement.setBorderColour(checkValidColour(elementContent, myPresentation.getTheme()));
                         break;
                     case "onclickaction":
-                        textElement.setOnClickAction(elementContent);
+                        textElement.setOnClickAction(checkValidOnClickAction(elementContent));
                         break;
                     case "onclickinfo":
                         textElement.setOnClickInfo(elementContent);
@@ -418,7 +416,7 @@ public class ParserXML {
 
                 switch (elementName) {
                     case "onclickaction":
-                        graphicElement.setOnClickAction(elementContent);
+                        graphicElement.setOnClickAction(checkValidOnClickAction(elementContent));
                         break;
                     case "onclickinfo":
                         graphicElement.setOnClickInfo(elementContent);
@@ -543,7 +541,7 @@ public class ParserXML {
                         imageElement.setPath(elementContent);
                         break;
                     case "onclickaction":
-                        imageElement.setOnClickAction(elementContent);
+                        imageElement.setOnClickAction(checkValidOnClickAction(elementContent));
                         break;
                     case "onclickinfo":
                         imageElement.setOnClickInfo(elementContent);
@@ -632,7 +630,7 @@ public class ParserXML {
                         videoElement.setPath(elementContent);
                         break;
                     case "onclickaction":
-                        videoElement.setOnClickAction(elementContent);
+                        videoElement.setOnClickAction(checkValidOnClickAction(elementContent));
                         break;
                     case "onclickinfo":
                         videoElement.setOnClickInfo(elementContent);

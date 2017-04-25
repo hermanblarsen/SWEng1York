@@ -163,14 +163,30 @@ public class Utils {
         //If checking presentation defaults and font invalid, return Comic Sans
         if (presentationDefaults == null) {
             logger.warn("Invalid default Font specified in XML, defaulting to " + VALID_FONTS[0]);
-            return VALID_FONTS[0]; //Return comic sans xD
+            return VALID_FONTS[0]; //Return comic sans
         } else {
             logger.warn("Invalid Font specified in XML, defaulting to " + presentationDefaults.getFont());
             return presentationDefaults.getFont(); //Return default presentation font
         }
     }
 
-    public static ArrayList<String> getFilesInFolder(String path){
+    /**
+     * Check onClickAction is valid (in schema) and return it if it is. If invalid, return fallback onclick action.
+     *
+     * @param onClickAction Action string parsed from XML to check for validity
+     * @return Valid onClickAction
+     * @author Amrik Sadhra
+     */
+    public static String checkValidOnClickAction(String onClickAction) {
+        //If onClickAction valid, return onclickaction
+        if (Arrays.asList(VALID_ONCLICK_ACTIONS).contains(onClickAction.toLowerCase())) return onClickAction;
+        else {
+            logger.warn("Invalid onClickAction specified in XML, defaulting to " + FALLBACK_ONCLICK_ACTION);
+            return FALLBACK_ONCLICK_ACTION;
+        }
+    }
+
+    public static ArrayList<String> getFilesInFolder(String path) {
         ArrayList<String> filesInFolder = new ArrayList<>();
         //Set target path to read list of present files from
         final File folder = new File(path);
