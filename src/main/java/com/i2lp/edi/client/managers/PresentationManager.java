@@ -51,7 +51,8 @@ public abstract class PresentationManager {
     protected Scene scene;
     protected StackPane displayPane;
     private VBox sceneBox;
-    public Presentation myPresentationElement;
+
+    protected Presentation presentationElement;
     protected ProgressBar pb;
     protected Label slideNumber;
     protected Boolean isFullscreen = false;
@@ -71,8 +72,12 @@ public abstract class PresentationManager {
 
     protected double slideWidth;
     protected double slideHeight;
-    public int currentSlideNumber = 0; //Current slide number in presentation
+    protected int currentSlideNumber = 0; //Current slide number in presentation
     private boolean isMouseOverSlide = true;
+
+    public Presentation getPresentationElement() {
+        return presentationElement;
+    }
 
 
     /**
@@ -85,12 +90,13 @@ public abstract class PresentationManager {
     protected void assignAttributes(Presentation myPresentationElement) {
         for (Slide toAssign : myPresentationElement.getSlideList()) {
             for (SlideElement toBeAssigned : toAssign.getSlideElementList()) {
+                toBeAssigned.setPresentationManager(this); //Needed for onClickAction
                 toBeAssigned.setSlideID(toAssign.getSlideID());
                 toBeAssigned.setPresentationID(myPresentationElement.getDocumentID());
                 toBeAssigned.setSlideCanvas(toAssign);
-                if(this instanceof TeacherPresentationManager){
+                if (this instanceof TeacherPresentationManager) {
                     toBeAssigned.setTeacher(true);
-                }else{
+                } else {
                     toBeAssigned.setTeacher(false);
                 }
                 toBeAssigned.setSlideWidth(slideWidth);
@@ -122,13 +128,13 @@ public abstract class PresentationManager {
         slideNumber = new Label();
         presControls = addPresentationControls(presentationStage);
         loadPresentation(path);
-        slideNumber.setText("Slide 1 of " + myPresentationElement.getSlideList().size());
+        slideNumber.setText("Slide 1 of " + presentationElement.getSlideList().size());
 
 
         Rectangle2D primaryScreenBounds = Screen.getPrimary().getVisualBounds();
 
         slideWidth = primaryScreenBounds.getWidth() * SLIDE_SIZE;
-        slideHeight = slideWidth / myPresentationElement.getDocumentAspectRatio();
+        slideHeight = slideWidth / presentationElement.getDocumentAspectRatio();
 
         scene = new Scene(sceneBox, slideWidth, slideHeight); //1000x600
         scene.getStylesheets().add("bootstrapfx.css");
@@ -158,26 +164,26 @@ public abstract class PresentationManager {
                     key.getCode().equals(KeyCode.PAGE_DOWN) ||
                     key.getCode().equals(KeyCode.DOWN)) {
                 controlPresentation(Slide.SLIDE_BACKWARD);
-            } else if(key.getCode().equals(KeyCode.F5)) {
+            } else if (key.getCode().equals(KeyCode.F5)) {
                 presentationStage.setFullScreen(true);
-            } else if(key.getCode().equals(KeyCode.B)) {
-                if(isShowBlack) {
+            } else if (key.getCode().equals(KeyCode.B)) {
+                if (isShowBlack) {
                     isShowBlack = false;
                 } else {
                     isShowBlack = true;
                 }
                 displayCurrentSlide();
-            } else if(key.getCode().equals(KeyCode.HOME)) {
-                while (slideAdvance(myPresentationElement, Slide.SLIDE_BACKWARD) != Presentation.PRESENTATION_START);
-            } else if(key.getCode().equals(KeyCode.END)) {
-                while (slideAdvance(myPresentationElement, Slide.SLIDE_FORWARD) != Presentation.PRESENTATION_FINISH);
+            } else if (key.getCode().equals(KeyCode.HOME)) {
+                while (slideAdvance(presentationElement, Slide.SLIDE_BACKWARD) != Presentation.PRESENTATION_START) ;
+            } else if (key.getCode().equals(KeyCode.END)) {
+                while (slideAdvance(presentationElement, Slide.SLIDE_FORWARD) != Presentation.PRESENTATION_FINISH) ;
             }
         });
     }
 
     private void addMouseListeners() {
         scene.setOnMouseClicked(mouseEvent -> {
-            if(mouseEvent.getButton().equals(MouseButton.SECONDARY)) {
+            if (mouseEvent.getButton().equals(MouseButton.SECONDARY)) {
                 ContextMenu cMenu = new ContextMenu();
 
                 MenuItem nextSequence = new MenuItem("Next sequence");
@@ -190,13 +196,15 @@ public abstract class PresentationManager {
 
                 MenuItem firstSequence = new MenuItem("First sequence");
                 firstSequence.setOnAction(firstEvent -> {
-                    while (slideAdvance(myPresentationElement, Slide.SLIDE_BACKWARD) != Presentation.PRESENTATION_START);
+                    while (slideAdvance(presentationElement, Slide.SLIDE_BACKWARD) != Presentation.PRESENTATION_START)
+                        ;
                 });
                 cMenu.getItems().add(firstSequence);
 
                 MenuItem lastSequence = new MenuItem("Last sequence");
                 lastSequence.setOnAction(lastEvent -> {
-                    while (slideAdvance(myPresentationElement, Slide.SLIDE_FORWARD) != Presentation.PRESENTATION_FINISH);
+                    while (slideAdvance(presentationElement, Slide.SLIDE_FORWARD) != Presentation.PRESENTATION_FINISH)
+                        ;
                 });
                 cMenu.getItems().add(lastSequence);
 
@@ -206,8 +214,8 @@ public abstract class PresentationManager {
 
         //TODO: Doesn't work when cursor over webview
         scene.setOnScroll(event -> {
-            if(isMouseOverSlide) {
-                if(event.getDeltaY()>0) {
+            if (isMouseOverSlide) {
+                if (event.getDeltaY() > 0) {
                     controlPresentation(Slide.SLIDE_BACKWARD);
                 } else {
                     controlPresentation(Slide.SLIDE_FORWARD);
@@ -224,7 +232,7 @@ public abstract class PresentationManager {
         cursorHideTimer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
-                if(!mouseMoved && !isCursorHidden && isMouseOverSlide)
+                if (!mouseMoved && !isCursorHidden && isMouseOverSlide)
                     setCursorHidden(true);
 
                 mouseMoved = false;
@@ -232,13 +240,13 @@ public abstract class PresentationManager {
         }, 0, 2000);
 
         displayPane.addEventHandler(MouseEvent.ANY, event -> {
-            if(event.getEventType().equals(MouseEvent.MOUSE_ENTERED)) {
+            if (event.getEventType().equals(MouseEvent.MOUSE_ENTERED)) {
                 isMouseOverSlide = true;
-            } else if(event.getEventType().equals(MouseEvent.MOUSE_EXITED)) {
+            } else if (event.getEventType().equals(MouseEvent.MOUSE_EXITED)) {
                 isMouseOverSlide = false;
-            } else if(event.getEventType().equals(MouseEvent.MOUSE_MOVED)) {
+            } else if (event.getEventType().equals(MouseEvent.MOUSE_MOVED)) {
                 mouseMoved = true;
-                if(isCursorHidden)
+                if (isCursorHidden)
                     setCursorHidden(false);
             }
         });
@@ -254,10 +262,10 @@ public abstract class PresentationManager {
         logger.info("Attempting to load presentation located at: " + path);
 
         ParserXML readPresentationParser = new ParserXML(path);
-        //myPresentationElement = readPresentationParser.parsePresentation();
-        myPresentationElement = Presentation.generateTestPresentation();     //TEST
+        presentationElement = readPresentationParser.parsePresentation();
+        //presentationElement = Presentation.generateTestPresentation();     //TEST
 
-        assignAttributes(myPresentationElement);
+        assignAttributes(presentationElement);
         displayCurrentSlide();
     }
 
@@ -266,27 +274,27 @@ public abstract class PresentationManager {
 
         double width = displayPane.getWidth();
         double height = displayPane.getHeight();
-        double aspectRatio = myPresentationElement.getDocumentAspectRatio();
+        double aspectRatio = presentationElement.getDocumentAspectRatio();
 
-        if (width/height > aspectRatio) {
-            slideWidth = height*aspectRatio;
+        if (width / height > aspectRatio) {
+            slideWidth = height * aspectRatio;
             slideHeight = height;
         } else {
             slideWidth = width;
-            slideHeight = width/aspectRatio;
+            slideHeight = width / aspectRatio;
         }
 
-        myPresentationElement.getSlideList().get(currentSlideNumber).setMaxSize(slideWidth, slideHeight);
-        assignSizeProperties(myPresentationElement.getSlide(currentSlideNumber));
+        presentationElement.getSlideList().get(currentSlideNumber).setMaxSize(slideWidth, slideHeight);
+        assignSizeProperties(presentationElement.getSlide(currentSlideNumber));
 
-        for (SlideElement toResize : myPresentationElement.getSlide(currentSlideNumber).getVisibleSlideElementList()) {
-                toResize.doClassSpecificRender();
+        for (SlideElement toResize : presentationElement.getSlide(currentSlideNumber).getVisibleSlideElementList()) {
+            toResize.doClassSpecificRender();
         }
     }
 
     @SuppressWarnings("ConstantConditions")
     private void controlPresentation(int direction) {
-        int presentationStatus = slideAdvance(myPresentationElement, direction);
+        int presentationStatus = slideAdvance(presentationElement, direction);
 
         //If Presentation handler told us that slide is changing, update the Slide present on Main screen
         //Can do specific things when presentation reached end, or start.
@@ -302,7 +310,7 @@ public abstract class PresentationManager {
             }
         }
 
-        slideProgress(myPresentationElement);
+        slideProgress(presentationElement);
     }
 
     //protected abstract void questionQueueFunction();
@@ -310,10 +318,10 @@ public abstract class PresentationManager {
     protected abstract void loadSpecificFeatures();
 
     protected void commentFunction() {
-        if(!elementClicked) {
+        if (!elementClicked) {
             sceneBox.getChildren().add(commentPanel);
             elementClicked = true;
-        }else{
+        } else {
             sceneBox.getChildren().remove(commentPanel);
             elementClicked = false;
         }
@@ -336,16 +344,16 @@ public abstract class PresentationManager {
             controlPresentation(Slide.SLIDE_FORWARD);
 
         });
-        nextButton.addEventHandler(MouseEvent.MOUSE_ENTERED, evt-> nextButton.setEffect(shadow));
-        nextButton.addEventHandler(MouseEvent.MOUSE_EXITED,evt-> nextButton.setEffect(null));
+        nextButton.addEventHandler(MouseEvent.MOUSE_ENTERED, evt -> nextButton.setEffect(shadow));
+        nextButton.addEventHandler(MouseEvent.MOUSE_EXITED, evt -> nextButton.setEffect(null));
 
         Image back = new Image("file:projectResources/icons/Left_NEW.png", 30, 30, true, true);
         ImageView backButton = new ImageView(back);
         backButton.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
             controlPresentation(Slide.SLIDE_BACKWARD);
         });
-        backButton.addEventHandler(MouseEvent.MOUSE_ENTERED, evt-> backButton.setEffect(shadow));
-        backButton.addEventHandler(MouseEvent.MOUSE_EXITED,evt-> backButton.setEffect(null));
+        backButton.addEventHandler(MouseEvent.MOUSE_ENTERED, evt -> backButton.setEffect(shadow));
+        backButton.addEventHandler(MouseEvent.MOUSE_EXITED, evt -> backButton.setEffect(null));
 
 
         Image fullScreen = new Image("file:projectResources/icons/Fullscreen_NEW.png", 30, 30, true, true);
@@ -367,10 +375,10 @@ public abstract class PresentationManager {
                 slideHeight = primaryScreenBounds.getHeight() * 0.75;
             }
         });
-        fullScreenButton.addEventHandler(MouseEvent.MOUSE_ENTERED, evt-> fullScreenButton.setEffect(shadow));
-        fullScreenButton.addEventHandler(MouseEvent.MOUSE_EXITED,evt-> fullScreenButton.setEffect(null));
+        fullScreenButton.addEventHandler(MouseEvent.MOUSE_ENTERED, evt -> fullScreenButton.setEffect(shadow));
+        fullScreenButton.addEventHandler(MouseEvent.MOUSE_EXITED, evt -> fullScreenButton.setEffect(null));
         ImageView specificFeats;
-        if(this instanceof StudentPresentationManager) {
+        if (this instanceof StudentPresentationManager) {
             Image questionBubble = new Image("file:projectResources/icons/QM_Filled.png", 30, 30, true, true);
             ImageView questionQ = new ImageView(questionBubble);
             questionQ.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
@@ -387,7 +395,7 @@ public abstract class PresentationManager {
             questionQ.addEventHandler(MouseEvent.MOUSE_EXITED, evt -> questionQ.setEffect(null));
             specificFeats = questionQ;
         } else {
-            Image checkList = new Image("file:projectResources/icons/TeacherToolKit.png",30,30,true,true);
+            Image checkList = new Image("file:projectResources/icons/TeacherToolKit.png", 30, 30, true, true);
             ImageView teacherToolKit = new ImageView(checkList);
             teacherToolKit.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
                 if (!questionQueueActive) {
@@ -418,8 +426,8 @@ public abstract class PresentationManager {
             }
 
         });
-        commentButton.addEventHandler(MouseEvent.MOUSE_ENTERED, evt-> commentButton.setEffect(shadow));
-        commentButton.addEventHandler(MouseEvent.MOUSE_EXITED,evt-> commentButton.setEffect(null));
+        commentButton.addEventHandler(MouseEvent.MOUSE_ENTERED, evt -> commentButton.setEffect(shadow));
+        commentButton.addEventHandler(MouseEvent.MOUSE_EXITED, evt -> commentButton.setEffect(null));
 
 
         StackPane progressBar = new StackPane();
@@ -427,7 +435,7 @@ public abstract class PresentationManager {
         progressBar.getChildren().addAll(pb, slideNumber);
 
         presControls.getChildren().addAll(backButton, nextButton, fullScreenButton, specificFeats, commentButton, progressBar);
-        if(this instanceof StudentPresentationManager){
+        if (this instanceof StudentPresentationManager) {
 
         }
 
@@ -477,7 +485,7 @@ public abstract class PresentationManager {
                         //Update MainUI panes when changing slides to account for new Slide root pane.
                         displayCurrentSlide();
                     }
-                } else if (changeStatus == Slide.SLIDE_PRE_CHANGE){
+                } else if (changeStatus == Slide.SLIDE_PRE_CHANGE) {
                     //Userful state for Thumbnail generation
                     presentationStatus = Presentation.SLIDE_LAST_ELEMENT;
                 }
@@ -560,16 +568,16 @@ public abstract class PresentationManager {
             }
         }
 
-        if(slideToAdvance.getCurrentSequenceNumber() == slideToAdvance.getMaxSequenceNumber()) return Slide.SLIDE_PRE_CHANGE;
+        if (slideToAdvance.getCurrentSequenceNumber() == slideToAdvance.getMaxSequenceNumber())
+            return Slide.SLIDE_PRE_CHANGE;
         return Slide.SLIDE_NO_MOVE;
     }
 
     /**
      * Shutdown the presentation manager cleanly.
-     *
      */
     @SuppressWarnings("FinalizeCalledExplicitly")
-    public void close(){
+    public void close() {
         presentationStage.close();
         try {
             finalize();
@@ -580,7 +588,7 @@ public abstract class PresentationManager {
 
     public void setCursorHidden(boolean cursorHidden) {
         isCursorHidden = cursorHidden;
-        if(cursorHidden) {
+        if (cursorHidden) {
             scene.getRoot().setCursor(Cursor.NONE); //TODO: Doesn't seem to work on webviews?
             displayPane.addEventFilter(MouseEvent.MOUSE_CLICKED, disabledCursorFilter);
         } else {
@@ -593,16 +601,44 @@ public abstract class PresentationManager {
         resize();
 
         displayPane.getChildren().clear();
-        Slide slide = myPresentationElement.getSlide(currentSlideNumber);
-        slide.setBackground(new Background(new BackgroundFill(Color.valueOf(myPresentationElement.getTheme().getBackgroundColour()), null, null)));
+        Slide slide = presentationElement.getSlide(currentSlideNumber);
+        slide.setBackground(new Background(new BackgroundFill(Color.valueOf(presentationElement.getTheme().getBackgroundColour()), null, null)));
         displayPane.getChildren().add(slide);
 
-        if(isShowBlack)
+        if (isShowBlack)
             displayPane.getChildren().add(blackRegion);
 
-        if(!(this instanceof ThumbnailGenerationManager)){
+        if (!(this instanceof ThumbnailGenerationManager)) {
             displayPane.getChildren().add(presControls);
             StackPane.setAlignment(presControls, Pos.BOTTOM_CENTER);
         }
+    }
+
+    /**
+     * Go to a specific slide number
+     *
+     * @param targetSlideNumber Slide to traverse to.
+     * @author Amrik Sadhra
+     */
+    public void goToSlide(int targetSlideNumber) {
+        //If target slide invalid, do nothing and log warning
+        if ((targetSlideNumber < 0) || (targetSlideNumber > presentationElement.getMaxSlideNumber())) {
+            logger.warn("Target slide number lies outside that which is available in this presentation. Modify XML to account for this.");
+            return;
+        }
+
+        //If we need to go backwards, go backwards
+        if (targetSlideNumber < currentSlideNumber) {
+            while (currentSlideNumber != targetSlideNumber - 1) {
+                slideAdvance(presentationElement, Slide.SLIDE_BACKWARD);
+            }
+        } else if (targetSlideNumber > currentSlideNumber) { //If we need to fo forwards, go forwards
+            while (currentSlideNumber != targetSlideNumber - 1) {
+                slideAdvance(presentationElement, Slide.SLIDE_FORWARD);
+            }
+        }
+
+        //Update progress bar
+        slideProgress(presentationElement);
     }
 }

@@ -19,7 +19,7 @@ public class Constants {
     //Valid Fonts taken from https://www.w3schools.com/cssref/css_websafe_fonts.asp
     public static final String[] VALID_FONTS= {"\"Comic Sans MS\", cursive, sans-serif", "\"Courier New\", Courier, monospace", "\"Lucida Console\", Monaco, monospace", "Verdana, Geneva, sans-serif", "\"Trebuchet MS\", Helvetica, sans-serif", "Tahoma, Geneva, sans-serif", "\"Lucida Sans Unicode\", \"Lucida Grande\", sans-serif", "Impact, Charcoal, sans-serif", "\"Arial Black\", Gadget, sans-serif", "Arial, Helvetica, sans-serif", "\"Times New Roman\", Times, serif", "\"Palatino Linotype\", \"Book Antiqua\", Palatino, serif", "Georgia, serif"};
     public static final String[] VALID_ONCLICK_ACTIONS = {"dynamicmediatoggle", "gotoslide", "openwebsite"};
-    public static final String FALLBACK_ONCLICK_ACTION = "none"; 
+    public static final String FALLBACK_ONCLICK_ACTION = "none";
     public static final int MAX_FONT_SIZE = 100; //Upper bound for font sizes on presentation
     public static final String FALLBACK_COLOUR = "#000000FF"; //Used as default colour when Presentation defaults are invalid
 

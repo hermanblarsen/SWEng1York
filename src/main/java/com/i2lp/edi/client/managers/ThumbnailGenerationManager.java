@@ -56,7 +56,7 @@ public class ThumbnailGenerationManager extends PresentationManager {
     }
 
     public static void generateSlideThumbNail(ThumbnailGenerationManager slideGenManager) {
-        Presentation presentation = slideGenManager.myPresentationElement;
+        Presentation presentation = slideGenManager.presentationElement;
 
         //Move to end of current slide so all elements are visible in snapshot
         //noinspection StatementWithEmptyBody

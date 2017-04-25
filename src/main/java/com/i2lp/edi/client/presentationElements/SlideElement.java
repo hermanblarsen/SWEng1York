@@ -1,6 +1,7 @@
 package com.i2lp.edi.client.presentationElements;
 
 import com.i2lp.edi.client.Animation.Animation;
+import com.i2lp.edi.client.managers.PresentationManager;
 import javafx.scene.Node;
 import javafx.scene.layout.Pane;
 import org.slf4j.Logger;
@@ -30,6 +31,8 @@ public abstract class SlideElement {
     protected double slideWidth;
     protected double slideHeight;
     protected boolean teacher;
+
+    protected PresentationManager presentationManager;
 
     public abstract void doClassSpecificRender();
 
@@ -191,6 +194,10 @@ public abstract class SlideElement {
         this.slideHeight = slideHeight;
     }
 
+    public void setPresentationManager(PresentationManager presentationManager) {
+        this.presentationManager = presentationManager;
+    }
+
     protected void scaleDimensions(float xPosition, float yPosition){
         //Convert position percentages to multipliers against canvas size and update location
         getCoreNode().setTranslateX(xPosition * slideWidth);
@@ -204,7 +211,7 @@ public abstract class SlideElement {
                 //onclickinfo=”URL”
                 break;
             case "gotoslide":
-                //onClickInfo = slideID
+                presentationManager.goToSlide(Integer.parseInt(onClickInfo));
                 break;
 
             case "dynamicmediatoggle":

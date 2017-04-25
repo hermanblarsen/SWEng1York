@@ -70,7 +70,7 @@
                 <bordercolour>#ABCDEFFF</bordercolour>
                 <bordersize>2</bordersize>
                 <onclickaction>gotoslide</onclickaction>
-                <onclickinfo>3</onclickinfo>
+                <onclickinfo>2</onclickinfo>
                 <aspectratiolock>true</aspectratiolock>
                 <elementaspectratio>2</elementaspectratio>
             </text>
