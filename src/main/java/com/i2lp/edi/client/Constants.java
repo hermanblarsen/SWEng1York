@@ -1,7 +1,5 @@
 package com.i2lp.edi.client;
 
-import javafx.stage.Screen;
-
 /**
  * Created by amriksadhra on 14/04/2017.
  */
@@ -10,7 +8,7 @@ public class Constants {
      // see https://docs.oracle.com/middleware/1212/core/MAVEN/maven_version.htm#MAVEN8903
 
     //Build number and string for use in About dialogues.
-    private static final String BUILD_NUMBER = "30";
+    private static final String BUILD_NUMBER = "32";
     public static final String BUILD_STRING = "Version: v0." + Constants.BUILD_NUMBER;
 
     public static final String BASE_PATH = System.getProperty("java.io.tmpdir") + "Edi/";
@@ -25,6 +23,5 @@ public class Constants {
 
     /* ELEMENT RENDERING CONSTANTS */
     public static final int TEXT_ELEMENT_ZOOM_FACTOR = 2;
-    public static final int SCREEN_WIDTH = (int) Screen.getPrimary().getVisualBounds().getWidth();
 }
 

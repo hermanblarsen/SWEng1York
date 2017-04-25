@@ -7,8 +7,8 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
+import javafx.stage.Screen;
 
-import static com.i2lp.edi.client.Constants.SCREEN_WIDTH;
 import static com.i2lp.edi.client.Constants.TEXT_ELEMENT_ZOOM_FACTOR;
 
 /**
@@ -93,7 +93,7 @@ public class TextElement extends SlideElement {
             //Rescale positioning of elements
             scaleDimensions(xPosition, yPosition);
             //Alter Zoom of webview to maintain proportions
-            browser.setZoom((slideWidth/SCREEN_WIDTH) * TEXT_ELEMENT_ZOOM_FACTOR);
+            browser.setZoom((slideWidth/ Screen.getPrimary().getVisualBounds().getWidth()) * TEXT_ELEMENT_ZOOM_FACTOR);
         }
 
         //Stage 2 DoClassSpecificRender: Refresh content inside Core Node
