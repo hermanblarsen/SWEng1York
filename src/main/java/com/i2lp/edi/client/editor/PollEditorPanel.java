@@ -162,7 +162,7 @@ public class PollEditorPanel extends Panel {
             body.getChildren().remove(answerTextField);
             body.add(answerTextField, 3, answerTextFields.indexOf(answerTextField) + 1);
             if(answerTextField.getText().isEmpty())
-                answerTextField.setPromptText("Answer " + Integer.toString(answerLabels.indexOf(answerTextField) + 1));
+                answerTextField.setPromptText("Answer " + Integer.toString(answerTextFields.indexOf(answerTextField) + 1));
         }
 
         for(Button answerRemoveButton : answerRemoveButtons) {

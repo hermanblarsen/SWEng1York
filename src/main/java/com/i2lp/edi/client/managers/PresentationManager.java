@@ -2,10 +2,7 @@ package com.i2lp.edi.client.managers;
 
 import com.i2lp.edi.client.Animation.Animation;
 import com.i2lp.edi.client.exceptions.SequenceNotFoundException;
-import com.i2lp.edi.client.presentationElements.CommentPanel;
-import com.i2lp.edi.client.presentationElements.Presentation;
-import com.i2lp.edi.client.presentationElements.Slide;
-import com.i2lp.edi.client.presentationElements.SlideElement;
+import com.i2lp.edi.client.presentationElements.*;
 import com.i2lp.edi.client.presentationViewer.StudentPresentationManager;
 import com.i2lp.edi.client.presentationViewer.TeacherPresentationManager;
 import com.i2lp.edi.client.utilities.ParserXML;
@@ -62,6 +59,7 @@ public abstract class PresentationManager {
     protected Stage presentationStage;
     protected Boolean elementClicked = false;
     protected Panel commentPanel;
+    protected ResponseIndicator responseIndicator = new ResponseIndicator();
     private boolean isShowBlack = false;
     private boolean mouseMoved = true;
     private EventHandler<MouseEvent> disabledCursorFilter;
@@ -130,6 +128,10 @@ public abstract class PresentationManager {
         loadPresentation(path);
         slideNumber.setText("Slide 1 of " + presentationElement.getSlideList().size());
 
+        //Dummy data
+        responseIndicator.setNumberOfResponses(0);
+        responseIndicator.setNumberOfStudents(20);
+        responseIndicator.setOnMouseClicked(event -> responseIndicator.incrementResponses());
 
         Rectangle2D primaryScreenBounds = Screen.getPrimary().getVisualBounds();
 
