@@ -1,18 +1,16 @@
 package com.i2lp.edi.client.presentationElements;
 
-import com.sun.javafx.css.Size;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
-import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 
 /**
  * Created by Luke on 22/04/2017.
  */
-public class ResponseIndicator extends HBox{
+public class ResponseIndicator extends HBox {
 
     private int numberOfStudents;
     private int numberOfResponses;
@@ -29,11 +27,12 @@ public class ResponseIndicator extends HBox{
         textPane.setAlignment(Pos.TOP_CENTER);
         textPane.setPadding(new Insets(15,0,0,0));
 
-
         StackPane stack = new StackPane(progressIndicator, textPane);
         stack.setAlignment(Pos.TOP_CENTER);
         setAlignment(Pos.TOP_RIGHT);
         getChildren().add(stack);
+
+        setNumberOfResponses(0);
     }
 
     public void setNumberOfStudents(int number) {
@@ -70,5 +69,17 @@ public class ResponseIndicator extends HBox{
         }
         String red = Integer.toString(255 - (int)(ratio * 180));
         progressIndicator.setStyle("-fx-progress-color: rgb(" + red + ", 255, 20)");
+    }
+
+    public boolean isDone() {
+        if(progressIndicator.getProgress() >= 1)
+            return true;
+        else
+            return false;
+    }
+
+    public void setDone() {
+        setNumberOfResponses(numberOfStudents);
+        updateProgress();
     }
 }

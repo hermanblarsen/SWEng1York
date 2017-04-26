@@ -2,6 +2,7 @@ package com.i2lp.edi.client.presentationElements;
 
 import com.i2lp.edi.client.utilities.Utils;
 import javafx.concurrent.Worker;
+import javafx.event.Event;
 import javafx.scene.Node;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
@@ -49,6 +50,10 @@ public class TextElement extends SlideElement {
     public void setupElement() {
         //Stage 1 Setup: Instantiate Core Node
         browser = new WebView();
+
+        //Prevent browser from reacting to events as specified by default for all Webviews
+        browser.addEventFilter(MouseEvent.ANY, event -> event.consume());
+
         webEngine = browser.getEngine();
 
         //Stage 2 Setup: Load Content into Core Node

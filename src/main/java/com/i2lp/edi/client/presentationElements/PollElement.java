@@ -4,15 +4,14 @@ import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.util.Duration;
@@ -32,6 +31,9 @@ public class PollElement extends InteractiveElement {
     protected HBox pollOptions;
     protected Timeline timeline;
     protected Panel questionPane;
+    protected ResponseIndicator responseIndicator;
+    private Label remainingTime;
+    ToggleButton[] answerButton;
 
     public PollElement() {
 
@@ -48,41 +50,8 @@ public class PollElement extends InteractiveElement {
     }
 
     @Override
-    public void doClassSpecificRender() { //TODO: Needs more cleanup by converting variables to fields and moving more stuff to setupElement()
-        Label remainingTime = new Label("Time Remaining: " + timeLimit);
-        final IntegerProperty i = new SimpleIntegerProperty(timeLimit);
-        timeline = new Timeline(
-                new KeyFrame(
-                        Duration.seconds(1),
-                        evt -> {
-                            i.set(i.get() - 1);
-                            remainingTime.setText("Time Remaining: " + i.get());
-                        }
-                )
-        );
-        timeline.setCycleCount(timeLimit);
-        timeline.setOnFinished(event -> {
-            //pollPane.getChildren().remove(pollOptions);
-            questionPane.getChildren().remove(pollOptions);
-            Label done = new Label("DONE");
-            //pollPane.setCenter(done);
-            questionPane.setBody(done);
-        });
-        if(teacher && !timerStart) {
-            Button startTimer = new Button("START");
-            startTimer.getStyleClass().setAll("btn", "btn-default");
-            startTimer.addEventHandler(MouseEvent.MOUSE_CLICKED,evt->{
-                timerStart = true;
-                pollOptions= new HBox();
-                pollOptions.getChildren().addAll(setUpQuestions(), remainingTime);
-                //pollPane.setCenter(pollOptions);
-                questionPane.setBody(pollOptions);
-                //delay.play();
-                timeline.play();
-            });
-            //pollPane.setCenter(startTimer);
-            questionPane.setBody(startTimer);
-        }
+    public void doClassSpecificRender() {
+        //TODO: Need to figure out resizing behaviour
     }
 
     @Override
@@ -107,8 +76,43 @@ public class PollElement extends InteractiveElement {
 
 //        });
 
-        questionPane.setMinSize(slideWidth,slideHeight); //TODO: Need to figure out resizing behaviour
+        remainingTime = new Label("Time Remaining: " + timeLimit);
+        final IntegerProperty i = new SimpleIntegerProperty(timeLimit);
+        timeline = new Timeline(
+                new KeyFrame(
+                        Duration.seconds(1),
+                        evt -> {
+                            i.set(i.get() - 1);
+                            remainingTime.setText("Time Remaining: " + i.get());
+                        }
+                )
+        );
 
+        timeline.setCycleCount(timeLimit);
+        timeline.setOnFinished(event -> {
+            //pollPane.getChildren().remove(pollOptions);
+            displayDone();
+        });
+
+        if(teacher && !timerStart) {
+            Button startTimer = new Button("START");
+            startTimer.getStyleClass().setAll("btn", "btn-default");
+            startTimer.addEventHandler(MouseEvent.MOUSE_CLICKED, evt->{
+                timerStart = true;
+                responseIndicator = new ResponseIndicator();
+                responseIndicator.setNumberOfStudents(20); //TODO: Get this from server
+                pollOptions = new HBox();
+                pollOptions.getChildren().setAll(responseIndicator, setUpQuestions(), remainingTime);
+                pollOptions.setAlignment(Pos.TOP_CENTER);
+                pollOptions.setSpacing(20);
+                //pollPane.setCenter(pollOptions);
+                questionPane.setBody(pollOptions);
+                //delay.play();
+                timeline.play();
+            });
+            //pollPane.setCenter(startTimer);
+            questionPane.setBody(startTimer);
+        }
     }
 
     @Override
@@ -117,7 +121,7 @@ public class PollElement extends InteractiveElement {
     }
 
     private VBox setUpQuestions(){
-        ToggleButton[] answerButton = new ToggleButton[possibleAnswers.size()];
+        answerButton = new ToggleButton[possibleAnswers.size()];
         final ToggleGroup group = new ToggleGroup();
         VBox answerSelection = new VBox();
         //answerSelection.setMaxWidth(slideCanvas.getMaxWidth());
@@ -127,11 +131,34 @@ public class PollElement extends InteractiveElement {
             answerButton[i] = new ToggleButton(possibleAnswers.get(i));
             //answerButton[i].setMinWidth(slideCanvas.getWidth());
             answerButton[i].getStyleClass().setAll("btn","btn-default");
-            answerButton[i].addEventHandler(MouseEvent.MOUSE_CLICKED, evt -> System.out.println("Button " + number + " clicked!"));
+            answerButton[i].addEventHandler(MouseEvent.MOUSE_CLICKED, evt -> {
+                responseIndicator.incrementResponses();
+                System.out.println("Button " + number + " clicked!");
+                checkIfDone();
+            });
             answerSelection.getChildren().add(answerButton[i]);
             answerButton[i].setToggleGroup(group);
         }
         return answerSelection;
+    }
+
+    private void checkIfDone() {
+        if(responseIndicator.isDone()) {
+            timeline.stop();
+            displayDone();
+        }
+    }
+
+    private void displayDone() {
+//        questionPane.getChildren().remove(pollOptions);
+//        Label done = new Label("DONE");
+//        //pollPane.setCenter(done);
+//        questionPane.setBody(done);
+        pollOptions.getChildren().remove(remainingTime);
+        responseIndicator.setDone();
+        for(int i=0; i < answerButton.length; i++) {
+            answerButton[i].setDisable(true);
+        }
     }
 
     public String getPollQuestion() {

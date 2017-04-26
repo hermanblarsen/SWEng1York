@@ -58,9 +58,11 @@ public class VideoElement extends SlideElement{
         mediaPane.setTranslateX(slideWidth * xPosition);
         mediaPane.setTranslateY(slideHeight * yPosition);
         //System.out.println("CURRENT PATH: "+ media.getSource());
-        if(autoplay){
+        if(autoplay) {
             mp.play();
         }
+
+        setAutoplay(false); //Only autoplay on first render (prevents resizing from causing the video to play)
     }
 
     @Override
