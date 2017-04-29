@@ -353,7 +353,7 @@ public class Presentation extends Pane {
         myPresentation.setSlideList(slides);
         myPresentation.setDocumentAspectRatio((float) 4/3);
         Theme theme = new Theme();
-        theme.setBackgroundColour("#FFFFFF");
+        theme.setBackgroundColour("#2ECC71FF");
         myPresentation.setTheme(theme);
 
         return myPresentation;

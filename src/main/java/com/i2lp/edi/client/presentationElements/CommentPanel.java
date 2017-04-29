@@ -1,6 +1,5 @@
 package com.i2lp.edi.client.presentationElements;
 
-import com.sun.javafx.scene.web.skin.HTMLEditorSkin;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.layout.HBox;
@@ -13,17 +12,17 @@ import org.kordamp.bootstrapfx.scene.layout.Panel;
  */
 public class CommentPanel extends Panel {
 
-    protected HTMLEditor he = new HTMLEditor();
-    protected String comment = new String();
+    protected HTMLEditor htmlEditor = new HTMLEditor();
+    protected String comment;
     protected boolean submitEnable;
 
     public CommentPanel(boolean submitEnable) {
         this.submitEnable = submitEnable;
 
-        he.setMaxWidth(Double.MAX_VALUE);
+        htmlEditor.setMaxWidth(Double.MAX_VALUE);
 
         VBox commentEditor = new VBox();
-        commentEditor.getChildren().addAll(he, addControls());
+        commentEditor.getChildren().addAll(htmlEditor, addControls());
 
         getStyleClass().add("panel-primary");
         setMaxHeight(300);
@@ -60,7 +59,7 @@ public class CommentPanel extends Panel {
     }
 
     protected void commentSaveFunction(){
-        comment = he.getHtmlText();
+        comment = htmlEditor.getHtmlText();
     }
 
     protected void commentSubmitFunction(){

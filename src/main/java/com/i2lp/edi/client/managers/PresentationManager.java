@@ -7,6 +7,8 @@ import com.i2lp.edi.client.presentationViewer.StudentPresentationManager;
 import com.i2lp.edi.client.presentationViewer.TeacherPresentationManager;
 import com.i2lp.edi.client.utilities.ParserXML;
 import javafx.animation.FadeTransition;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -128,7 +130,7 @@ public abstract class PresentationManager {
         blackRegion.setBackground(new Background(new BackgroundFill(Color.BLACK, null, null)));
         progressBar = new ProgressBar(0);
         slideNumber = new Label();
-        presControls = addPresentationControls(presentationStage);
+        presControls = addPresentationControls();
         loadPresentation(path);
         slideNumber.setText("Slide 1 of " + presentationElement.getSlideList().size());
 
@@ -167,6 +169,8 @@ public abstract class PresentationManager {
                 controlPresentation(Slide.SLIDE_BACKWARD);
             } else if (key.getCode().equals(KeyCode.F5)) {
                 toggleFullscreen();
+            } else if (key.getCode().equals(KeyCode.ESCAPE) && isFullscreen) {
+                setFullscreen(false);
             } else if (key.getCode().equals(KeyCode.B)) {
                 if (isShowBlack) {
                     isShowBlack = false;
@@ -261,8 +265,8 @@ public abstract class PresentationManager {
 
     private void addResizeListeners() {
         //Automatic resize of SlideElements
-        scene.widthProperty().addListener((observableValue, oldSceneWidth, newSceneWidth) -> resize());
-        scene.heightProperty().addListener((observableValue, oldSceneHeight, newSceneHeight) -> resize());
+        displayPane.widthProperty().addListener((observableValue, oldSceneWidth, newSceneWidth) -> resize());
+        displayPane.heightProperty().addListener((observableValue, oldSceneHeight, newSceneHeight) -> resize());
     }
 
     public void loadPresentation(String path) {
@@ -277,8 +281,6 @@ public abstract class PresentationManager {
     }
 
     private void resize() {
-        logger.trace("Resizing slide Elements");
-
         double width = displayPane.getWidth();
         double height = displayPane.getHeight();
         double aspectRatio = presentationElement.getDocumentAspectRatio();
@@ -333,14 +335,14 @@ public abstract class PresentationManager {
             isCommentPanelVisible = false;
         }
 
-        resize(); //TODO: Figure out why resize() doesn't work in this case
+        resize();
     }
 
     protected void createCommentPanel() {
         commentPanel = new CommentPanel(true);
     }
 
-    public HBox addPresentationControls(Stage primaryStage) {
+    public HBox addPresentationControls() {
         HBox presControls = new HBox();
         presControls.setStyle("-fx-background-color:transparent");//#34495e
         presControls.setPadding(new Insets(5, 12, 5, 12));
@@ -348,18 +350,13 @@ public abstract class PresentationManager {
         DropShadow shadow = new DropShadow();
         Image next = new Image("file:projectResources/icons/Right_NEW.png", 30, 30, true, true);
         ImageView nextButton = new ImageView(next);
-        nextButton.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
-            controlPresentation(Slide.SLIDE_FORWARD);
-
-        });
+        nextButton.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> controlPresentation(Slide.SLIDE_FORWARD));
         nextButton.addEventHandler(MouseEvent.MOUSE_ENTERED, evt -> nextButton.setEffect(shadow));
         nextButton.addEventHandler(MouseEvent.MOUSE_EXITED, evt -> nextButton.setEffect(null));
 
         Image back = new Image("file:projectResources/icons/Left_NEW.png", 30, 30, true, true);
         ImageView backButton = new ImageView(back);
-        backButton.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
-            controlPresentation(Slide.SLIDE_BACKWARD);
-        });
+        backButton.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> controlPresentation(Slide.SLIDE_BACKWARD));
         backButton.addEventHandler(MouseEvent.MOUSE_ENTERED, evt -> backButton.setEffect(shadow));
         backButton.addEventHandler(MouseEvent.MOUSE_EXITED, evt -> backButton.setEffect(null));
 
@@ -613,8 +610,6 @@ public abstract class PresentationManager {
     }
 
     protected void displayCurrentSlide() {
-        resize();
-
         displayPane.getChildren().clear();
         Slide slide = presentationElement.getSlide(currentSlideNumber);
         slide.setBackground(new Background(new BackgroundFill(Color.valueOf(presentationElement.getTheme().getBackgroundColour()), null, null)));
@@ -624,9 +619,11 @@ public abstract class PresentationManager {
             displayPane.getChildren().add(blackRegion);
 
         if (!(this instanceof ThumbnailGenerationManager)) {
-            displayPane.getChildren().add(presControls);
+            displayPane.getChildren().add(presControls); //TODO: Fix glitch when transitioning between slides
             StackPane.setAlignment(presControls, Pos.BOTTOM_CENTER);
         }
+
+        resize();
     }
 
     /**
