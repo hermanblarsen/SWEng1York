@@ -1,7 +1,11 @@
 package com.i2lp.edi.client.presentationElements;
 
+import eu.hansolo.tilesfx.Tile;
+import eu.hansolo.tilesfx.TileBuilder;
+import eu.hansolo.tilesfx.tools.ChartData;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.beans.DefaultProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.geometry.Insets;
@@ -12,12 +16,16 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.util.Duration;
 import org.kordamp.bootstrapfx.scene.layout.Panel;
 
 import java.util.List;
+import java.util.Random;
 
 /**
  * Created by Koen on 06/04/2017.
@@ -31,9 +39,13 @@ public class PollElement extends InteractiveElement {
     protected HBox pollOptions;
     protected Timeline timeline;
     protected Panel questionPane;
-    protected ResponseIndicator responseIndicator;
+    //protected ResponseIndicator responseIndicator;
     private Label remainingTime;
-    ToggleButton[] answerButton;
+    private Tile countdownTile;
+    private Tile answerOutputTile;
+    private ToggleButton[] answerButton;
+    private ChartData[] chartDataArray;
+    private Color assignedColour;
 
     public PollElement() {
 
@@ -65,6 +77,8 @@ public class PollElement extends InteractiveElement {
         questionPane = new Panel(pollQuestion);
 
         questionPane.getStyleClass().add("panel-primary");
+       //questionPane.setBackground(new Background(new BackgroundFill(Tile.BACKGROUND, null, null)));
+        questionPane.setStyle("-fx-background-color: #2a2a2a");
         //question.setMinWidth(Double.MAX_VALUE);
 
 
@@ -83,6 +97,11 @@ public class PollElement extends InteractiveElement {
                         Duration.seconds(1),
                         evt -> {
                             i.set(i.get() - 1);
+                            //double percentage = ((i.get()/timeLimit)*100);
+                            //System.out.println("Test "+percentage);
+                            countdownTile.setMaxValue(timeLimit);
+                            countdownTile.setValue(i.get());
+
                             remainingTime.setText("Time Remaining: " + i.get());
                         }
                 )
@@ -94,15 +113,28 @@ public class PollElement extends InteractiveElement {
             displayDone();
         });
 
+        countdownTile = TileBuilder.create()
+                                   .skinType(Tile.SkinType.NUMBER)
+                                   .prefSize(300,300)
+                                   .title("Time Limit")
+                                   .value(timeLimit)
+                                   .description("Seconds")
+                                   .descriptionAlignment(Pos.BASELINE_RIGHT)
+                                   .build();
+        answerOutputTile = TileBuilder.create()
+                                      .skinType(Tile.SkinType.RADIAL_CHART)
+                                      .prefSize(300,300)
+                                      .title("Responses")
+                                      .build();
         if(teacher && !timerStart) {
             Button startTimer = new Button("START");
             startTimer.getStyleClass().setAll("btn", "btn-default");
             startTimer.addEventHandler(MouseEvent.MOUSE_CLICKED, evt->{
                 timerStart = true;
-                responseIndicator = new ResponseIndicator();
-                responseIndicator.setNumberOfStudents(20); //TODO: Get this from server
+                //responseIndicator = new ResponseIndicator();
+                //responseIndicator.setNumberOfStudents(20); //TODO: Get this from server
                 pollOptions = new HBox();
-                pollOptions.getChildren().setAll(responseIndicator, setUpQuestions(), remainingTime);
+                pollOptions.getChildren().setAll(answerOutputTile, setUpQuestions(), countdownTile);
                 pollOptions.setAlignment(Pos.TOP_CENTER);
                 pollOptions.setSpacing(20);
                 //pollPane.setCenter(pollOptions);
@@ -122,32 +154,39 @@ public class PollElement extends InteractiveElement {
 
     private VBox setUpQuestions(){
         answerButton = new ToggleButton[possibleAnswers.size()];
+        chartDataArray = new ChartData[possibleAnswers.size()];
         final ToggleGroup group = new ToggleGroup();
         VBox answerSelection = new VBox();
         //answerSelection.setMaxWidth(slideCanvas.getMaxWidth());
         //answerSelection.setMaxHeight(slideCanvas.getMaxHeight());
         for (int i = 0; i < possibleAnswers.size(); i++) {
             final int number = i;
+            chartDataArray[i] = new ChartData(possibleAnswers.get(i),0);
+            //chartDataArray[i].setName(possibleAnswers.get(i));
+            chartDataArray[i].setColor(assignBarColour(i));
             answerButton[i] = new ToggleButton(possibleAnswers.get(i));
             //answerButton[i].setMinWidth(slideCanvas.getWidth());
             answerButton[i].getStyleClass().setAll("btn","btn-default");
             answerButton[i].addEventHandler(MouseEvent.MOUSE_CLICKED, evt -> {
-                responseIndicator.incrementResponses();
+                //responseIndicator.incrementResponses();
                 System.out.println("Button " + number + " clicked!");
-                checkIfDone();
+                //checkIfDone();
+                chartDataArray[number].setValue(chartDataArray[number].getValue()+1);
             });
             answerSelection.getChildren().add(answerButton[i]);
             answerButton[i].setToggleGroup(group);
+
         }
+        answerOutputTile.setRadialChartData(chartDataArray);
         return answerSelection;
     }
 
-    private void checkIfDone() {
-        if(responseIndicator.isDone()) {
-            timeline.stop();
-            displayDone();
-        }
-    }
+//    private void checkIfDone() {
+//        if(responseIndicator.isDone()) {
+//            timeline.stop();
+//            displayDone();
+//        }
+//    }
 
     private void displayDone() {
 //        questionPane.getChildren().remove(pollOptions);
@@ -155,7 +194,7 @@ public class PollElement extends InteractiveElement {
 //        //pollPane.setCenter(done);
 //        questionPane.setBody(done);
         pollOptions.getChildren().remove(remainingTime);
-        responseIndicator.setDone();
+        //responseIndicator.setDone();
         for(int i=0; i < answerButton.length; i++) {
             answerButton[i].setDisable(true);
         }
@@ -200,6 +239,52 @@ public class PollElement extends InteractiveElement {
 
     public void setTimeLimit(int timeLimit) {
         this.timeLimit = timeLimit;
+    }
+
+    private Color assignBarColour(int i){
+        i = i%possibleAnswers.size();
+        //assignedColour = new Color();
+        //for(int j = i; j<possibleAnswers.size(); j++){
+            System.out.println("in i = "+ i);
+            switch (i){
+                case 1:
+                    assignedColour = Tile.BLUE;
+                    break;
+                case 8:
+                    assignedColour = Tile.DARK_BLUE;
+                    break;
+                case 6:
+                    assignedColour = Tile.GREEN;
+                    break;
+                case 2:
+                    assignedColour = Tile.LIGHT_GREEN;
+                    break;
+                case 3:
+                    assignedColour = Tile.LIGHT_RED;
+                    break;
+                case 5:
+                    assignedColour = Tile.MAGENTA;
+                    break;
+                case 9:
+                    assignedColour = Tile.ORANGE;
+                    break;
+                case 7:
+                    assignedColour = Tile.RED;
+                    break;
+                case 4:
+                    assignedColour = Tile.YELLOW;
+                    break;
+                case 0:
+                    assignedColour = Tile.YELLOW_ORANGE;
+                    break;
+                default:
+                    assignedColour = Tile.RED;
+                    break;
+            }
+       // Random rand = new Random();
+        //int n = rand.nextInt(10)+1;
+
+        return  assignedColour;
     }
 
 }

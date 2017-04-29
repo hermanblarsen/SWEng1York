@@ -288,6 +288,17 @@ public class Presentation extends Pane {
         poll.setSlideCanvas(slide1);
         slideElementsSlide1.add(poll);
 
+        WordCloudElement myWordCloudElement = new WordCloudElement();
+        myWordCloudElement.setTask("Enter Words about Edi");
+        myWordCloudElement.setTimeLimit(10);
+        myWordCloudElement.setLayer(7);
+        myWordCloudElement.setStartSequence(11);
+        myWordCloudElement.setEndSequence(12);
+        //myWordCloudElement.setCloudShapePath("file:/projectResources/logos/ediLogo400x400.png");
+        myWordCloudElement.setElementID(123456);
+        myWordCloudElement.setSlideCanvas(slide1);
+        slideElementsSlide1.add(myWordCloudElement);
+
         slide1.setSlideElementList(slideElementsSlide1);
 
 
