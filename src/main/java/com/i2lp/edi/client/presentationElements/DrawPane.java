@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
  */
 public class DrawPane extends Pane {
 
+    private boolean active;
     private Logger logger = LoggerFactory.getLogger(DrawPane.class);
     private Canvas canvas;
     private GraphicsContext graphicsContext;
@@ -33,14 +34,18 @@ public class DrawPane extends Pane {
         graphicsContext = canvas.getGraphicsContext2D();
 
         addEventHandler(MouseEvent.MOUSE_PRESSED, event -> {
-            graphicsContext.beginPath();
-            graphicsContext.moveTo(event.getX(), event.getY());
+            if(active) {
+                graphicsContext.beginPath();
+                graphicsContext.moveTo(event.getX(), event.getY());
+            }
         });
 
         addEventHandler(MouseEvent.MOUSE_DRAGGED, event -> {
-            graphicsContext.lineTo(event.getX(), event.getY());
-            graphicsContext.stroke();
-            saveCanvasToImage();
+            if(active) {
+                graphicsContext.lineTo(event.getX(), event.getY());
+                graphicsContext.stroke();
+                saveCanvasToImage();
+            }
         });
     }
 
@@ -79,5 +84,21 @@ public class DrawPane extends Pane {
     public void clear() {
         graphicsContext.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
         saveCanvasToImage();
+    }
+
+    public WritableImage getSlideDrawing() { return drawing; }
+
+    public void setSlideDrawing(WritableImage drawing) {
+        graphicsContext.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
+        this.drawing = drawing;
+        redraw();
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
     }
 }
