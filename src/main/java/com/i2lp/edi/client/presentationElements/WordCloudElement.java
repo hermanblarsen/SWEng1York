@@ -130,7 +130,7 @@ public class WordCloudElement extends InteractiveElement {
                 wordcloudPath.getParentFile().mkdirs(); //Create directory structure if not present yet
             }
             wc.writeToFile(TEMP_DIR_PATH + "Wordclouds/wordcloud.png");
-            //TODO filename can include presentationID and slideID, especially if we want them stored and recalled later.
+            //TODO filename can include presentationID and slideID, especially if we want them stored and recalled later. -Herman
 
             Image wordCloud = new Image("file:" + TEMP_DIR_PATH + "Wordclouds/wordcloud.png",600,600,true,true);
 
