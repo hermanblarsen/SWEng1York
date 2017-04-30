@@ -1,6 +1,7 @@
 package com.i2lp.edi.client.presentationElements;
 
 import com.i2lp.edi.client.exceptions.SequenceNotFoundException;
+import javafx.scene.image.WritableImage;
 import javafx.scene.layout.Pane;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,6 +23,8 @@ public class Slide extends Pane {
     protected List<ImageElement> imageElementList = new ArrayList<>();
     protected List<VideoElement> videoElementList = new ArrayList<>();
     protected List<AudioElement> audioElementList = new ArrayList<>();
+
+    private WritableImage slideDrawing = new WritableImage(1, 1);
 
     //Passed back up to Presentation layer, to alert on whether sequence has changed the current slide or not
     public static final int SLIDE_NO_MOVE = 0;
@@ -203,5 +206,9 @@ public class Slide extends Pane {
     public List<SlideElement> getVisibleSlideElementList() {
         return visibleSlideElementList;
     }
+
+    public WritableImage getSlideDrawing() { return slideDrawing; }
+
+    public void setSlideDrawing(WritableImage slideDrawing) { this.slideDrawing = slideDrawing; }
 }
 
