@@ -207,6 +207,11 @@ public class ParserXMLTest {
         assertTrue(faultyPresentation.getXmlFaults().size() > 0);
     }
 
+    @Test
+    public void testWritingXML() {
+        assertTrue(true);
+    }
+
     @After
     public void tearDown() throws Exception {
         System.out.println(""); //Space out log

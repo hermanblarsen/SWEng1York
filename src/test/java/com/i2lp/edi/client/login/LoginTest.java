@@ -2,6 +2,7 @@ package com.i2lp.edi.client.login;
 
 import com.i2lp.edi.client.managers.EdiManager;
 
+import com.sun.javafx.robot.FXRobot;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
@@ -26,26 +27,11 @@ import static org.testfx.api.FxAssert.verifyThat;
 /**
  * Created by habl on 15/04/2017.
  * Project: SWEng1York - Package: com.i2lp.edi.client.login
- */
+// */
 @Ignore
-public class LoginTest extends ApplicationTest{ //With TestFX environment
+public class LoginTest extends ApplicationTest{
 
-//–—public class LoginTest extends Application{ //With JavaFXThreadingRule environment
-
-//@RunWith( JavaFXTestRunner.class ) //https://gist.github.com/flasheater/a2703bfce0ca842d0e38#file-jfxtestrunner-java-L72
-//public class LoginTest{
-
-    //Test class for JavaFX GUI elements TODO remove this text when tested
-    /*
-    *
-    * INfo on fxml: https://blogs.oracle.com/jmxetc/entry/connecting_scenebuilder_edited_fxml_to
-    *
-    * */
-
-    //Elements on the GUI:
-    private static Pane pane;
-    private Parent moduleUnderTest;
-
+    //Elements to be tested on the GUI:
     private TextField userNameField;
     private PasswordField passwordField;
     private Button loginButton;
@@ -55,47 +41,6 @@ public class LoginTest extends ApplicationTest{ //With TestFX environment
     private EdiManager ediManager;
     private static Login myLogin;
 
-
-    /*
-    @Rule public JavaFXThreadingRule jfxRule = new JavaFXThreadingRule();
-    @BeforeClass
-    public static void initialiseJavaFX() {
-        Thread javaFxThread = new Thread("JavaFX Init Thread") {
-            @Override
-            public void run() {
-                Login.main(new String[0]);
-            }
-        };
-        javaFxThread.setDaemon(true);
-        javaFxThread.start();
-
-        try {
-            Thread.sleep(15000l);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-    }*/
-
-
-    // With JavaFXThreadingRule ... https://gist.github.com/andytill/3835914#file-javafxthreadingrule-java
-    /* //@Rule
-    //public JavaFXThreadingRule javafxRule = new JavaFXThreadingRule();
-    @BeforeClass
-    public static void initialiseJavaFX() {
-        Thread javaFxThread = new Thread("JavaFX Init Thread") {
-            @Override
-            public void run() {
-                Application.launch(LoginTest.class, new String[0]);
-            }
-        };
-        javaFxThread.setDaemon(true);
-        javaFxThread.start();
-    }
-    @Override
-    public void start(Stage stage) throws Exception {
-    }*/
-
-    //With testFX environment
     //This operation comes from ApplicationTest and loads the GUI to test.
     @Override
     public void start(Stage stage) throws Exception {
@@ -107,12 +52,6 @@ public class LoginTest extends ApplicationTest{ //With TestFX environment
         stage.toFront();
     }
 
-    // A shortcut to retrieve widgets in the GUI.
-//    public <T extends Node> T find(final String query) {
-//        // TestFX provides many operations to retrieve elements from the loaded GUI.
-//        return lookup(query).query();
-//    }
-
     @Before
     public void setUp() {
         userNameField = myLogin.usernameField;
@@ -123,27 +62,22 @@ public class LoginTest extends ApplicationTest{ //With TestFX environment
 
     @Test
     public void usernameTest() {
-        clickOn(userNameField).write("123");
+        doubleClickOn(userNameField).write("123");
         assertEquals("123", userNameField.getText());
     }
 
     @Test
     public void passwordTest() {
-        clickOn(passwordField).write("123");
+        doubleClickOn(passwordField).write("123");
         assertEquals("123", passwordField.getText());
     }
 
     @Test
     public void loginTest() {
-        clickOn(userNameField).write("LoginName");
-        clickOn(passwordField).write("password");
+        doubleClickOn(userNameField).write("Teacher");
+        doubleClickOn(passwordField).write("password");
 
         clickOn(loginButton);
-//        assertTrue(myLogin.loginSuccessful);
-        assertEquals("LoginName", userNameField.getText());
-        assertEquals("password", passwordField.getText());
-
-        targetWindow("I2LP").closeCurrentWindow();
     }
 
     @After

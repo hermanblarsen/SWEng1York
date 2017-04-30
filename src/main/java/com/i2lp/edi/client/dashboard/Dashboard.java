@@ -32,6 +32,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -205,22 +206,29 @@ public abstract class Dashboard extends Application {
         topPanel.setSpacing(10);
         topPanel.setStyle("-fx-background-color: #34495e;");
 
-        Button createPresButton = new Button("TEST: Generate Thumbnails");
+        Button createPresButton = new Button("TEST: Generate Thumbnails"); //TODO remove
         createPresButton.getStyleClass().setAll("btn", "btn-success");
         createPresButton.setOnAction(event -> ThumbnailGenerationManager.generateSlideThumbnails("file:projectResources/sampleXMLsimple.xml"));
 
         final FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Open Resource File");
+        FileChooser.ExtensionFilter xmlExtensionFilter =
+                new FileChooser.ExtensionFilter("XML Presentations (*.XML)", "*.xml", "*.XML");
+        fileChooser.getExtensionFilters().add(xmlExtensionFilter);
+        fileChooser.setSelectedExtensionFilter(xmlExtensionFilter);
+        fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
+        fileChooser.setTitle("Load Presentation");
 
         Button loadPresButton = new Button("Load Presentation");
         loadPresButton.getStyleClass().setAll("btn", "btn-default");
         loadPresButton.setOnAction(event -> {
             Node source = (Node) event.getSource();
             Window stage = source.getScene().getWindow();
+
+
             File file = fileChooser.showOpenDialog(stage);
             if (file != null) {
                 launchPresentation(file.getPath());
-            }
+            } else logger.info("No presentation was selected");
         });
 
         Text platformTitle = new Text("     Integrated Interactive Learning Platform");
