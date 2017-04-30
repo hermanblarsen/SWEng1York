@@ -97,7 +97,7 @@
 				<yposition>0.1</yposition>
 				<xsize>0.8</xsize>
 				<ysize>0.8</ysize>
-				<path>projectResources/edi.png</path>
+				<path>projectResources/logos/ediLogo1000x1000.png</path>
 				<onclickaction>gotoslide</onclickaction>
 				<onclickinfo>2</onclickinfo>
 				<opacity>0.3</opacity>
@@ -109,7 +109,7 @@
 				<yposition>0.2</yposition>
 				<xsize>0.8</xsize>
 				<ysize>0.8</ysize>
-				<path>projectResources/edi.png</path>
+				<path>projectResources/logos/ediLogo1000x1000.png</path>
 				<onclickaction>gotoslide</onclickaction>
 				<onclickinfo>2</onclickinfo>
 				<opacity>1</opacity>
@@ -123,7 +123,7 @@
 				<yposition>0</yposition>
 				<xsize>1</xsize>
 				<ysize>1</ysize>
-				<path>projectResources/prometheus.mp4</path>
+				<path>projectResources/sampleFiles/prometheus.mp4</path>
 				<onclickaction>openwebsite</onclickaction>
 				<onclickinfo>https://www.google.no/</onclickinfo>
 				<loop>true</loop>

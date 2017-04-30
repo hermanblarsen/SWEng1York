@@ -30,7 +30,7 @@ public class ParserXMLTest {
     private ArrayList<SlideElement> slideElementArray3;
     private ArrayList<SlideElement> slideElementArray4;
     private ArrayList<SlideElement> slideElementArray2;
-    private String examplePath = "projectResources/sampleFiles/sampleXml.xml";
+    private String examplePath = "projectResources/sampleFiles/xmlTests/sampleXml.xml";
 
     @Before
     public void setUp() throws Exception {
@@ -192,7 +192,7 @@ public class ParserXMLTest {
     @Test
     public void testFaultyXml(){
         ParserXML faultyParserXML = new ParserXML("projectResources/sampleFiles/xmlTests/faultyTestXml.xml");
-        Presentation faultyPresentation = null;
+        Presentation faultyPresentation;
         logger.info("Testing Faulty XML document: ...");
         faultyPresentation = faultyParserXML.parsePresentation();
         assertTrue(faultyPresentation.getXmlFaults().size() > 0);

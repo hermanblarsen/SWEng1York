@@ -37,7 +37,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
 
-import static com.i2lp.edi.client.Constants.BASE_PATH;
+import static com.i2lp.edi.client.Constants.TEMP_DIR_PATH;
 import static javafx.scene.layout.BorderPane.*;
 
 
@@ -170,7 +170,7 @@ public abstract class Dashboard extends Application {
         aboutStackPane.getChildren().add(backgroundRegion);
         BorderPane aboutBorder = new BorderPane();
         aboutStackPane.getChildren().add(aboutBorder);
-        ImageView ediLogoImageView = new ImageView(new Image("file:projectResources/edi.png"));
+        ImageView ediLogoImageView = new ImageView(new Image("file:projectResources/logos/ediLogo64x64.png"));
         ediLogoImageView.setPreserveRatio(true);
         ediLogoImageView.setSmooth(true);
         ediLogoImageView.setFitWidth(300);
@@ -208,7 +208,7 @@ public abstract class Dashboard extends Application {
 
         Button createPresButton = new Button("TEST: Generate Thumbnails"); //TODO remove
         createPresButton.getStyleClass().setAll("btn", "btn-success");
-        createPresButton.setOnAction(event -> ThumbnailGenerationManager.generateSlideThumbnails("file:projectResources/sampleXMLsimple.xml"));
+        createPresButton.setOnAction(event -> ThumbnailGenerationManager.generateSlideThumbnails("file:projectResources/sampleFiles/sampleXmlSimple.xml"));
 
         final FileChooser fileChooser = new FileChooser();
         FileChooser.ExtensionFilter xmlExtensionFilter =
@@ -340,10 +340,10 @@ public abstract class Dashboard extends Application {
 
             ImageView preview;
             try {
-                preview = new ImageView("file:" + BASE_PATH + "Thumbnails/" + selectedPresID + "_slide" + i + "_thumbnail.png");
+                preview = new ImageView("file:" + TEMP_DIR_PATH + "Thumbnails/" + selectedPresID + "_slide" + i + "_thumbnail.png");
             } catch (NullPointerException | IllegalArgumentException e) {
                 logger.info("Slide thumbnail not found");
-                preview = new ImageView("file:projectResources/emptyThumbnail.png");
+                preview = new ImageView("file:projectResources/projectResources/icons/emptyThumbnail.png");
             }
 
             preview.setFitWidth(170);

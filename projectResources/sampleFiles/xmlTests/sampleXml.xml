@@ -10,7 +10,7 @@
 	<slideshow>
 		<defaults>
 			<bgcolour>#FF2304FF</bgcolour>
-			<font>Arial</font>
+			<font>Arial, Helvetica, sans-serif</font>
 			<fontsize>12</fontsize>
 			<fontcolour>#F00D33FF</fontcolour>
 			<graphicscolour>#F40D33FF</graphicscolour>

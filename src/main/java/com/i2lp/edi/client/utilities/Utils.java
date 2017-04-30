@@ -57,7 +57,7 @@ public class Utils {
      * @author Amrik Sadhra
      */
     public static String cssGen(String presentationID, int slideID, int elementID, int fontSize, String font, String fontColour, String bgColor, String borderColour, int borderSize) {
-        File cssFilePath = new File(BASE_PATH + "Presentation" + presentationID + "/" + "Slide" + slideID + "Element" + elementID + "format.css");
+        File cssFilePath = new File(TEMP_DIR_PATH + "Presentation" + presentationID + "/" + "Slide" + slideID + "Element" + elementID + "format.css");
 
         if (cssFilePath.exists()) {
             return "file:" + cssFilePath.getAbsolutePath();

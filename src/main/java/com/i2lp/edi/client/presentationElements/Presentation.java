@@ -320,7 +320,7 @@ public class Presentation extends Pane {
         slideElementsSlide2.add(myTextElementNewSlide);
 
         VideoElement myVideoElement = new VideoElement();
-        myVideoElement.setPath("projectResources/prometheus.mp4");
+        myVideoElement.setPath("projectResources/sampleFiles/prometheus.mp4");
         myVideoElement.setAutoplay(true);
         myVideoElement.setMediaControl(true);
         myVideoElement.setLoop(false);

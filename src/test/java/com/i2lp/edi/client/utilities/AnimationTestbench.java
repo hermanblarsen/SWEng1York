@@ -30,7 +30,7 @@ public class AnimationTestbench extends Application {
 //    @Override
 //    public void start(Stage primaryStage){
 //        TeacherPresentationManager presentationManager = new TeacherPresentationManager();
-//        presentationManager.openPresentation("file:projectResources/sampleXMLsimpleAnimation.xml");
+//        presentationManager.openPresentation("file:projectResources/sampleFiles/sampleXmlSimpleAnimation.xml");
 //        SVGPath testPath = new SVGPath();
 //        testPath.setContent("M10 10 L100 100");
 //        testPath.setStroke(Color.BLUE);

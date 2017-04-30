@@ -1,7 +1,8 @@
-package com.i2lp.edi.client.utilities;
+package com.i2lp.edi.client.presentationElements;
 
 import com.i2lp.edi.client.Animation.Animation;
 import com.i2lp.edi.client.presentationElements.GraphicElement;
+import com.i2lp.edi.client.presentationViewer.TeacherPresentationManager;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
@@ -9,17 +10,16 @@ import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import org.junit.Test;
+import org.testfx.framework.junit.ApplicationTest;
+
+import java.io.File;
 
 import static org.junit.Assert.assertEquals;
 
 
-public class GraphicElementTest extends Application {
+public class GraphicElementTest extends ApplicationTest {
     private GraphicElement elementUnderTest;
     Pane testPane =  new Pane();
-
-    public static void main(String[] args){
-        launch(args);
-    }
 
     @Override
     public void start(Stage primaryStage){
