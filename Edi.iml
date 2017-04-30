@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <module org.jetbrains.idea.maven.project.MavenProjectsManager.isMavenModule="true" type="JAVA_MODULE" version="4">
-  <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_8" inherit-compiler-output="false">
+  <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_8">
     <output url="file://$MODULE_DIR$/target/classes" />
     <output-test url="file://$MODULE_DIR$/target/test-classes" />
     <content url="file://$MODULE_DIR$">
@@ -15,6 +15,36 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="AudioElementRemove" level="project" />
+    <orderEntry type="library" name="Maven: eu.hansolo:tilesfx:1.4.1" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: com.googlecode.json-simple:json-simple:1.1.1" level="project" />
+    <orderEntry type="library" name="Maven: com.kennycason:kumo:1.5" level="project" />
+    <orderEntry type="library" name="Maven: com.googlecode.lambdaj:lambdaj:2.3.3" level="project" />
+    <orderEntry type="library" name="Maven: org.hamcrest:hamcrest-all:1.1" level="project" />
+    <orderEntry type="library" name="Maven: org.objenesis:objenesis:1.2" level="project" />
+    <orderEntry type="library" name="Maven: cglib:cglib-nodep:2.2" level="project" />
+    <orderEntry type="library" name="Maven: log4j:log4j:1.2.17" level="project" />
+    <orderEntry type="library" name="Maven: commons-io:commons-io:2.4" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.commons:commons-lang3:3.4" level="project" />
+    <orderEntry type="library" name="Maven: org.jsoup:jsoup:1.8.2" level="project" />
+    <orderEntry type="library" name="Maven: com.github.davidmoten:rtree:0.7.5" level="project" />
+    <orderEntry type="library" name="Maven: com.github.davidmoten:guava-mini:0.1" level="project" />
+    <orderEntry type="library" name="Maven: io.reactivex:rxjava:1.1.1" level="project" />
+    <orderEntry type="library" name="Maven: org.languagetool:language-en:2.5" level="project" />
+    <orderEntry type="library" name="Maven: org.languagetool:languagetool-core:2.5" level="project" />
+    <orderEntry type="library" name="Maven: net.java.dev.jna:jna:4.0.0" level="project" />
+    <orderEntry type="library" name="Maven: org.carrot2:morfologik-fsa:1.9.0" level="project" />
+    <orderEntry type="library" name="Maven: org.carrot2:morfologik-speller:1.9.0" level="project" />
+    <orderEntry type="library" name="Maven: org.carrot2:morfologik-stemming:1.9.0" level="project" />
+    <orderEntry type="library" name="Maven: net.sourceforge.segment:segment:1.4.2" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.tika:tika-core:1.4" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.opennlp:opennlp-tools:1.5.3" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.opennlp:opennlp-maxent:3.0.3" level="project" />
+    <orderEntry type="library" name="Maven: edu.washington.cs.knowitall:opennlp-tokenize-models:1.5" level="project" />
+    <orderEntry type="library" name="Maven: edu.washington.cs.knowitall:opennlp-postag-models:1.5" level="project" />
+    <orderEntry type="library" name="Maven: edu.washington.cs.knowitall:opennlp-chunk-models:1.5" level="project" />
+    <orderEntry type="library" name="Maven: org.languagetool:language-zh:2.5" level="project" />
+    <orderEntry type="library" name="Maven: com.googlecode.ictclas4j:ictclas4j:1.0.1" level="project" />
+    <orderEntry type="library" name="Maven: com.google.code:cjftransform:1.0.1" level="project" />
     <orderEntry type="library" name="Maven: org.apache.maven.plugins:maven-jxr-plugin:2.5" level="project" />
     <orderEntry type="library" name="Maven: org.apache.velocity:velocity:1.5" level="project" />
     <orderEntry type="library" name="Maven: commons-collections:commons-collections:3.1" level="project" />

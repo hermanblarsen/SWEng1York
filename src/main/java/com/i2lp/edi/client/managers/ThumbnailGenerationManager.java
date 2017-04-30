@@ -45,7 +45,7 @@ public class ThumbnailGenerationManager extends PresentationManager {
 
 
     @Override
-    protected void commentFunction() {
+    protected void toggleComments() {
 
     }
 
