@@ -2,6 +2,7 @@ package com.i2lp.edi.client.utilities;
 
 import com.i2lp.edi.client.presentationElements.*;
 import com.sun.org.apache.xerces.internal.parsers.DOMParser;
+import javafx.scene.media.MediaException;
 import javafx.util.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -578,19 +579,24 @@ public class ParserXML {
 
                 switch (elementName){
                     case "path":
-                        audioElement.setPath(elementContent);
+                        try {
+                            audioElement.setPath(elementContent);
+                        } catch (MediaException e){
+                            logger.warn("Auto element error: " + e.getMessage());
+                            faultsDetected.add("Media Error: " + e.getMessage());
+                        }
                         break;
                     case "loop":
-                        audioElement.setLoop(Boolean.valueOf(elementContent));
+                        audioElement.isLoop(Boolean.valueOf(elementContent));
                         break;
                     case "autoplay":
-                        audioElement.setAutoplay(Boolean.valueOf(elementContent));
+                        audioElement.isAutoPlay(Boolean.valueOf(elementContent));
                         break;
                     case "starttime":
-                        audioElement.setStartTime(Integer.valueOf(elementContent));
+                        audioElement.setStartTime(Duration.seconds(Integer.valueOf(elementContent)));
                         break;
                     case "endtime":
-                        audioElement.setEndTime(Integer.valueOf(elementContent));
+                        audioElement.setEndTime(Duration.seconds(Integer.valueOf(elementContent)));
                         break;
                     default:
                         logger.warn("Audio Property Name Not Recognised! Name: " + elementName +

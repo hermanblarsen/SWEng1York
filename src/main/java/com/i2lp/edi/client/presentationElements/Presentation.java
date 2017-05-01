@@ -358,6 +358,19 @@ public class Presentation extends Pane {
         myTextElementNewSlide2.setSlideCanvas(slide3);
         slideElementsSlide3.add(myTextElementNewSlide2);
 
+        AudioElement audioElement = new AudioElement();
+        audioElement.setLayer(0);
+        audioElement.setElementID(1);
+        audioElement.setStartSequence(2);
+        audioElement.setEndSequence(3);
+        audioElement.setDuration(5);
+        audioElement.setPath("projectResources/sampleFiles/example.mp3");
+        audioElement.isLoop(false);
+        audioElement.isAutoPlay(false);
+        audioElement.setStartTime(Duration.seconds(0));
+        audioElement.setEndTime(Duration.seconds(5));
+        slideElementsSlide3.add(audioElement);
+
         slide3.setSlideElementList(slideElementsSlide3);
 
         Presentation myPresentation = new Presentation();

@@ -81,9 +81,12 @@ public abstract class SlideElement {
                     } else {
                         getCoreNode().setVisible(false);
                     }
-                    destroyElement();
                     break;
             }
+        }
+        if(animationType == Animation.EXIT_ANIMATION) {
+            // Audio Element needs to be included in this
+            destroyElement();
         }
     }
 

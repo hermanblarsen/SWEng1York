@@ -83,7 +83,7 @@
 				</oval>
 			</graphic>
 			<audio elementid ="3" startsequence="2" endsequence="4" duration="12.0">
-				<path>audio.mp3</path>
+				<path>projectResources/example.mp3</path>
 				<loop>true</loop>
 				<autoplay>false</autoplay>
 				<starttime>1</starttime>

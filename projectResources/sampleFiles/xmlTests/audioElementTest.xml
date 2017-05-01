@@ -1,0 +1,31 @@
+<document documentid="sampleinput">
+    <documentdetails>
+        <author>Joe Bloggs</author>
+        <version>1.0</version>
+        <documentaspectratio>1.78</documentaspectratio>
+        <description>Sample XML input</description>
+        <tags>sample,xml,input</tags>
+        <groupformat>2</groupformat>
+    </documentdetails>
+    <slideshow>
+        <defaults>
+            <bgcolour>#FF2304</bgcolour>
+            <font>Arial</font>
+            <fontsize>12</fontsize>
+            <fontcolour>#F00D33FF</fontcolour>
+            <graphicscolour>#F40D33FF</graphicscolour>
+            <autoplaymedia>true</autoplaymedia>
+        </defaults>
+
+        <slide slideid="1">
+
+            <audio elementid ="1" startsequence="2" endsequence="1" duration="1">
+                <path>projectResources/sampleFiles/example.mp3</path>
+                <loop>true</loop>
+                <starttime>0</starttime>
+                <endtime>1</endtime>
+            </audio>
+
+        </slide>
+    </slideshow>
+</document>
