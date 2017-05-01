@@ -111,6 +111,9 @@ public class ParserXML {
                     String elementContent = documentDetailsElementNode.getTextContent();
 
                     switch (elementName) {
+                        case "title":
+                            myPresentation.setTitle(elementContent);
+                            break;
                         case "author":
                             myPresentation.setAuthor(elementContent);
                             break;
@@ -288,7 +291,7 @@ public class ParserXML {
             faultsDetected.add("No slides found!");
         }
         myPresentation.setSlideList(slideArray);
-        logger.info("Presentation Parsed");
+        logger.info("Presentation Parsed. Faults found: " + this.faultsDetected.size());
     }
 
     private void parseElementAttributes (Node slideElementNode, SlideElement slideElement) {

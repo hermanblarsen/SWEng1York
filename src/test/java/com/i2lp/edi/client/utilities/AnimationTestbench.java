@@ -28,7 +28,7 @@ public class AnimationTestbench extends Application {
 
 //
 //    @Override
-//    public void start(Stage primaryStage){
+//    public void start(Stage dashboardStage){
 //        TeacherPresentationManager presentationManager = new TeacherPresentationManager();
 //        presentationManager.openPresentation("file:projectResources/sampleFiles/sampleXmlSimpleAnimation.xml");
 //        SVGPath testPath = new SVGPath();

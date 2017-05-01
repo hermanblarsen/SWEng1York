@@ -30,7 +30,7 @@ public class Constants {
     public static final String[] VALID_ONCLICK_ACTIONS = {"dynamicmediatoggle", "gotoslide", "openwebsite"};
     public static final String FALLBACK_ONCLICK_ACTION = "none";
     public static final int MAX_FONT_SIZE = 100; //Upper bound for font sizes on presentation
-    public static final String FALLBACK_COLOUR = "#000000FF"; //Used as default colour when Presentation defaults are invalid
+    public static final String FALLBACK_COLOUR = "#000000FF"; //Black used as default colour when Presentation defaults are invalid
 
     /* ELEMENT RENDERING CONSTANTS */
     public static final int TEXT_ELEMENT_ZOOM_FACTOR = 2;

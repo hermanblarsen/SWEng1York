@@ -32,7 +32,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -52,21 +51,23 @@ public abstract class Dashboard extends Application {
     protected static Logger logger = LoggerFactory.getLogger(Dashboard.class);
     private EdiManager ediManager;
     protected PresentationManager presentationManager;
-    protected Stage primaryStage;
+    protected Stage dashboardStage;
     protected String selectedPresID;
     private ArrayList<PresentationPreviewPanel> previewPanels;
     private FlowPane presentationPreviewsFlowPane;
 
     @Override
-    public void start(Stage primaryStage) {
-        this.primaryStage = primaryStage;
+    public void start(Stage dashboardStage) {
+        this.dashboardStage = dashboardStage;
         //Initialise UI
-        primaryStage.setTitle("I2LP");
+        dashboardStage.setTitle("Edi");
+        Image ediLogoSmall = new Image("file:projectResources/logos/ediLogo32x32.png");
+        dashboardStage.getIcons().add(ediLogoSmall);
 
         border = new BorderPane();
         scene = new Scene(border, 1000, 600);
         scene.getStylesheets().add("bootstrapfx.css");
-        primaryStage.setScene(scene);
+        dashboardStage.setScene(scene);
 
         previewPanels = new ArrayList<>();
 
@@ -105,7 +106,7 @@ public abstract class Dashboard extends Application {
                         schedule.setOnAction(scheduleEvent -> showScheduler(event.getScreenX(), event.getScreenY()));
                         cMenu.getItems().add(schedule);
                     }
-                    cMenu.show(primaryStage, event.getScreenX(), event.getScreenY());
+                    cMenu.show(dashboardStage, event.getScreenX(), event.getScreenY());
                 }
 
             });
@@ -115,13 +116,11 @@ public abstract class Dashboard extends Application {
         border.setRight(addBorderRight());
         border.setLeft(addBorderLeft());
 
-        primaryStage.show();
+        dashboardStage.show();
     }
 
     private ScrollPane addBorderCenter() {
-
         presentationPreviewsFlowPane = new FlowPane(Orientation.HORIZONTAL);
-
         presentationPreviewsFlowPane.setPadding(new Insets(5, 0, 5, 0));
         presentationPreviewsFlowPane.setVgap(4);
         presentationPreviewsFlowPane.setHgap(4);
@@ -181,7 +180,7 @@ public abstract class Dashboard extends Application {
         aboutBorder.setCenter(ediLogoImageView);
 
         aboutPopup.setAutoHide(true);
-        aboutPopup.show(primaryStage);
+        aboutPopup.show(dashboardStage);
     }
 
     /**
@@ -228,6 +227,7 @@ public abstract class Dashboard extends Application {
             File file = fileChooser.showOpenDialog(stage);
             if (file != null) {
                 launchPresentation(file.getPath());
+                //TODO add to library somehow?
             } else logger.info("No presentation was selected");
         });
 
@@ -433,7 +433,7 @@ public abstract class Dashboard extends Application {
 
         schedulerPopup.setAutoHide(true);
         schedulerPopup.getContent().add(popupVBox);
-        schedulerPopup.show(primaryStage, x, y);
+        schedulerPopup.show(dashboardStage, x, y);
     }
 
     private void showPresentationEditor(String presentationPath) {

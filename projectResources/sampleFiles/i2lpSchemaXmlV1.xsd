@@ -1,0 +1,226 @@
+<?xml version="1.1" encoding="utf-8" standalone="no"?>
+<schema version="1.0">
+  <element name="document">
+    <type>
+      <attribute name="documentid" type="string"/>
+      <element name="documentdetails">
+        <annotation>
+          <info>
+            Details such as author, version, slide aspectratio, etc. 
+			Note: i) Tags are separated by comma ONLY. 
+			ii) Group format allows to determine whether given file is native to the application, each group should use its number to annotate their files.
+          </info>
+        </annotation>
+        <type>
+          <element name="title" type="string"/>
+          <element name="author" type="string"/>
+          <element name="version" type="float"/>
+          <element name="documentaspectratio" type="float"/>
+          <element name="description" type="string"/>
+          <element name="tags" type="string"/>
+          <element name="groupformat" type="int"/>
+        </type>
+      </element>
+      <element name="slideshow">
+        <annotation>
+          <info>
+            Note:
+            i) Top-left corner of the window is the origin (0,0). Positive x-axis towards the right, positive y-axis downwards.
+            ii) All coordinates specify the top-left corner of an object, either directly for rectangular shapes or indirectly by describing the corner of a rectangle superimposed on the object.
+            iii) All positions and dimensions are given in terms of % of the full slide size.
+            iv) If an element has “aspectratiolock” = true, the image will maintain its aspect ratio irrespective of the shape or size of the surrounding box. “elementaspectratio” is given as a float “x”, where x represents ratio x:1( e.g. 1.78:1 is 16:9). Else the image will be stretched to fit the box.
+            v) Font sizes are specified in pt.
+            vi) All colours are stored in #RGBA (Red, Green, Blue, Alpha), where Alpha describes the opacity of the colour. Red, Green, Blue and Alpha are described by a single hex number #RRGGBBAA  where RR, GG, BB and AA are defined from 00 to FF. For Alpha, AA=FF means the colour is fully opaque, Alpha=00 means the colour is fully transparent.
+            vii) “documentid” is an string unique for every presentation.“slideid” is integers unique within every presentation, where “elementid” is assigned sequentially to elements locally on every slide.
+            viii) “layer” allows for correct overlap control of elements. If a slide contains n elements, elements on that slide would have layers from n down to 0. n is an integer and n=0 is the background. A layer with a higher value takes priority, and will be rendered over smaller layer valued elements (e.g. element with layer=2 is rendered over an element with layer=1). Two elements on the same slide cannot have the same layer.
+            ix) Sequencing of elements, specified with “startsequence” and “endsequence” respectively, describe in which order elements will appear (and disappear) on a slide. Every slide is instantiated with sequence=1. “startsequence” has to be specified for every element, and several elements can have the same sequence number. “endsequence” describes when the element should disappear, and can be 0/null if an object should remain on the slide. An element with startsequence=2 and endsequence=4 will be displayed when the external slide sequence counter reaches 2 (eg. after 1 click), and will remain on screen until the counter reaches 4 (eg. after another 2 clicks), where the element will disappear.
+            x) “starttime” and “endtime” for audio/video elements allows the presentation to not play the provided files in full. Times are given in seconds and specifies a time in the audio/video file. If the start/end-time extends past the duration of the sound/video element, the shorter duration will be used.
+            xi) If an object is given a duration it will be displayed from its “startsequence” for a given amount of time in seconds. If “duration” and “endsequence” is defined, the external slide sequence counter will iterate whenever one of the two attributes finish (counter  reaches “endsequence”, or the element is displayed for the full “duration”).
+            xii) “onclickaction” specifies the action to be performed when an object is clicked. Onclick actions require providing a special attribute, “onclickinfo”, further detailing the action to be performed. Each element may only have a maximum of 1 “onclickaction”.
+            ix.a)onclickaction=”openwebsite”, onclickinfo=”URL”
+            ix.b)onclickaction=”gotoslide”, onclickinfo=”slideid”
+            ix.c)onclickaction=”dynamicmediatoggle”, onclickinfo=”elementid”
+				This would dynamically start, pause or resume playback of audio and video.
+            xiii) Text elements can either be provided as a string with “textcontent” or in a .txt file. All text should be formatted using HTML. To access the correct .txt file and the correct content within, two elements will be used: “textfilepath” and “textcontentreference”. “textcontentreference” will be a string consisting of “slideid” and the “elementid” separated by a comma. Only one of “textcontent” or “textfilepath” should be declared, whereas if both are specified then the “textcontent” will be used.
+          </info>
+        </annotation>
+        <type>
+          <element name="defaults">
+            <annotation>
+              <info>
+                Defaults for all slides (if not overwritten locally).
+              </info>
+            </annotation>
+            <type>
+              <element name="bgcolour" type="string"/>
+              <element name="font" type="string"/>
+              <element name="fontsize" type="int"/>
+              <element name="fontcolour" type="string"/>
+              <element name="graphicscolour" type="string"/>
+              <element name="autoplaymedia" type="boolean"/>
+            </type>
+          </element>
+          <element name="slide">
+            <annotation>
+              <info>
+                Individual slide.
+              </info>
+            </annotation>
+            <type>
+              <attribute name="slideid" type="int"/>
+              <element name="text">
+                <annotation>
+                  <info>
+                    Textbox with text to be displayed.
+                  </info>
+                </annotation>
+                <type>
+                  <attribute name="elementid" type="int"/>
+                  <attribute name="layer" type="int"/>
+                  <attribute name="visibility" type="boolean"/>
+                  <attribute name="startsequence" type="int"/>
+                  <attribute name="endsequence" type="int"/>
+                  <attribute name="duration" type="float"/>
+                  <element name="textcontent" type="string"/>
+                  <element name="textfilepath" type="string"/>
+                  <element name="textcontentreference" type="string"/>
+                  <element name="xposition" type="float"/>
+                  <element name="yposition" type="float"/>
+                  <element name="xsize" type="float"/>
+                  <element name="ysize" type="float"/>
+                  <element name="font" type="string"/>
+                  <element name="fontsize" type="int"/>
+                  <element name="fontcolour" type="string"/>
+                  <element name="bgcolour" type="string"/>
+                  <element name="bordercolour" type="string"/>
+                  <element name="onclickaction" type="string"/>
+                  <element name="onclickinfo" type="string"/>
+                  <element name="aspectratiolock" type="boolean"/>
+                  <element name="elementaspectratio" type="float"/>
+                </type>
+              </element>
+              <element name="graphic">
+                <annotation>
+                  <info>
+                    Graphic to be displayed.
+                  </info>
+                </annotation>
+                <type>
+                  <attribute name="elementid" type="int"/>
+                  <attribute name="layer" type="int"/>
+                  <attribute name="visibility" type="boolean"/>
+                  <attribute name="startsequence" type="int"/>
+                  <attribute name="endsequence" type="int"/>
+                  <attribute name="duration" type="float"/>
+                  <element name="onclickaction" type="string"/>
+                  <element name="onclickinfo" type="string"/>
+                  <element name="aspectratiolock" type="boolean"/>
+                  <element name="elementaspectratio" type="float"/>
+                  <element name="linecolour" type="string"/>
+                  <element name="fillcolour" type="string"/>
+                  <element name="polygon">
+                    <annotation>
+                      <info>
+                        Polygons to be displayed.
+                      </info>
+                    </annotation>
+                    <type>
+                      <element name="xpositions" type="floatarray"/>
+                      <element name="ypositions" type="floatarray"/>
+                      <element name="isclosed" type="boolean"/>
+                    </type>
+                  </element>
+                  <element name="oval">
+                    <annotation>
+                      <info>
+                        Oval to be displayed.
+                      </info>
+                    </annotation>
+                    <type>
+                      <element name="xposition" type="float"/>
+                      <element name="yposition" type="float"/>
+                      <element name="rvertical" type="float"/>
+                      <element name="rhorizontal" type="float"/>
+                      <element name="rotation" type="float"/>
+                    </type>
+                  </element>
+                </type>
+              </element>
+              <element name="image">
+                <annotation>
+                  <info>
+                    Image to be displayed. File formats: .jpg, .png.
+                  </info>
+                </annotation>
+                <type>
+                  <attribute name="elementid" type="int"/>
+                  <attribute name="layer" type="int"/>
+                  <attribute name="visibility" type="boolean"/>
+                  <attribute name="startsequence" type="int"/>
+                  <attribute name="endsequence" type="int"/>
+                  <attribute name="duration" type="float"/>
+                  <element name="xposition" type="float"/>
+                  <element name="yposition" type="float"/>
+                  <element name="xsize" type="float"/>
+                  <element name="ysize" type="float"/>
+                  <element name="path" type="string"/>
+                  <element name="onclickaction" type="string"/>
+                  <element name="onclickinfo" type="string"/>
+                  <element name="opacity" type="float"/>
+                  <element name="aspectratiolock" type="boolean"/>
+                  <element name="elementaspectratio" type="float"/>
+                </type>
+              </element>
+              <element name="video">
+                <annotation>
+                  <info>
+                    Video to be played. File format: .mp4.
+                  </info>
+                </annotation>
+                <type>
+                  <attribute name="elementid" type="int"/>
+                  <attribute name="layer" type="int"/>
+                  <attribute name="visibility" type="boolean"/>
+                  <attribute name="startsequence" type="int"/>
+                  <attribute name="endsequence" type="int"/>
+                  <attribute name="duration" type="float"/>
+                  <element name="xposition" type="float"/>
+                  <element name="yposition" type="float"/>
+                  <element name="xsize" type="float"/>
+                  <element name="ysize" type="float"/>
+                  <element name="path" type="string"/>
+                  <element name="onclickaction" type="string"/>
+                  <element name="onclickinfo" type="string"/>
+                  <element name="loop" type="boolean"/>
+                  <element name="aspectratiolock" type="boolean"/>
+                  <element name="elementaspectratio" type="float"/>
+                  <element name="autoplay" type="boolean"/>
+                  <element name="starttime" type="int"/>
+                  <element name="endtime" type="int"/>
+                </type>
+              </element>
+              <element name="audio">
+                <annotation>
+                  <info>
+                    Sound to be played. File formats: .mp3, .mp4.
+                  </info>
+                </annotation>
+                <type>
+                  <attribute name="elementid" type="int"/>
+                  <attribute name="startsequence" type="int"/>
+                  <attribute name="endsequence" type="int"/>
+                  <attribute name="duration" type="float"/>
+                  <element name="path" type="string"/>
+                  <element name="loop" type="boolean"/>
+                  <element name="autoplay" type="boolean"/>
+                  <element name="starttime" type="int"/>
+                  <element name="endtime" type="int"/>
+                </type>
+              </element>
+            </type>
+          </element>
+        </type>
+      </element>
+    </type>
+  </element>
+</schema>

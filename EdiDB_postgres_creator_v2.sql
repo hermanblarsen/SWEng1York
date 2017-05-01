@@ -138,4 +138,4 @@ ALTER TABLE "thumbnails" ADD CONSTRAINT "thumbnails_fk0" FOREIGN KEY ("presentat
 
 
 --Example SQL statement for junction table
--- SELECT *  FROM users JOIN jnct_users_modules USING(user_id);
+SELECT *  FROM users JOIN jnct_users_modules USING(user_id);

@@ -117,10 +117,14 @@ public abstract class PresentationManager {
 
     public void openPresentation(String path) {
         presentationStage = new Stage();
-        presentationStage.setTitle("Edi");
+        Image ediLogoSmall = new Image("file:projectResources/logos/ediLogo32x32.png");
+        presentationStage.getIcons().add(ediLogoSmall);
+
         presentationStage.setMinWidth(STAGE_MIN_WIDTH);
         presentationStage.setMinHeight(STAGE_MIN_HEIGHT);
         presentationStage.setOnCloseRequest(event -> destroyAllVisibleElements());
+
+
 
         sceneBox = new VBox();
         displayPane = new StackPane();
@@ -134,7 +138,10 @@ public abstract class PresentationManager {
         progressBar = new ProgressBar(0);
         slideNumber = new Label();
         presControls = addPresentationControls();
+
         loadPresentation(path);
+
+        presentationStage.setTitle(presentationElement.getTitle());
         slideNumber.setText("Slide 1 of " + presentationElement.getSlideList().size());
 
         Rectangle2D primaryScreenBounds = Screen.getPrimary().getVisualBounds();
@@ -273,11 +280,13 @@ public abstract class PresentationManager {
     }
 
     public void loadPresentation(String path) {
-        logger.info("Attempting to load presentation located at: " + path);
+//        logger.info("Attempting to load presentation located at: " + path);
+//        ParserXML xmlParser = new ParserXML(path);
+//        presentationElement = xmlParser.parsePresentation();
 
-        ParserXML readPresentationParser = new ParserXML(path);
-        //presentationElement = readPresentationParser.parsePresentation();
-        presentationElement = Presentation.generateTestPresentation();     //TEST
+        //TEST PRESENTATION, STOP USING
+        logger.info("Bypassing file located at: " + path + ", programmatically making tet presentation instead.");
+        presentationElement = Presentation.generateTestPresentation();  //TODO REMOVE AND STOP USING
 
         assignAttributes(presentationElement);
         displayCurrentSlide();
@@ -504,7 +513,7 @@ public abstract class PresentationManager {
                 if(!isMouseOverControls)
                     ft0.play();
             }
-        }, (long) 2000);
+        }, (long) 1000); //TODO make this a constant, and maybe add id or show to context menu.
 
         presControls.setMaxHeight(PRES_CONTROLS_HEIGHT);
         presControls.setAlignment(Pos.BOTTOM_LEFT);
