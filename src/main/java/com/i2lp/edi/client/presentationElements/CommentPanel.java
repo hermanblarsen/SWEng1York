@@ -15,6 +15,8 @@ public class CommentPanel extends Panel {
     protected HTMLEditor htmlEditor = new HTMLEditor();
     protected String comment;
     protected boolean submitEnable;
+    protected Button saveButton;
+    protected Button submitButton;
 
     public CommentPanel(boolean submitEnable) {
         this.submitEnable = submitEnable;
@@ -36,11 +38,11 @@ public class CommentPanel extends Panel {
     }
 
     private HBox addControls() {
-        Button saveButton = new Button("Save Locally");
+        saveButton = new Button("Save Locally");
         saveButton.getStyleClass().setAll("btn", "btn-default");
         saveButton.setOnAction(event -> commentSaveFunction());
 
-        Button submitButton = new Button("Submit To Lecturer");
+        submitButton = new Button("Submit To Lecturer");
         submitButton.getStyleClass().setAll("btn", "btn-default");
         submitButton.setOnAction(event -> commentSubmitFunction());
 

@@ -11,6 +11,8 @@ import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
 @SuiteClasses({
+        com.i2lp.edi.client.presentationElements.CommentTest.class,
+        com.i2lp.edi.client.editor.PollEditorTest.class,
         com.i2lp.edi.client.utilities.ParserXMLTest.class,
         VideoElementTest.class,
         GraphicElementTest.class,

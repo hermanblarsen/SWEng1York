@@ -12,17 +12,20 @@ import java.util.ArrayList;
  * Created by Kacper on 2017-04-13.
  */
 public class PollEditorPanel extends Panel {
-    private GridPane body;
-    private TextField questionTextField;
-    private String responseType; //Should this be an enum? Could be a boolean if only two options: open question (text) or multiple-choice question (choose a, b, c)
-    private ComboBox<String> responseTypeChoiceBox;
-    private Label answersLabel;
-    private Button addAnswerButton;
-    private ArrayList<TextField> answerTextFields;
-    private ArrayList<Label> answerLabels;
-    private ArrayList<Button> answerRemoveButtons;
-    private int answerNumber;
-    private VBox parent;
+    protected GridPane body;
+    protected TextField questionTextField;
+    protected String responseType; //Should this be an enum? Could be a boolean if only two options: open question (text) or multiple-choice question (choose a, b, c)
+    protected ComboBox<String> responseTypeChoiceBox;
+    protected Label answersLabel;
+    protected Button removeButton;
+    protected Button moveUpButton;
+    protected Button moveDownButton;
+    protected Button addAnswerButton;
+    protected ArrayList<TextField> answerTextFields;
+    protected ArrayList<Label> answerLabels;
+    protected ArrayList<Button> answerRemoveButtons;
+    protected int answerNumber;
+    protected VBox parent;
 
     public PollEditorPanel(VBox parent) {
         this.parent = parent;
@@ -34,17 +37,17 @@ public class PollEditorPanel extends Panel {
         Region separatorRegion = new Region();
         titleBox.getChildren().add(separatorRegion);
         titleBox.setHgrow(separatorRegion, Priority.ALWAYS);
-        Button moveUpButton = new Button("Move up");
+        moveUpButton = new Button("Move up");
         moveUpButton.getStyleClass().setAll("btn");
         moveUpButton.getStyleClass().add("btn-primary");
         moveUpButton.setOnAction(event -> moveUp());
         titleBox.getChildren().add(moveUpButton);
-        Button moveDownButton = new Button("Move down");
+        moveDownButton = new Button("Move down");
         moveDownButton.setOnAction(event -> moveDown());
         moveDownButton.getStyleClass().setAll("btn");
         moveDownButton.getStyleClass().add("btn-primary");
         titleBox.getChildren().add(moveDownButton);
-        Button removeButton = new Button("Remove");
+        removeButton = new Button("Remove");
         removeButton.setOnAction(event -> parent.getChildren().remove(this));
         removeButton.getStyleClass().setAll("btn");
         removeButton.getStyleClass().add("btn-danger");
