@@ -27,6 +27,7 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 
 import static com.i2lp.edi.client.Constants.TEMP_DIR_PATH;
+import static com.i2lp.edi.client.Constants.remoteServerAddress;
 
 
 public class Login extends Application {
@@ -198,7 +199,7 @@ public class Login extends Application {
     public void serverConnect() {
         if (!offline) {
             //Connect to com.i2lp.edi.server
-            mySocketClient = new SocketClient("127.0.0.1", 8080);
+            mySocketClient = new SocketClient(remoteServerAddress, 8080);
             ediManager.setClient(mySocketClient);
         }
         else {
