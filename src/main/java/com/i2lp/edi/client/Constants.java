@@ -5,6 +5,14 @@ package com.i2lp.edi.client;
  */
 public class Constants {
 
+    /* Development Debug Constants */
+    public static final String DEVELOPMENT_MODE = "teacher"; //Change user type
+    public static boolean developerOffline = false; //Enable offline Edi
+
+    public static final String localServerAddress = "127.0.0.1";
+    public static final String remoteServerAddress = "db.amriksadhra.com";
+    public static final boolean localServer = false; //Set if making changes to server logic and wish to test locally
+
     //Build number and string for use in About dialogues.
     private static final String BUILD_NUMBER = "32";
     public static final String BUILD_STRING = "Version: v0." + Constants.BUILD_NUMBER;
@@ -34,5 +42,6 @@ public class Constants {
 
     /* ELEMENT RENDERING CONSTANTS */
     public static final int TEXT_ELEMENT_ZOOM_FACTOR = 2;
+
 }
 

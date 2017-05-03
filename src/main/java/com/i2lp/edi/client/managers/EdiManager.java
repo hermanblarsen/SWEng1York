@@ -5,6 +5,7 @@ import com.i2lp.edi.client.dashboard.StudentDashboard;
 import com.i2lp.edi.client.dashboard.TeacherDashboard;
 import com.i2lp.edi.client.login.Login;
 import com.i2lp.edi.server.SocketClient;
+import com.i2lp.edi.server.packets.User;
 import javafx.application.Application;
 import javafx.stage.Stage;
 import org.slf4j.Logger;
@@ -21,8 +22,9 @@ public class EdiManager extends Application {
     Logger logger = LoggerFactory.getLogger(EdiManager.class);
     private Login loginDialog;
     private SocketClient mySocketClient;
+    private User userData; //Store currently logged in users data
     private boolean offline = false;
-    private boolean loginSuccessful;
+
 
     public static void main(String [] args) {
         //Instantiate the ediManager, which will automatically call init() and start(Stage)
@@ -72,11 +74,22 @@ public class EdiManager extends Application {
         }
     }
 
+    /**
+     * Custom logic when user is logged in should go here. Currently displaying First name of user.
+     * @param toSet User data received from Edi server
+     * @author Amrik Sadhra
+     */
+    private void setUserData(User toSet){
+        this.userData = toSet;
+        logger.info("Welcome " + userData.getFirstName());
+    }
+
     //This is called from loginWindow when the user has input valid credentials
-    public void loginSucceded(boolean isTeacher) {
+    public void loginSucceded(boolean isTeacher, User userData) {
         logger.info("Login succeeded");
-        loginSuccessful = true;
         Stage dashboardStage = new Stage();
+        setUserData(userData); //User data is now available throughout Edi
+
 
         //Additional com.i2lp.edi.client.login stuff
         if (isTeacher) {

@@ -1,9 +1,6 @@
 package com.i2lp.edi.client.presentationElements;
 
 import com.i2lp.edi.client.Animation.Animation;
-import com.i2lp.edi.client.presentationElements.GraphicElement;
-import com.i2lp.edi.client.presentationViewer.TeacherPresentationManager;
-import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
@@ -11,8 +8,6 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import org.junit.Test;
 import org.testfx.framework.junit.ApplicationTest;
-
-import java.io.File;
 
 import static org.junit.Assert.assertEquals;
 

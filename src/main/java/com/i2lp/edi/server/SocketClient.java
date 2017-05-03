@@ -1,6 +1,7 @@
 package com.i2lp.edi.server;
 
 import com.i2lp.edi.client.utilities.Utils;
+import com.i2lp.edi.server.packets.Module;
 import com.i2lp.edi.server.packets.User;
 import com.i2lp.edi.server.packets.UserAuth;
 import com.impossibl.postgres.api.jdbc.PGConnection;
@@ -13,25 +14,29 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.URISyntaxException;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static com.i2lp.edi.client.Constants.TEMP_DIR_PATH;
+import static com.i2lp.edi.client.Constants.*;
 import static com.i2lp.edi.client.utilities.Utils.getFilesInFolder;
 
 /**
  * Created by amriksadhra on 20/03/2017.
  */
 public class SocketClient {
+    /* Constant to indicate server has not responded */
+    private static final int NO_RESPONSE = -1;
+    public static final int PASSWORD_INVALID = 0;
     //Timeout times for user addition/authorisation asynchronous functions
     private static final int LOGIN_TIMEOUT = 5;
     private static final int ADDITION_TIMEOUT = 5;
 
     private Logger logger = LoggerFactory.getLogger(SocketClient.class);
-    private String serverIPAddress;
 
     //TODO: These will be filled by actual values, for now they are temp and meaningless
     private int current_presentation_id = 1;
@@ -42,20 +47,23 @@ public class SocketClient {
     Socket socket;
 
     public static void main(String[] args) {
-        new SocketClient("db.amriksadhra.com", 8080);
+        new SocketClient(remoteServerAddress, 8080);
     }
 
     public SocketClient(String serverIP, int serverPort) {
-        serverIPAddress = Utils.buildIPAddress(serverIP, serverPort);
+        connectToRemoteDB(remoteServerAddress);
 
-        connectToRemoteSocket();
-        connectToRemoteDB();
+        if (localServer) {
+            connectToRemoteSocket(localServerAddress, 8080);
+        } else {
+            connectToRemoteSocket(serverIP, serverPort);
+        }
     }
 
-    public void connectToRemoteDB() {
+    public void connectToRemoteDB(String dbHostName) {
         //Connect to PostgreSQL Instance
         dataSource = new PGDataSource();
-        dataSource.setHost("db.amriksadhra.com");
+        dataSource.setHost(dbHostName);
         dataSource.setPort(5432);
         dataSource.setDatabase("edi");
         dataSource.setUser("iilp");
@@ -90,7 +98,9 @@ public class SocketClient {
         }
     }
 
-    public void connectToRemoteSocket() {
+    public void connectToRemoteSocket(String socketHostName, int serverPort) {
+        String serverIPAddress = Utils.buildIPAddress(socketHostName, serverPort);
+
         //Alert tester that connection is being attempted
         logger.info("Client: Attempting Connection to " + serverIPAddress);
 
@@ -167,16 +177,15 @@ public class SocketClient {
     }
 
     /**
-     * Calls userAuthAsync function but with a LOGIN_TIMEOUT second timeout. If we hit timeout, return false, else wait for com.i2lp.edi.server
-     * to respond with response.
+     * Calls userAuthAsync function but with a LOGIN_TIMEOUT second timeout. If we hit timeout, return empty user data. Else return valid user data.
      *
      * @param toAuth User details to authenticate
-     * @return String containing user_type of authenticated user.
+     * @return User containing user_type of authenticated user.
      * @author Amrik Sadhra
      */
-    public String userAuth(UserAuth toAuth) {
+    public User userAuth(UserAuth toAuth) {
         ExecutorService executor = Executors.newSingleThreadExecutor();
-        Future<String> future = executor.submit(new UserAuthTask(toAuth));
+        Future<User> future = executor.submit(new UserAuthTask(toAuth));
 
         try {
             logger.info("Attempting login of User: " + toAuth.getUserToLogin());
@@ -191,7 +200,7 @@ public class SocketClient {
         }
         //If we hit any of the catch statements
         executor.shutdownNow();
-        return "false";
+        return new User(NO_RESPONSE, "", "", "", "", "");
     }
 
     /**
@@ -222,7 +231,7 @@ public class SocketClient {
         return "USER_ADD_FAILED";
     }
 
-    class UserAuthTask implements Callable<String> {
+    class UserAuthTask implements Callable<User> {
         UserAuth toAuth;
 
         public UserAuthTask(UserAuth toAuth) {
@@ -230,7 +239,7 @@ public class SocketClient {
         }
 
         @Override
-        public String call() throws Exception {
+        public User call() throws Exception {
             return userAuthAsync(toAuth);
         }
     }
@@ -253,36 +262,41 @@ public class SocketClient {
      * a user against the database to determine if they have the correct username/password.
      *
      * @param toAuth User to add to the current users database located serverside
+     * @return User data for user if authenticated.
      * @author Amrik Sadhra
      */
-    public String userAuthAsync(UserAuth toAuth) {
+    public User userAuthAsync(UserAuth toAuth) {
         //Ensure atomic write to variable, bypassing Lambda final restriction
-        AtomicReference<String> loginSuccessFinal = new AtomicReference<>("no_response");
+        AtomicReference<User> loginSuccessFinal = new AtomicReference<>(new User(NO_RESPONSE, "", "", "", "", ""));
 
         JSONObject obj = new JSONObject();
         try {
             obj.put("userToLogin", toAuth.getUserToLogin());
             obj.put("password", toAuth.getPassword());
             socket.emit("AuthUser", obj);
+
             socket.on("AuthUser", objects -> {
-                if (!(objects[0]).equals("auth_fail")) {
+                //If user id not equal to 0 (password invalid)
+                if (!(objects[0]).equals(PASSWORD_INVALID)) {
                     logger.info("User " + toAuth.getUserToLogin() + " has successfully logged in");
+                    logger.debug("Parsing user packet data");
+
+                    //Parse user data
+                    loginSuccessFinal.set(new User((Integer) objects[0], (String) objects[1], (String) objects[2], (String) objects[3], (String) objects[4]));
                 } else {
                     logger.error("Incorrect username/password for login.");
                 }
-
-                loginSuccessFinal.set((String) objects[0]);
             });
         } catch (JSONException e) {
             logger.error("Unable to generate JSON object for passing user authentication details. ", e);
         }
 
-        //Spinlock method until the com.i2lp.edi.server has responded, and changed the value of the success variable
-        while (loginSuccessFinal.get().equals("no_response")) {
+        //Spinlock method until the server has responded, and changed the value of the success variable (user id not equal to 0)
+        while (loginSuccessFinal.get().getUserID() == NO_RESPONSE) {
             logger.trace("JVM optimises out empty while loops, hence this.. Waiting for server response.");
         }
 
-        //Return the string holding the user_type
+        //Return the UserData
         return loginSuccessFinal.get();
     }
 
@@ -330,30 +344,6 @@ public class SocketClient {
         return additionSuccessFinal.get();
     }
 
-
-    public void listUsers() {
-        try (PGConnection connection = (PGConnection) dataSource.getConnection()) {
-            Statement statement = connection.createStatement();
-
-            //List Users
-            ResultSet userList = statement.executeQuery("SELECT * FROM USERS;");
-            while (userList.next()) {
-                int user_id = userList.getInt("user_id");
-                String first_name = userList.getString("first_name");
-                String second_name = userList.getString("second_name");
-                String login_name = userList.getString("login_name");
-                String userType = userList.getString("user_type");
-                int class_id = userList.getInt("classes_class_id");
-
-                System.out.println("user_ID: " + user_id + " | login_name: " + login_name + " | fn: " + first_name + " | sn: " + second_name + " | userType: " + userType + " | class_id: " + class_id);
-            }
-            userList.close();
-            statement.close();
-        } catch (Exception e) {
-            logger.error("Unable to execute update response procedure, PDJBC dump: ", e);
-        }
-    }
-
     public void closeAll() {
         try {
             dataSource.getConnection().close();
@@ -363,7 +353,35 @@ public class SocketClient {
         socket.close();
     }
 
-    public void sendLocalThumbnailList(){
+
+    public ArrayList<Module> getModulesForUser(int userID) {
+        ArrayList<Module> modulesForUser = new ArrayList<>();
+
+        //Attempt to add a user using stored procedure
+        try (PGConnection connection = (PGConnection) dataSource.getConnection()) {
+
+            PreparedStatement statement = connection.prepareStatement("SELECT * FROM edi.public.sp_getmodulesforuser(?);");
+
+            //Fill prepared statements to avoid SQL injection
+            statement.setInt(1, userID);
+
+            //Call stored procedure on database
+            ResultSet rs = statement.executeQuery();
+
+            //TODO: Log this
+            while (rs.next()) {
+                modulesForUser.add(new Module(rs.getInt("module_id"), rs.getString("description"), rs.getString("subject"), rs.getTime("time_last_updated"), rs.getTimestamp("time_created"), rs.getString("module_name")));
+
+            }
+
+            statement.close();
+        } catch (Exception e) {
+            logger.error("Unable to connect to PostgreSQL on port 5432. PJDBC dump:", e);
+        }
+        return modulesForUser;
+    }
+
+    public void sendLocalThumbnailList() {
         //Get presentation names from Server through SQL query
         //Generate the directory names and build a tree
         getFilesInFolder(TEMP_DIR_PATH);

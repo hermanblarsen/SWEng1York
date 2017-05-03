@@ -1,5 +1,5 @@
 package com.i2lp.edi.client.presentationViewer;
-import com.i2lp.edi.client.managers.PresentationManager;
+import com.i2lp.edi.client.managers.PresentationController;
 import com.i2lp.edi.client.presentationElements.CommentPanel;
 import javafx.animation.Animation;
 import javafx.animation.Interpolator;
@@ -28,7 +28,7 @@ import java.util.Objects;
 /**
  * Created by kma517 on 16/03/2017.
  */
-public class TeacherPresentationManager extends PresentationManager {
+public class TeacherPresentationController extends PresentationController {
     protected boolean questionClicked = false;
     protected boolean toolkitOpen = false;
     protected String setText;

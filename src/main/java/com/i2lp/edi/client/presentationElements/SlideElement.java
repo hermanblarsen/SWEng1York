@@ -1,7 +1,7 @@
 package com.i2lp.edi.client.presentationElements;
 
 import com.i2lp.edi.client.Animation.Animation;
-import com.i2lp.edi.client.managers.PresentationManager;
+import com.i2lp.edi.client.managers.PresentationController;
 import javafx.scene.Node;
 import javafx.scene.layout.Pane;
 import org.slf4j.Logger;
@@ -32,7 +32,7 @@ public abstract class SlideElement {
     protected double slideHeight;
     protected boolean teacher;
 
-    protected PresentationManager presentationManager;
+    protected PresentationController presentationController;
 
     public abstract void doClassSpecificRender();
 
@@ -197,8 +197,8 @@ public abstract class SlideElement {
         this.slideHeight = slideHeight;
     }
 
-    public void setPresentationManager(PresentationManager presentationManager) {
-        this.presentationManager = presentationManager;
+    public void setPresentationController(PresentationController presentationController) {
+        this.presentationController = presentationController;
     }
 
     protected void scaleDimensions(float xPosition, float yPosition){
@@ -214,7 +214,7 @@ public abstract class SlideElement {
                 //onclickinfo=”URL”
                 break;
             case "gotoslide":
-                presentationManager.goToSlide(Integer.parseInt(onClickInfo));
+                presentationController.goToSlide(Integer.parseInt(onClickInfo));
                 break;
 
             case "dynamicmediatoggle":

@@ -3,6 +3,7 @@ package com.i2lp.edi.client.login;
 import com.i2lp.edi.client.Constants;
 import com.i2lp.edi.client.managers.EdiManager;
 import com.i2lp.edi.server.SocketClient;
+import com.i2lp.edi.server.packets.User;
 import com.i2lp.edi.server.packets.UserAuth;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
@@ -42,9 +43,6 @@ public class Login extends Application {
 
     protected boolean loginSuccessful = false;
     protected boolean offline = false;
-
-    protected boolean developer = true;
-    protected static final String DEVELOPMENT_MODE = "teacher";
 
     @Override
     public void start(Stage loginStage) {
@@ -149,21 +147,20 @@ public class Login extends Application {
     }
 
     private void login() {
-        //TODO: Store this userauth object instead of keeping anonymous.
+        User userData;
 
-        String userType;
-        if(developer){
-           userType = DEVELOPMENT_MODE;
+        if(Constants.developerOffline){
+           userData = new User(0, "Development", "User", "ediDev@i2lp.com","User", Constants.DEVELOPMENT_MODE);
            logger.info("Bypassing Server");
         } else {
-            userType= this.verifyLogin(new UserAuth(usernameField.getCharacters().toString(), passwordField.getCharacters().toString()));
+            userData = this.verifyLogin(new UserAuth(usernameField.getCharacters().toString(), passwordField.getCharacters().toString()));
         }
 
         //Run different dashboards based on user type returned from DB
         boolean isTeacher = false;
         loginSuccessful = false;
 
-        switch (userType) {
+        switch (userData.getUserType()) {
             case "admin":
                 loginSuccessful = true;
                 break;
@@ -180,7 +177,7 @@ public class Login extends Application {
         }
 
         if (loginSuccessful) {
-            //If login is successfull, notify ediManager to close login stage and open dashboard.
+            //If login is successful, notify ediManager to close login stage and open dashboard.
             loginSuccessful = true;
             try {
                 this.stop();
@@ -189,7 +186,7 @@ public class Login extends Application {
                 logger.warn("Closing of Login Dialog unsuccessful!");
             }
             finally {
-                ediManager.loginSucceded(isTeacher); //Do this after shutting down the login window.
+                ediManager.loginSucceded(isTeacher, userData); //Do this after shutting down the login window.
             }
         } else {
             logger.info("Login unsuccessful");
@@ -201,7 +198,7 @@ public class Login extends Application {
     public void serverConnect() {
         if (!offline) {
             //Connect to com.i2lp.edi.server
-            mySocketClient = new SocketClient("db.amriksadhra.com", 8080);
+            mySocketClient = new SocketClient("127.0.0.1", 8080);
             ediManager.setClient(mySocketClient);
         }
         else {
@@ -209,7 +206,7 @@ public class Login extends Application {
         }
     }
 
-    public String verifyLogin(UserAuth userToAuth) {
+    public User verifyLogin(UserAuth userToAuth) {
         return mySocketClient.userAuth(userToAuth);
     }
 

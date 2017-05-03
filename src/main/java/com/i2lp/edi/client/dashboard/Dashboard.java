@@ -3,11 +3,11 @@ package com.i2lp.edi.client.dashboard;
 import com.i2lp.edi.client.Constants;
 import com.i2lp.edi.client.editor.PresentationEditor;
 import com.i2lp.edi.client.managers.EdiManager;
-import com.i2lp.edi.client.managers.PresentationManager;
-import com.i2lp.edi.client.managers.ThumbnailGenerationManager;
+import com.i2lp.edi.client.managers.PresentationController;
+import com.i2lp.edi.client.managers.ThumbnailGenerationController;
 import com.i2lp.edi.client.presentationElements.Presentation;
-import com.i2lp.edi.client.presentationViewer.StudentPresentationManager;
-import com.i2lp.edi.client.presentationViewer.TeacherPresentationManager;
+import com.i2lp.edi.client.presentationViewer.StudentPresentationController;
+import com.i2lp.edi.client.presentationViewer.TeacherPresentationController;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
@@ -50,7 +50,7 @@ public abstract class Dashboard extends Application {
     protected Presentation myPresentationElement;
     protected static Logger logger = LoggerFactory.getLogger(Dashboard.class);
     private EdiManager ediManager;
-    protected PresentationManager presentationManager;
+    protected PresentationController presentationController;
     protected Stage dashboardStage;
     protected String selectedPresID;
     private ArrayList<PresentationPreviewPanel> previewPanels;
@@ -192,11 +192,11 @@ public abstract class Dashboard extends Application {
      */
     private void launchPresentation(String path) {
         if (this instanceof StudentDashboard) {
-            presentationManager = new StudentPresentationManager();
+            presentationController = new StudentPresentationController();
         } else if (this instanceof TeacherDashboard) {
-            presentationManager = new TeacherPresentationManager();
+            presentationController = new TeacherPresentationController();
         }
-        presentationManager.openPresentation(path);
+        presentationController.openPresentation(path);
     }
 
     private HBox addTopPanel() {
@@ -207,7 +207,7 @@ public abstract class Dashboard extends Application {
 
         Button createPresButton = new Button("TEST: Generate Thumbnails"); //TODO remove
         createPresButton.getStyleClass().setAll("btn", "btn-success");
-        createPresButton.setOnAction(event -> ThumbnailGenerationManager.generateSlideThumbnails("file:projectResources/sampleFiles/sampleXmlSimple.xml"));
+        createPresButton.setOnAction(event -> ThumbnailGenerationController.generateSlideThumbnails("file:projectResources/sampleFiles/sampleXmlSimple.xml"));
 
         final FileChooser fileChooser = new FileChooser();
         FileChooser.ExtensionFilter xmlExtensionFilter =

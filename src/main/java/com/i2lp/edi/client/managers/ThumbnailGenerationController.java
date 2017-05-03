@@ -22,8 +22,8 @@ import static com.i2lp.edi.client.Constants.TEMP_DIR_PATH;
 /**
  * Created by amriksadhra on 12/04/2017.
  */
-public class ThumbnailGenerationManager extends PresentationManager {
-    private static Logger logger = LoggerFactory.getLogger(ThumbnailGenerationManager.class);
+public class ThumbnailGenerationController extends PresentationController {
+    private static Logger logger = LoggerFactory.getLogger(ThumbnailGenerationController.class);
 
     public void openPresentation(String path) {
         presentationStage = new Stage();
@@ -50,12 +50,12 @@ public class ThumbnailGenerationManager extends PresentationManager {
     }
 
     public static void generateSlideThumbnails(String presentationPath) {
-        ThumbnailGenerationManager slideGenManager = new ThumbnailGenerationManager();
+        ThumbnailGenerationController slideGenManager = new ThumbnailGenerationController();
         slideGenManager.openPresentation(presentationPath);
         generateSlideThumbNail(slideGenManager);
     }
 
-    public static void generateSlideThumbNail(ThumbnailGenerationManager slideGenManager) {
+    public static void generateSlideThumbNail(ThumbnailGenerationController slideGenManager) {
         Presentation presentation = slideGenManager.presentationElement;
 
         //Move to end of current slide so all elements are visible in snapshot

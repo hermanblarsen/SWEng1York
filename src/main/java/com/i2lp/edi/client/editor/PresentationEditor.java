@@ -1,6 +1,6 @@
 package com.i2lp.edi.client.editor;
 
-import com.i2lp.edi.client.managers.PresentationManager;
+import com.i2lp.edi.client.managers.PresentationController;
 import com.i2lp.edi.client.utilities.Status;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
@@ -24,10 +24,10 @@ import org.slf4j.LoggerFactory;
 /**
  * Created by Kacper on 2017-04-13.
  */
-//Depending on how we want the editor to work, it might be useful for this to extend PresentationManager.
+//Depending on how we want the editor to work, it might be useful for this to extend PresentationController.
 //For now, this is only a quiz editor
 public class PresentationEditor {
-    Logger logger = LoggerFactory.getLogger(PresentationManager.class);
+    Logger logger = LoggerFactory.getLogger(PresentationController.class);
 
     private Scene scene;
     private String presentationPath;

@@ -1,23 +1,29 @@
 package com.i2lp.edi.server;
 
-import com.corundumstudio.socketio.*;
+import com.corundumstudio.socketio.AckRequest;
+import com.corundumstudio.socketio.Configuration;
+import com.corundumstudio.socketio.SocketIOClient;
+import com.corundumstudio.socketio.SocketIOServer;
 import com.corundumstudio.socketio.listener.ConnectListener;
 import com.corundumstudio.socketio.listener.DataListener;
 import com.corundumstudio.socketio.listener.DisconnectListener;
 import com.i2lp.edi.client.Constants;
 import com.i2lp.edi.client.utilities.Utils;
+import com.i2lp.edi.server.packets.User;
+import com.i2lp.edi.server.packets.UserAuth;
 import com.impossibl.postgres.api.jdbc.PGConnection;
 import com.impossibl.postgres.api.jdbc.PGNotificationListener;
 import com.impossibl.postgres.jdbc.PGDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.i2lp.edi.server.packets.User;
-import com.i2lp.edi.server.packets.UserAuth;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
+
+import static com.i2lp.edi.client.Constants.*;
+import static com.i2lp.edi.server.SocketClient.PASSWORD_INVALID;
 
 
 /**
@@ -37,14 +43,19 @@ public class SocketServer {
     ArrayList<SocketIOClient> myClients = new ArrayList<>();
 
     public static void main(String[] args) {
-        new SocketServer("db.amriksadhra.com", 8080);
+        new SocketServer(remoteServerAddress, 8080);
     }
 
     public SocketServer(String hostName, int serverPort) {
         logger.info("EDI Server " + Constants.BUILD_STRING);
 
-        connectToLocalDB(hostName);
-        startSocket(hostName, serverPort);
+        if (localServer) {
+            connectToLocalDB(remoteServerAddress);
+            startSocket(localServerAddress, serverPort);
+        } else {
+            connectToLocalDB(hostName);
+            startSocket(hostName, serverPort);
+        }
     }
 
     public void startSocket(String socketHostName, int serverPort) {
@@ -79,7 +90,7 @@ public class SocketServer {
 
                 //Attempt to add a user using stored procedure
                 try (PGConnection connection = (PGConnection) dataSource.getConnection()) {
-                    PreparedStatement statement = connection.prepareStatement("select edi.public.sp_adduser(?, ?, ?, ?, ?);");
+                    PreparedStatement statement = connection.prepareStatement("SELECT edi.public.sp_adduser(?, ?, ?, ?, ?);");
 
                     //Fill prepared statements to avoid SQL injection
                     statement.setString(1, data.getFirstName());
@@ -110,34 +121,38 @@ public class SocketServer {
             @SuppressWarnings("SqlResolve")
             @Override
             public void onData(final SocketIOClient client, UserAuth data, final AckRequest ackRequest) {
-                String userType = "no_response";
+                //Generate empty User for client to parse and detect login failed
+                User userDataSend = new User(PASSWORD_INVALID, "", "", "", "");
 
                 try (PGConnection connection = (PGConnection) dataSource.getConnection()) {
-                    PreparedStatement statement = connection.prepareStatement("SELECT (f).auth_result_return, (f).user_type_return FROM (SELECT edi.public.sp_authuser(? , ?) AS f) AS x;");
+                    PreparedStatement statement = connection.prepareStatement("SELECT user_id, user_type, username, first_name, last_name, email_address FROM edi.public.sp_authuser(?, ?);");
 
                     //Fill prepared statements to avoid SQL injection
                     statement.setString(1, data.getUserToLogin());
                     statement.setString(2, data.getPassword());
 
-
-
                     //Call stored procedure on database
-                    ResultSet authStatus = statement.executeQuery();
+                    ResultSet userDataQuery = statement.executeQuery();
 
-                    while (authStatus.next()) {
-                        if (authStatus.getBoolean("auth_result_return")) {
+                    while (userDataQuery.next()) {
+                        if (userDataQuery.getString("user_type") != null) {
                             logger.info("User " + data.getUserToLogin() + " successfully logged in! Time to let the client know.");
+
+                            userDataSend.setUserID(userDataQuery.getInt("user_id"));
+                            userDataSend.setFirstName(userDataQuery.getString("first_name"));
+                            userDataSend.setSecondName(userDataQuery.getString("last_name"));
+                            userDataSend.setEmailAddress(userDataQuery.getString("email_address"));
+                            userDataSend.setUserType(userDataQuery.getString("user_type"));
                         }
-                        userType = authStatus.getString("user_type_return");
                     }
-                    authStatus.close();
+                    userDataQuery.close();
                     statement.close();
                 } catch (Exception e) {
                     logger.error("Unable to connect to PostgreSQL on port 5432. PJDBC dump:", e);
                 }
 
-                //Alert com.i2lp.edi.client to whether their user auth was a success or fail, and what user type is
-                client.sendEvent("AuthUser", userType);
+                //Alert com.i2lp.edi.client to whether their user auth was a success or fail by returning user data or empty packet
+                client.sendEvent("AuthUser", userDataSend.getUserID(), userDataSend.getFirstName(), userDataSend.getSecondName(), userDataSend.getEmailAddress(), userDataSend.getUserType());
             }
         });
 

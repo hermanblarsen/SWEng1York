@@ -113,10 +113,10 @@ public class Utils {
             }
         } else {
             if (size > MAX_FONT_SIZE) {
-                logger.warn("Invalid font size specified in XML (Exceeds " + MAX_FONT_SIZE + "), defaulting to XML Default");
+                logger.warn("Invalid font size (" + size + ") specified in XML (Exceeds " + MAX_FONT_SIZE + "), defaulting to XML Default");
                 return presentationDefaults.getFontSize();
             } else {//Size smaller or equal to 0
-                logger.warn("Invalid font size specified in XML (Less than 0), defaulting to XML Default");
+                logger.warn("Invalid font size (" + size + ") specified in XML (Less than 0), defaulting to XML Default");
                 return presentationDefaults.getFontSize();
             }
 
@@ -140,10 +140,10 @@ public class Utils {
 
         //If we're checking presentation default, and its invalid
         if (presentationDefaults == null) {
-            logger.warn("Invalid default RGBA Colour specified in XML, defaulting to: " + FALLBACK_COLOUR);
+            logger.warn("Invalid default RGBA Colour specified in XML: " + colour + " , defaulting to: " + FALLBACK_COLOUR);
             return FALLBACK_COLOUR;
         } else {
-            logger.warn("Invalid RGBA Colour specified in XML, defaulting to XML Default");
+            logger.warn("Invalid RGBA Colour specified in XML: " + colour + " , defaulting to XML Default");
             return presentationDefaults.getFontColour();
         }
     }
@@ -162,10 +162,10 @@ public class Utils {
 
         //If checking presentation defaults and font invalid, return Comic Sans
         if (presentationDefaults == null) {
-            logger.warn("Invalid default Font specified in XML, defaulting to " + VALID_FONTS[0]);
+            logger.warn("Invalid default Font specified in XML: " + font + " , defaulting to " + VALID_FONTS[0]);
             return VALID_FONTS[0]; //Return comic sans
         } else {
-            logger.warn("Invalid Font specified in XML, defaulting to " + presentationDefaults.getFont());
+            logger.warn("Invalid Font specified in XML: " + font + " , defaulting to " + presentationDefaults.getFont());
             return presentationDefaults.getFont(); //Return default presentation font
         }
     }
@@ -181,7 +181,7 @@ public class Utils {
         //If onClickAction valid, return onclickaction
         if (Arrays.asList(VALID_ONCLICK_ACTIONS).contains(onClickAction.toLowerCase())) return onClickAction;
         else {
-            logger.warn("Invalid onClickAction specified in XML, defaulting to " + FALLBACK_ONCLICK_ACTION);
+            logger.warn("Invalid onClickAction specified in XML: " + onClickAction + " defaulting to " + FALLBACK_ONCLICK_ACTION);
             return FALLBACK_ONCLICK_ACTION;
         }
     }

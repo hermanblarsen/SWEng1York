@@ -1,6 +1,6 @@
 package com.i2lp.edi.client.presentationElements;
 
-import com.i2lp.edi.client.presentationViewer.TeacherPresentationManager;
+import com.i2lp.edi.client.presentationViewer.TeacherPresentationController;
 import javafx.application.Application;
 import javafx.stage.Stage;
 
@@ -19,7 +19,7 @@ public class GraphicElementIntegrationTest extends Application{
 
 	@Override
     public void start(Stage primaryStage){
-        TeacherPresentationManager presentationManager = new TeacherPresentationManager();
+        TeacherPresentationController presentationManager = new TeacherPresentationController();
         File file = new File("projectResources/sampleFiles/xmlTests/graphicElementTestXml.xml");
 
         presentationManager.openPresentation(file.toURI().toString());

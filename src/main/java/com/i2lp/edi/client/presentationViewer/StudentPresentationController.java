@@ -1,11 +1,9 @@
 package com.i2lp.edi.client.presentationViewer;
 
-import com.i2lp.edi.client.managers.PresentationManager;
+import com.i2lp.edi.client.managers.PresentationController;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.image.Image;
@@ -13,19 +11,14 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.scene.text.Text;
-import javafx.scene.web.HTMLEditor;
-import javafx.scene.web.WebEngine;
-import javafx.scene.web.WebView;
 import javafx.stage.Stage;
 
 
 /**
  * Created by kma517 on 16/03/2017.
  */
-public class StudentPresentationManager extends PresentationManager {
+public class StudentPresentationController extends PresentationController {
     protected Boolean elementClicked = false;
 
 
