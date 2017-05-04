@@ -2,6 +2,7 @@ package com.i2lp.edi.server;
 
 import com.i2lp.edi.client.utilities.Utils;
 import com.i2lp.edi.server.packets.Module;
+import com.i2lp.edi.server.packets.PresentationMetadata;
 import com.i2lp.edi.server.packets.User;
 import com.i2lp.edi.server.packets.UserAuth;
 import com.impossibl.postgres.api.jdbc.PGConnection;
@@ -353,6 +354,30 @@ public class SocketClient {
         socket.close();
     }
 
+    public ArrayList<PresentationMetadata> getPresentationsForUser(int userID){
+        ArrayList<PresentationMetadata> presentationsForUser = new ArrayList<>();
+
+        //Attempt to add a user using stored procedure
+        try (PGConnection connection = (PGConnection) dataSource.getConnection()) {
+            PreparedStatement statement = connection.prepareStatement("select * from edi.public.sp_getpresentationsforuser(?);");
+
+            //Fill prepared statements to avoid SQL injection
+            statement.setInt(1, userID);
+
+            //Call stored procedure on database
+            ResultSet rs = statement.executeQuery();
+
+            //TODO: Log this
+            while (rs.next()) {
+                presentationsForUser.add(new PresentationMetadata(rs.getInt("presentation_id"), rs.getInt("module_id"), rs.getInt("current_slide_number"), rs.getString("xml_url"), rs.getBoolean(("live"))));
+            }
+
+            statement.close();
+        } catch (Exception e) {
+            logger.error("Unable to connect to PostgreSQL on port 5432. PJDBC dump:", e);
+        }
+        return presentationsForUser;
+    }
 
     public ArrayList<Module> getModulesForUser(int userID) {
         ArrayList<Module> modulesForUser = new ArrayList<>();

@@ -40,6 +40,9 @@ public class Constants {
     public static final int MAX_FONT_SIZE = 100; //Upper bound for font sizes on presentation
     public static final String FALLBACK_COLOUR = "#000000FF"; //Black used as default colour when Presentation defaults are invalid
 
+    /* Server Interaction Constants */
+    public static final String MISSING_DOCUMENT_ID = "NoID"; //Used by getDocumentID function when the XML_URL doesnt contain a valid DocumentID
+
     /* ELEMENT RENDERING CONSTANTS */
     public static final int TEXT_ELEMENT_ZOOM_FACTOR = 2;
 

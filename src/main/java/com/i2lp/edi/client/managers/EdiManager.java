@@ -21,8 +21,9 @@ import java.net.Socket;
 public class EdiManager extends Application {
     Logger logger = LoggerFactory.getLogger(EdiManager.class);
     private Login loginDialog;
-    private SocketClient mySocketClient;
-    private User userData; //Store currently logged in users data
+    private PresentationManager presentationManager;
+    protected SocketClient mySocketClient;
+    protected User userData; //Store currently logged in users data
     private boolean offline = false;
 
 
@@ -84,12 +85,14 @@ public class EdiManager extends Application {
         logger.info("Welcome " + userData.getFirstName());
     }
 
+
     //This is called from loginWindow when the user has input valid credentials
     public void loginSucceded(boolean isTeacher, User userData) {
         logger.info("Login succeeded");
         Stage dashboardStage = new Stage();
-        setUserData(userData); //User data is now available throughout Edi
 
+        setUserData(userData); //User data is now available throughout Edi
+        this.presentationManager = new PresentationManager(this);
 
         //Additional com.i2lp.edi.client.login stuff
         if (isTeacher) {
