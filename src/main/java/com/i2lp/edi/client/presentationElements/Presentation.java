@@ -26,6 +26,8 @@ public class Presentation extends Pane {
     private boolean isI2lpFormat;
     private ArrayList<String> xmlFaults = null;
 
+    private boolean isAutoplayPresetation = false;
+
 
     private int maxSlideNumber = 0;
 
@@ -186,6 +188,7 @@ public class Presentation extends Pane {
         myTextElement.setLayer(0);
         myTextElement.setStartSequence(1);
         myTextElement.setEndSequence(3);
+        myTextElement.setDuration(1);
         myTextElement.setElementID(0);
         myTextElement.setFont("Arial");
         myTextElement.setFontSize(12);
@@ -203,6 +206,7 @@ public class Presentation extends Pane {
         myTextElement1.setLayer(0);
         myTextElement1.setStartSequence(1);
         myTextElement1.setEndSequence(3);
+        myTextElement1.setDuration(0.5f);
         myTextElement1.setElementID(9);
         myTextElement1.setFont("Arial");
         myTextElement1.setFontSize(12);
@@ -218,6 +222,7 @@ public class Presentation extends Pane {
         myGraphicElement2.setLayer(1);
         myGraphicElement2.setStartSequence(3);
         myGraphicElement2.setEndSequence(5);
+        myGraphicElement2.setDuration(0.5f);
         myGraphicElement2.setFillColour("#00000000");
         myGraphicElement2.setLineColour("#00FF00FF");
         myGraphicElement2.setOvalYPosition(0.5f);
@@ -233,6 +238,7 @@ public class Presentation extends Pane {
         myGraphicElement.setLayer(2);
         myGraphicElement.setStartSequence(2);
         myGraphicElement.setEndSequence(5);
+        myGraphicElement.setDuration(1);
         myGraphicElement.setFillColour("#EEFFFFFF");
         myGraphicElement.setLineColour("#0000FFFF");
         myGraphicElement.polySetXPoints(new float[] {0.1f, 0.5f, 0.5f});
@@ -247,6 +253,7 @@ public class Presentation extends Pane {
         myGraphicElement3.setLayer(3);
         myGraphicElement3.setStartSequence(6);
         myGraphicElement3.setEndSequence(8);
+        myGraphicElement3.setDuration(0.5f);
         myGraphicElement3.setFillColour("#FF0000FF");
         myGraphicElement3.setLineColour("#0000FFFF");
         myGraphicElement3.polySetXPoints(new float[] {0.5f, 0.5f, 0.4f});
@@ -261,6 +268,7 @@ public class Presentation extends Pane {
         myTextElement11.setLayer(2);
         myTextElement11.setStartSequence(4);
         myTextElement11.setEndSequence(7);
+        myTextElement11.setDuration(0.5f);
         myTextElement11.setElementID(5);
         myTextElement11.setFont("Times New Roman");
         myTextElement11.setFontSize(24);
@@ -284,6 +292,7 @@ public class Presentation extends Pane {
         poll.setLayer(6);
         poll.setStartSequence(9);
         poll.setEndSequence(10);
+        poll.setDuration(1);
         poll.setElementID(111111);
         poll.setSlideCanvas(slide1);
         slideElementsSlide1.add(poll);
@@ -294,6 +303,7 @@ public class Presentation extends Pane {
         myWordCloudElement.setLayer(7);
         myWordCloudElement.setStartSequence(11);
         myWordCloudElement.setEndSequence(12);
+        myWordCloudElement.setDuration(10);
         //myWordCloudElement.setCloudShapePath("file:/projectResources/logos/ediLogo400x400.png");
         myWordCloudElement.setElementID(123456);
         myWordCloudElement.setSlideCanvas(slide1);
@@ -314,6 +324,7 @@ public class Presentation extends Pane {
         myTextElementNewSlide.setLayer(2);
         myTextElementNewSlide.setStartSequence(2);
         myTextElementNewSlide.setEndSequence(4);
+        myTextElementNewSlide.setDuration(1);
         myTextElementNewSlide.setElementID(69);
         myTextElementNewSlide.setTextContent("<b>Slide2</b>");
         myTextElementNewSlide.setSlideCanvas(slide2);
@@ -335,6 +346,7 @@ public class Presentation extends Pane {
         myVideoElement.setLayer(1);
         myVideoElement.setStartSequence(1);
         myVideoElement.setEndSequence(3);
+        myVideoElement.setDuration(0.5f);
         myVideoElement.setSlideCanvas(slide2);
         slideElementsSlide2.add(myVideoElement);
 
@@ -353,6 +365,7 @@ public class Presentation extends Pane {
         myTextElementNewSlide2.setLayer(1);
         myTextElementNewSlide2.setStartSequence(1);
         myTextElementNewSlide2.setEndSequence(2);
+        myTextElementNewSlide2.setDuration(1);
         myTextElementNewSlide2.setElementID(124214);
         myTextElementNewSlide2.setTextContent("<b>Slide3</b>");
         myTextElementNewSlide2.setSlideCanvas(slide3);
@@ -397,5 +410,13 @@ public class Presentation extends Pane {
 
     public void setXmlFaults(ArrayList<String> xmlFaults) {
         this.xmlFaults = xmlFaults;
+    }
+
+    public boolean isAutoplayPresetation() {
+        return isAutoplayPresetation;
+    }
+
+    public void setAutoplayPresetation(boolean autoplayPresetation) {
+        isAutoplayPresetation = autoplayPresetation;
     }
 }

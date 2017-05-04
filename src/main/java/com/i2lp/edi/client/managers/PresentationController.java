@@ -6,6 +6,8 @@ import com.i2lp.edi.client.presentationElements.*;
 import com.i2lp.edi.client.presentationViewer.StudentPresentationController;
 import com.i2lp.edi.client.presentationViewer.TeacherPresentationController;
 import javafx.animation.FadeTransition;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -161,6 +163,10 @@ public abstract class PresentationController {
 
         createCommentPanel();
         resize();
+
+        if (presentationElement.isAutoplayPresetation()){
+            autoPlay();
+        }
     }
 
     private void addKeyboardListeners() {
@@ -641,6 +647,53 @@ public abstract class PresentationController {
         if (slideToAdvance.getCurrentSequenceNumber() == slideToAdvance.getMaxSequenceNumber())
             return Slide.SLIDE_PRE_CHANGE;
         return Slide.SLIDE_NO_MOVE;
+    }
+
+    private void autoPlay(){
+        Slide currentSlide = presentationElement.getSlide(currentSlideNumber);
+
+        try{
+            float longestDuration = 0;
+            boolean isAnyNewElements = false;
+
+            ArrayList<SlideElement> currentElements = Slide.searchForSequenceElement(currentSlide.getSlideElementList(), currentSlide.getCurrentSequenceNumber());
+            for (SlideElement element : currentElements) {
+                // Go Through every element which has start/end sequence here
+                if (element.getStartSequence() == currentSlide.getCurrentSequenceNumber()) {
+                    //If this element starts at this sequence number (Ignore any which end on this number)
+                    isAnyNewElements = true;
+                    if (element.getDuration() > longestDuration) {
+                        // We will stay on this sequence number for the duration of the longest Element
+                        longestDuration = element.getDuration();
+                    }
+                }
+            }
+
+            boolean isLastSlide =  currentSlideNumber == presentationElement.getMaxSlideNumber()-1;
+            boolean isLastElement = currentSlide.getCurrentSequenceNumber() == currentSlide.getMaxSequenceNumber();
+            if (!(isLastElement && isLastSlide)) {
+                // If this isn't the last element in the presentation.
+                if (isAnyNewElements && (longestDuration != 0)) {
+                    //If a new element was added then set the timer which will advance the slide
+                    Timeline autoplayTimeline = new Timeline(
+                            new KeyFrame(Duration.seconds(longestDuration), task -> {
+                                controlPresentation(Slide.SLIDE_FORWARD);
+                                autoPlay();
+                            })
+                    );
+                    autoplayTimeline.setCycleCount(1);
+                    autoplayTimeline.play();
+                } else {
+                    // No new elements start at this sequence number so just skip it.
+                    controlPresentation(Slide.SLIDE_FORWARD);
+                    autoPlay();
+                }
+            }
+        } catch (SequenceNotFoundException snfe){
+            // Most likely we've gone past max sequence number
+            controlPresentation(Slide.SLIDE_FORWARD);
+            autoPlay();
+        }
     }
 
     /**
