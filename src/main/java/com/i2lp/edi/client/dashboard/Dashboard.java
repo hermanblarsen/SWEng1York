@@ -36,8 +36,8 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
 
-import static com.i2lp.edi.client.Constants.TEMP_DIR_PATH;
-import static javafx.scene.layout.BorderPane.*;
+import static com.i2lp.edi.client.Constants.PRESENTATIONS_PATH;
+import static javafx.scene.layout.BorderPane.setAlignment;
 
 
 /**
@@ -75,9 +75,12 @@ public abstract class Dashboard extends Application {
         border.setCenter(addBorderCenter());
 
         //The following code has to be placed between addBorderCenter() and addBorderLeft()
-        int numOfPresentations = 20; //TODO: numOfPresentations to be read from database
-        for (int i=0; i<numOfPresentations; i++) {
-            PresentationPreviewPanel previewPanel = new PresentationPreviewPanel(presentationPreviewsFlowPane);
+        int numOfPresentations = ediManager.getPresentationManager().getLocalPresentationList().size();
+
+        for (int i = 0;i < numOfPresentations; i++) {
+            String presentationDocumentID = ediManager.getPresentationManager().getLocalPresentationList().get(i).getDocumentID();
+
+            PresentationPreviewPanel previewPanel = new PresentationPreviewPanel(presentationPreviewsFlowPane, PRESENTATIONS_PATH + presentationDocumentID + File.separator + presentationDocumentID + ".xml");
             previewPanel.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
                 if(event.getButton() == MouseButton.PRIMARY) {
                     if (previewPanel.isSelected()) {
@@ -184,7 +187,6 @@ public abstract class Dashboard extends Application {
     }
 
     /**
-     * s
      * Helper method to launch correct Presentation manager dependent upon current object type
      *
      * @param path Path to presentation
@@ -340,7 +342,7 @@ public abstract class Dashboard extends Application {
 
             ImageView preview;
             try {
-                preview = new ImageView("file:" + TEMP_DIR_PATH + "Thumbnails/" + selectedPresID + "_slide" + i + "_thumbnail.png");
+                preview = new ImageView("file:" + PRESENTATIONS_PATH + selectedPresID + "/Thumbnails/" + "slide" + i + "_thumbnail.png");
             } catch (NullPointerException | IllegalArgumentException e) {
                 logger.info("Slide thumbnail not found");
                 preview = new ImageView("file:projectResources/projectResources/icons/emptyThumbnail.png");

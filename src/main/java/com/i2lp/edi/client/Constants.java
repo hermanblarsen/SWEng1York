@@ -17,7 +17,10 @@ public class Constants {
     private static final String BUILD_NUMBER = "32";
     public static final String BUILD_STRING = "Version: v0." + Constants.BUILD_NUMBER;
 
-    public static final String TEMP_DIR_PATH = System.getProperty("java.io.tmpdir") + "Edi/";
+    public static final String BASE_PATH = System.getProperty("java.io.tmpdir") + "Edi/";
+    public static final String TEMP_PATH = BASE_PATH + "/Temp/";
+    public static final String PRESENTATIONS_PATH = BASE_PATH + "/Presentations/";
+
 
     /* XML Input validation */
     //Valid Fonts taken from https://www.w3schools.com/cssref/css_websafe_fonts.asp

@@ -12,9 +12,6 @@ public class PresentationMetadata {
     private int presentation_id;
     private int module_id;
     private int current_slide_number;
-
-
-
     private String xml_url;
     private boolean live;
 

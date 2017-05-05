@@ -409,7 +409,7 @@ public class SocketClient {
     public void sendLocalThumbnailList() {
         //Get presentation names from Server through SQL query
         //Generate the directory names and build a tree
-        getFilesInFolder(TEMP_DIR_PATH);
+        getFilesInFolder(BASE_PATH);
         // Use Apache commons library to get difference between server thumbnails and client thumbnails
        /* List difference = ListUtils.subtract(Arrays.asList(filesOnServer), Arrays.asList(clientFiles));
 

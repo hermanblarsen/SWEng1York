@@ -12,7 +12,8 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Random;
 
-import static com.i2lp.edi.client.Constants.TEMP_DIR_PATH;
+import static com.i2lp.edi.client.Constants.PRESENTATIONS_PATH;
+
 
 /**
  * Created by Kacper on 2017-04-08.
@@ -43,7 +44,7 @@ public class PresentationPreviewPanel extends Panel {
 
         ImageView preview;
         try {
-            preview = new ImageView("file:"+ TEMP_DIR_PATH + "Thumbnails/" + getPresentation().getDocumentID() + "_slide0_thumbnail.png");
+            preview = new ImageView("file:"+ PRESENTATIONS_PATH + getPresentation().getDocumentID() + "/Thumbnails/" + "slide0_thumbnail.png");
         } catch(NullPointerException | IllegalArgumentException e) {
             preview = new ImageView("file:projectResources/projectResources/icons/emptyThumbnail.png");
         }

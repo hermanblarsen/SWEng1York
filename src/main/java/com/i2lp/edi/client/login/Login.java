@@ -26,7 +26,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 
-import static com.i2lp.edi.client.Constants.TEMP_DIR_PATH;
+import static com.i2lp.edi.client.Constants.BASE_PATH;
 import static com.i2lp.edi.client.Constants.remoteServerAddress;
 
 
@@ -84,7 +84,7 @@ public class Login extends Application {
 
         //Print useful development information to terminal
         logger.info("EDI Client " + Constants.BUILD_STRING);
-        logger.info("Scratch Directory: " + TEMP_DIR_PATH);
+        logger.info("Scratch Directory: " + BASE_PATH);
 
         populateGUI();
         loginStage.show();

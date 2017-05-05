@@ -160,6 +160,10 @@ public class SocketServer {
         server.start();
     }
 
+    private void generateZips(){
+
+    }
+
     /**
      * Connects to Local PostgreSQL instance and registers the event listener that fires whenever the
      * database is modified. Requires the connection to remain active, and so has an infinite while loop.

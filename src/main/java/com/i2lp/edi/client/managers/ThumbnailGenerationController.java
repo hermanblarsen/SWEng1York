@@ -17,7 +17,7 @@ import javax.imageio.ImageIO;
 import java.io.File;
 import java.io.IOException;
 
-import static com.i2lp.edi.client.Constants.TEMP_DIR_PATH;
+import static com.i2lp.edi.client.Constants.PRESENTATIONS_PATH;
 
 /**
  * Created by amriksadhra on 12/04/2017.
@@ -63,7 +63,7 @@ public class ThumbnailGenerationController extends PresentationController {
         while (slideGenManager.slideAdvance(presentation, Slide.SLIDE_FORWARD) != Presentation.SLIDE_LAST_ELEMENT);
 
         //If we're in last element of slide, take snapshot
-        File thumbnailFile = new File(TEMP_DIR_PATH + "Thumbnails/" + presentation.getDocumentID() + "_slide" + (slideGenManager.currentSlideNumber) + "_thumbnail.png");
+        File thumbnailFile = new File(PRESENTATIONS_PATH + presentation.getDocumentID() + "/Thumbnails/" + "slide" + (slideGenManager.currentSlideNumber) + "_thumbnail.png");
         if (!thumbnailFile.exists()) {
             logger.debug("Thumbnail at " + thumbnailFile.getAbsolutePath() + " already exists");
             thumbnailFile.getParentFile().mkdirs(); //Create directory structure if not present yet

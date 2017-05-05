@@ -5,6 +5,7 @@ import com.i2lp.edi.client.exceptions.SequenceNotFoundException;
 import com.i2lp.edi.client.presentationElements.*;
 import com.i2lp.edi.client.presentationViewer.StudentPresentationController;
 import com.i2lp.edi.client.presentationViewer.TeacherPresentationController;
+import com.i2lp.edi.client.utilities.ParserXML;
 import javafx.animation.FadeTransition;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -285,13 +286,13 @@ public abstract class PresentationController {
     }
 
     public void loadPresentation(String path) {
-//        logger.info("Attempting to load presentation located at: " + path);
-//        ParserXML xmlParser = new ParserXML(path);
-//        presentationElement = xmlParser.parsePresentation();
+        logger.info("Attempting to load presentation located at: " + path);
+        ParserXML xmlParser = new ParserXML(path);
+        presentationElement = xmlParser.parsePresentation();
 
         //TEST PRESENTATION, STOP USING
-        logger.info("Bypassing file located at: " + path + ", programmatically making tet presentation instead.");
-        presentationElement = Presentation.generateTestPresentation();  //TODO REMOVE AND STOP USING
+        //logger.info("Bypassing file located at: " + path + ", programmatically making tet presentation instead.");
+        //presentationElement = Presentation.generateTestPresentation();  //TODO REMOVE AND STOP USING
 
         assignAttributes(presentationElement);
         displayCurrentSlide();

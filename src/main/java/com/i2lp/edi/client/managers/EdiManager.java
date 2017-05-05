@@ -32,6 +32,8 @@ public class EdiManager extends Application {
         launch(args);
     }
 
+
+
     //Temporary, so that edimanager can close the ports and prevent port-in-use errors on next execution
     public void setClient(SocketClient mySocketClient){
         this.mySocketClient = mySocketClient;
@@ -113,5 +115,9 @@ public class EdiManager extends Application {
     public void stop() {
         logger.info("Closing client-side networking ports.");
         if (!offline) mySocketClient.closeAll();
+    }
+
+    public PresentationManager getPresentationManager() {
+        return presentationManager;
     }
 }

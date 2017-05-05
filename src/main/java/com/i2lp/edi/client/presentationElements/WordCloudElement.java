@@ -34,7 +34,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.i2lp.edi.client.Constants.TEMP_DIR_PATH;
+import static com.i2lp.edi.client.Constants.BASE_PATH;
 
 /**
  * Created by Koen on 06/04/2017.
@@ -122,17 +122,17 @@ public class WordCloudElement extends InteractiveElement {
             wc.setColorPalette(new ColorPalette(Color.ORANGE,Color.GREEN,Color.cyan));
             wc.setFontScalar(new SqrtFontScalar(10,40));
             wc.build(wordFrequencies);
-//            wc.writeToFile(TEMP_DIR_PATH + "Wordclouds/wordcloud" + + ".png");
+//            wc.writeToFile(BASE_PATH + "Wordclouds/wordcloud" + + ".png");
 
 
-            File wordcloudPath = new File(TEMP_DIR_PATH + "/Wordclouds/wordcloud.png");
+            File wordcloudPath = new File(BASE_PATH + "/Wordclouds/wordcloud.png");
             if (!wordcloudPath.exists()) {
                 wordcloudPath.getParentFile().mkdirs(); //Create directory structure if not present yet
             }
-            wc.writeToFile(TEMP_DIR_PATH + "Wordclouds/wordcloud.png");
+            wc.writeToFile(BASE_PATH + "Wordclouds/wordcloud.png");
             //TODO filename can include presentationID and slideID, especially if we want them stored and recalled later. -Herman
 
-            Image wordCloud = new Image("file:" + TEMP_DIR_PATH + "Wordclouds/wordcloud.png",600,600,true,true);
+            Image wordCloud = new Image("file:" + BASE_PATH + "Wordclouds/wordcloud.png",600,600,true,true);
 
             ImageView iv = new ImageView(wordCloud);
             wordCloudPanel.setBody(iv);
