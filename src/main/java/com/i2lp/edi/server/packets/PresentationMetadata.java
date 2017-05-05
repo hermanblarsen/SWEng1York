@@ -12,6 +12,9 @@ public class PresentationMetadata {
     private int presentation_id;
     private int module_id;
     private int current_slide_number;
+
+
+
     private String xml_url;
     private boolean live;
 
@@ -29,11 +32,15 @@ public class PresentationMetadata {
      * @return DocumentID of presentation
      */
     public String getDocumentID(){
-        String HEX_PATTERN = "https?\\:\\/\\/(?:www\\.)?amriksadhra\\.com\\/Edi\\/([^\\.]+)\\.xml";
+        String HEX_PATTERN = "https?\\:\\/\\/(?:www\\.)?amriksadhra\\.com\\/Edi\\/([^\\.]+)\\.zip";
         Pattern pattern = Pattern.compile(HEX_PATTERN);
         Matcher matcher = pattern.matcher(xml_url);
 
         if (matcher.find()) return matcher.group(1);
         else return MISSING_DOCUMENT_ID;
+    }
+
+    public String getXml_url() {
+        return xml_url;
     }
 }
