@@ -8,7 +8,10 @@ import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.Scene;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.image.WritableImage;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,18 +61,21 @@ public class ThumbnailGenerationController extends PresentationController {
     public static void generateSlideThumbNail(ThumbnailGenerationController slideGenManager) {
         Presentation presentation = slideGenManager.presentationElement;
 
+        //Check if thumbnail already there
+        File thumbnailFile = new File(PRESENTATIONS_PATH + "Thumbnails/" + presentation.getDocumentID() + "_slide" + (slideGenManager.currentSlideNumber) + "_thumbnail.png");
+        if (!thumbnailFile.exists()) {
+            thumbnailFile.getParentFile().mkdirs(); //Create directory structure if not present yet
+        } else {
+            logger.debug("Thumbnail at " + thumbnailFile.getAbsolutePath() + " already exists");
+            slideGenManager.close();
+            return;
+        }
+
         //Move to end of current slide so all elements are visible in snapshot
         //noinspection StatementWithEmptyBody
         while (slideGenManager.slideAdvance(presentation, Slide.SLIDE_FORWARD) != Presentation.SLIDE_LAST_ELEMENT);
-
         //If we're in last element of slide, take snapshot
-        File thumbnailFile = new File(PRESENTATIONS_PATH + presentation.getDocumentID() + "/Thumbnails/" + "slide" + (slideGenManager.currentSlideNumber) + "_thumbnail.png");
-        if (!thumbnailFile.exists()) {
-            logger.debug("Thumbnail at " + thumbnailFile.getAbsolutePath() + " already exists");
-            thumbnailFile.getParentFile().mkdirs(); //Create directory structure if not present yet
-        } else {
-            return;
-        }
+
 
         //This task will succeed when the webviews have all rendered
         Task webviewRenderChecker = new Task() {
@@ -122,5 +128,15 @@ public class ThumbnailGenerationController extends PresentationController {
                 logger.error("Generating presentation thumbnail for " + presentation.getDocumentID() + " at " + thumbnailFile.getAbsolutePath() + " failed");
             }
         });
+    }
+
+    @Override
+    protected void displayCurrentSlide() {
+        displayPane.getChildren().clear();
+        Slide slide = presentationElement.getSlide(currentSlideNumber);
+        slide.setBackground(new Background(new BackgroundFill(Color.valueOf(presentationElement.getTheme().getBackgroundColour()), null, null)));
+        displayPane.getChildren().add(slide);
+
+        resize();
     }
 }

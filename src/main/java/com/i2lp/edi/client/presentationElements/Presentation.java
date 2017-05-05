@@ -412,7 +412,7 @@ public class Presentation extends Pane {
         this.xmlFaults = xmlFaults;
     }
 
-    public boolean isAutoplayPresetation() {
+    public boolean isAutoplayPresentation() {
         return isAutoplayPresetation;
     }
 

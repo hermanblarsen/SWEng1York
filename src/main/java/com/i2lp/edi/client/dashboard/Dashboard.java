@@ -341,11 +341,17 @@ public abstract class Dashboard extends Application {
             slides[i].setPadding(new Insets(5));
 
             ImageView preview;
-            try {
-                preview = new ImageView("file:" + PRESENTATIONS_PATH + selectedPresID + "/Thumbnails/" + "slide" + i + "_thumbnail.png");
-            } catch (NullPointerException | IllegalArgumentException e) {
-                logger.info("Slide thumbnail not found");
-                preview = new ImageView("file:projectResources/projectResources/icons/emptyThumbnail.png");
+            File thumbnailFile = new File(PRESENTATIONS_PATH + "Thumbnails/" + selectedPresID + "_slide" + i + "_thumbnail.png");
+
+            if(thumbnailFile.exists()) {
+                try {
+                    preview = new ImageView("file:" + PRESENTATIONS_PATH + "Thumbnails/" + selectedPresID + "_slide" + i + "_thumbnail.png");
+                } catch (NullPointerException | IllegalArgumentException e) {
+                    logger.debug("Couldn't open thumbnail" + thumbnailFile.toString());
+                    preview = new ImageView("file:projectResources/icons/emptyThumbnail.png");
+                }
+            } else {
+                preview = new ImageView("file:projectResources/icons/emptyThumbnail.png");
             }
 
             preview.setFitWidth(170);

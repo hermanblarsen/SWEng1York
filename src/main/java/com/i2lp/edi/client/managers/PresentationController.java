@@ -45,9 +45,9 @@ import java.util.TimerTask;
  * Created by kma517 on 16/03/2017.
  */
 public abstract class PresentationController {
-    private static final float SLIDE_SIZE = 0.5f;
+    private static final float SLIDE_SIZE_ON_OPEN = 0.5f;
     private static final double PRES_CONTROLS_HEIGHT = 40;
-    private static final double STAGE_MIN_WIDTH = 450;
+    private static final double STAGE_MIN_WIDTH = 510;
     private static final double STAGE_MIN_HEIGHT = 300;
     Logger logger = LoggerFactory.getLogger(PresentationController.class);
 
@@ -71,7 +71,6 @@ public abstract class PresentationController {
     private Region blackRegion;
     private DrawPane drawPane;
 
-    private boolean isCursorHidden = false;
     private CursorState cursorState = CursorState.DEFAULT;
 
     protected double slideWidth;
@@ -84,6 +83,29 @@ public abstract class PresentationController {
     private boolean isDrawModeOn = false;
     private boolean showDrawing = true;
 
+
+    public PresentationController() {
+        presentationStage = new Stage();
+        Image ediLogoSmall = new Image("file:projectResources/logos/ediLogo32x32.png");
+        presentationStage.getIcons().add(ediLogoSmall);
+
+        presentationStage.setMinWidth(STAGE_MIN_WIDTH);
+        presentationStage.setMinHeight(STAGE_MIN_HEIGHT);
+        presentationStage.setOnCloseRequest(event -> destroyAllVisibleElements());
+
+        sceneBox = new VBox();
+        displayPane = new StackPane();
+        sceneBox.getChildren().add(displayPane);
+        VBox.setVgrow(displayPane, Priority.ALWAYS);
+        displayPane.setBackground(new Background(new BackgroundFill(Color.BLACK, null, null)));
+        displayPane.setAlignment(Pos.CENTER);
+        blackRegion = new Region();
+        blackRegion.setBackground(new Background(new BackgroundFill(Color.BLACK, null, null)));
+        drawPane = new DrawPane();
+        progressBar = new ProgressBar(0);
+        slideNumber = new Label();
+        presControls = addPresentationControls();
+    }
 
     /**
      * Assign Slide to each SlideElement within a presentation, to enable them to be setup and rendered. Plumbs XML parsing into
@@ -118,28 +140,6 @@ public abstract class PresentationController {
     }
 
     public void openPresentation(String path) {
-        presentationStage = new Stage();
-        Image ediLogoSmall = new Image("file:projectResources/logos/ediLogo32x32.png");
-        presentationStage.getIcons().add(ediLogoSmall);
-
-        presentationStage.setMinWidth(STAGE_MIN_WIDTH);
-        presentationStage.setMinHeight(STAGE_MIN_HEIGHT);
-        presentationStage.setOnCloseRequest(event -> destroyAllVisibleElements());
-
-
-
-        sceneBox = new VBox();
-        displayPane = new StackPane();
-        sceneBox.getChildren().add(displayPane);
-        VBox.setVgrow(displayPane, Priority.ALWAYS);
-        displayPane.setBackground(new Background(new BackgroundFill(Color.BLACK, null, null)));
-        displayPane.setAlignment(Pos.CENTER);
-        blackRegion = new Region();
-        blackRegion.setBackground(new Background(new BackgroundFill(Color.BLACK, null, null)));
-        drawPane = new DrawPane();
-        progressBar = new ProgressBar(0);
-        slideNumber = new Label();
-        presControls = addPresentationControls();
 
         loadPresentation(path);
 
@@ -148,7 +148,7 @@ public abstract class PresentationController {
 
         Rectangle2D primaryScreenBounds = Screen.getPrimary().getVisualBounds();
 
-        slideWidth = primaryScreenBounds.getWidth() * SLIDE_SIZE;
+        slideWidth = primaryScreenBounds.getWidth() * SLIDE_SIZE_ON_OPEN;
         slideHeight = slideWidth / presentationElement.getDocumentAspectRatio();
 
         scene = new Scene(sceneBox, slideWidth, slideHeight); //1000x600
@@ -165,7 +165,7 @@ public abstract class PresentationController {
         createCommentPanel();
         resize();
 
-        if (presentationElement.isAutoplayPresetation()){
+        if (presentationElement.isAutoplayPresentation()){
             autoPlay();
         }
     }
@@ -298,7 +298,7 @@ public abstract class PresentationController {
         displayCurrentSlide();
     }
 
-    private void resize() {
+    protected void resize() {
         double width = displayPane.getWidth();
         double height = displayPane.getHeight();
         double aspectRatio = presentationElement.getDocumentAspectRatio();
@@ -635,14 +635,7 @@ public abstract class PresentationController {
                 elementToAnimate.renderElement(Animation.ENTRY_ANIMATION); //Entry Sequence
                 } else if (elementToAnimate.getEndSequence() == slideToAdvance.getCurrentSequenceNumber()) {
                     elementToAnimate.renderElement(Animation.EXIT_ANIMATION); //Exit Sequence
-                } //TODO: @Amrik, does the code below make sense?
-//            } else if(direction == Slide.SLIDE_BACKWARD) { //When going backwards elements should exit where they entered and vice versa
-//                if (elementToAnimate.getEndSequence() == slideToAdvance.getCurrentSequenceNumber()) {
-//                    elementToAnimate.renderElement(Animation.ENTRY_ANIMATION); //Entry Sequence
-//                } else if (elementToAnimate.getStartSequence() == slideToAdvance.getCurrentSequenceNumber()) {
-//                    elementToAnimate.renderElement(Animation.EXIT_ANIMATION); //Exit Sequence
-//                }
-//            }
+                }
         }
 
         if (slideToAdvance.getCurrentSequenceNumber() == slideToAdvance.getMaxSequenceNumber())
@@ -706,7 +699,7 @@ public abstract class PresentationController {
         try {
             finalize();
         } catch (Throwable throwable) {
-            logger.error("Couldnt finalize PresMan");
+            logger.error("Couldnt finalize PresCon");
         }
     }
 
@@ -743,11 +736,8 @@ public abstract class PresentationController {
         if (isShowBlack)
             displayPane.getChildren().add(blackRegion);
 
-
-        if (!(this instanceof ThumbnailGenerationController)) {
-            displayPane.getChildren().add(presControls); //TODO: Fix glitch when transitioning between slides
-            StackPane.setAlignment(presControls, Pos.BOTTOM_CENTER);
-        }
+        displayPane.getChildren().add(presControls); //TODO: Fix glitch when transitioning between slides
+        StackPane.setAlignment(presControls, Pos.BOTTOM_CENTER);
 
         resize();
     }

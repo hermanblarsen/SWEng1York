@@ -10,6 +10,7 @@ import org.kordamp.bootstrapfx.scene.layout.Panel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.util.Random;
 
 import static com.i2lp.edi.client.Constants.PRESENTATIONS_PATH;
@@ -43,10 +44,17 @@ public class PresentationPreviewPanel extends Panel {
         this.setText("ID: " + getPresentation().getDocumentID());
 
         ImageView preview;
-        try {
-            preview = new ImageView("file:"+ PRESENTATIONS_PATH + getPresentation().getDocumentID() + "/Thumbnails/" + "slide0_thumbnail.png");
-        } catch(NullPointerException | IllegalArgumentException e) {
-            preview = new ImageView("file:projectResources/projectResources/icons/emptyThumbnail.png");
+        File thumbnailFile = new File(PRESENTATIONS_PATH + getPresentation().getDocumentID() + "/Thumbnails/" + "slide0_thumbnail.png");
+
+        if(thumbnailFile.exists()) {
+            try {
+                preview = new ImageView("file:"+ PRESENTATIONS_PATH + getPresentation().getDocumentID() + "/Thumbnails/" + "slide0_thumbnail.png");
+            } catch (NullPointerException | IllegalArgumentException e) {
+                logger.debug("Couldn't open thumbnail" + thumbnailFile.toString());
+                preview = new ImageView("file:projectResources/icons/emptyThumbnail.png");
+            }
+        } else {
+            preview = new ImageView("file:projectResources/icons/emptyThumbnail.png");
         }
 
         preview.setFitWidth(150);
