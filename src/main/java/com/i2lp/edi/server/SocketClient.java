@@ -24,7 +24,6 @@ import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static com.i2lp.edi.client.Constants.*;
-import static com.i2lp.edi.client.utilities.Utils.getFilesInFolder;
 
 /**
  * Created by amriksadhra on 20/03/2017.
@@ -406,18 +405,11 @@ public class SocketClient {
         return modulesForUser;
     }
 
-    public void sendLocalThumbnailList() {
-        //Get presentation names from Server through SQL query
-        //Generate the directory names and build a tree
-        getFilesInFolder(BASE_PATH);
-        // Use Apache commons library to get difference between server thumbnails and client thumbnails
-       /* List difference = ListUtils.subtract(Arrays.asList(filesOnServer), Arrays.asList(clientFiles));
-
-        // If no difference between client and server, dont send request data packet
-        if (difference.size() == 0) {
-            return;
-        } else {
-            socket.emit("ClientThumbnails");
-        }*/
+    /**
+     * Send packet to server Socket to alert it that a new presentation is available for
+     * integration into the Edi database.
+     */
+    public void alertServerToUpload(String presentationName){
+        socket.emit("NewUpload", presentationName);
     }
 }

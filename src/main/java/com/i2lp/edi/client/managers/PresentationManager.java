@@ -2,13 +2,12 @@ package com.i2lp.edi.client.managers;
 
 import com.i2lp.edi.server.SocketClient;
 import com.i2lp.edi.server.packets.PresentationMetadata;
+import org.apache.commons.net.ftp.FTP;
+import org.apache.commons.net.ftp.FTPClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
@@ -19,6 +18,7 @@ import java.util.zip.ZipInputStream;
 
 import static com.i2lp.edi.client.Constants.*;
 import static com.i2lp.edi.client.utilities.Utils.getFilesInFolder;
+
 
 /**
  * Created by amriksadhra on 03/05/2017.
@@ -144,7 +144,7 @@ public class PresentationManager {
                 String fileName = ze.getName();
                 File newFile = new File(outputFolder + File.separator + fileName);
 
-                if(!newFile.toString().contains(".")){
+                if (!newFile.toString().contains(".")) {
                     newFile.mkdir();
                     ze = zis.getNextEntry();
                     continue;
@@ -194,5 +194,44 @@ public class PresentationManager {
         }
 
         return remotePresentationDocumentIDs;
+    }
+
+    public void uploadPresentation(String fileToUpload, String filename) {
+        Thread uploadThread = new Thread(() -> { //Make upload async to avoid blocking main thread
+            FTPClient ftpClient = new FTPClient();
+            try {
+                ftpClient.connect("ftp.amriksadhra.com", 21);
+                ftpClient.login(FTP_USER, FTP_PASS);
+                ftpClient.enterLocalPassiveMode();
+
+                ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
+
+                // APPROACH #1: uploads first file using an InputStream
+                File localFile = new File(fileToUpload);
+
+                String remoteFile = "Uploads/" + filename + ".zip";
+                InputStream inputStream = new FileInputStream(localFile);
+                logger.info("Start uploading " + filename + " data");
+
+                boolean done = ftpClient.storeFile(remoteFile, inputStream);
+                inputStream.close();
+                if (done) {
+                    logger.info("The presentation has uploaded succesfully. Awaiting server-side processing.");
+                    socketClient.alertServerToUpload(filename);
+                }
+            } catch (IOException e) {
+                logger.error("Error uploading presentation data to Edi Server! ", e);
+            } finally {
+                try {
+                    if (ftpClient.isConnected()) {
+                        ftpClient.logout();
+                        ftpClient.disconnect();
+                    }
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
+            }
+        });
+        uploadThread.start();
     }
 }

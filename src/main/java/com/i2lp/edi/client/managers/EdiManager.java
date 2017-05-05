@@ -32,8 +32,6 @@ public class EdiManager extends Application {
         launch(args);
     }
 
-
-
     //Temporary, so that edimanager can close the ports and prevent port-in-use errors on next execution
     public void setClient(SocketClient mySocketClient){
         this.mySocketClient = mySocketClient;
@@ -95,6 +93,7 @@ public class EdiManager extends Application {
 
         setUserData(userData); //User data is now available throughout Edi
         this.presentationManager = new PresentationManager(this);
+
 
         //Additional com.i2lp.edi.client.login stuff
         if (isTeacher) {

@@ -75,12 +75,12 @@ public abstract class Dashboard extends Application {
         //The following code has to be placed between addBorderCenter() and addBorderLeft()
         int numOfPresentations = ediManager.getPresentationManager().getLocalPresentationList().size();
 
-        for (int i = 0;i < numOfPresentations; i++) {
+        for (int i = 0; i < numOfPresentations; i++) {
             String presentationDocumentID = ediManager.getPresentationManager().getLocalPresentationList().get(i).getDocumentID();
 
             PresentationPreviewPanel previewPanel = new PresentationPreviewPanel(presentationPreviewsFlowPane, PRESENTATIONS_PATH + presentationDocumentID + File.separator + presentationDocumentID + ".xml");
             previewPanel.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
-                if(event.getButton() == MouseButton.PRIMARY) {
+                if (event.getButton() == MouseButton.PRIMARY) {
                     if (previewPanel.isSelected()) {
                         launchPresentation(previewPanel.getPresentationPath());
                     } else {
@@ -98,7 +98,7 @@ public abstract class Dashboard extends Application {
                     open.setOnAction(openEvent -> launchPresentation(previewPanel.getPresentationPath()));
                     cMenu.getItems().add(open);
 
-                    if(this instanceof  TeacherDashboard) {
+                    if (this instanceof TeacherDashboard) {
                         MenuItem edit = new MenuItem("Edit");
                         edit.setOnAction(editEvent -> showPresentationEditor(previewPanel.getPresentationPath()));
                         cMenu.getItems().add(edit);
@@ -264,6 +264,7 @@ public abstract class Dashboard extends Application {
             Button addButton = new Button("Add");
             addButton.getStyleClass().setAll("btn", "btn-success");
             addButton.setOnAction(event1 -> {
+                ediManager.getPresentationManager().uploadPresentation("PathToLol.zip", "lol");//TODO: Tie this to XML zip
                 addToServerStage.close();
             });
             addToServerGridPane.add(addButton, 0, 3);
@@ -347,7 +348,7 @@ public abstract class Dashboard extends Application {
         logger.info("Searching for " + text);
 
         for (PresentationPreviewPanel panel : previewPanels) {
-            if(!panel.getPresentation().getDocumentID().contains(text) &&
+            if (!panel.getPresentation().getDocumentID().contains(text) &&
                     !panel.getPresentation().getTags().contains(text) &&
                     !panel.getPresentation().getAuthor().contains(text) &&
                     !panel.isHidden()) {
@@ -381,11 +382,11 @@ public abstract class Dashboard extends Application {
             slides[i].setPadding(new Insets(5));
 
             ImageView preview;
-            File thumbnailFile = new File(PRESENTATIONS_PATH + "Thumbnails/" + selectedPresID + "_slide" + i + "_thumbnail.png");
+            File thumbnailFile = new File(PRESENTATIONS_PATH + selectedPresID + "/Thumbnails/" + "slide" + i + "_thumbnail.png");
 
-            if(thumbnailFile.exists()) {
+            if (thumbnailFile.exists()) {
                 try {
-                    preview = new ImageView("file:" + PRESENTATIONS_PATH + "Thumbnails/" + selectedPresID + "_slide" + i + "_thumbnail.png");
+                    preview = new ImageView("file:" + PRESENTATIONS_PATH + selectedPresID + "/Thumbnails/" + "slide" + i + "_thumbnail.png");
                 } catch (NullPointerException | IllegalArgumentException e) {
                     logger.debug("Couldn't open thumbnail" + thumbnailFile.toString());
                     preview = new ImageView("file:projectResources/icons/emptyThumbnail.png");
@@ -419,10 +420,10 @@ public abstract class Dashboard extends Application {
 
     //TODO: Will this maintain sorting order?
     private void filterBySubject(String subject) {
-        for(PresentationPreviewPanel panel : previewPanels) {
-            if(!subject.equals(panel.getPresentationSubject()) && !panel.isHidden())
+        for (PresentationPreviewPanel panel : previewPanels) {
+            if (!subject.equals(panel.getPresentationSubject()) && !panel.isHidden())
                 panel.setHidden(true);
-            else if(subject.equals(panel.getPresentationSubject()) && panel.isHidden())
+            else if (subject.equals(panel.getPresentationSubject()) && panel.isHidden())
                 panel.setHidden(false);
         }
     }
@@ -445,8 +446,8 @@ public abstract class Dashboard extends Application {
         });
 
         presentationPreviewsFlowPane.getChildren().clear();
-        for(PresentationPreviewPanel panel : previewPanels) {
-            if(!panel.isHidden())
+        for (PresentationPreviewPanel panel : previewPanels) {
+            if (!panel.isHidden())
                 presentationPreviewsFlowPane.getChildren().add(panel);
         }
     }

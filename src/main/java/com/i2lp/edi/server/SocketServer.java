@@ -8,6 +8,7 @@ import com.corundumstudio.socketio.listener.ConnectListener;
 import com.corundumstudio.socketio.listener.DataListener;
 import com.corundumstudio.socketio.listener.DisconnectListener;
 import com.i2lp.edi.client.Constants;
+import com.i2lp.edi.client.managers.ThumbnailGenerationController;
 import com.i2lp.edi.client.utilities.Utils;
 import com.i2lp.edi.server.packets.User;
 import com.i2lp.edi.server.packets.UserAuth;
@@ -156,11 +157,25 @@ public class SocketServer {
             }
         });
 
+        server.addEventListener("NewUpload", String.class, new DataListener<String>() {
+            @Override
+            public void onData(final SocketIOClient client, String data, final AckRequest ackRequest) {
+                generateZip(data);
+
+                //Insert some shit into the db
+            }
+        });
+
 
         server.start();
     }
 
-    private void generateZips(){
+    private void generateZip(String data){
+        //Start up thumbnail manager after parsing presentation xml
+        ThumbnailGenerationController thumbnailGenerationController = new ThumbnailGenerationController();
+        thumbnailGenerationController.openPresentation("Uploads/" + data);
+
+
 
     }
 

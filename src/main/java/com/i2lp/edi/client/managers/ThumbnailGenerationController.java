@@ -62,7 +62,7 @@ public class ThumbnailGenerationController extends PresentationController {
         Presentation presentation = slideGenManager.presentationElement;
 
         //Check if thumbnail already there
-        File thumbnailFile = new File(PRESENTATIONS_PATH + "Thumbnails/" + presentation.getDocumentID() + "_slide" + (slideGenManager.currentSlideNumber) + "_thumbnail.png");
+        File thumbnailFile = new File(PRESENTATIONS_PATH + slideGenManager.presentationElement.getDocumentID() + "/Thumbnails/" + "slide" + (slideGenManager.currentSlideNumber) + "_thumbnail.png");
         if (!thumbnailFile.exists()) {
             thumbnailFile.getParentFile().mkdirs(); //Create directory structure if not present yet
         } else {

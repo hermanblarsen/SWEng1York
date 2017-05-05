@@ -14,13 +14,16 @@ public class Constants {
     public static final boolean localServer = false; //Set if making changes to server logic and wish to test locally
 
     //Build number and string for use in About dialogues.
-    private static final String BUILD_NUMBER = "32";
+    private static final String BUILD_NUMBER = "33";
     public static final String BUILD_STRING = "Version: v0." + Constants.BUILD_NUMBER;
 
     public static final String BASE_PATH = System.getProperty("java.io.tmpdir") + "Edi/";
     public static final String TEMP_PATH = BASE_PATH + "/Temp/";
     public static final String PRESENTATIONS_PATH = BASE_PATH + "/Presentations/";
 
+    //FTP details for presentation upload
+    public static final String FTP_USER = "bscftp";
+    public static final String FTP_PASS = "Combline90+";
 
     /* XML Input validation */
     //Valid Fonts taken from https://www.w3schools.com/cssref/css_websafe_fonts.asp
