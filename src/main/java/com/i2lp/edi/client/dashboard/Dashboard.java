@@ -9,9 +9,7 @@ import com.i2lp.edi.client.presentationElements.Presentation;
 import com.i2lp.edi.client.presentationViewer.StudentPresentationController;
 import com.i2lp.edi.client.presentationViewer.TeacherPresentationController;
 import javafx.application.Application;
-import javafx.geometry.Insets;
-import javafx.geometry.Orientation;
-import javafx.geometry.Pos;
+import javafx.geometry.*;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -233,11 +231,53 @@ public abstract class Dashboard extends Application {
             } else logger.info("No presentation was selected");
         });
 
+        Button addToServerButton = new Button("Add presentation to server");
+        addToServerButton.getStyleClass().setAll("btn", "btn-success");
+        addToServerButton.setOnAction(event -> {
+            Stage addToServerStage = new Stage();
+            GridPane addToServerGridPane = new GridPane();
+            addToServerGridPane.setAlignment(Pos.CENTER);
+
+            addToServerGridPane.setHgap(10);
+            addToServerGridPane.setVgap(10);
+            addToServerGridPane.setPadding(new Insets(25, 25, 25, 25));
+            Scene addToServerScene = new Scene(addToServerGridPane, 300, 300);
+            addToServerScene.getStylesheets().add("bootstrapfx.css");
+
+            Button selectXML = new Button("Select XML");
+            selectXML.getStyleClass().setAll("btn", "btn-primary");
+            selectXML.setOnAction(event1 -> {
+                File file = fileChooser.showOpenDialog(dashboardStage);
+            });
+            addToServerGridPane.add(selectXML, 0, 0);
+            GridPane.setConstraints(selectXML, 0, 0, 1, 1, HPos.CENTER, VPos.CENTER);
+
+            Label saveInModule = new Label("Save in module:");
+            addToServerGridPane.add(saveInModule, 0, 1);
+            GridPane.setConstraints(saveInModule, 0, 1, 1, 1, HPos.CENTER, VPos.CENTER);
+
+            ComboBox<String> modulesCombo = new ComboBox<>();
+            modulesCombo.getItems().addAll("Module 1", "Module 2", "Module 3");
+            addToServerGridPane.add(modulesCombo, 0, 2);
+            GridPane.setConstraints(modulesCombo, 0, 2, 1, 1, HPos.CENTER, VPos.CENTER);
+
+            Button addButton = new Button("Add");
+            addButton.getStyleClass().setAll("btn", "btn-success");
+            addButton.setOnAction(event1 -> {
+                addToServerStage.close();
+            });
+            addToServerGridPane.add(addButton, 0, 3);
+            GridPane.setConstraints(addButton, 0, 3, 1, 1, HPos.CENTER, VPos.CENTER);
+
+            addToServerStage.setScene(addToServerScene);
+            addToServerStage.show();
+        });
+
         Text platformTitle = new Text("     Integrated Interactive Learning Platform");
         platformTitle.getStyleClass().setAll("h3");
         platformTitle.setFill(Color.WHITESMOKE);
 
-        topPanel.getChildren().addAll(createPresButton, loadPresButton, platformTitle);
+        topPanel.getChildren().addAll(createPresButton, loadPresButton, addToServerButton, platformTitle);
 
         return topPanel;
     }

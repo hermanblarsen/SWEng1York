@@ -67,7 +67,7 @@ public class ThumbnailGenerationController extends PresentationController {
             thumbnailFile.getParentFile().mkdirs(); //Create directory structure if not present yet
         } else {
             logger.debug("Thumbnail at " + thumbnailFile.getAbsolutePath() + " already exists");
-            slideGenManager.close();
+            slideGenManager.close(); //TODO: This causes thumbGen to close even if all thumbs are missing apart from the first one
             return;
         }
 
