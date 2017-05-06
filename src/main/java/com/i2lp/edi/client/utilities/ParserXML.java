@@ -373,13 +373,13 @@ public class ParserXML {
                         textElement.setFontSize(checkValidFontSize(Integer.valueOf(elementContent), myPresentation.getTheme()));
                         break;
                     case "fontcolour":
-                        textElement.setFontColour(checkValidColour(elementContent, myPresentation.getTheme()));
+                        textElement.setFontColour(hexToRGBA(checkValidColour(elementContent, myPresentation.getTheme())));
                         break;
                     case "bgcolour":
-                        textElement.setBgColour(checkValidColour(elementContent, myPresentation.getTheme()));
+                        textElement.setBgColour(hexToRGBA(checkValidColour(elementContent, myPresentation.getTheme())));
                         break;
                     case "bordercolour":
-                        textElement.setBorderColour(checkValidColour(elementContent, myPresentation.getTheme()));
+                        textElement.setBorderColour(hexToRGBA(checkValidColour(elementContent, myPresentation.getTheme())));
                         break;
                     case "onclickaction":
                         textElement.setOnClickAction(checkValidOnClickAction(elementContent));

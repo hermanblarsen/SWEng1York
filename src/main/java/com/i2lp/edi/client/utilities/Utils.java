@@ -206,6 +206,20 @@ public class Utils {
         return toFind.substring(0, toFind.lastIndexOf("/"));
     }
 
+    public static String hexToRGBA(String hex){
+        String rHex = hex.substring(1, 3);
+        String gHex = hex.substring(3, 5);
+        String bHex = hex.substring(5, 7);
+        String aHex = hex.substring(7, 9);
+
+        int r = Integer.parseInt(rHex, 16);
+        int g = Integer.parseInt(gHex, 16);
+        int b = Integer.parseInt(bHex, 16);
+        double a = Integer.parseInt(aHex, 16)/255;
+
+        return "rgba("+r+", "+g+", "+b+", "+a+")";
+    }
+
     public static String removeFileExtension(String toRemove){
         return toRemove.substring(0, toRemove.lastIndexOf("."));
     }

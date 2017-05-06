@@ -71,7 +71,7 @@ public abstract class SlideElement {
                         logger.info("Entry animation playing");
                     } else {
                         // If there's no animation to show the element then just make it visible
-                        getCoreNode().setVisible(true);
+                        getCoreNode().setVisible(isVisibility());
                     }
                     break;
                 case Animation.EXIT_ANIMATION: //Exit Animation (playback)
@@ -79,7 +79,7 @@ public abstract class SlideElement {
                         endAnimation.play();
                         logger.info("Exit animation playing");
                     } else {
-                        getCoreNode().setVisible(false);
+                        getCoreNode().setVisible(isVisibility());
                     }
                     break;
             }
