@@ -79,7 +79,7 @@ public abstract class SlideElement {
                         endAnimation.play();
                         logger.info("Exit animation playing");
                     } else {
-                        getCoreNode().setVisible(isVisibility());
+                        getCoreNode().setVisible(false);
                     }
                     break;
             }

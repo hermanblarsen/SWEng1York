@@ -20,6 +20,12 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.attribute.FileOwnerAttributeView;
+import java.nio.file.attribute.UserPrincipal;
+import java.nio.file.attribute.UserPrincipalLookupService;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
@@ -165,16 +171,37 @@ public class SocketServer {
                 String presentationName = data.substring(0, data.lastIndexOf(" "));
                 int moduleID = Integer.parseInt(data.substring(data.lastIndexOf(" ")+1, data.length()));
 
+                File fromClient = new File("/home/bscftp/Uploads/" + presentationName + ".zip");
+                File commitToLibrary = new File("/var/www/html/Edi/" + presentationName + ".zip");
+
                 logger.info("New presentation detected for processing: " + presentationName + " ModuleID: " + moduleID);
+
+                if(commitToLibrary.exists()){
+                    logger.info("Presentation already exists. Deleting current Zip and placing new file in library.");
+                    commitToLibrary.delete();
+                    //TODO: Drop presentation from SQL db?
+                }
 
                 //Move Zip directly to /var/www/html/Edi/
                 try {
-                    FileUtils.moveFile(new File("/home/bscftp/Uploads/" + presentationName + ".zip"), new File("/var/www/html/Edi/" + presentationName + ".zip"));
-                    //Run SQL statement
-                    //Insert some shit into the db
+                    FileUtils.moveFile(fromClient, commitToLibrary);
+                    commitToLibrary.setExecutable(true);
+                    commitToLibrary.setReadable(true);
+                    commitToLibrary.setWritable(true);
+
+                    Path path = commitToLibrary.toPath();
+                    FileOwnerAttributeView view = Files.getFileAttributeView(path, FileOwnerAttributeView.class);
+                    UserPrincipalLookupService lookupService = FileSystems.getDefault().getUserPrincipalLookupService();
+                    UserPrincipal userPrincipal = lookupService.lookupPrincipalByName("www-data");
+                    Files.setOwner(path, userPrincipal);
                 } catch (IOException e) {
                     logger.error("Unable to move Uploaded presentation " + data + " + to host directory.", e);
                 }
+
+
+
+                //Run SQL statement
+                //Insert some shit into the db
             }
         });
         server.start();
