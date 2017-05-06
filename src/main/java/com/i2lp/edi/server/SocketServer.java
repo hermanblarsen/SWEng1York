@@ -169,7 +169,7 @@ public class SocketServer {
 
                 //Move Zip directly to /var/www/html/Edi/
                 try {
-                    FileUtils.moveFile(new File("../Uploads/" + presentationName + ".zip"), new File("/var/www/html/Edi/" + presentationName + ".zip"));
+                    FileUtils.moveFile(new File("/home/bscftp/Uploads/" + presentationName + ".zip"), new File("/var/www/html/Edi/" + presentationName + ".zip"));
                     //Run SQL statement
                     //Insert some shit into the db
                 } catch (IOException e) {
