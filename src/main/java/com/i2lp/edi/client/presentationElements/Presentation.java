@@ -2,11 +2,19 @@ package com.i2lp.edi.client.presentationElements;
 
 
 import com.i2lp.edi.client.utilities.Theme;
+import javafx.geometry.Rectangle2D;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import javafx.util.Duration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.i2lp.edi.client.Constants.PRESENTATIONS_PATH;
+import static com.i2lp.edi.client.Constants.THUMBNAIL_WIDTH;
 
 /**
  * Created by habl on 23/02/2017.
@@ -14,6 +22,7 @@ import java.util.List;
 @SuppressWarnings({"WeakerAccess", "unused"})
 public class Presentation extends Pane {
 
+    protected static Logger logger = LoggerFactory.getLogger(Presentation.class);
     private String title;
     private String documentID;
     private String author;
@@ -418,5 +427,30 @@ public class Presentation extends Pane {
 
     public void setAutoplayPresetation(boolean autoplayPresetation) {
         isAutoplayPresetation = autoplayPresetation;
+    }
+
+    public ImageView getSlidePreview(int slideNumber, double thumbnailWidth) {
+        ImageView preview;
+        File thumbnailFile = new File(PRESENTATIONS_PATH + getDocumentID() + "/Thumbnails/" + "slide" + slideNumber + "_thumbnail.png");
+
+        if (thumbnailFile.exists()) {
+            try {
+                preview = new ImageView("file:" + PRESENTATIONS_PATH + getDocumentID() + "/Thumbnails/" + "slide" + slideNumber + "_thumbnail.png");
+                Rectangle2D viewport = new Rectangle2D(0, 0, THUMBNAIL_WIDTH, THUMBNAIL_WIDTH/getDocumentAspectRatio());
+                preview.setViewport(viewport); //TODO: Move creating ImageView for thumbnails to a separate method and use it in PreviewPanel
+            } catch (NullPointerException | IllegalArgumentException e) {
+                logger.debug("Couldn't open thumbnail" + thumbnailFile.toString());
+                preview = new ImageView("file:projectResources/icons/emptyThumbnail.png");
+            }
+        } else {
+            preview = new ImageView("file:projectResources/icons/emptyThumbnail.png");
+        }
+
+        preview.setFitWidth(thumbnailWidth);
+        preview.setPreserveRatio(true);
+        preview.setSmooth(true);
+        preview.setCache(true);
+
+        return preview;
     }
 }

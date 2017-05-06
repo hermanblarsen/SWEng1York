@@ -9,6 +9,7 @@ import com.i2lp.edi.client.presentationElements.Presentation;
 import com.i2lp.edi.client.presentationViewer.StudentPresentationController;
 import com.i2lp.edi.client.presentationViewer.TeacherPresentationController;
 import javafx.application.Application;
+import javafx.beans.binding.Bindings;
 import javafx.geometry.*;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -35,6 +36,7 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 
 import static com.i2lp.edi.client.Constants.PRESENTATIONS_PATH;
+import static com.i2lp.edi.client.Constants.THUMBNAIL_WIDTH;
 import static javafx.scene.layout.BorderPane.setAlignment;
 
 
@@ -45,12 +47,11 @@ import static javafx.scene.layout.BorderPane.setAlignment;
 public abstract class Dashboard extends Application {
     protected Scene scene;
     protected BorderPane border;
-    protected Presentation myPresentationElement;
     protected static Logger logger = LoggerFactory.getLogger(Dashboard.class);
     private EdiManager ediManager;
     protected PresentationController presentationController;
     protected Stage dashboardStage;
-    protected String selectedPresID;
+    protected Presentation selectedPres;
     private ArrayList<PresentationPreviewPanel> previewPanels;
     private FlowPane presentationPreviewsFlowPane;
 
@@ -84,11 +85,11 @@ public abstract class Dashboard extends Application {
                     if (previewPanel.isSelected()) {
                         launchPresentation(previewPanel.getPresentationPath());
                     } else {
-                        for (int j = 0; j < numOfPresentations; j++)
+                        for (int j = 0; j < previewPanels.size(); j++)
                             previewPanels.get(j).setSelected(false);
 
                         previewPanel.setSelected(true);
-                        selectedPresID = previewPanel.getPresentation().getDocumentID();
+                        selectedPres = previewPanel.getPresentation();
                         border.setRight(addBorderRight());
                     }
                 } else if (event.getButton() == MouseButton.SECONDARY) {
@@ -106,6 +107,10 @@ public abstract class Dashboard extends Application {
                         MenuItem schedule = new MenuItem("Schedule");
                         schedule.setOnAction(scheduleEvent -> showScheduler(event.getScreenX(), event.getScreenY()));
                         cMenu.getItems().add(schedule);
+
+                        MenuItem delete = new MenuItem("Delete");
+                        delete.setOnAction(deleteEvent -> deletePresentation(previewPanel));
+                        cMenu.getItems().add(delete);
                     }
                     cMenu.show(dashboardStage, event.getScreenX(), event.getScreenY());
                 }
@@ -114,13 +119,21 @@ public abstract class Dashboard extends Application {
             previewPanels.add(previewPanel);
         }
 
-        border.setRight(addBorderRight());
         border.setLeft(addBorderLeft());
 
         dashboardStage.show();
     }
 
+    private void deletePresentation(PresentationPreviewPanel previewPanel) {
+        previewPanels.remove(previewPanel);
+        presentationPreviewsFlowPane.getChildren().remove(previewPanel);
+
+        //TODO: delete presentation from server
+    }
+
     private ScrollPane addBorderCenter() {
+        ScrollPane scrollPane = new ScrollPane();
+
         presentationPreviewsFlowPane = new FlowPane(Orientation.HORIZONTAL);
         presentationPreviewsFlowPane.setPadding(new Insets(5, 0, 5, 0));
         presentationPreviewsFlowPane.setVgap(4);
@@ -129,12 +142,11 @@ public abstract class Dashboard extends Application {
 
         showAllPreviewPanels();
 
-        ScrollPane centerPane = new ScrollPane();
-        centerPane.setContent(presentationPreviewsFlowPane);
-        centerPane.setHbarPolicy(ScrollBarPolicy.NEVER);
-        centerPane.setFitToWidth(true);
+        scrollPane.setContent(presentationPreviewsFlowPane);
+        scrollPane.setHbarPolicy(ScrollBarPolicy.NEVER);
+        scrollPane.setFitToWidth(true);
 
-        return centerPane;
+        return scrollPane;
     }
 
     private BorderPane addBorderTop() {
@@ -170,7 +182,7 @@ public abstract class Dashboard extends Application {
         aboutStackPane.getChildren().add(backgroundRegion);
         BorderPane aboutBorder = new BorderPane();
         aboutStackPane.getChildren().add(aboutBorder);
-        ImageView ediLogoImageView = new ImageView(new Image("file:projectResources/logos/ediLogo64x64.png"));
+        ImageView ediLogoImageView = new ImageView(new Image("file:projectResources/logos/ediLogo400x400.png"));
         ediLogoImageView.setPreserveRatio(true);
         ediLogoImageView.setSmooth(true);
         ediLogoImageView.setFitWidth(300);
@@ -362,8 +374,6 @@ public abstract class Dashboard extends Application {
     }
 
     private ScrollPane addBorderRight() {
-        ScrollPane scroll = new ScrollPane();
-
         FlowPane flow = new FlowPane();
         flow.setPadding(new Insets(5, 0, 5, 0));
         flow.setVgap(4);
@@ -381,31 +391,14 @@ public abstract class Dashboard extends Application {
             slides[i].setAlignment(Pos.CENTER);
             slides[i].setPadding(new Insets(5));
 
-            ImageView preview;
-            File thumbnailFile = new File(PRESENTATIONS_PATH + selectedPresID + "/Thumbnails/" + "slide" + i + "_thumbnail.png");
-
-            if (thumbnailFile.exists()) {
-                try {
-                    preview = new ImageView("file:" + PRESENTATIONS_PATH + selectedPresID + "/Thumbnails/" + "slide" + i + "_thumbnail.png");
-                } catch (NullPointerException | IllegalArgumentException e) {
-                    logger.debug("Couldn't open thumbnail" + thumbnailFile.toString());
-                    preview = new ImageView("file:projectResources/icons/emptyThumbnail.png");
-                }
-            } else {
-                preview = new ImageView("file:projectResources/icons/emptyThumbnail.png");
-            }
-
-            preview.setFitWidth(170);
-            preview.setPreserveRatio(true);
-            preview.setSmooth(true);
-            preview.setCache(true);
-
-            slides[i].getChildren().add(preview);
+            slides[i].getChildren().add(selectedPres.getSlidePreview(i, 170)); //TODO: Add constant for width
             slides[i].getChildren().add(new Label(Integer.toString(i)));
             flow.getChildren().add(slides[i]);
             FlowPane.setMargin(slides[i], new Insets(0, 20, 0, 5));
         }
 
+        ScrollPane scroll = new ScrollPane();
+        scroll.setHbarPolicy(ScrollBarPolicy.NEVER);
         scroll.setContent(flow);
 
         return scroll;

@@ -43,25 +43,7 @@ public class PresentationPreviewPanel extends Panel {
 
         this.setText("ID: " + getPresentation().getDocumentID());
 
-        ImageView preview;
-        File thumbnailFile = new File(PRESENTATIONS_PATH + getPresentation().getDocumentID() + "/Thumbnails/" + "slide0_thumbnail.png");
-
-        if(thumbnailFile.exists()) {
-            try {
-                preview = new ImageView("file:"+ PRESENTATIONS_PATH + getPresentation().getDocumentID() + "/Thumbnails/" + "slide0_thumbnail.png");
-            } catch (NullPointerException | IllegalArgumentException e) {
-                logger.debug("Couldn't open thumbnail" + thumbnailFile.toString());
-                preview = new ImageView("file:projectResources/icons/emptyThumbnail.png");
-            }
-        } else {
-            preview = new ImageView("file:projectResources/icons/emptyThumbnail.png");
-        }
-
-        preview.setFitWidth(150);
-        preview.setPreserveRatio(true);
-        preview.setSmooth(true);
-        preview.setCache(true);
-        this.setBody(preview);
+        this.setBody(getPresentation().getSlidePreview(0, 170)); //TODO: Make width a constant
         this.setFooter(new Label("Subject: " + presentationSubject));
 
         Tooltip tooltip = new Tooltip("Title: " + getPresentation().getTitle() + "\n" +

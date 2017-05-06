@@ -10,6 +10,7 @@ import javafx.animation.FadeTransition;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.event.EventHandler;
+import javafx.geometry.Dimension2D;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
@@ -715,7 +716,9 @@ public abstract class PresentationController {
                 displayPane.addEventFilter(MouseEvent.MOUSE_CLICKED, disabledCursorFilter);
                 break;
             case DRAW:
-                scene.getRoot().setCursor(new ImageCursor(new Image("file:projectResources/cursors/drawCursor.png"),0, Double.MAX_VALUE));
+                Dimension2D cursorDimension = ImageCursor.getBestSize(32, 32); //TODO use constants for size
+                ImageCursor cursor = new ImageCursor(new Image("file:projectResources/cursors/drawCursor.png", cursorDimension.getWidth(), cursorDimension.getHeight(), true, true), 0, Double.MAX_VALUE);
+                scene.getRoot().setCursor(cursor);
                 break;
             default:
                 //This should never be reached

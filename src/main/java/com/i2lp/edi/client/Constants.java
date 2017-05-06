@@ -25,6 +25,9 @@ public class Constants {
     public static final String FTP_USER = "bscftp";
     public static final String FTP_PASS = "Combline90+";
 
+    //Slide thumbnail size
+    public static final double THUMBNAIL_WIDTH = 320;
+
     /* XML Input validation */
     //Valid Fonts taken from https://www.w3schools.com/cssref/css_websafe_fonts.asp
     public static final String[] VALID_FONTS= {
