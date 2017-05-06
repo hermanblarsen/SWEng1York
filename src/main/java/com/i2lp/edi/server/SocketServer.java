@@ -163,7 +163,7 @@ public class SocketServer {
             @Override
             public void onData(final SocketIOClient client, String data, final AckRequest ackRequest) {
                 String presentationName = data.substring(0, data.lastIndexOf(" "));
-                int moduleID = Integer.parseInt(data.substring(data.lastIndexOf(" "), data.length()));
+                int moduleID = Integer.parseInt(data.substring(data.lastIndexOf(" ")+1, data.length()));
 
                 logger.info("New presentation detected for processing: " + presentationName + " ModuleID: " + moduleID);
 
