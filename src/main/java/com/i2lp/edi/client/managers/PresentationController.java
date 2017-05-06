@@ -127,11 +127,10 @@ public abstract class PresentationController {
                 } else {
                     toBeAssigned.setTeacher(false);
                 }
-                if(!(toBeAssigned instanceof AudioElement)) {
-                    toBeAssigned.setSlideCanvas(toAssign); //Has to be called after setTeacher()
-                    toBeAssigned.setSlideWidth(slideWidth);
-                    toBeAssigned.setSlideHeight(slideHeight);
-                }
+                //setupElement is called from within setSlideCanvas.  setupElement needs to be done for all elements.
+                toBeAssigned.setSlideCanvas(toAssign); //Has to be called after setTeacher()
+                toBeAssigned.setSlideWidth(slideWidth);
+                toBeAssigned.setSlideHeight(slideHeight);
             }
         }
     }
