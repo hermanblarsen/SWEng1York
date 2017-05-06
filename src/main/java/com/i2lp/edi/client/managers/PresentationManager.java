@@ -6,6 +6,7 @@ import com.i2lp.edi.server.packets.PresentationMetadata;
 import javafx.concurrent.Task;
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
+import org.apache.maven.shared.utils.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,14 +14,11 @@ import java.io.*;
 import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
 import static com.i2lp.edi.client.Constants.*;
 import static com.i2lp.edi.client.utilities.Utils.getFilesInFolder;
-import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
 
 /**
@@ -147,9 +145,9 @@ public class PresentationManager {
         //Generate thumbnails for Slides.
         ThumbnailGenerationController.generateSlideThumbnails(fileToUpload);
         try {
-            Files.copy(Paths.get(fileToUpload), Paths.get(PRESENTATIONS_PATH + filename + File.separator + filename + ".xml"), REPLACE_EXISTING);
+            FileUtils.copyFile(new File(fileToUpload), new File(PRESENTATIONS_PATH + filename + File.separator + filename + ".xml"));
         } catch (IOException e) {
-            logger.error("Unable to copy XML file into local presentation library.");
+            logger.error("Unable to copy XML file into local presentation library.", e);
         }
         final String zipPath = TEMP_PATH + filename + ".zip";
 

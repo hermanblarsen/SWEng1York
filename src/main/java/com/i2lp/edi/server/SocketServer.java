@@ -14,12 +14,12 @@ import com.i2lp.edi.server.packets.UserAuth;
 import com.impossibl.postgres.api.jdbc.PGConnection;
 import com.impossibl.postgres.api.jdbc.PGNotificationListener;
 import com.impossibl.postgres.jdbc.PGDataSource;
+import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
@@ -169,8 +169,7 @@ public class SocketServer {
 
                 //Move Zip directly to /var/www/html/Edi/
                 try {
-                    Files.move(Paths.get("../Uploads/" + presentationName + ".zip"), Paths.get("/var/www/html/Edi/" + presentationName + ".zip"));
-
+                    FileUtils.moveFile(new File("../Uploads/" + presentationName + ".zip"), new File("/var/www/html/Edi/" + presentationName + ".zip"));
                     //Run SQL statement
                     //Insert some shit into the db
                 } catch (IOException e) {
