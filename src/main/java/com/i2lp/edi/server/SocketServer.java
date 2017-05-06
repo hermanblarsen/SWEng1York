@@ -8,7 +8,6 @@ import com.corundumstudio.socketio.listener.ConnectListener;
 import com.corundumstudio.socketio.listener.DataListener;
 import com.corundumstudio.socketio.listener.DisconnectListener;
 import com.i2lp.edi.client.Constants;
-import com.i2lp.edi.client.managers.ThumbnailGenerationController;
 import com.i2lp.edi.client.utilities.Utils;
 import com.i2lp.edi.server.packets.User;
 import com.i2lp.edi.server.packets.UserAuth;
@@ -18,6 +17,9 @@ import com.impossibl.postgres.jdbc.PGDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
@@ -160,23 +162,22 @@ public class SocketServer {
         server.addEventListener("NewUpload", String.class, new DataListener<String>() {
             @Override
             public void onData(final SocketIOClient client, String data, final AckRequest ackRequest) {
-                generateZip(data);
+                String presentationName = data.substring(0, data.lastIndexOf(" "));
+                int moduleID = Integer.parseInt(data.substring(data.lastIndexOf(" "), data.length()));
 
-                //Insert some shit into the db
+                logger.info("New presentation detected for processing: " + presentationName + " ModuleID: " + moduleID);
+
+                //Move Zip directly to /var/www/html/Edi/
+                try {
+                    Files.move(Paths.get("../Uploads/" + presentationName + ".zip"), Paths.get("/var/www/html/Edi/" + presentationName + ".zip"));
+                    //Run SQL statement
+                    //Insert some shit into the db
+                } catch (IOException e) {
+                    logger.error("Unable to move Uploaded presentation to host directory: " + data);
+                }
             }
         });
-
-
         server.start();
-    }
-
-    private void generateZip(String data){
-        //Start up thumbnail manager after parsing presentation xml
-        ThumbnailGenerationController thumbnailGenerationController = new ThumbnailGenerationController();
-        thumbnailGenerationController.openPresentation("Uploads/" + data);
-
-
-
     }
 
     /**

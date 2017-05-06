@@ -4,12 +4,10 @@ import com.i2lp.edi.client.Constants;
 import com.i2lp.edi.client.editor.PresentationEditor;
 import com.i2lp.edi.client.managers.EdiManager;
 import com.i2lp.edi.client.managers.PresentationController;
-import com.i2lp.edi.client.managers.ThumbnailGenerationController;
 import com.i2lp.edi.client.presentationElements.Presentation;
 import com.i2lp.edi.client.presentationViewer.StudentPresentationController;
 import com.i2lp.edi.client.presentationViewer.TeacherPresentationController;
 import javafx.application.Application;
-import javafx.beans.binding.Bindings;
 import javafx.geometry.*;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -34,9 +32,10 @@ import java.io.File;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static com.i2lp.edi.client.Constants.PRESENTATIONS_PATH;
-import static com.i2lp.edi.client.Constants.THUMBNAIL_WIDTH;
+import static com.i2lp.edi.client.utilities.Utils.removeFileExtension;
 import static javafx.scene.layout.BorderPane.setAlignment;
 
 
@@ -47,6 +46,7 @@ import static javafx.scene.layout.BorderPane.setAlignment;
 public abstract class Dashboard extends Application {
     protected Scene scene;
     protected BorderPane border;
+    protected Presentation myPresentationElement;
     protected static Logger logger = LoggerFactory.getLogger(Dashboard.class);
     private EdiManager ediManager;
     protected PresentationController presentationController;
@@ -217,10 +217,6 @@ public abstract class Dashboard extends Application {
         topPanel.setSpacing(10);
         topPanel.setStyle("-fx-background-color: #34495e;");
 
-        Button createPresButton = new Button("TEST: Generate Thumbnails"); //TODO remove
-        createPresButton.getStyleClass().setAll("btn", "btn-success");
-        createPresButton.setOnAction(event -> ThumbnailGenerationController.generateSlideThumbnails("file:projectResources/sampleFiles/sampleXmlSimple.xml"));
-
         final FileChooser fileChooser = new FileChooser();
         FileChooser.ExtensionFilter xmlExtensionFilter =
                 new FileChooser.ExtensionFilter("XML Presentations (*.XML)", "*.xml", "*.XML");
@@ -246,6 +242,8 @@ public abstract class Dashboard extends Application {
         Button addToServerButton = new Button("Add pres to server");
         addToServerButton.getStyleClass().setAll("btn", "btn-success");
         addToServerButton.setOnAction(event -> {
+            AtomicReference<File> xmlLocation = new AtomicReference<>(); //Store location of XML from filechooser, for upload to presentation after Thumbnail and CSS gen
+
             Stage addToServerStage = new Stage();
             GridPane addToServerGridPane = new GridPane();
             addToServerGridPane.setAlignment(Pos.CENTER);
@@ -260,6 +258,7 @@ public abstract class Dashboard extends Application {
             selectXML.getStyleClass().setAll("btn", "btn-primary");
             selectXML.setOnAction(event1 -> {
                 File file = fileChooser.showOpenDialog(dashboardStage);
+                xmlLocation.set(file);
             });
             addToServerGridPane.add(selectXML, 0, 0);
             GridPane.setConstraints(selectXML, 0, 0, 1, 1, HPos.CENTER, VPos.CENTER);
@@ -276,7 +275,7 @@ public abstract class Dashboard extends Application {
             Button addButton = new Button("Add");
             addButton.getStyleClass().setAll("btn", "btn-success");
             addButton.setOnAction(event1 -> {
-                ediManager.getPresentationManager().uploadPresentation("PathToLol.zip", "lol");//TODO: Tie this to XML zip
+                ediManager.getPresentationManager().uploadPresentation(xmlLocation.get().getAbsolutePath(), removeFileExtension(xmlLocation.get().getName()), 1); //TODO: Add proper ModuleID
                 addToServerStage.close();
             });
             addToServerGridPane.add(addButton, 0, 3);
@@ -290,7 +289,7 @@ public abstract class Dashboard extends Application {
         platformTitle.getStyleClass().setAll("h3");
         platformTitle.setFill(Color.WHITESMOKE);
 
-        topPanel.getChildren().addAll(createPresButton, loadPresButton, addToServerButton, platformTitle);
+        topPanel.getChildren().addAll(loadPresButton, addToServerButton, platformTitle);
 
         return topPanel;
     }

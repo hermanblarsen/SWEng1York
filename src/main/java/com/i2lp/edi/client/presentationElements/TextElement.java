@@ -2,7 +2,6 @@ package com.i2lp.edi.client.presentationElements;
 
 import com.i2lp.edi.client.utilities.Utils;
 import javafx.concurrent.Worker;
-import javafx.event.Event;
 import javafx.scene.Node;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
@@ -61,7 +60,7 @@ public class TextElement extends SlideElement {
         webEngine.loadContent(textContent);
 
         //Apply Dynamically created CSS to TextElement
-        cssFilePath = Utils.cssGen(presentationID, slideID, elementID, fontSize, font, fontColour, bgColour, borderColour, borderSize);
+        cssFilePath = Utils.cssGen(presentationController.getXmlPath(), slideID, elementID, fontSize, font, fontColour, bgColour, borderColour, borderSize);
         webEngine.setUserStyleSheetLocation(cssFilePath);
 
         //Stage 3 Setup: DoClassSpecificRender for resizing, register State Handlers, register onClickAction method in superclass

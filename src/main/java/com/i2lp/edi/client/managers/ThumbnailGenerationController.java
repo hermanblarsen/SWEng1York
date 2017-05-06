@@ -20,8 +20,6 @@ import javax.imageio.ImageIO;
 import java.io.File;
 import java.io.IOException;
 
-import static com.i2lp.edi.client.Constants.PRESENTATIONS_PATH;
-
 /**
  * Created by amriksadhra on 12/04/2017.
  */
@@ -37,6 +35,7 @@ public class ThumbnailGenerationController extends PresentationController {
         presentationStage.show();
 
         //Hide the presentation manager
+        //TODO: Put the stage in the bottom right of
         presentationStage.toBack();
         loadPresentation(path);
     }
@@ -53,32 +52,33 @@ public class ThumbnailGenerationController extends PresentationController {
     }
 
     public static void generateSlideThumbnails(String presentationPath) {
-        ThumbnailGenerationController slideGenManager = new ThumbnailGenerationController();
-        slideGenManager.openPresentation(presentationPath);
-        generateSlideThumbNail(slideGenManager);
+        ThumbnailGenerationController slideGenController = new ThumbnailGenerationController();
+        slideGenController.openPresentation(presentationPath);
+        slideGenController.generateSlideThumbNail(slideGenController);
     }
 
-    public static void generateSlideThumbNail(ThumbnailGenerationController slideGenManager) {
-        Presentation presentation = slideGenManager.presentationElement;
+    public void generateSlideThumbNail(ThumbnailGenerationController slideGenController) {
+        Presentation presentation = slideGenController.presentationElement;
 
         //Check if thumbnail already there
-        File thumbnailFile = new File(PRESENTATIONS_PATH + slideGenManager.presentationElement.getDocumentID() + "/Thumbnails/" + "slide" + (slideGenManager.currentSlideNumber) + "_thumbnail.png");
+        File thumbnailFile = new File(this.getXmlPath() + "/Thumbnails/" + "slide" + (slideGenController.currentSlideNumber) + "_thumbnail.png");
         if (!thumbnailFile.exists()) {
             thumbnailFile.getParentFile().mkdirs(); //Create directory structure if not present yet
         } else {
             logger.debug("Thumbnail at " + thumbnailFile.getAbsolutePath() + " already exists");
-            if (slideGenManager.slideAdvance(presentation, Slide.SLIDE_FORWARD) == Presentation.PRESENTATION_FINISH) {
+            slideGenController.close(); //TODO: This causes thumbGen to close even if all thumbs are missing apart from the first one
+            if (slideGenController.slideAdvance(presentation, Slide.SLIDE_FORWARD) == Presentation.PRESENTATION_FINISH) {
                 logger.info("Done generating thumbnails for presentation " + presentation.getDocumentID());
-                slideGenManager.close();
+                slideGenController.close();
             } else {
-                generateSlideThumbNail(slideGenManager);
+                generateSlideThumbNail(slideGenController);
             }
             return;
         }
 
         //Move to end of current slide so all elements are visible in snapshot
         //noinspection StatementWithEmptyBody
-        while (slideGenManager.slideAdvance(presentation, Slide.SLIDE_FORWARD) != Presentation.SLIDE_LAST_ELEMENT);
+        while (slideGenController.slideAdvance(presentation, Slide.SLIDE_FORWARD) != Presentation.SLIDE_LAST_ELEMENT);
         //If we're in last element of slide, take snapshot
 
 
@@ -87,7 +87,7 @@ public class ThumbnailGenerationController extends PresentationController {
             @Override
             protected Object call() throws Exception {
                 //WebViews don't render immediately, so text doesn't show in snapshots.
-                if (presentation.getSlide(slideGenManager.currentSlideNumber).getTextElementList().isEmpty()) {
+                if (presentation.getSlide(slideGenController.currentSlideNumber).getTextElementList().isEmpty()) {
                     //If no TextElements, skip the render delay
                     return null;
                 } else {
@@ -96,12 +96,12 @@ public class ThumbnailGenerationController extends PresentationController {
                     while (true) {
                         renderDone = true;
                         //Iterate through elements, query if rendered
-                        for (TextElement toGetRenderStatus : presentation.getSlide(slideGenManager.currentSlideNumber).getTextElementList()) {
+                        for (TextElement toGetRenderStatus : presentation.getSlide(slideGenController.currentSlideNumber).getTextElementList()) {
                             if (!toGetRenderStatus.isRendered()) renderDone = false;
                         }
                         if (renderDone) break;
                     }
-                    logger.debug("All webviews on TextElements in slide " + (slideGenManager.currentSlideNumber) + " have completed rendering.");
+                    logger.debug("All webviews on TextElements in slide " + (slideGenController.currentSlideNumber) + " have completed rendering.");
                     //TODO: Even though the webview has told us its done rendering, there is some overhead before it is visible on StackPane. Account for this with minor delay. I cant find any state variable that we can check to avoid waiting. Maybe you can Kacper
                     //This value may need to be upped on slower systems to ensure successful screenshot
                     Thread.sleep(50);
@@ -117,17 +117,17 @@ public class ThumbnailGenerationController extends PresentationController {
         //When webviews rendered, can take snapshot
         webviewRenderChecker.setOnSucceeded(event ->
         {
-            logger.info("Generating thumbnail file for " + presentation.getDocumentID() + " Slide " + (slideGenManager.currentSlideNumber) + " at " + thumbnailFile.getAbsolutePath());
-            WritableImage thumbnail = presentation.getSlide(slideGenManager.currentSlideNumber).snapshot(new SnapshotParameters(), null);
+            logger.info("Generating thumbnail file for " + presentation.getDocumentID() + " Slide " + (slideGenController.currentSlideNumber) + " at " + thumbnailFile.getAbsolutePath());
+            WritableImage thumbnail = presentation.getSlide(slideGenController.currentSlideNumber).snapshot(new SnapshotParameters(), null);
             try {
                 //Write the snapshot to the chosen file
                 ImageIO.write(SwingFXUtils.fromFXImage(thumbnail, null), "png", thumbnailFile);
                 //Advance to next slide, and generate next Slide Thumbnail
-                if (slideGenManager.slideAdvance(presentation, Slide.SLIDE_FORWARD) == Presentation.PRESENTATION_FINISH) {
+                if (slideGenController.slideAdvance(presentation, Slide.SLIDE_FORWARD) == Presentation.PRESENTATION_FINISH) {
                     logger.info("Done generating thumbnails for presentation " + presentation.getDocumentID());
-                    slideGenManager.close();
+                    slideGenController.close();
                 } else {
-                    generateSlideThumbNail(slideGenManager);
+                    generateSlideThumbNail(slideGenController);
                 }
             } catch (IOException ex) {
                 logger.error("Generating presentation thumbnail for " + presentation.getDocumentID() + " at " + thumbnailFile.getAbsolutePath() + " failed");

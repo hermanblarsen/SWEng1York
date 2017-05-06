@@ -1,7 +1,9 @@
 package com.i2lp.edi.client.managers;
 
+import com.i2lp.edi.client.utilities.ZipUtils;
 import com.i2lp.edi.server.SocketClient;
 import com.i2lp.edi.server.packets.PresentationMetadata;
+import javafx.concurrent.Task;
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 import org.slf4j.Logger;
@@ -13,10 +15,9 @@ import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 
 import static com.i2lp.edi.client.Constants.*;
+import static com.i2lp.edi.client.utilities.Utils.getFileParentDirectory;
 import static com.i2lp.edi.client.utilities.Utils.getFilesInFolder;
 
 
@@ -115,67 +116,11 @@ public class PresentationManager {
                 logger.error("Unable to download presentation " + toDownload.getDocumentID() + "!");
                 return;
             }
-            unzipPresentation(tempDir.getAbsolutePath() + File.separator + toDownload.getDocumentID() + ".zip", presDir.getAbsolutePath() + File.separator + toDownload.getDocumentID());
+            ZipUtils.unzipPresentation(tempDir.getAbsolutePath() + File.separator + toDownload.getDocumentID() + ".zip", presDir.getAbsolutePath() + File.separator + toDownload.getDocumentID());
         }
     }
 
-    /**
-     * Unzip downloaded zip file to Presentations folder, and then delete the downloaded zip
-     *
-     * @param zipFile      Input zip file to extract
-     * @param outputFolder Output location of files
-     * @author Amrik Sadhra, https://www.mkyong.com/
-     */
-    public void unzipPresentation(String zipFile, String outputFolder) {
-        byte[] buffer = new byte[1024];
-        try {
-            //create output directory is not exists
-            File folder = new File(outputFolder);
-            if (!folder.exists()) {
-                folder.mkdir();
-            }
 
-            //get the zip file content
-            ZipInputStream zis = new ZipInputStream(new FileInputStream(zipFile));
-            //get the zipped file list entry
-            ZipEntry ze = zis.getNextEntry();
-
-            while (ze != null) {
-                String fileName = ze.getName();
-                File newFile = new File(outputFolder + File.separator + fileName);
-
-                if (!newFile.toString().contains(".")) {
-                    newFile.mkdir();
-                    ze = zis.getNextEntry();
-                    continue;
-                }
-
-                logger.info("Unzipping " + newFile.getAbsoluteFile());
-
-                //create all non exists folders
-                //else you will hit FileNotFoundException for compressed folder
-                new File(newFile.getParent()).mkdirs();
-
-                FileOutputStream fos = new FileOutputStream(newFile);
-
-                int len;
-                while ((len = zis.read(buffer)) > 0) {
-                    fos.write(buffer, 0, len);
-                }
-
-                fos.close();
-                ze = zis.getNextEntry();
-            }
-
-            zis.closeEntry();
-            zis.close();
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
-
-        //Cleanup downloaded zip file by deleting
-        new File(zipFile).delete();
-    }
 
     private ArrayList<String> getLocalPresentationListString() {
         //Assume folder names are DocumentID for now, else have to fire up parser to get them
@@ -196,7 +141,29 @@ public class PresentationManager {
         return remotePresentationDocumentIDs;
     }
 
-    public void uploadPresentation(String fileToUpload, String filename) {
+
+    public void uploadPresentation(String fileToUpload, String filename, int moduleID) {
+        //Generate thumbnails for Slides.
+        ThumbnailGenerationController.generateSlideThumbnails(fileToUpload);
+        final String zipPath = getFileParentDirectory(fileToUpload) + File.separator + filename + ".zip";
+
+        //Create zip after thumbnail and CSS generation are done
+        Task zipCreationTask = new Task() {
+            @Override
+            protected Object call() throws Exception {
+                try {
+                    Thread.sleep(1000); //Wait for thumbnails to be generated TODO: replace with checker for numFiles
+                    new ZipUtils(getFileParentDirectory(fileToUpload), zipPath);
+                    return null;
+                } catch (InterruptedException e) {
+                    logger.error("Unable to sleep on Zip generation thread.");
+                }
+                return 1;
+            }
+        };
+        Thread zipThread = new Thread(zipCreationTask);
+        zipThread.start();
+
         Thread uploadThread = new Thread(() -> { //Make upload async to avoid blocking main thread
             FTPClient ftpClient = new FTPClient();
             try {
@@ -206,18 +173,18 @@ public class PresentationManager {
 
                 ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
 
-                // APPROACH #1: uploads first file using an InputStream
-                File localFile = new File(fileToUpload);
+                //Upload file using an InputStream
+                File localFile = new File(zipPath);
 
-                String remoteFile = "Uploads/" + filename + ".zip";
+                String remoteFile = "Uploads/" + filename+ ".zip";
                 InputStream inputStream = new FileInputStream(localFile);
                 logger.info("Start uploading " + filename + " data");
 
                 boolean done = ftpClient.storeFile(remoteFile, inputStream);
                 inputStream.close();
                 if (done) {
-                    logger.info("The presentation has uploaded succesfully. Awaiting server-side processing.");
-                    socketClient.alertServerToUpload(filename);
+                    logger.info("The presentation has uploaded successfully. Awaiting server-side processing.");
+                    socketClient.alertServerToUpload(filename, moduleID);
                 }
             } catch (IOException e) {
                 logger.error("Error uploading presentation data to Edi Server! ", e);
@@ -232,6 +199,6 @@ public class PresentationManager {
                 }
             }
         });
-        uploadThread.start();
+        zipCreationTask.setOnSucceeded(event -> uploadThread.start());
     }
 }

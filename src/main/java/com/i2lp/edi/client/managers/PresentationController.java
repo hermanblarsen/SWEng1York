@@ -41,6 +41,8 @@ import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import static com.i2lp.edi.client.utilities.Utils.getFileParentDirectory;
+
 
 /**
  * Created by kma517 on 16/03/2017.
@@ -52,6 +54,9 @@ public abstract class PresentationController {
     private static final int STAGE_MIN_HEIGHT = 300;
     private static final int HIDE_CURSOR_DELAY = 2000;
     Logger logger = LoggerFactory.getLogger(PresentationController.class);
+
+
+    protected String xmlPath = null;
 
     protected Scene scene;
     protected StackPane displayPane;
@@ -143,7 +148,6 @@ public abstract class PresentationController {
     }
 
     public void openPresentation(String path) {
-
         loadPresentation(path);
 
         presentationStage.setTitle(presentationElement.getTitle());
@@ -290,6 +294,8 @@ public abstract class PresentationController {
 
     public void loadPresentation(String path) {
         logger.info("Attempting to load presentation located at: " + path);
+        this.xmlPath = getFileParentDirectory(path);
+
         ParserXML xmlParser = new ParserXML(path);
         presentationElement = xmlParser.parsePresentation();
 
@@ -804,6 +810,11 @@ public abstract class PresentationController {
         for(SlideElement slideElement : presentationElement.getSlide(currentSlideNumber).getVisibleSlideElementList())
             slideElement.destroyElement();
     }
+
+    public String getXmlPath() {
+        return xmlPath;
+    }
+
 }
 
 enum CursorState {

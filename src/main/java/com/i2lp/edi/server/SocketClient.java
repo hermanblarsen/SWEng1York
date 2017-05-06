@@ -409,7 +409,7 @@ public class SocketClient {
      * Send packet to server Socket to alert it that a new presentation is available for
      * integration into the Edi database.
      */
-    public void alertServerToUpload(String presentationName){
-        socket.emit("NewUpload", presentationName);
+    public void alertServerToUpload(String presentationName, int moduleID){
+        socket.emit("NewUpload", presentationName + " " + moduleID);
     }
 }

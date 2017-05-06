@@ -56,8 +56,8 @@ public class Utils {
      * @return Filename of CSS file that stores the CSS for a given TextElement
      * @author Amrik Sadhra
      */
-    public static String cssGen(String presentationID, int slideID, int elementID, int fontSize, String font, String fontColour, String bgColor, String borderColour, int borderSize) {
-        File cssFilePath = new File(PRESENTATIONS_PATH + presentationID + "/CSS/" + "Slide" + slideID + "Element" + elementID + "format.css");
+    public static String cssGen(String xmlPath, int slideID, int elementID, int fontSize, String font, String fontColour, String bgColor, String borderColour, int borderSize) {
+        File cssFilePath = new File(xmlPath + "/CSS/" + "Slide" + slideID + "Element" + elementID + "format.css");
 
         if (cssFilePath.exists()) {
             return "file:" + cssFilePath.getAbsolutePath();
@@ -199,6 +199,19 @@ public class Utils {
         }
 
         return filesInFolder;
+    }
+
+    /**
+     * Remove file from path, to get parent directory.
+     * @param toFind File to get path of
+     * @return Parent directory
+     */
+    public static String getFileParentDirectory(String toFind){
+        return toFind.substring(0, toFind.lastIndexOf("/"));
+    }
+
+    public static String removeFileExtension(String toRemove){
+        return toRemove.substring(0, toRemove.lastIndexOf("."));
     }
 }
 
