@@ -557,6 +557,7 @@ public abstract class PresentationController {
                         presentationStatus = Presentation.PRESENTATION_FINISH;
                     } else {
                         presentationElement.getSlide(currentSlideNumber).setSlideDrawing(drawPane.getSlideDrawing());
+                        presentationElement.getSlide(currentSlideNumber).destroyAllVisible(); // Destroy any remaining elements
                         currentSlideNumber++;
                         presentationStatus = Presentation.SLIDE_CHANGE;
                         //Update MainUI panes when changing slides to account for new Slide root pane.
@@ -570,6 +571,7 @@ public abstract class PresentationController {
                 logger.info("Reached final slide: " + presentationToAdvance.getMaxSlideNumber());
                 presentationStatus = Presentation.PRESENTATION_FINISH;
             }
+
         } else if (direction == Slide.SLIDE_BACKWARD) {
             //If we're not at start of presentation
             if (currentSlideNumber >= 0) {
@@ -577,6 +579,7 @@ public abstract class PresentationController {
                 //Allow slideElements to play on slide though.
                 if (elementAdvance(presentationToAdvance.getSlide(currentSlideNumber), direction) == direction) {
                     presentationElement.getSlide(currentSlideNumber).setSlideDrawing(drawPane.getSlideDrawing());
+                    presentationElement.getSlide(currentSlideNumber).destroyAllVisible(); //Destroy any remaining elements on the slide
                     currentSlideNumber--;
                     if (currentSlideNumber < 0) {
                         logger.info("Reached Min slide number. Presentation back at start.");
