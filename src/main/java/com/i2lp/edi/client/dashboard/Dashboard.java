@@ -226,10 +226,11 @@ public abstract class Dashboard extends Application {
                 new FileChooser.ExtensionFilter("XML Presentations (*.XML)", "*.xml", "*.XML");
         fileChooser.getExtensionFilters().add(xmlExtensionFilter);
         fileChooser.setSelectedExtensionFilter(xmlExtensionFilter);
-        fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
-        fileChooser.setTitle("Load Presentation");
+        fileChooser.setInitialDirectory(new File("projectResources/sampleFiles/xml"));
+//        fileChooser.setInitialDirectory(new File(System.getProperty("user.home"))); //TODO reinstate when tested
+        fileChooser.setTitle("Add Presentation");
 
-        Button loadPresButton = new Button("Load Presentation");
+        Button loadPresButton = new Button("Add Presentation");
         loadPresButton.getStyleClass().setAll("btn", "btn-default");
         loadPresButton.setOnAction(event -> {
             Node source = (Node) event.getSource();
@@ -239,11 +240,10 @@ public abstract class Dashboard extends Application {
             File file = fileChooser.showOpenDialog(stage);
             if (file != null) {
                 launchPresentation(file.getPath());
-                //TODO add to library somehow?
             } else logger.info("No presentation was selected");
         });
 
-        Button addToServerButton = new Button("Add presentation to server");
+        Button addToServerButton = new Button("Add pres to server");
         addToServerButton.getStyleClass().setAll("btn", "btn-success");
         addToServerButton.setOnAction(event -> {
             Stage addToServerStage = new Stage();

@@ -11,14 +11,14 @@
 	<slideshow>
 		<defaults>
 			<bgcolour>#ecf0f1FF</bgcolour>
-			<font>Times New Roman, Times, serif</font>
+			<font>"Times New Roman", Times, serif</font>
 			<fontsize>12</fontsize>
-			<fontcolour>#FFFFFFFF</fontcolour>
+			<fontcolour>#000000FF</fontcolour>
 			<graphicscolour>#2ecc71FF</graphicscolour>
 			<autoplaymedia>true</autoplaymedia>
 		</defaults>
 		<slide slideid="1">
-			<text elementid ="1" layer="1" visibility="true" startsequence="1" endsequence="4" duration="0">
+			<text elementid ="0" layer="1" visibility="true" startsequence="1" endsequence="4" duration="0">
 				<textcontent>
 					<p>Example HTML text input number 1. This is supposed to be a list: <ul><li><i>italic</i></li><li><b>bold</b></li></ul>. Furthermore, these characters are illegal in XML: &lt; &gt; &amp; &apos; &quot;, input by and &amp; followed by lt, gt, amp, apos or quot respectively, finally followed by a ';'.</p>
 				</textcontent>
@@ -30,10 +30,11 @@
 				<fontsize>12</fontsize>
 				<fontcolour>#2196F3FF</fontcolour>
 				<bgcolour>#000000FF</bgcolour>
-				<bordercolour>#673AB7</bordercolour>
+				<bordercolour>#673AB77F</bordercolour>
+                <bordersize>2</bordersize>
 				<aspectratiolock>true</aspectratiolock>
 			</text>
-			<text elementid ="2" layer="2" visibility="true" startsequence="2" endsequence="5">
+			<text elementid ="1" layer="2" visibility="false" startsequence="2" endsequence="5">
 				<textcontent>
 					<p>Example HTML Number 2! Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
 				</textcontent>
@@ -42,12 +43,13 @@
 				<xsize>0.8</xsize>
 				<ysize>0.5</ysize>
 				<fontsize>12</fontsize>
-				<fontcolour>#FFFFFFFF</fontcolour>
+				<fontcolour>#000000FF</fontcolour>
 				<bgcolour>#4CAF5055</bgcolour>
-				<bordercolour>#FFFFFFFF</bordercolour>
+				<bordercolour>#123456FF</bordercolour>
+                <bordersize>2</bordersize>
 				<aspectratiolock>true</aspectratiolock>
 			</text>
-			<text elementid ="3" layer="2" visibility="true" startsequence="3" endsequence="5">
+			<text elementid ="2" layer="2" visibility="true" startsequence="3" endsequence="5">
 				<textcontent>
 					<p>Some text on top of the other two. Bigger is better!
 						Click me to go to Google!</p>
@@ -56,31 +58,33 @@
 				<yposition>0.4</yposition>
 				<xsize>0.2</xsize>
 				<ysize>0.2</ysize>
-				<font>Comic Sans MS", cursive, sans-serif</font>
+				<font>"Comic Sans MS", cursive, sans-serif</font>
 				<fontsize>16</fontsize>
-				<fontcolour>#FFFFFFFF</fontcolour>
-				<bgcolour>#FFFFFF77</bgcolour>
+				<fontcolour>#654321FF</fontcolour>
+				<bgcolour>#789ABC77</bgcolour>
 				<bordercolour>#c0392bFF</bordercolour>
+                <bordersize>2</bordersize>
 				<onclickaction>openwebsite</onclickaction>
 				<onclickinfo>https://www.google.com</onclickinfo>
 				<aspectratiolock>true</aspectratiolock>
 			</text>
 		</slide>
 		<slide slideid="2">
-			<graphic elementid ="1" layer="1" visibility="false" startsequence="1">
-				<onclickaction>dynamicmediatoggle</onclickaction>
-				<onclickinfo>3</onclickinfo>
-				<aspectratiolock>true</aspectratiolock>
-				<elementaspectratio>1.0</elementaspectratio>
-				<linecolour>#FF0000FF</linecolour>
-				<fillcolour>#00FF0066</fillcolour>
-				<polygon>
-					<xpositions>0.1, 0.2, 0.15</xpositions>
-					<ypositions>0.1, 0.2, 0.15</ypositions>
-					<isclosed>true</isclosed>
-				</polygon>
-			</graphic>
-			<graphic elementid ="2" layer="2" visibility="true" startsequence="2">
+            <graphic elementid ="0" layer="2" visibility="true" startsequence="2">
+                <onclickaction>dynamicmediatoggle</onclickaction>
+                <onclickinfo>3</onclickinfo>
+                <aspectratiolock>true</aspectratiolock>
+                <elementaspectratio>1.0</elementaspectratio>
+                <linecolour>#aaffaaFF</linecolour>
+                <fillcolour>#FF00008F</fillcolour>
+                <polygon>
+                    <xpositions>0, 0.1, 0.3, 0.1, 0.2, 0</xpositions>
+                    <ypositions>0, 0.2, 0.2, 0.4, 0.7, 0.5</ypositions>
+                    <isclosed>true</isclosed>
+                </polygon>
+            </graphic>
+
+			<graphic elementid ="1" layer="2" visibility="true" startsequence="2">
 				<onclickaction>gotoslide</onclickaction>
 				<onclickinfo>1</onclickinfo>
 				<aspectratiolock>false</aspectratiolock>
@@ -95,16 +99,18 @@
 					<rotation>45</rotation>
 				</oval>
 			</graphic>
-			<audio elementid ="3" startsequence="2">
-				<path>/projectResources/NorwegianPimsleur.mp3</path>
+
+			<audio elementid ="2" startsequence="2">
+				<path>projectResources/sampleFiles/NeverGonnaGiveYouUp.mp3</path>
 				<loop>true</loop>
-				<autoplay>false</autoplay>
+				<autoplay>true</autoplay>
 				<starttime>0</starttime>
 				<endtime>15</endtime>
 			</audio>
+
 		</slide>
 		<slide slideid="3">
-			<image elementid ="1" layer="1" visibility="true" startsequence="1" >
+			<image elementid ="0" layer="1" visibility="true" startsequence="1" >
 				<xposition>0.1</xposition>
 				<yposition>0.1</yposition>
 				<xsize>0.8</xsize>
@@ -116,7 +122,7 @@
 				<aspectratiolock>true</aspectratiolock>
 				<elementaspectratio>1.0</elementaspectratio>
 			</image>
-			<image elementid ="2" layer="2" visibility="true" startsequence="2">
+			<image elementid ="1" layer="2" visibility="true" startsequence="2">
 				<xposition>0.2</xposition>
 				<yposition>0.2</yposition>
 				<xsize>0.8</xsize>
@@ -130,7 +136,7 @@
 			</image>
 		</slide>
 		<slide slideid="4">
-			<video elementid ="1" layer="1" visibility="true" startsequence="1" endsequence="2">
+			<video elementid ="0" layer="1" visibility="true" startsequence="1" endsequence="2">
 				<xposition>0</xposition>
 				<yposition>0</yposition>
 				<xsize>1</xsize>
@@ -141,9 +147,9 @@
 				<loop>true</loop>
 				<aspectratiolock>true</aspectratiolock>
 				<elementaspectratio>2</elementaspectratio>
-				<autoplay>false</autoplay>
+				<autoplay>true</autoplay>
 				<starttime>0</starttime>
-				<endtime>55</endtime>
+				<endtime>15000</endtime>
 			</video>
 		</slide>
 	</slideshow>

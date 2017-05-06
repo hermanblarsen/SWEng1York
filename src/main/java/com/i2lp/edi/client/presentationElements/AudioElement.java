@@ -621,9 +621,9 @@ public class AudioElement extends SlideElement{
     public void isAutoPlay(Boolean isAutoPlay) {
         this.isAutoPlay = isAutoPlay;
 
-        if (mediaPlayer != null) {
-            mediaPlayer.setAutoPlay(isAutoPlay);
-        }
+//        if (mediaPlayer != null) {    //TODO this cannot be set as the element then starts when presentattion starts
+//            mediaPlayer.setAutoPlay(isAutoPlay);
+//        }
 
     }
 

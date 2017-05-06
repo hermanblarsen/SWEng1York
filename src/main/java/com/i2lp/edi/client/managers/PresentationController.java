@@ -47,9 +47,10 @@ import java.util.TimerTask;
  */
 public abstract class PresentationController {
     private static final float SLIDE_SIZE_ON_OPEN = 0.5f;
-    private static final double PRES_CONTROLS_HEIGHT = 40;
-    private static final double STAGE_MIN_WIDTH = 510;
-    private static final double STAGE_MIN_HEIGHT = 300;
+    private static final int PRES_CONTROLS_HEIGHT = 40;
+    private static final int STAGE_MIN_WIDTH = 510;
+    private static final int STAGE_MIN_HEIGHT = 300;
+    private static final int HIDE_CURSOR_DELAY = 2000;
     Logger logger = LoggerFactory.getLogger(PresentationController.class);
 
     protected Scene scene;
@@ -126,9 +127,11 @@ public abstract class PresentationController {
                 } else {
                     toBeAssigned.setTeacher(false);
                 }
-                toBeAssigned.setSlideCanvas(toAssign); //Has to be called after setTeacher()
-                toBeAssigned.setSlideWidth(slideWidth);
-                toBeAssigned.setSlideHeight(slideHeight);
+                if(!(toBeAssigned instanceof AudioElement)) {
+                    toBeAssigned.setSlideCanvas(toAssign); //Has to be called after setTeacher()
+                    toBeAssigned.setSlideWidth(slideWidth);
+                    toBeAssigned.setSlideHeight(slideHeight);
+                }
             }
         }
     }
@@ -520,7 +523,7 @@ public abstract class PresentationController {
                 if(!isMouseOverControls)
                     ft0.play();
             }
-        }, (long) 1000); //TODO make this a constant, and maybe add id or show to context menu.
+        }, (long) HIDE_CURSOR_DELAY); //TODO maybe add id or show to context menu.
 
         presControls.setMaxHeight(PRES_CONTROLS_HEIGHT);
         presControls.setAlignment(Pos.BOTTOM_LEFT);
@@ -763,7 +766,7 @@ public abstract class PresentationController {
             while (currentSlideNumber != targetSlideNumber - 1) {
                 slideAdvance(presentationElement, Slide.SLIDE_BACKWARD);
             }
-        } else if (targetSlideNumber > currentSlideNumber) { //If we need to fo forwards, go forwards
+        } else if (targetSlideNumber > currentSlideNumber) { //If we need to go forwards, go forwards
             while (currentSlideNumber != targetSlideNumber - 1) {
                 slideAdvance(presentationElement, Slide.SLIDE_FORWARD);
             }

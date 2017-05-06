@@ -55,7 +55,7 @@ public class PresentationPreviewPanel extends Panel {
     }
 
     public PresentationPreviewPanel(Pane parentPane){
-        this(parentPane, "file:projectResources/sampleFiles/sampleXmlSimple.xml");
+        this(parentPane, "file:projectResources/sampleFiles/xml/sampleXmlSimple.xml");
     }
 
     public String getPresentationPath() {
