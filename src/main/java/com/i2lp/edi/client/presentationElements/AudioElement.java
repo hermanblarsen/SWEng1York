@@ -267,9 +267,9 @@ public class AudioElement extends SlideElement{
 
     @Override
     public void doClassSpecificRender() {
-        //if (isAutoPlay) { //Without a control panel, autoplay doesn't make any sense as there's no other way to start it. -Zain
+        if (isAutoPlay) {
             startAudio();
-        //}
+        }
     }
 
     @Override
@@ -620,11 +620,6 @@ public class AudioElement extends SlideElement{
      */
     public void isAutoPlay(Boolean isAutoPlay) {
         this.isAutoPlay = isAutoPlay;
-
-//        if (mediaPlayer != null) {    //TODO this cannot be set as the element then starts when presentattion starts
-//            mediaPlayer.setAutoPlay(isAutoPlay);
-//        }
-
     }
 
     /**

@@ -37,6 +37,7 @@ public abstract class SlideElement {
     public abstract void doClassSpecificRender();
 
     public void removeElement(){
+        destroyElement();
         if(onCanvas){
             slideCanvas.getChildren().remove(getCoreNode());
             onCanvas = false;
@@ -94,6 +95,12 @@ public abstract class SlideElement {
 
     public abstract void setupElement();
 
+    /**
+     * Must be called whenever an element is no longer on screen / active.
+     * This method should be used as an opportunity to halt, cleanup the element, and to return it to a state where no
+     * elements of it have any effect.
+     * If you disagree with this description then let me know -Zain
+     */
     public abstract void destroyElement();
 
     public void setSlideCanvas(Pane slideCanvas) {

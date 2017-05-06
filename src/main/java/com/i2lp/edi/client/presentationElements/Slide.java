@@ -210,5 +210,15 @@ public class Slide extends Pane {
     public WritableImage getSlideDrawing() { return slideDrawing; }
 
     public void setSlideDrawing(WritableImage slideDrawing) { this.slideDrawing = slideDrawing; }
+
+    /**
+     * "Destroys" all of the visible elements on this slide.  Should be called whenever a slide is no longer visible so that
+     *  all elements are given the opportunity to clean up anything non-visual.
+     */
+    public void destroyAllVisible(){
+        for(SlideElement element : visibleSlideElementList){
+            element.destroyElement();
+        }
+    }
 }
 
