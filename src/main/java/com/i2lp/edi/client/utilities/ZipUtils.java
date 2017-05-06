@@ -46,8 +46,7 @@ public class ZipUtils {
                 ZipEntry ze = new ZipEntry(file);
                 zos.putNextEntry(ze);
 
-                FileInputStream in =
-                        new FileInputStream(sourceFolder + File.separator + file);
+                FileInputStream in = new FileInputStream(sourceFolder + File.separator + file);
 
                 int len;
                 while ((len = in.read(buffer)) > 0) {

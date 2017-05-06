@@ -60,7 +60,7 @@ public class TextElement extends SlideElement {
         webEngine.loadContent(textContent);
 
         //Apply Dynamically created CSS to TextElement
-        cssFilePath = Utils.cssGen(presentationController.getXmlPath(), slideID, elementID, fontSize, font, fontColour, bgColour, borderColour, borderSize);
+        cssFilePath = Utils.cssGen(presentationID, slideID, elementID, fontSize, font, fontColour, bgColour, borderColour, borderSize);
         webEngine.setUserStyleSheetLocation(cssFilePath);
 
         //Stage 3 Setup: DoClassSpecificRender for resizing, register State Handlers, register onClickAction method in superclass

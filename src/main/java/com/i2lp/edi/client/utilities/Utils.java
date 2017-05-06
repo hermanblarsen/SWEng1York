@@ -56,14 +56,10 @@ public class Utils {
      * @return Filename of CSS file that stores the CSS for a given TextElement
      * @author Amrik Sadhra
      */
-    public static String cssGen(String xmlPath, int slideID, int elementID, int fontSize, String font, String fontColour, String bgColor, String borderColour, int borderSize) {
-        File cssFilePath = new File(xmlPath + "/CSS/" + "Slide" + slideID + "Element" + elementID + "format.css");
+    public static String cssGen(String presentationID, int slideID, int elementID, int fontSize, String font, String fontColour, String bgColor, String borderColour, int borderSize) {
+        File cssFilePath = new File(PRESENTATIONS_PATH + presentationID + "/CSS/" + "Slide" + slideID + "Element" + elementID + "format.css");
 
-        if (cssFilePath.exists()) {
-            return "file:" + cssFilePath.getAbsolutePath();
-        } else {
-            cssFilePath.getParentFile().mkdirs(); //Create directory structure if not present yet
-        }
+        if (!cssFilePath.exists()) cssFilePath.getParentFile().mkdirs(); //Create directory structure if not present yet
 
         ArrayList<String> lines = new ArrayList<>();
 

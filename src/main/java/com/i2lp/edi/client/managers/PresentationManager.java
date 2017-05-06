@@ -13,12 +13,14 @@ import java.io.*;
 import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
 import static com.i2lp.edi.client.Constants.*;
-import static com.i2lp.edi.client.utilities.Utils.getFileParentDirectory;
 import static com.i2lp.edi.client.utilities.Utils.getFilesInFolder;
+import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
 
 /**
@@ -121,7 +123,6 @@ public class PresentationManager {
     }
 
 
-
     private ArrayList<String> getLocalPresentationListString() {
         //Assume folder names are DocumentID for now, else have to fire up parser to get them
         return getFilesInFolder(BASE_PATH + "Presentations/");
@@ -145,7 +146,12 @@ public class PresentationManager {
     public void uploadPresentation(String fileToUpload, String filename, int moduleID) {
         //Generate thumbnails for Slides.
         ThumbnailGenerationController.generateSlideThumbnails(fileToUpload);
-        final String zipPath = getFileParentDirectory(fileToUpload) + File.separator + filename + ".zip";
+        try {
+            Files.copy(Paths.get(fileToUpload), Paths.get(PRESENTATIONS_PATH + filename + File.separator + filename + ".xml"), REPLACE_EXISTING);
+        } catch (IOException e) {
+            logger.error("Unable to copy XML file into local presentation library.");
+        }
+        final String zipPath = TEMP_PATH + filename + ".zip";
 
         //Create zip after thumbnail and CSS generation are done
         Task zipCreationTask = new Task() {
@@ -153,7 +159,7 @@ public class PresentationManager {
             protected Object call() throws Exception {
                 try {
                     Thread.sleep(1000); //Wait for thumbnails to be generated TODO: replace with checker for numFiles
-                    new ZipUtils(getFileParentDirectory(fileToUpload), zipPath);
+                    new ZipUtils(PRESENTATIONS_PATH + filename, zipPath);
                     return null;
                 } catch (InterruptedException e) {
                     logger.error("Unable to sleep on Zip generation thread.");
@@ -176,7 +182,7 @@ public class PresentationManager {
                 //Upload file using an InputStream
                 File localFile = new File(zipPath);
 
-                String remoteFile = "Uploads/" + filename+ ".zip";
+                String remoteFile = "Uploads/" + filename + ".zip";
                 InputStream inputStream = new FileInputStream(localFile);
                 logger.info("Start uploading " + filename + " data");
 
@@ -185,6 +191,7 @@ public class PresentationManager {
                 if (done) {
                     logger.info("The presentation has uploaded successfully. Awaiting server-side processing.");
                     socketClient.alertServerToUpload(filename, moduleID);
+                    new File(zipPath).delete(); //Clean up zip after upload
                 }
             } catch (IOException e) {
                 logger.error("Error uploading presentation data to Edi Server! ", e);
@@ -199,6 +206,8 @@ public class PresentationManager {
                 }
             }
         });
-        zipCreationTask.setOnSucceeded(event -> uploadThread.start());
+        zipCreationTask.setOnSucceeded(event -> {
+            uploadThread.start();
+        });
     }
 }

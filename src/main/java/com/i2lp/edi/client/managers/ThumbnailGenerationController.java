@@ -20,6 +20,8 @@ import javax.imageio.ImageIO;
 import java.io.File;
 import java.io.IOException;
 
+import static com.i2lp.edi.client.Constants.PRESENTATIONS_PATH;
+
 /**
  * Created by amriksadhra on 12/04/2017.
  */
@@ -61,7 +63,7 @@ public class ThumbnailGenerationController extends PresentationController {
         Presentation presentation = slideGenController.presentationElement;
 
         //Check if thumbnail already there
-        File thumbnailFile = new File(this.getXmlPath() + "/Thumbnails/" + "slide" + (slideGenController.currentSlideNumber) + "_thumbnail.png");
+        File thumbnailFile = new File(PRESENTATIONS_PATH + this.presentationElement.getDocumentID() + "/Thumbnails/" + "slide" + (slideGenController.currentSlideNumber) + "_thumbnail.png");
         if (!thumbnailFile.exists()) {
             thumbnailFile.getParentFile().mkdirs(); //Create directory structure if not present yet
         } else {

@@ -170,10 +170,11 @@ public class SocketServer {
                 //Move Zip directly to /var/www/html/Edi/
                 try {
                     Files.move(Paths.get("../Uploads/" + presentationName + ".zip"), Paths.get("/var/www/html/Edi/" + presentationName + ".zip"));
+
                     //Run SQL statement
                     //Insert some shit into the db
                 } catch (IOException e) {
-                    logger.error("Unable to move Uploaded presentation to host directory: " + data);
+                    logger.error("Unable to move Uploaded presentation " + data + " + to host directory.", e);
                 }
             }
         });

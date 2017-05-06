@@ -18,8 +18,8 @@ public class Constants {
     public static final String BUILD_STRING = "Version: v0." + Constants.BUILD_NUMBER;
 
     public static final String BASE_PATH = System.getProperty("java.io.tmpdir") + "Edi/";
-    public static final String TEMP_PATH = BASE_PATH + "/Temp/";
-    public static final String PRESENTATIONS_PATH = BASE_PATH + "/Presentations/";
+    public static final String TEMP_PATH = BASE_PATH + "Temp/";
+    public static final String PRESENTATIONS_PATH = BASE_PATH + "Presentations/";
 
     //FTP details for presentation upload
     public static final String FTP_USER = "bscftp";
