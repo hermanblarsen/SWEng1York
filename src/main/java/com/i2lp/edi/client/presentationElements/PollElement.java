@@ -1,5 +1,6 @@
 package com.i2lp.edi.client.presentationElements;
 
+import edu.emory.mathcs.backport.java.util.Arrays;
 import eu.hansolo.tilesfx.Tile;
 import eu.hansolo.tilesfx.TileBuilder;
 import eu.hansolo.tilesfx.tools.ChartData;
@@ -24,6 +25,7 @@ import javafx.scene.paint.Color;
 import javafx.util.Duration;
 import org.kordamp.bootstrapfx.scene.layout.Panel;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -33,6 +35,7 @@ import java.util.Random;
 public class PollElement extends InteractiveElement {
     protected String pollQuestion;
     protected List<String> possibleAnswers;
+    protected String answers;
     protected boolean answered = false;
     protected boolean timerStart = false;
     protected int timeLimit = 20;
@@ -168,6 +171,7 @@ public class PollElement extends InteractiveElement {
     }
 
     private VBox setUpQuestions(){
+        setUpQuestionList(answers);
         answerButton = new ToggleButton[possibleAnswers.size()];
         chartDataArray = new ChartData[possibleAnswers.size()];
         final ToggleGroup group = new ToggleGroup();
@@ -334,5 +338,17 @@ public class PollElement extends InteractiveElement {
         this.yPosition = yPosition;
     }
 
+    public String getAnswers() {
+        return answers;
+    }
+
+    public void setAnswers(String answers) {
+        this.answers = answers;
+    }
+
+    public void setUpQuestionList(String answers){
+        possibleAnswers = new ArrayList<String>();
+        possibleAnswers = Arrays.asList(answers.split(","));
+    }
 
 }
