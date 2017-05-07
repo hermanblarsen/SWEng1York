@@ -199,9 +199,26 @@ public class SocketServer {
                 }
 
 
+                //Insert new presentation into database
+                try (PGConnection connection = (PGConnection) dataSource.getConnection()) {
+                    PreparedStatement statement = connection.prepareStatement("select sp_addpresentationtomodule(?, ?);");
 
-                //Run SQL statement
-                //Insert some shit into the db
+                    //Fill prepared statements to avoid SQL injection
+                    statement.setInt(1, moduleID);
+                    statement.setString(1, "http://www.amriksadhra.com/Edi/" + presentationName + ".zip");
+
+                    //Call stored procedure on database
+                    ResultSet presentationAddStatus = statement.executeQuery();
+
+                    while (presentationAddStatus.next()) {
+                        logger.info("Status of Presentation SQL insertion: " + presentationAddStatus.getString(1));
+                        client.sendEvent("NewUploadStatus", presentationAddStatus.getString(1)); //Send status packet back to user
+                    }
+                    presentationAddStatus.close();
+                    statement.close();
+                } catch (Exception e) {
+                    logger.error("Unable to connect to PostgreSQL on port 5432. PJDBC dump:", e);
+                }
             }
         });
         server.start();

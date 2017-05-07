@@ -41,6 +41,13 @@ public class PresentationManager {
         this.ediManager = ediManager;
         this.socketClient = ediManager.mySocketClient;
 
+        updatePresentations();
+    }
+
+    /**
+     * Update local presentation list with all available on server. Called whenever a presentation is added or goes live.
+     */
+    public void updatePresentations(){
         //Work out what we presentations are available locally, what are available remotely.
         localPresentationListString = getLocalPresentationListString();
         remotePresentationList = getRemotePresentationList();
@@ -59,14 +66,19 @@ public class PresentationManager {
 
 
             for (String missingPresentationDocumentID : (ArrayList<String>) difference) {
-                for (int i = 0; i < remotePresentationList.size(); i++) {//Search remote list for missing documentID
-                    if (remotePresentationList.get(i).getDocumentID().equals(missingPresentationDocumentID)) {
-                        downloadList.add(remotePresentationList.get(i)); //Add missing presentation to download list
+                for (PresentationMetadata remotePresentation : remotePresentationList) {//Search remote list for missing documentID
+                    if (remotePresentation.getDocumentID().equals(missingPresentationDocumentID)) {
+                        downloadList.add(remotePresentation); //Add missing presentation to download list
                     }
                 }
             }
             downloadMissingPresentations(downloadList);
             updateLocalPresentationList(remotePresentationList);//Metadata now matches that available on server after download, so set.
+
+            //If dashboard created, update the dashboard UI
+            if(ediManager.getDashboard() != null){
+                ediManager.getDashboard().updatePresentationPreviews();
+            }
         }
     }
 
@@ -188,7 +200,7 @@ public class PresentationManager {
                 inputStream.close();
                 if (done) {
                     logger.info("The presentation has uploaded successfully. Awaiting server-side processing.");
-                    socketClient.alertServerToUpload(filename, moduleID);
+                    socketClient.alertServerToUpload(filename, moduleID); //Tell server a new file has arrived
                     new File(zipPath).delete(); //Clean up zip after upload
                 }
             } catch (IOException e) {
@@ -204,8 +216,6 @@ public class PresentationManager {
                 }
             }
         });
-        zipCreationTask.setOnSucceeded(event -> {
-            uploadThread.start();
-        });
+        zipCreationTask.setOnSucceeded(event -> uploadThread.start());
     }
 }

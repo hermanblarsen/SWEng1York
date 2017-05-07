@@ -1,5 +1,6 @@
 package com.i2lp.edi.server;
 
+import com.i2lp.edi.client.managers.EdiManager;
 import com.i2lp.edi.client.utilities.Utils;
 import com.i2lp.edi.server.packets.Module;
 import com.i2lp.edi.server.packets.PresentationMetadata;
@@ -42,12 +43,14 @@ public class SocketClient {
     private int current_presentation_id = 1;
     private int current_question_id = 1;
 
-    //PostgreSQL database connection
-    PGDataSource dataSource;
-    Socket socket;
+    //Network connections
+    private PGDataSource dataSource;
+    private Socket socket;
+    //EdiManager
+    private EdiManager ediManager;
 
     public static void main(String[] args) {
-        new SocketClient(remoteServerAddress, 8080);
+        //new SocketClient(remoteServerAddress, 8080);
     }
 
     public SocketClient(String serverIP, int serverPort) {
@@ -58,6 +61,10 @@ public class SocketClient {
         } else {
             connectToRemoteSocket(serverIP, serverPort);
         }
+    }
+
+    public void setEdiManager(EdiManager ediManager) {
+        this.ediManager = ediManager;
     }
 
     public void connectToRemoteDB(String dbHostName) {
@@ -134,23 +141,39 @@ public class SocketClient {
     public void updateLocalTables(Object tableToUpdate) {
         //SocketIO will pass a generic object. But we know its a string because that's what DB_notify returns from com.i2lp.edi.server side
         switch ((String) tableToUpdate) {
+            case "interactions":
+                logger.info("New responses to act upon registered on edi server!");
+                //updateResponses(current_presentation_id, current_question_id);
+                break;
+
+            case "interactive_elements":
+                logger.info("New interactive elements present on edi server!");
+                //updateResponses(current_presentation_id, current_question_id);
+                break;
+
             case "users":
                 logger.info("Users database changed!");
                 //TODO: Update Local User information
                 break;
 
-            case "presentation_library":
+            case "presentations":
                 logger.info("Presentation library database changed!");
-                //TODO: Update local presentation Information
+                ediManager.getPresentationManager().updatePresentations(); //Update presentation information
                 break;
 
-            case "classes":
-                logger.info("Classes database changed!");
+            case "jnct_users_modules":
+                logger.info("Modules user is registered for may have changed!");
+                ediManager.getPresentationManager().updatePresentations(); //Update presentation information
+                break;
+
+
+            case "modules":
+                logger.info("Modules database changed!");
                 //TODO: Update class list
                 break;
 
-            case "responses":
-                logger.info("New responses to act upon registered on com.i2lp.edi.server!");
+            case "questions":
+                logger.info("New questions registered on edi server!");
                 updateResponses(current_presentation_id, current_question_id);
                 break;
         }
@@ -353,12 +376,12 @@ public class SocketClient {
         socket.close();
     }
 
-    public ArrayList<PresentationMetadata> getPresentationsForUser(int userID){
+    public ArrayList<PresentationMetadata> getPresentationsForUser(int userID) {
         ArrayList<PresentationMetadata> presentationsForUser = new ArrayList<>();
 
         //Attempt to add a user using stored procedure
         try (PGConnection connection = (PGConnection) dataSource.getConnection()) {
-            PreparedStatement statement = connection.prepareStatement("select * from edi.public.sp_getpresentationsforuser(?);");
+            PreparedStatement statement = connection.prepareStatement("SELECT * FROM edi.public.sp_getpresentationsforuser(?);");
 
             //Fill prepared statements to avoid SQL injection
             statement.setInt(1, userID);
@@ -409,7 +432,13 @@ public class SocketClient {
      * Send packet to server Socket to alert it that a new presentation is available for
      * integration into the Edi database.
      */
-    public void alertServerToUpload(String presentationName, int moduleID){
+    public void alertServerToUpload(String presentationName, int moduleID) {
         socket.emit("NewUpload", presentationName + " " + moduleID);
+        socket.on("NewUploadStatus", objects -> {
+            logger.info("Addition of " + presentationName + " presentation had the following status: " + objects[0]);
+            if (((String) objects[0]).contains("Success")) {
+                ediManager.getPresentationManager().updatePresentations(); //Go and download the presentation from the server
+            }
+        });
     }
 }

@@ -1,6 +1,7 @@
 package com.i2lp.edi.client.managers;
 
 
+import com.i2lp.edi.client.dashboard.Dashboard;
 import com.i2lp.edi.client.dashboard.StudentDashboard;
 import com.i2lp.edi.client.dashboard.TeacherDashboard;
 import com.i2lp.edi.client.login.Login;
@@ -22,6 +23,10 @@ public class EdiManager extends Application {
     Logger logger = LoggerFactory.getLogger(EdiManager.class);
     private Login loginDialog;
     private PresentationManager presentationManager;
+
+
+
+    private Dashboard dashboard;
     protected SocketClient mySocketClient;
     protected User userData; //Store currently logged in users data
     private boolean offline = false;
@@ -98,14 +103,14 @@ public class EdiManager extends Application {
         //Additional com.i2lp.edi.client.login stuff
         if (isTeacher) {
             logger.info("Teacher Dashboard Opened");
-            TeacherDashboard teacherDashboard = new TeacherDashboard();
-            teacherDashboard.setEdiManager(this);
-            teacherDashboard.start(dashboardStage);
+            dashboard = new TeacherDashboard();
+            dashboard.setEdiManager(this);
+            dashboard.start(dashboardStage);
         } else {
             logger.info("Student Dashboard Opened");
-            StudentDashboard studentDashboard = new StudentDashboard();
-            studentDashboard.setEdiManager(this);
-            studentDashboard.start(dashboardStage);
+            dashboard = new StudentDashboard();
+            dashboard.setEdiManager(this);
+            dashboard.start(dashboardStage);
         }
     }
 
@@ -118,5 +123,9 @@ public class EdiManager extends Application {
 
     public PresentationManager getPresentationManager() {
         return presentationManager;
+    }
+
+    public Dashboard getDashboard() {
+        return dashboard;
     }
 }

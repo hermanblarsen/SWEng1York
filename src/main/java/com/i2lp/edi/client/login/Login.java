@@ -198,8 +198,10 @@ public class Login extends Application {
 
     public void serverConnect() {
         if (!offline) {
-            //Connect to com.i2lp.edi.server
+            //Connect to edi server
             mySocketClient = new SocketClient(remoteServerAddress, 8080);
+            //TODO: Should I move ediManager to SocketClient constructor?
+            mySocketClient.setEdiManager(ediManager);
             ediManager.setClient(mySocketClient);
         }
         else {

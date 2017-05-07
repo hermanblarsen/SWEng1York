@@ -80,7 +80,7 @@ public abstract class Dashboard extends Application {
         dashboardStage.show();
     }
 
-    private void updatePresentationPreviews() {
+    public void updatePresentationPreviews() {
         previewPanels = new ArrayList<>();
         int numOfPresentations = ediManager.getPresentationManager().getLocalPresentationList().size();
 
