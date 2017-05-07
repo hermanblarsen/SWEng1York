@@ -14,15 +14,15 @@ import org.slf4j.LoggerFactory;
 public abstract class SlideElement {
     Logger logger = LoggerFactory.getLogger(getClass());
 
-    protected float duration;
+    protected float duration=-1;
     protected int slideID; //Needed for CSS generation, CSS filename needs this to identify what to apply
 
     protected String presentationID; //Needed for CSS generation
     protected int elementID;
-    protected int layer;
-    protected boolean visibility;
-    protected int startSequence;
-    protected int endSequence;
+    protected int layer=1;
+    protected boolean visibility = true;
+    protected int startSequence  = 0 ;
+    protected int endSequence = -1;
     protected String onClickAction;
     protected String onClickInfo;
     protected Pane slideCanvas;

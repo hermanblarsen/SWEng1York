@@ -119,7 +119,6 @@ public abstract class Dashboard extends Application {
                     }
                     cMenu.show(dashboardStage, event.getScreenX(), event.getScreenY());
                 }
-
             });
             previewPanels.add(previewPanel);
         }

@@ -1,4 +1,4 @@
-<document documentid="SamplePresentation">
+<document documentid="i2lpSampleXml">
 	<documentdetails>
 		<title>Sample Presentation</title>
 		<author>Herman Larsen</author>
@@ -10,7 +10,7 @@
 	</documentdetails>
 	<slideshow>
 		<defaults>
-			<bgcolour>#ecf0f1FF</bgcolour>
+			<bgcolour>#FFFFFFFF</bgcolour>
 			<font>"Times New Roman", Times, serif</font>
 			<fontsize>12</fontsize>
 			<fontcolour>#000000FF</fontcolour>
@@ -18,59 +18,58 @@
 			<autoplaymedia>true</autoplaymedia>
 		</defaults>
 		<slide slideid="1">
-			<text elementid ="0" layer="1" visibility="true" startsequence="1" endsequence="4" duration="0">
-				<textcontent>
-					<p>Example HTML text input number 1. This is supposed to be a list: <ul><li><i>italic</i></li><li><b>bold</b></li></ul>. Furthermore, these characters are illegal in XML: &lt; &gt; &amp; &apos; &quot;, input by and &amp; followed by lt, gt, amp, apos or quot respectively, finally followed by a ';'.</p>
-				</textcontent>
-				<xposition>0.1</xposition>
-				<yposition>0.1</yposition>
-				<xsize>0.8</xsize>
-				<ysize>0.2</ysize>
-				<font>Arial, Helvetica, sans-serif</font>
-				<fontsize>12</fontsize>
-				<fontcolour>#2196F3FF</fontcolour>
-				<bgcolour>#000000FF</bgcolour>
-				<bordercolour>#673AB77F</bordercolour>
-                <bordersize>2</bordersize>
-				<aspectratiolock>true</aspectratiolock>
-			</text>
-			<text elementid ="1" layer="2" visibility="false" startsequence="2" endsequence="5">
-				<textcontent>
-					<p>Example HTML Number 2! Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
-				</textcontent>
-				<xposition>0.2</xposition>
-				<yposition>0.5</yposition>
-				<xsize>0.8</xsize>
-				<ysize>0.5</ysize>
-				<fontsize>12</fontsize>
-				<fontcolour>#000000FF</fontcolour>
-				<bgcolour>#4CAF5055</bgcolour>
-				<bordercolour>#123456FF</bordercolour>
-                <bordersize>2</bordersize>
-				<aspectratiolock>true</aspectratiolock>
-			</text>
-			<text elementid ="2" layer="2" visibility="true" startsequence="3" endsequence="5">
-				<textcontent>
-					<p>Some text on top of the other two. Bigger is better!
-						Click me to go to Google!</p>
-				</textcontent>
-				<xposition>0.4</xposition>
-				<yposition>0.4</yposition>
-				<xsize>0.2</xsize>
-				<ysize>0.2</ysize>
-				<font>"Comic Sans MS", cursive, sans-serif</font>
-				<fontsize>16</fontsize>
-				<fontcolour>#654321FF</fontcolour>
-				<bgcolour>#789ABC77</bgcolour>
-				<bordercolour>#c0392bFF</bordercolour>
-                <bordersize>2</bordersize>
-				<onclickaction>openwebsite</onclickaction>
-				<onclickinfo>https://www.google.com</onclickinfo>
-				<aspectratiolock>true</aspectratiolock>
-			</text>
+            <!--Title-->
+            <text elementid ="0" layer="10" startsequence="1">
+                <textcontent>
+                    &lt;h1&gt;Text Slide&lt;/h1&gt;
+                    <bordercolour>#ABCDEFFF</bordercolour>
+                    <bordersize>5</bordersize>
+                </textcontent>
+                <xposition>0.3</xposition>
+                <yposition>0.05</yposition>
+                <xsize>0.5</xsize>
+                <ysize>0.1</ysize>
+            </text>
+
+            <text elementid ="1" layer="1" startsequence="1">
+                <textcontent>
+                    &lt;p&gt;Example HTML text input number 1. This is supposed to be a list: &lt;ul&gt;&lt;li&gt;&lt;i&gt;italic&lt;/i&gt;&lt;/li&gt;&lt;li&gt;&lt;b&gt;bold&lt;/b&gt;&lt;/li&gt;&lt;/ul&gt;. Furthermore, these characters are illegal in XML: &lt; &gt; &amp; &apos; &quot;, input by and &amp; followed by lt, gt, amp, apos or quot respectively, finally followed by a ';'.&lt;/p&gt;
+                </textcontent>
+            </text>
+
+            <text elementid ="2" layer="2" startsequence="2">
+                <textcontent>
+                    &lt;p&gt;Example HTML Number 2! Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.&lt;/p&gt;
+                </textcontent>
+                <xposition>0.1</xposition>
+                <yposition>0.6</yposition>
+                <xsize>0.9</xsize>
+                <ysize>0.4</ysize>
+            </text>
+
+            <text elementid ="3" layer="3" startsequence="3">
+                <textcontent>
+                    &lt;h1&gt;Some text on top of the other two. Bigger is better!&lt;/h1&gt;
+                    &lt;p&gt;Now for a line break&lt;/p&gt;
+                    &lt;p&gt;Click me to go to Google!&lt;/p&gt;
+                </textcontent>
+                <xposition>0.1</xposition>
+                <yposition>0.4</yposition>
+                <xsize>0.6</xsize>
+                <ysize>0.4</ysize>
+                <fontsize>20</fontsize>
+                <fontcolour>#EEEEEEFF</fontcolour>
+                <bgcolour>#112266FF</bgcolour>
+                <bordercolour>#ABCDEFFF</bordercolour>
+                <bordersize>5</bordersize>
+                <onclickaction>openwebsite</onclickaction>
+                <onclickinfo>https://www.google.no/</onclickinfo>
+            </text>
 		</slide>
+
+
 		<slide slideid="2">
-            <graphic elementid ="0" layer="2" visibility="true" startsequence="2">
+            <graphic elementid ="0" layer="2" visibility="true" startsequence="3">
                 <onclickaction>dynamicmediatoggle</onclickaction>
                 <onclickinfo>3</onclickinfo>
                 <aspectratiolock>true</aspectratiolock>
@@ -78,13 +77,13 @@
                 <linecolour>#aaffaaFF</linecolour>
                 <fillcolour>#FF00008F</fillcolour>
                 <polygon>
-                    <xpositions>0, 0.1, 0.3, 0.1, 0.2, 0</xpositions>
-                    <ypositions>0, 0.2, 0.2, 0.4, 0.7, 0.5</ypositions>
+                    <xpositions>0.5, 0.6, 0.9, 0.65, 0.7, 0.5, 0.3, 0.35, 0.1, 0.4, 0.5</xpositions>
+                    <ypositions>0.2, 0.4, 0.4, 0.5, 0.9, 0.7, 0.9, 0.5, 0.4, 0.4, 0.2</ypositions>
                     <isclosed>true</isclosed>
                 </polygon>
             </graphic>
 
-			<graphic elementid ="1" layer="2" visibility="true" startsequence="2">
+			<graphic elementid ="1" layer="2" visibility="false" startsequence="1">
 				<onclickaction>gotoslide</onclickaction>
 				<onclickinfo>1</onclickinfo>
 				<aspectratiolock>false</aspectratiolock>
@@ -94,13 +93,13 @@
 				<oval>
 					<xposition>0.6</xposition>
 					<yposition>0.2</yposition>
-					<rhorizontal>0.1</rhorizontal>
-					<rvertical>0.05</rvertical>
+					<rhorizontal>0.5</rhorizontal>
+					<rvertical>0.3</rvertical>
 					<rotation>45</rotation>
 				</oval>
 			</graphic>
 
-			<audio elementid ="2" startsequence="2">
+			<audio elementid ="3" startsequence="2" endsequence="3">
 				<path>projectResources/sampleFiles/NeverGonnaGiveYouUp.mp3</path>
 				<loop>true</loop>
 				<autoplay>true</autoplay>

@@ -14,8 +14,8 @@ import org.junit.runners.Suite.SuiteClasses;
         com.i2lp.edi.client.presentationElements.CommentTest.class,
         com.i2lp.edi.client.editor.PollEditorTest.class,
         com.i2lp.edi.client.utilities.ParserXMLTest.class,
-        VideoElementTest.class,
-        GraphicElementTest.class,
+        com.i2lp.edi.client.presentationElements.VideoElementTest.class,
+        com.i2lp.edi.client.presentationElements.GraphicElementTest.class,
         com.i2lp.edi.client.login.LoginTest.class
 })
 public class AllTests {

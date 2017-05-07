@@ -56,7 +56,7 @@ public class Utils {
      * @return Filename of CSS file that stores the CSS for a given TextElement
      * @author Amrik Sadhra
      */
-    public static String cssGen(String presentationID, int slideID, int elementID, int fontSize, String font, String fontColour, String bgColor, String borderColour, int borderSize) {
+    public static String cssGen(String presentationID, int slideID, int elementID, int fontSize, String font, String fontColour, String bgColor, String borderColour, int borderSize, boolean hasBorder) {
         File cssFilePath = new File(PRESENTATIONS_PATH + presentationID + "/CSS/" + "Slide" + slideID + "Element" + elementID + "format.css");
 
         if (!cssFilePath.exists()) cssFilePath.getParentFile().mkdirs(); //Create directory structure if not present yet
@@ -64,6 +64,8 @@ public class Utils {
         ArrayList<String> lines = new ArrayList<>();
 
         lines.add("body {");
+        lines.add("overflow-x: hidden;");
+        lines.add("overflow-y: hidden;");
 
         //Assume validity as XML parser has ensured is valid
         //This is the perfect place for default adding for element
@@ -72,7 +74,7 @@ public class Utils {
         if (font != null) lines.add("   font-family: " + font + ";");
         if (fontSize != 0) lines.add("   font-size: " + fontSize + "px;");
 
-        if (borderSize != 0) {
+        if (hasBorder) {
             lines.add("   border-style: solid;");
             lines.add("   border-width: " + borderSize + "px;");
             if (borderColour != null) lines.add("   border-color: " + borderColour + ";");

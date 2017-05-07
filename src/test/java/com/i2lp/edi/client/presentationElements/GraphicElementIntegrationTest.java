@@ -24,5 +24,7 @@ public class GraphicElementIntegrationTest extends Application{
 
         presentationManager.openPresentation(file.toURI().toString());
     }
+
+
 }
 

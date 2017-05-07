@@ -10,21 +10,22 @@ public class Theme {
     private int fontSize;
     private String fontColour;
     private String graphicsColour;
-    private int borderThickness;
+
     private boolean isBorder;
+    private int borderThickness;
     private String borderColour;
 
 
     public Theme () {
         //set standard theme/ behaviour
-        this.backgroundColour = "";
-        this.font = "";
-        this.fontSize = 0;
-        this.fontColour = "";
-        this.graphicsColour = "";
-        this.borderThickness = 0;
+        this.backgroundColour = "#FFFFFFFF";
+        this.font = "\"Times New Roman\", Times, serif";
+        this.fontSize = 12;
+        this.fontColour = "#000000FF";
+        this.graphicsColour = "000000FF";
         this.isBorder = true;
-        this.borderColour = "";
+        this.borderThickness = 1;
+        this.borderColour = "000000FF";
     }
 
     public String getBackgroundColour() {

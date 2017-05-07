@@ -99,7 +99,7 @@ public abstract class PresentationController {
 
         presentationStage.setMinWidth(STAGE_MIN_WIDTH);
         presentationStage.setMinHeight(STAGE_MIN_HEIGHT);
-        presentationStage.setOnCloseRequest(event -> destroyAllVisibleElements());
+        presentationStage.setOnCloseRequest(event -> destroyAllElements());
 
         sceneBox = new VBox();
         sceneBox.addEventHandler(MouseEvent.MOUSE_PRESSED, event -> {
@@ -678,11 +678,11 @@ public abstract class PresentationController {
     }
 
     protected void slideProgress(Presentation presentation) {
-        double slideNo = currentSlideNumber + 1;
-        double slideMax = presentation.getSlideList().size();
-        double progress = slideNo / slideMax;
-        progressBar.setProgress(progress);
-        slideNumber.setText("Slide " + (int) slideNo + " of " + (int) slideMax);
+        int slideNumber = currentSlideNumber + 1;
+        int slideNumberMax = presentation.getSlideList().size();
+        float slideProgress = slideNumber / slideNumberMax;
+        progressBar.setProgress(slideProgress);
+        this.slideNumber.setText("Slide " + slideNumber + " of " + slideNumberMax);
     }
 
     public int slideAdvance(Presentation presentationToAdvance, int direction) {
@@ -956,8 +956,8 @@ public abstract class PresentationController {
         }
     }
 
-    private void destroyAllVisibleElements() {
-        for(SlideElement slideElement : presentationElement.getSlide(currentSlideNumber).getVisibleSlideElementList())
+    private void destroyAllElements() {
+        for(SlideElement slideElement : presentationElement.getSlide(currentSlideNumber).getSlideElementList())
             slideElement.destroyElement();
     }
 

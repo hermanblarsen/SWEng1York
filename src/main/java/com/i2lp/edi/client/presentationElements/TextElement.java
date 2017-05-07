@@ -16,7 +16,7 @@ import static com.i2lp.edi.client.Constants.TEXT_ELEMENT_ZOOM_FACTOR;
  */
 
 public class TextElement extends SlideElement {
-    protected String textContent;
+    protected String textContent = "Error: No Text Content Fund!";
     protected String textFilepath;
     protected String textContentReference;
     protected String font;
@@ -27,10 +27,13 @@ public class TextElement extends SlideElement {
     private int borderSize;
     protected String borderColour;
 
-    protected float xPosition;
-    protected float yPosition;
-    protected float xSize;
-    protected float ySize;
+
+    protected boolean hasBorder;
+
+    protected float xPosition = 0.25f;
+    protected float yPosition = 0.25f;
+    protected float xSize = 0.5f;
+    protected float ySize = 0.5f;
 
     protected boolean aspectRatioLock;
     protected float elementAspectRatio;
@@ -60,7 +63,7 @@ public class TextElement extends SlideElement {
         webEngine.loadContent(textContent);
 
         //Apply Dynamically created CSS to TextElement
-        cssFilePath = Utils.cssGen(presentationID, slideID, elementID, fontSize, font, fontColour, bgColour, borderColour, borderSize);
+        cssFilePath = Utils.cssGen(presentationID, slideID, elementID, fontSize, font, fontColour, bgColour, borderColour, borderSize, hasBorder);
         webEngine.setUserStyleSheetLocation(cssFilePath);
 
         //Stage 3 Setup: DoClassSpecificRender for resizing, register State Handlers, register onClickAction method in superclass
@@ -143,7 +146,7 @@ public class TextElement extends SlideElement {
             this.xPosition = 0.5f;
         } else if (xPosition < 0) {
             logger.warn("Malformed XML. X Position for ElementID: " + elementID + " is smaller than 0% of slide width. Defaulting to 50%.");
-            this.xPosition = 0.5f;
+            this.xPosition = 0f;
         } else {
             this.xPosition = xPosition;
         }
@@ -159,7 +162,7 @@ public class TextElement extends SlideElement {
             this.yPosition = 0.5f;
         } else if (yPosition < 0) {
             logger.warn("Malformed XML. Y Position for ElementID: " + elementID + " is smaller than 0% of slide height. Defaulting to 50%.");
-            this.yPosition = 0.5f;
+            this.yPosition = 0f;
         } else {
             this.yPosition = yPosition;
         }
@@ -172,10 +175,10 @@ public class TextElement extends SlideElement {
     public void setxSize(float xSize) {
         if (xSize > 1) {
             logger.warn("Malformed XML. X Size for ElementID: " + elementID + " is larger than 100% of slide width. Defaulting to 50%.");
-            this.xSize = 0.5f;
+            this.xSize = 1f;
         } else if (xSize < 0) {
             logger.warn("Malformed XML. X Size for ElementID: " + elementID + " is smaller than 0% of slide width. Defaulting to 50%.");
-            this.xSize = 0.5f;
+            this.xSize = 0.05f;
         } else {
             this.xSize = xSize;
         }
@@ -188,10 +191,10 @@ public class TextElement extends SlideElement {
     public void setySize(float ySize) {
         if (ySize > 1) {
             logger.warn("Malformed XML. Y Size for ElementID: " + elementID + " is larger than 100% of slide height. Defaulting to 50%.");
-            this.ySize = 0.5f;
+            this.ySize = 1f;
         } else if (ySize < 0) {
             logger.warn("Malformed XML. Y Size for ElementID: " + elementID + " is smaller than 0% of slide height. Defaulting to 50%.");
-            this.ySize = 0.5f;
+            this.ySize = 0.05f;
         } else {
             this.ySize = ySize;
         }
@@ -268,5 +271,13 @@ public class TextElement extends SlideElement {
     @Override
     public Node getCoreNode() {
         return browser;
+    }
+
+    public boolean isHasBorder() {
+        return hasBorder;
+    }
+
+    public void setHasBorder(boolean hasBorder) {
+        this.hasBorder = hasBorder;
     }
 }

@@ -73,7 +73,6 @@ public class EdiManager extends Application {
         } finally {
             try {
                 if (!testSocket.isClosed()) testSocket.close();
-                logger.debug("Socket for internet access check closed");
             } catch (IOException e) {
                 logger.warn("IOException when closing socket for internet access check");
             }
@@ -118,7 +117,7 @@ public class EdiManager extends Application {
     @Override
     public void stop() {
         logger.info("Closing client-side networking ports.");
-        if (!offline) mySocketClient.closeAll();
+        mySocketClient.closeAll();
     }
 
     public PresentationManager getPresentationManager() {
