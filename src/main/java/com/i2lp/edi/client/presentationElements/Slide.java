@@ -7,7 +7,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 
 /**
  * Created by habl on 23/02/2017.
@@ -24,7 +26,8 @@ public class Slide extends Pane {
     protected List<VideoElement> videoElementList = new ArrayList<>();
     protected List<AudioElement> audioElementList = new ArrayList<>();
 
-    private WritableImage slideDrawing = new WritableImage(1, 1);
+    private ArrayList<WritableImage> slideDrawings;
+    private int drawingIndex;
 
     //Passed back up to Presentation layer, to alert on whether sequence has changed the current slide or not
     public static final int SLIDE_NO_MOVE = 0;
@@ -41,6 +44,9 @@ public class Slide extends Pane {
     public Slide() {
         slideElementList = new ArrayList<>();
         visibleSlideElementList = new ArrayList<>();
+        slideDrawings = new ArrayList<>();
+        slideDrawings.add(new WritableImage(1, 1));
+        drawingIndex = 0;
     }
 
     public void addElement(int elementIndex, SlideElement newElement) {
@@ -206,9 +212,31 @@ public class Slide extends Pane {
         return visibleSlideElementList;
     }
 
-    public WritableImage getSlideDrawing() { return slideDrawing; }
+    public WritableImage getCurrentSlideDrawing() { return slideDrawings.get(drawingIndex); }
 
-    public void setSlideDrawing(WritableImage slideDrawing) { this.slideDrawing = slideDrawing; }
+    public WritableImage getPreviousSlideDrawing() {
+        if(drawingIndex > 0)
+            return slideDrawings.get(--drawingIndex);
+        else
+            return  slideDrawings.get(drawingIndex);
+    }
+
+    public WritableImage getNextSlideDrawing() {
+        if(drawingIndex < slideDrawings.size() - 1)
+            return slideDrawings.get(++drawingIndex);
+        else
+            return slideDrawings.get(drawingIndex);
+    }
+
+    public void addSlideDrawing(WritableImage slideDrawing) {
+        ListIterator<WritableImage> iterator = slideDrawings.listIterator(drawingIndex + 1);
+        while(iterator.hasNext()) {
+            iterator.next();
+            iterator.remove();
+        }
+        slideDrawings.add(slideDrawing);
+        drawingIndex++;
+    }
 
     /**
      * "Destroys" all of the visible elements on this slide.  Should be called whenever a slide is no longer visible so that

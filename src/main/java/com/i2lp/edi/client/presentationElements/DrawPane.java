@@ -85,6 +85,8 @@ public class DrawPane extends Pane {
             if(isActive) {
                 saveCanvasToImage();
                 newPathStarted = false;
+                Slide slide = (Slide) parentPane.getChildren().get(0);
+                slide.addSlideDrawing(drawing);
             }
         });
     }

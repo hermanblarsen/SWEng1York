@@ -56,6 +56,7 @@ public abstract class Dashboard extends Application {
     protected Presentation selectedPres;
     private ArrayList<PresentationPreviewPanel> previewPanels;
     private FlowPane presentationPreviewsFlowPane;
+    private ComboBox<String> sortCombo;
 
     @Override
     public void start(Stage dashboardStage) {
@@ -81,7 +82,13 @@ public abstract class Dashboard extends Application {
     }
 
     public void updatePresentationPreviews() {
-        previewPanels = new ArrayList<>();
+        if(previewPanels == null)
+            previewPanels = new ArrayList<>();
+        else
+            previewPanels.clear();
+
+        presentationPreviewsFlowPane.getChildren().clear();
+
         int numOfPresentations = ediManager.getPresentationManager().getLocalPresentationList().size();
 
         for (int i = 0; i < numOfPresentations; i++) {
@@ -122,6 +129,9 @@ public abstract class Dashboard extends Application {
             });
             previewPanels.add(previewPanel);
         }
+
+        if(sortCombo != null)
+            sortBy(sortCombo.getValue());
     }
 
     private void selectPreviewPanel(PresentationPreviewPanel previewPanel) {
@@ -356,7 +366,7 @@ public abstract class Dashboard extends Application {
         Panel sortPanel = new Panel("Sort by");
         sortPanel.getStyleClass().add("panel-primary");
         VBox sortVBox = new VBox();
-        ComboBox<String> sortCombo = new ComboBox<>();
+        sortCombo = new ComboBox<>();
         sortCombo.getItems().addAll("Name A-Z", "Name Z-A", "Subject A-Z", "Subject Z-A");
         sortCombo.setOnAction(event -> sortBy(sortCombo.getValue()));
         sortCombo.setValue(sortCombo.getItems().get(0));
