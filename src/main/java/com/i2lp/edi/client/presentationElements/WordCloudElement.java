@@ -120,8 +120,8 @@ public class WordCloudElement extends InteractiveElement {
             FrequencyAnalyzer fa = new FrequencyAnalyzer();
             List<WordFrequency> wordFrequencies = fa.load(wordList);
 
-            Dimension dimention = new Dimension(600,600); //TODO this needs to be set from the XML - Herman
-            WordCloud wc = new WordCloud(dimention, CollisionMode.PIXEL_PERFECT);
+            Dimension dimension = new Dimension(Math.round(xSize),Math.round(ySize)); //TODO this needs to be set from the XML - Herman
+            WordCloud wc = new WordCloud(dimension, CollisionMode.PIXEL_PERFECT);
             wc.setPadding(2);
             if(cloudShapePath != null){
                 try {
