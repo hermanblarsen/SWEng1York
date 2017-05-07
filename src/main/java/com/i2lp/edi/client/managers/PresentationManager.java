@@ -3,6 +3,7 @@ package com.i2lp.edi.client.managers;
 import com.i2lp.edi.client.utilities.ZipUtils;
 import com.i2lp.edi.server.SocketClient;
 import com.i2lp.edi.server.packets.PresentationMetadata;
+import javafx.application.Platform;
 import javafx.concurrent.Task;
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
@@ -47,6 +48,7 @@ public class PresentationManager {
     /**
      * Update local presentation list with all available on server. Called whenever a presentation is added or goes live.
      */
+    @SuppressWarnings("unchecked")
     public void updatePresentations(){
         //Work out what we presentations are available locally, what are available remotely.
         localPresentationListString = getLocalPresentationListString();
@@ -59,7 +61,7 @@ public class PresentationManager {
 
         // If no difference between client and server, don't download anything
         if (difference.size() == 0) {
-            updateLocalPresentationList(remotePresentationList); //Metadata matches that available on server, so set.
+            updateLocalData();
             return;
         } else {
             ArrayList<PresentationMetadata> downloadList = new ArrayList<>();
@@ -75,10 +77,18 @@ public class PresentationManager {
             downloadMissingPresentations(downloadList);
             updateLocalPresentationList(remotePresentationList);//Metadata now matches that available on server after download, so set.
 
-            //If dashboard created, update the dashboard UI
-            if(ediManager.getDashboard() != null){
-                ediManager.getDashboard().updatePresentationPreviews();
-            }
+            updateLocalData();
+        }
+    }
+
+    /**
+     * Make local data match remote data after sync, and update UI.
+     */
+    private void updateLocalData(){
+        updateLocalPresentationList(remotePresentationList); //Metadata matches that available on server, so set.
+        //If dashboard created, update the dashboard UI
+        if(ediManager.getDashboard() != null){
+            Platform.runLater(() -> ediManager.getDashboard().updatePresentationPreviews());
         }
     }
 

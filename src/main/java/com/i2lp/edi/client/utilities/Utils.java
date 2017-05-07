@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -217,9 +218,9 @@ public class Utils {
         int r = Integer.parseInt(rHex, 16);
         int g = Integer.parseInt(gHex, 16);
         int b = Integer.parseInt(bHex, 16);
-        double a = Integer.parseInt(aHex, 16)/255;
+        double a = new BigDecimal((double) Integer.parseInt(aHex, 16)/255).setScale(1, BigDecimal.ROUND_HALF_UP).doubleValue();
 
-        return "rgba("+r+", "+g+", "+b+", "+a+")";
+        return "rgba("+r+","+g+","+b+","+a+")";
     }
 
     public static String removeFileExtension(String toRemove){

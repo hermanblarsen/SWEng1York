@@ -1,6 +1,7 @@
 package com.i2lp.edi.client.presentationElements;
 
 import com.i2lp.edi.client.utilities.Utils;
+import com.sun.webkit.WebPage;
 import javafx.concurrent.Worker;
 import javafx.scene.Node;
 import javafx.scene.input.MouseEvent;
@@ -8,6 +9,10 @@ import javafx.scene.layout.Pane;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import javafx.stage.Screen;
+
+import java.lang.reflect.Field;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static com.i2lp.edi.client.Constants.TEXT_ELEMENT_ZOOM_FACTOR;
 
@@ -74,6 +79,22 @@ public class TextElement extends SlideElement {
         browser.getEngine().getLoadWorker().stateProperty().addListener((arg0, oldState, newState) -> {
             if (newState == Worker.State.SUCCEEDED) {
                 isReady = true;
+            }
+            //Set Background of WebView to transparent (using reflection) as CSS wont do the job on Node level
+            try {
+                Pattern c = Pattern.compile("rgba?\\((\\d{1,3})[,\\)](\\d{1,3})[,\\)](\\d{1,3})[,\\)](\\d+\\.\\d+)\\)?");
+                Matcher m = c.matcher (bgColour);
+
+                if (m.matches())
+                {
+                    // Use reflection to retrieve the WebEngine's private 'page' field.
+                    Field f = webEngine.getClass().getDeclaredField("page");
+                    f.setAccessible(true);
+                    WebPage page = (WebPage) f.get(webEngine);
+                    page.setBackgroundColor(new java.awt.Color(Float.valueOf(m.group(1)), Float.valueOf(m.group(2)), Float.valueOf(m.group(3)),  Float.valueOf(m.group(4))).getRGB());
+                }
+            } catch (Exception e) {
+                System.out.println("Error: " + e);
             }
         });
         browser.setVisible(visibility);
