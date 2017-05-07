@@ -12,7 +12,6 @@
           </info>
         </annotation>
         <type>
-          <element name="documentTitle" type="string"/>
           <element name="author" type="string"/>
           <element name="version" type="float"/>
           <element name="documentaspectratio" type="float"/>
@@ -30,19 +29,20 @@
             iii) All positions and dimensions are given in terms of % of the full slide size.
             iv) If an element has “aspectratiolock” = true, the image will maintain its aspect ratio irrespective of the shape or size of the surrounding box. “elementaspectratio” is given as a float “x”, where x represents ratio x:1( e.g. 1.78:1 is 16:9). Else the image will be stretched to fit the box.
             v) Font sizes are specified in pt.
-            vi) All colours are stored in #RGBA (Red, Green, Blue, Alpha), where Alpha describes the opacity of the colour. Red, Green, Blue and Alpha are described by a single hex number #RRGGBBAA  where RR, GG, BB and AA are defined from 00 to FF. For Alpha, AA=FF means the colour is fully opaque, Alpha=00 means the colour is fully transparent.
-            vii) “documentid” is an string unique for every presentation.“slideid” is integers unique within every presentation, where “elementid” is assigned sequentially to elements locally on every slide.
+            vi) All colours are stored in #RGBA (Red, Green, Blue, Alpha), where Alpha describes the opacity of the colour. Red, Green, Blue and Alpha are described by a single hex number #RRGGBBAA  where RR, GG, BB and AA are defined from 00 to FF. For Alpha, AA=FF means the colour is fully opaque, Alpha=00 means the colour is fully transparent. Opacity in images is defined differently, as a float value between 0.0 and 1.0, where 1.0 is fully opaque.
+			vii) “documentid” is an string unique for every presentation.“slideid” is integers unique within every presentation, where “elementid” is assigned sequentially to elements locally on every slide.
             viii) “layer” allows for correct overlap control of elements. If a slide contains n elements, elements on that slide would have layers from n down to 0. n is an integer and n=0 is the background. A layer with a higher value takes priority, and will be rendered over smaller layer valued elements (e.g. element with layer=2 is rendered over an element with layer=1). Two elements on the same slide cannot have the same layer.
             ix) Sequencing of elements, specified with “startsequence” and “endsequence” respectively, describe in which order elements will appear (and disappear) on a slide. Every slide is instantiated with sequence=1. “startsequence” has to be specified for every element, and several elements can have the same sequence number. “endsequence” describes when the element should disappear, and can be 0/null if an object should remain on the slide. An element with startsequence=2 and endsequence=4 will be displayed when the external slide sequence counter reaches 2 (eg. after 1 click), and will remain on screen until the counter reaches 4 (eg. after another 2 clicks), where the element will disappear.
-            x) “starttime” and “endtime” for audio/video elements allows the presentation to not play the provided files in full. Times are given in seconds and specifies a time in the audio/video file. If the start/end-time extends past the duration of the sound/video element, the shorter duration will be used.
-            xi) If an object is given a duration it will be displayed from its “startsequence” for a given amount of time in seconds. If “duration” and “endsequence” is defined, the external slide sequence counter will iterate whenever one of the two attributes finish (counter  reaches “endsequence”, or the element is displayed for the full “duration”).
-            xii) “onclickaction” specifies the action to be performed when an object is clicked. Onclick actions require providing a special attribute, “onclickinfo”, further detailing the action to be performed. Each element may only have a maximum of 1 “onclickaction”.
+			x) “starttime” and “endtime” for audio/video elements allows the presentation to not play the provided files in full. Times are given in milliseconds and specifies a time in the audio/video file. If the start/end-time extends past the duration of the sound/video element, the shorter duration will be used.
+            xi) If an object is given a duration it will be displayed from its “startsequence” for a given amount of time in milliseconds. If “duration” and “endsequence” is defined, the external slide sequence counter will iterate whenever one of the two attributes finish (counter  reaches “endsequence”, or the element is displayed for the full “duration”).
+			xii) “onclickaction” specifies the action to be performed when an object is clicked. Onclick actions require providing a special attribute, “onclickinfo”, further detailing the action to be performed. Each element may only have a maximum of 1 “onclickaction”.
             ix.a)onclickaction=”openwebsite”, onclickinfo=”URL”
             ix.b)onclickaction=”gotoslide”, onclickinfo=”slideid”
             ix.c)onclickaction=”dynamicmediatoggle”, onclickinfo=”elementid”
 				This would dynamically start, pause or resume playback of audio and video.
-            xiii) Text elements can either be provided as a string with “textcontent” or in a .txt file. All text should be formatted using HTML. To access the correct .txt file and the correct content within, two elements will be used: “textfilepath” and “textcontentreference”. “textcontentreference” will be a string consisting of “slideid” and the “elementid” separated by a comma. Only one of “textcontent” or “textfilepath” should be declared, whereas if both are specified then the “textcontent” will be used.
-          </info>
+            xiii) All text should be formatted using HTML.
+			xiv)Rotation is performed around the centre of the shape as the pivot point. This rotation is defined in an anticlockwise direction and in degrees. 			
+			</info>
         </annotation>
         <type>
           <element name="defaults">
@@ -80,7 +80,7 @@
                   <attribute name="visibility" type="boolean"/>
                   <attribute name="startsequence" type="int"/>
                   <attribute name="endsequence" type="int"/>
-                  <attribute name="duration" type="float"/>
+                  <attribute name="duration" type="int"/>
                   <element name="textcontent" type="string"/>
                   <element name="textfilepath" type="string"/>
                   <element name="textcontentreference" type="string"/>
@@ -93,6 +93,7 @@
                   <element name="fontcolour" type="string"/>
                   <element name="bgcolour" type="string"/>
                   <element name="bordercolour" type="string"/>
+				  <element name="bordersize" type="int"/>
                   <element name="onclickaction" type="string"/>
                   <element name="onclickinfo" type="string"/>
                   <element name="aspectratiolock" type="boolean"/>
@@ -111,12 +112,13 @@
                   <attribute name="visibility" type="boolean"/>
                   <attribute name="startsequence" type="int"/>
                   <attribute name="endsequence" type="int"/>
-                  <attribute name="duration" type="float"/>
+                  <attribute name="duration" type="int"/>
                   <element name="onclickaction" type="string"/>
                   <element name="onclickinfo" type="string"/>
                   <element name="aspectratiolock" type="boolean"/>
                   <element name="elementaspectratio" type="float"/>
                   <element name="linecolour" type="string"/>
+				  <element name="linesize" type="int"/>
                   <element name="fillcolour" type="string"/>
                   <element name="polygon">
                     <annotation>
@@ -158,7 +160,7 @@
                   <attribute name="visibility" type="boolean"/>
                   <attribute name="startsequence" type="int"/>
                   <attribute name="endsequence" type="int"/>
-                  <attribute name="duration" type="float"/>
+                  <attribute name="duration" type="int"/>
                   <element name="xposition" type="float"/>
                   <element name="yposition" type="float"/>
                   <element name="xsize" type="float"/>
@@ -183,7 +185,7 @@
                   <attribute name="visibility" type="boolean"/>
                   <attribute name="startsequence" type="int"/>
                   <attribute name="endsequence" type="int"/>
-                  <attribute name="duration" type="float"/>
+                  <attribute name="duration" type="int"/>
                   <element name="xposition" type="float"/>
                   <element name="yposition" type="float"/>
                   <element name="xsize" type="float"/>
@@ -209,7 +211,7 @@
                   <attribute name="elementid" type="int"/>
                   <attribute name="startsequence" type="int"/>
                   <attribute name="endsequence" type="int"/>
-                  <attribute name="duration" type="float"/>
+                  <attribute name="duration" type="int"/>
                   <element name="path" type="string"/>
                   <element name="loop" type="boolean"/>
                   <element name="autoplay" type="boolean"/>

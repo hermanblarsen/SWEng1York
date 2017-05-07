@@ -1,6 +1,6 @@
 package com.i2lp.edi.client.managers;
 
-import com.i2lp.edi.client.Animation.Animation;
+import com.i2lp.edi.client.animation.Animation;
 import com.i2lp.edi.client.exceptions.SequenceNotFoundException;
 import com.i2lp.edi.client.presentationElements.*;
 import com.i2lp.edi.client.presentationViewer.StudentPresentationController;
@@ -47,7 +47,7 @@ import static com.i2lp.edi.client.utilities.Utils.getFileParentDirectory;
 public abstract class PresentationController {
     private static final float SLIDE_SIZE_ON_OPEN = 0.5f;
     private static final int PRES_CONTROLS_HEIGHT = 40;
-    private static final int STAGE_MIN_WIDTH = 510;
+    private static final int STAGE_MIN_WIDTH = 300;
     private static final int STAGE_MIN_HEIGHT = 300;
     private static final int HIDE_CURSOR_DELAY = 2000;
     private static final double MAX_ERASER_SIZE = 20;
@@ -87,6 +87,7 @@ public abstract class PresentationController {
     protected double slideWidth;
     protected double slideHeight;
     protected int currentSlideNumber = 0; //Current slide number in presentation
+    protected int currentSequenceNumber = 0; //Current slide number in presentation
     private boolean isMouseOverSlide = true;
     private double preFullscreenSlideWidth;
     private double preFullscreenSlideHeight;
@@ -180,7 +181,7 @@ public abstract class PresentationController {
     public void openPresentation(String path) {
         loadPresentation(path);
 
-        presentationStage.setTitle(presentationElement.getTitle());
+        presentationStage.setTitle(presentationElement.getDocumentTitle());
         slideNumber.setText("Slide 1 of " + presentationElement.getSlideList().size());
 
         Rectangle2D primaryScreenBounds = Screen.getPrimary().getVisualBounds();
@@ -689,10 +690,25 @@ public abstract class PresentationController {
     }
 
     protected void slideProgress(Presentation presentation) {
+        //Make sure currentSlideNumber doesn't overflow
+
         int slideNumber = currentSlideNumber + 1;
+
+        //Calculate the total number of sequences in the presentation
+        int sequenceNumberMax=0;
+        for (Slide slide: presentation.getSlideList()) {
+            sequenceNumberMax+=slide.getMaxSequenceNumber();
+            sequenceNumberMax++;
+        }
+        //Make sure the current sequence doesn't go out of bounds
+        if (currentSequenceNumber >= sequenceNumberMax) currentSequenceNumber = sequenceNumberMax;
+        if (currentSequenceNumber <=0) currentSequenceNumber = 0;
+
         int slideNumberMax = presentation.getSlideList().size();
-        float slideProgress = slideNumber / slideNumberMax;
-        progressBar.setProgress(slideProgress);
+
+        //Calculate progress and reset text in progressbar
+        float slideProgress = (float) (currentSequenceNumber) / sequenceNumberMax;
+        progressBar.setProgress((double)slideProgress);
         this.slideNumber.setText("Slide " + slideNumber + " of " + slideNumberMax);
     }
 
@@ -765,6 +781,7 @@ public abstract class PresentationController {
             } catch (SequenceNotFoundException e) {
                 logger.warn("Failed to find Element with Sequence number of " + slideToAdvance.getCurrentSequenceNumber() + " in slideElementList.");
             }
+        currentSequenceNumber++;
         } else if ((slideToAdvance.getCurrentSequenceNumber() > 0) && (direction == Slide.SLIDE_BACKWARD)) {  //If we're going backwards and still elements left
             try {
                 checkInVisibleSet = Slide.searchForSequenceElement(slideToAdvance.getSlideElementList(), slideToAdvance.getCurrentSequenceNumber());
@@ -778,12 +795,15 @@ public abstract class PresentationController {
                 logger.warn("Failed to find Element with Sequence number of " + slideToAdvance.getCurrentSequenceNumber() + " in slideElementList.");
             }
             slideToAdvance.setCurrentSequenceNumber(slideToAdvance.getCurrentSequenceNumber() - 1);
+            currentSequenceNumber--;
         } else {
             //If we're at limit of sequence number, alert calling method that we need to move to next/previous slide dependent on direction and reset sequence number
             switch (direction) {
                 case Slide.SLIDE_FORWARD:
+                    currentSequenceNumber++;
                     return Slide.SLIDE_FORWARD;
                 case Slide.SLIDE_BACKWARD:
+                    currentSequenceNumber--;
                     return Slide.SLIDE_BACKWARD;
             }
         }

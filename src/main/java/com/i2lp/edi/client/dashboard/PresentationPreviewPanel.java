@@ -42,12 +42,12 @@ public class PresentationPreviewPanel extends Panel {
         Random random = new Random();
         presentationSubject = "Subject " + random.nextInt(3); //TODO: Get presentation subject from XML
 
-        this.setText("ID: " + getPresentation().getDocumentID());
+        this.setText("ID: " + this.presentation.getDocumentID());
 
         this.setBody(getPresentation().getSlidePreview(0, 170)); //TODO: Make width a constant
         this.setFooter(new Label("Subject: " + presentationSubject));
 
-        Tooltip tooltip = new Tooltip("Title: " + getPresentation().getTitle() + "\n" +
+        Tooltip tooltip = new Tooltip("Title: " + getPresentation().getDocumentTitle() + "\n" +
                                         "Author: " + getPresentation().getAuthor() + "\n" +
                                         "Subject: " + getPresentation().getSubject() + "\n" +
                                         "Description: " + getPresentation().getDescription() + "\n" +

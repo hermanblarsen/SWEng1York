@@ -112,7 +112,7 @@ public class ParserXML {
 
                     switch (elementName) {
                         case "title":
-                            myPresentation.setTitle(elementContent);
+                            myPresentation.setDocumentTitle(elementContent);
                             break;
                         case "author":
                             myPresentation.setAuthor(elementContent);

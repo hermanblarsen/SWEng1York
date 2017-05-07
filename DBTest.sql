@@ -1,13 +1,13 @@
 
 CREATE TABLE "books" (
 	"book_id" SERIAL,
-	"title" varchar(255),
+	"documentTitle" varchar(255),
 	"description" varchar(255),
 	CONSTRAINT books_pk PRIMARY KEY ("book_id")
 ) WITH (
   OIDS=FALSE
 );
-INSERT INTO public.books (book_id, title, description)
+INSERT INTO public.books (book_id, documentTitle, description)
 VALUES (1, 'T1', 'D1'), (2, 'T2', 'D2'), ('3', 'T3', 'D3');
 
 CREATE TABLE "authors" (

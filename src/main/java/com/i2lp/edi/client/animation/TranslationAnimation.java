@@ -1,4 +1,4 @@
-package com.i2lp.edi.client.Animation;
+package com.i2lp.edi.client.animation;
 
 import javafx.animation.*;
 import javafx.util.Duration;

@@ -1,6 +1,6 @@
 package com.i2lp.edi.client.presentationElements;
 
-import com.i2lp.edi.client.Animation.Animation;
+import com.i2lp.edi.client.animation.Animation;
 import com.i2lp.edi.client.managers.PresentationController;
 import javafx.scene.Node;
 import javafx.scene.layout.Pane;
@@ -66,8 +66,8 @@ public abstract class SlideElement {
                 case Animation.NO_ANIMATION: //No animation (click)
                     logger.info("No animation");
                     break;
-                case Animation.ENTRY_ANIMATION: //Entry Animation (playback)
-                    if (startAnimation != null) {//Animation Exists as StartSequence Present
+                case Animation.ENTRY_ANIMATION: //Entry animation (playback)
+                    if (startAnimation != null) {//animation Exists as StartSequence Present
                         startAnimation.play();
                         logger.info("Entry animation playing");
                     } else {
@@ -75,8 +75,8 @@ public abstract class SlideElement {
                         getCoreNode().setVisible(isVisibility());
                     }
                     break;
-                case Animation.EXIT_ANIMATION: //Exit Animation (playback)
-                    if (endAnimation != null) {//Animation Exists as EndSequence Present
+                case Animation.EXIT_ANIMATION: //Exit animation (playback)
+                    if (endAnimation != null) {//animation Exists as EndSequence Present
                         endAnimation.play();
                         logger.info("Exit animation playing");
                     } else {

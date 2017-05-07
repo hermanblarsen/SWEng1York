@@ -1,6 +1,7 @@
 package com.i2lp.edi.server;
 
 import com.i2lp.edi.client.managers.EdiManager;
+import com.i2lp.edi.client.presentationElements.Presentation;
 import com.i2lp.edi.client.utilities.Utils;
 import com.i2lp.edi.server.packets.Module;
 import com.i2lp.edi.server.packets.PresentationMetadata;
@@ -254,6 +255,7 @@ public class SocketClient {
         return "USER_ADD_FAILED";
     }
 
+
     class UserAuthTask implements Callable<User> {
         UserAuth toAuth;
 
@@ -440,5 +442,46 @@ public class SocketClient {
                 ediManager.getPresentationManager().updatePresentations(); //Go and download the presentation from the server
             }
         });
+    }
+
+    /**
+     *  Delete the requested presentation from the respective module, deleting the data base table reference and the server zip contents
+     * @param presentationID
+     * @param moduleID
+     * @return
+     */
+    public String removePresentationFromModule(int presentationID, int moduleID) { //TODO @Amrik make delete zip stuff. and maybe my logic
+        String return_status_removal = "";
+        String xml_path = "";
+        try (PGConnection connection = (PGConnection) dataSource.getConnection()) {
+            PreparedStatement statementXml = connection.prepareStatement("SELECT * FROM edi.public.sp_getpresentationsformodule(?);");
+            //Fill prepared statements to avoid SQL injection
+            statementXml.setInt(1, moduleID);
+
+            //Call stored procedure on database
+            ResultSet getXmlUrlResultSet = statementXml.executeQuery();
+
+            while (getXmlUrlResultSet.next()) {
+                int presentationIdTemp = getXmlUrlResultSet.getInt("presentation_id");
+                if (presentationIdTemp == presentationID) xml_path = getXmlUrlResultSet.getString("xml_url");
+            }
+            statementXml.close();
+
+            //When the xml for the presentation is retrieved, then remove it for the respective module
+            PreparedStatement statementRemovePresentation = connection.prepareStatement("SELECT edi.public.sp_removepresentationfrommodule(?, ?);");
+            //Fill prepared statements to avoid SQL injection
+            statementRemovePresentation.setInt(1, moduleID);
+            statementRemovePresentation.setString(2, xml_path);
+
+            //Call stored procedure on database
+            statementRemovePresentation.executeQuery();
+
+            return_status_removal = statementRemovePresentation.getResultSet().toString(); //TODO is this right Amrik?
+
+            statementRemovePresentation.close();
+        } catch (Exception e) {
+            logger.error("Unable to connect to PostgreSQL on port 5432. PJDBC dump:", e);
+        }
+        return return_status_removal;
     }
 }

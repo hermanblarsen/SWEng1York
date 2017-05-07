@@ -1,9 +1,9 @@
 package com.i2lp.edi.client.utilities;
 
-import com.i2lp.edi.client.Animation.OpacityAnimation;
-import com.i2lp.edi.client.Animation.PathAnimation;
-import com.i2lp.edi.client.Animation.ScaleAnimation;
-import com.i2lp.edi.client.Animation.TranslationAnimation;
+import com.i2lp.edi.client.animation.OpacityAnimation;
+import com.i2lp.edi.client.animation.PathAnimation;
+import com.i2lp.edi.client.animation.ScaleAnimation;
+import com.i2lp.edi.client.animation.TranslationAnimation;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -60,20 +60,20 @@ public class AnimationTestbench extends Application {
         opacityAnimation.setCoreNodeToAnimate(testRect);
         pathAnimation.setCoreNodeToAnimate(testRect);
 
-        // Add Test Translation Animation Button
-        Button translationButton = new Button("Play Translation Animation");
+        // Add Test Translation animation Button
+        Button translationButton = new Button("Play Translation animation");
         translationButton.addEventHandler(MouseEvent.MOUSE_CLICKED, e-> translationAnimation.play());
 
-        // Add Test Scale Animation Button
-        Button scaleButton = new Button("Play Scale Animation");
+        // Add Test Scale animation Button
+        Button scaleButton = new Button("Play Scale animation");
         scaleButton.addEventHandler(MouseEvent.MOUSE_CLICKED, e-> scaleAnimation.play());
 
-        // Add Test Opacity Animation Button
-        Button opacityButton = new Button("Play Opacity Animation");
+        // Add Test Opacity animation Button
+        Button opacityButton = new Button("Play Opacity animation");
         opacityButton.addEventHandler(MouseEvent.MOUSE_CLICKED, e-> opacityAnimation.play());
 
-        // Add Test Path Animation Button
-        Button pathButton = new Button("Play Path Animation");
+        // Add Test Path animation Button
+        Button pathButton = new Button("Play Path animation");
         pathButton.addEventHandler(MouseEvent.MOUSE_CLICKED, e-> pathAnimation.play());
 
 

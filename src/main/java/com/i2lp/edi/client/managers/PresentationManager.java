@@ -162,6 +162,15 @@ public class PresentationManager {
         return remotePresentationDocumentIDs;
     }
 
+    public boolean removePresentation(int presentationID, int moduleID){ //TODO needs thinking @Amrik.
+        boolean status = false;
+        String return_status;
+        return_status = socketClient.removePresentationFromModule(presentationID, moduleID);
+
+        if (return_status.contains("Success")) status = true;
+
+        return status;
+    }
 
     public void uploadPresentation(String fileToUpload, String filename, int moduleID) {
         //Generate thumbnails for Slides.
@@ -178,7 +187,7 @@ public class PresentationManager {
             @Override
             protected Object call() throws Exception {
                 try {
-                    Thread.sleep(1000); //Wait for thumbnails to be generated TODO: replace with checker for numFiles
+                    Thread.sleep(1000); //Wait for thumbnails to be generated TODO: replace with checker for numFiles (y)
                     new ZipUtils(PRESENTATIONS_PATH + filename, zipPath);
                     return null;
                 } catch (InterruptedException e) {

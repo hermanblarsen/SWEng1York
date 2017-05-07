@@ -23,7 +23,13 @@ import static com.i2lp.edi.client.Constants.THUMBNAIL_WIDTH;
 public class Presentation extends Pane {
 
     protected static Logger logger = LoggerFactory.getLogger(Presentation.class);
-    private String title;
+    //From i2lp:
+    private String documentTitle;
+    private boolean live;
+    private int currentSlideNumber;
+    private String xmlUrl;
+
+    //From Schema
     private String documentID;
     private String author;
     private Float version;
@@ -35,7 +41,7 @@ public class Presentation extends Pane {
     private boolean isI2lpFormat;
     private ArrayList<String> xmlFaults = null;
 
-    private boolean isAutoplayPresetation = false;
+    private boolean autoplayPresentation = false;
 
 
     private int maxSlideNumber = 0;
@@ -174,9 +180,9 @@ public class Presentation extends Pane {
         this.description = description;
     }
 
-    public String getTitle() { return title; }
+    public String getDocumentTitle() { return documentTitle; }
 
-    public void setTitle(String title) { this.title = title; }
+    public void setDocumentTitle(String documentTitle) { this.documentTitle = documentTitle; }
 
     public String getSubject() { return subject; }
 
@@ -422,11 +428,11 @@ public class Presentation extends Pane {
     }
 
     public boolean isAutoplayPresentation() {
-        return isAutoplayPresetation;
+        return autoplayPresentation;
     }
 
-    public void setAutoplayPresetation(boolean autoplayPresetation) {
-        isAutoplayPresetation = autoplayPresetation;
+    public void setAutoplayPresentation(boolean autoplayPresentation) {
+        this.autoplayPresentation = autoplayPresentation;
     }
 
     public ImageView getSlidePreview(int slideNumber, double thumbnailWidth) {

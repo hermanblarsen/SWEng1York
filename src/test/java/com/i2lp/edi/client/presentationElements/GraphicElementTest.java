@@ -1,6 +1,6 @@
 package com.i2lp.edi.client.presentationElements;
 
-import com.i2lp.edi.client.Animation.Animation;
+import com.i2lp.edi.client.animation.Animation;
 import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;

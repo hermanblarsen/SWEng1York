@@ -1,4 +1,4 @@
-package com.i2lp.edi.client.Animation;
+package com.i2lp.edi.client.animation;
 
 
 import javafx.scene.Node;
@@ -10,7 +10,7 @@ import javafx.util.Duration;
 public abstract class Animation {
     //Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    //Animation Appearance Types
+    //animation Appearance Types
     public final static int NO_ANIMATION = 0;
     public final static int ENTRY_ANIMATION = 1;
     public final static int EXIT_ANIMATION = 2;

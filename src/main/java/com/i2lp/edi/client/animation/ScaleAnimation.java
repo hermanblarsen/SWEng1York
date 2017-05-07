@@ -1,6 +1,5 @@
-package com.i2lp.edi.client.Animation;
+package com.i2lp.edi.client.animation;
 
-import javafx.animation.FadeTransition;
 import javafx.animation.ScaleTransition;
 import javafx.util.Duration;
 

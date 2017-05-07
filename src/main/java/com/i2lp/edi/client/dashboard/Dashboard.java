@@ -143,10 +143,17 @@ public abstract class Dashboard extends Application {
     }
 
     private void deletePresentation(PresentationPreviewPanel previewPanel) {
-        previewPanels.remove(previewPanel);
-        presentationPreviewsFlowPane.getChildren().remove(previewPanel);
+        Presentation presentationToDelete = previewPanel.getPresentation();
 
-        //TODO: delete presentation from server
+        //TODO we possibly need to have module NAME and differentiate between presentation ID and presentationTITLE @Amrik
+        //Try to remove the presentation from the server
+        boolean successful_removal = ediManager.getPresentationManager().removePresentation(25, 1); //TODO we needs to store this somehow in our java @Amrik
+
+        if(successful_removal) {
+            previewPanels.remove(previewPanel);
+            presentationPreviewsFlowPane.getChildren().remove(previewPanel);
+        }
+        else logger.warn("Presentation Could not be removed"); //TODO improve this
     }
 
     private ScrollPane addBorderCenter() {

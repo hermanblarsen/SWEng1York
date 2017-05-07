@@ -1,6 +1,6 @@
 <document documentid="i2lpSampleXml">
 	<documentdetails>
-		<title>Sample Presentation</title>
+		<documentTitle>Sample Presentation</documentTitle>
 		<author>Herman Larsen</author>
 		<version>1.0</version>
 		<documentaspectratio>1</documentaspectratio>
