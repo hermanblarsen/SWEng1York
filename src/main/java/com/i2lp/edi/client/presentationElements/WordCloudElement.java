@@ -49,6 +49,10 @@ public class WordCloudElement extends InteractiveElement {
     protected Tile countdownTile;
     protected boolean  writingComplete = false;
     protected String cloudShapePath = null;
+    protected float xPosition =0;
+    protected float yPosition =0;
+    protected float xSize =0;
+    protected float ySize=0;
 
     @Override
     public void sendDataToServer() {
@@ -62,7 +66,16 @@ public class WordCloudElement extends InteractiveElement {
 
     @Override
     public void doClassSpecificRender() {
+        if (xSize == 0 || ySize == 0) {
+            wordCloudPanel.setPrefHeight(slideHeight);
+            wordCloudPanel.setPrefWidth(slideWidth);
+        } else {
+            wordCloudPanel.setPrefHeight(slideHeight * ySize);
+            wordCloudPanel.setPrefWidth(slideWidth * xSize);
+        }
 
+        wordCloudPanel.setTranslateX(slideWidth * xPosition);
+        wordCloudPanel.setTranslateY(slideHeight * yPosition);
     }
 
     @Override
@@ -193,4 +206,35 @@ public class WordCloudElement extends InteractiveElement {
         this.cloudShapePath = cloudShapePath;
     }
 
+    public float getxPosition() {
+        return xPosition;
+    }
+
+    public void setxPosition(float xPosition) {
+        this.xPosition = xPosition;
+    }
+
+    public float getyPosition() {
+        return yPosition;
+    }
+
+    public void setyPosition(float yPosition) {
+        this.yPosition = yPosition;
+    }
+
+    public float getxSize() {
+        return xSize;
+    }
+
+    public void setxSize(float xSize) {
+        this.xSize = xSize;
+    }
+
+    public float getySize() {
+        return ySize;
+    }
+
+    public void setySize(float ySize) {
+        this.ySize = ySize;
+    }
 }

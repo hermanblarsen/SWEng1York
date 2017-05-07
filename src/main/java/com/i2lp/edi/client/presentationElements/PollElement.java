@@ -46,6 +46,10 @@ public class PollElement extends InteractiveElement {
     private ToggleButton[] answerButton;
     private ChartData[] chartDataArray;
     private Color assignedColour;
+    protected float xSize= 0;
+    protected float ySize= 0;
+    protected float xPosition=0;
+    protected float yPosition=0;
 
     public PollElement() {
 
@@ -63,7 +67,17 @@ public class PollElement extends InteractiveElement {
 
     @Override
     public void doClassSpecificRender() {
-        //TODO: Need to figure out resizing behaviour
+        if (xSize == 0 || ySize == 0) {
+            questionPane.setPrefHeight(slideHeight);
+            questionPane.setPrefWidth(slideWidth);
+        } else {
+            questionPane.setPrefHeight(slideHeight * ySize);
+            questionPane.setPrefWidth(slideWidth * xSize);
+        }
+
+        questionPane.setTranslateX(slideWidth * xPosition);
+        questionPane.setTranslateY(slideHeight * yPosition);
+
     }
 
     @Override
@@ -286,5 +300,38 @@ public class PollElement extends InteractiveElement {
 
         return  assignedColour;
     }
+
+    public float getxSize() {
+        return xSize;
+    }
+
+    public void setxSize(float xSize) {
+        this.xSize = xSize;
+    }
+
+    public float getySize() {
+        return ySize;
+    }
+
+    public void setySize(float ySize) {
+        this.ySize = ySize;
+    }
+
+    public float getxPosition() {
+        return xPosition;
+    }
+
+    public void setxPosition(float xPosition) {
+        this.xPosition = xPosition;
+    }
+
+    public float getyPosition() {
+        return yPosition;
+    }
+
+    public void setyPosition(float yPosition) {
+        this.yPosition = yPosition;
+    }
+
 
 }
