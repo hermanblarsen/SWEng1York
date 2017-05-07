@@ -132,7 +132,7 @@ public class ParserXMLTest {
         assertEquals( 2, slide1TextElement1.getStartSequence(), ERROR_MARGIN);
         assertEquals( 4, slide1TextElement1.getEndSequence(), ERROR_MARGIN);
         assertEquals( 20.5, slide1TextElement1.getDuration(), ERROR_MARGIN);
-        assertEquals("rgba(238, 238, 238, 1.0)", slide1TextElementArray.get(0).getFontColour()); //#EEEEEEFF TODO: CHECK RGBA MATCHES HEX
+        assertEquals("rgba(238,238,238,1.0)", slide1TextElementArray.get(0).getFontColour()); //#EEEEEEFF TODO: CHECK RGBA MATCHES HEX
         assertEquals(1.2, slide1TextElementArray.get(0).getElementAspectRatio(), ERROR_MARGIN);
     }
 
