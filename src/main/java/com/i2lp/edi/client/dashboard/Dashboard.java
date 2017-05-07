@@ -8,11 +8,13 @@ import com.i2lp.edi.client.presentationElements.Presentation;
 import com.i2lp.edi.client.presentationViewer.StudentPresentationController;
 import com.i2lp.edi.client.presentationViewer.TeacherPresentationController;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.geometry.*;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.ScrollPane.ScrollBarPolicy;
+import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
@@ -62,18 +64,24 @@ public abstract class Dashboard extends Application {
         dashboardStage.setTitle("Edi");
         Image ediLogoSmall = new Image("file:projectResources/logos/ediLogo32x32.png");
         dashboardStage.getIcons().add(ediLogoSmall);
+        dashboardStage.setOnCloseRequest(event -> Platform.exit());
 
         border = new BorderPane();
         scene = new Scene(border, 1000, 600);
         scene.getStylesheets().add("bootstrapfx.css");
         dashboardStage.setScene(scene);
 
-        previewPanels = new ArrayList<>();
-
         border.setTop(addBorderTop());
         border.setCenter(addBorderCenter());
+        updatePresentationPreviews(); //This has to be placed between addBorderCenter() and addBorderLeft()
+        showAllPreviewPanels();
+        border.setLeft(addBorderLeft());
 
-        //The following code has to be placed between addBorderCenter() and addBorderLeft()
+        dashboardStage.show();
+    }
+
+    private void updatePresentationPreviews() {
+        previewPanels = new ArrayList<>();
         int numOfPresentations = ediManager.getPresentationManager().getLocalPresentationList().size();
 
         for (int i = 0; i < numOfPresentations; i++) {
@@ -85,14 +93,11 @@ public abstract class Dashboard extends Application {
                     if (previewPanel.isSelected()) {
                         launchPresentation(previewPanel.getPresentationPath());
                     } else {
-                        for (int j = 0; j < previewPanels.size(); j++)
-                            previewPanels.get(j).setSelected(false);
-
-                        previewPanel.setSelected(true);
-                        selectedPres = previewPanel.getPresentation();
-                        border.setRight(addBorderRight());
+                        selectPreviewPanel(previewPanel);
                     }
                 } else if (event.getButton() == MouseButton.SECONDARY) {
+                    selectPreviewPanel(previewPanel);
+
                     ContextMenu cMenu = new ContextMenu();
 
                     MenuItem open = new MenuItem("Open");
@@ -118,10 +123,14 @@ public abstract class Dashboard extends Application {
             });
             previewPanels.add(previewPanel);
         }
+    }
 
-        border.setLeft(addBorderLeft());
-
-        dashboardStage.show();
+    private void selectPreviewPanel(PresentationPreviewPanel previewPanel) {
+        for (int j = 0; j < previewPanels.size(); j++)
+            previewPanels.get(j).setSelected(false);
+        previewPanel.setSelected(true);
+        selectedPres = previewPanel.getPresentation();
+        border.setRight(addBorderRight());
     }
 
     private void deletePresentation(PresentationPreviewPanel previewPanel) {
@@ -139,8 +148,6 @@ public abstract class Dashboard extends Application {
         presentationPreviewsFlowPane.setVgap(4);
         presentationPreviewsFlowPane.setHgap(4);
         presentationPreviewsFlowPane.setStyle("-fx-background-color: #ffffff;");
-
-        showAllPreviewPanels();
 
         scrollPane.setContent(presentationPreviewsFlowPane);
         scrollPane.setHbarPolicy(ScrollBarPolicy.NEVER);
@@ -179,6 +186,8 @@ public abstract class Dashboard extends Application {
         aboutPopup.getContent().add(aboutStackPane);
         Region backgroundRegion = new Region();
         backgroundRegion.setBackground(new Background(new BackgroundFill(Color.WHITE, null, null)));
+        DropShadow shadow = new DropShadow();
+        backgroundRegion.setEffect(shadow);
         aboutStackPane.getChildren().add(backgroundRegion);
         BorderPane aboutBorder = new BorderPane();
         aboutStackPane.getChildren().add(aboutBorder);
@@ -203,6 +212,10 @@ public abstract class Dashboard extends Application {
      * @author Amrik Sadhra
      */
     private void launchPresentation(String path) {
+
+        if(presentationController != null)
+            presentationController.close();
+
         if (this instanceof StudentDashboard) {
             presentationController = new StudentPresentationController();
         } else if (this instanceof TeacherDashboard) {

@@ -1,13 +1,17 @@
 package com.i2lp.edi.client.presentationElements;
 
+import javafx.event.Event;
+import javafx.geometry.Bounds;
+import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.WritableImage;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,13 +21,18 @@ import org.slf4j.LoggerFactory;
  */
 public class DrawPane extends Pane {
 
-    private boolean active;
+    private boolean isActive;
+    private boolean isEraserMode;
     private Logger logger = LoggerFactory.getLogger(DrawPane.class);
     private Canvas canvas;
     private GraphicsContext graphicsContext;
     private WritableImage drawing;
+    private final StackPane parentPane;
+    private double eraserSize = 5;
+    private boolean newPathStarted = false;
 
-    public DrawPane() {
+    public DrawPane(StackPane parent) {
+        this.parentPane = parent;
         canvas = new Canvas(1, 1);
         getChildren().add(canvas);
         saveCanvasToImage();
@@ -33,20 +42,71 @@ public class DrawPane extends Pane {
 
         graphicsContext = canvas.getGraphicsContext2D();
 
+        addEventFilter(MouseEvent.ANY, event -> {
+            if(!isActive) {
+                Node target = findEventTarget(event, (Parent) parentPane.getChildren().get(0));
+                if(target != null) {
+                    logger.debug("Target found. Diverting event to " + target.toString());
+                    Event.fireEvent(target, (Event) event.clone());
+                    event.consume();
+                } else {
+                    logger.debug("Event target not found");
+                }
+            }
+        });
+
         addEventHandler(MouseEvent.MOUSE_PRESSED, event -> {
-            if(active) {
+            if(isActive) {
                 graphicsContext.beginPath();
                 graphicsContext.moveTo(event.getX(), event.getY());
+                newPathStarted = true;
+                if(!isEraserMode())
+                    graphicsContext.fillRect(event.getX() - graphicsContext.getLineWidth()/2, event.getY() - graphicsContext.getLineWidth()/2, graphicsContext.getLineWidth(), graphicsContext.getLineWidth());
             }
         });
 
         addEventHandler(MouseEvent.MOUSE_DRAGGED, event -> {
-            if(active) {
-                graphicsContext.lineTo(event.getX(), event.getY());
-                graphicsContext.stroke();
-                saveCanvasToImage();
+            if(isActive) {
+                if(!isEraserMode) {
+                    if(!newPathStarted) { //Hack to for when MOUSE_PRESSED wasn't detected first - happens sometimes for some reason
+                        graphicsContext.beginPath();
+                        graphicsContext.moveTo(event.getX(), event.getY());
+                        newPathStarted = true;
+                    }
+                    graphicsContext.lineTo(event.getX(), event.getY());
+                    graphicsContext.stroke();
+                } else {
+                    graphicsContext.clearRect(event.getX(), event.getY(), eraserSize, eraserSize);
+                }
             }
         });
+
+        addEventHandler(MouseEvent.MOUSE_RELEASED, event -> {
+            if(isActive) {
+                saveCanvasToImage();
+                newPathStarted = false;
+            }
+        });
+    }
+
+    private Node findEventTarget(MouseEvent event, Parent parent) {
+        logger.debug("Searching for event target in " + parent.toString());
+        Node foundTarget = null;
+        if(parent.getChildrenUnmodifiable().size() != 0) {
+            for(Node child : parent.getChildrenUnmodifiable()) {
+                Bounds boundsInScene = child.localToScene(child.getBoundsInLocal());
+                if(boundsInScene.contains(event.getSceneX(), event.getSceneY())) {
+                    if(child instanceof Parent) {
+                        foundTarget = findEventTarget(event, (Parent) child);
+                    } else {
+                        foundTarget = child;
+                    }
+                }
+            }
+        } else {
+            foundTarget = parent;
+        }
+        return foundTarget;
     }
 
     private void redraw() {
@@ -77,9 +137,14 @@ public class DrawPane extends Pane {
         graphicsContext.setLineWidth(width);
     }
 
-    public void setBrushPaint(Paint paint) {
-        graphicsContext.setStroke(paint);
+    public double getBrushWidth() { return graphicsContext.getLineWidth(); }
+
+    public void setBrushColor(Color color) {
+        graphicsContext.setStroke(color);
+        graphicsContext.setFill(color);
     }
+
+    public Color getBrushColor() { return (Color) graphicsContext.getStroke(); }
 
     public void clear() {
         graphicsContext.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
@@ -95,10 +160,20 @@ public class DrawPane extends Pane {
     }
 
     public boolean isActive() {
-        return active;
+        return isActive;
     }
 
     public void setActive(boolean active) {
-        this.active = active;
+        this.isActive = active;
     }
+
+    public Canvas getCanvas() { return canvas; }
+
+    public void setEraserMode(boolean eraserMode) { this.isEraserMode = eraserMode; }
+
+    public boolean isEraserMode() { return isEraserMode; }
+
+    public void setEraserSize(double size) { this.eraserSize = size; }
+
+    public double getEraserSize() { return eraserSize; }
 }

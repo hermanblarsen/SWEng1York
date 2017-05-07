@@ -4,16 +4,13 @@ import com.i2lp.edi.client.presentationElements.Presentation;
 import com.i2lp.edi.client.utilities.ParserXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
-import javafx.scene.image.ImageView;
+import javafx.scene.effect.DropShadow;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import org.kordamp.bootstrapfx.scene.layout.Panel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.File;
 import java.util.Random;
-
-import static com.i2lp.edi.client.Constants.PRESENTATIONS_PATH;
 
 
 /**
@@ -36,10 +33,14 @@ public class PresentationPreviewPanel extends Panel {
         this.setHidden(false);
         this.getStyleClass().add("panel-primary");
 
+        DropShadow shadow = new DropShadow();
+        this.addEventHandler(MouseEvent.MOUSE_ENTERED, event -> setEffect(shadow));
+        this.addEventHandler(MouseEvent.MOUSE_EXITED, event -> setEffect(null));
+
         ParserXML parser = new ParserXML(presentationPath);
         presentation = parser.parsePresentation();
         Random random = new Random();
-        presentationSubject = new String("Subject " + random.nextInt(3)); //TODO: Get presentation subject from XML
+        presentationSubject = "Subject " + random.nextInt(3); //TODO: Get presentation subject from XML
 
         this.setText("ID: " + getPresentation().getDocumentID());
 

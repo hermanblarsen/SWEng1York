@@ -34,15 +34,6 @@ public class Slide extends Pane {
 
     protected int slideID;
 
-
-    public int getCurrentSequenceNumber() {
-        return currentSequenceNumber;
-    }
-
-    public void setCurrentSequenceNumber(int currentSequenceNumber) {
-        this.currentSequenceNumber = currentSequenceNumber;
-    }
-
     int currentSequenceNumber = 0;
     int maxSequenceNumber = 0;
 
@@ -73,6 +64,14 @@ public class Slide extends Pane {
 
     public void moveElementToIndex(int index) {
 
+    }
+
+    public int getCurrentSequenceNumber() {
+        return currentSequenceNumber;
+    }
+
+    public void setCurrentSequenceNumber(int currentSequenceNumber) {
+        this.currentSequenceNumber = currentSequenceNumber;
     }
 
     public int getMaxSequenceNumber() {

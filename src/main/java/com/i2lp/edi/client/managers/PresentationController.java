@@ -9,6 +9,7 @@ import com.i2lp.edi.client.utilities.ParserXML;
 import javafx.animation.FadeTransition;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.geometry.Dimension2D;
 import javafx.geometry.Insets;
@@ -16,20 +17,16 @@ import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Cursor;
 import javafx.scene.ImageCursor;
+import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.control.ContextMenu;
-import javafx.scene.control.Label;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.ProgressBar;
+import javafx.scene.control.*;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.MouseButton;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.input.ScrollEvent;
+import javafx.scene.input.*;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import javafx.stage.Popup;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.util.Duration;
@@ -55,7 +52,6 @@ public abstract class PresentationController {
     private static final int HIDE_CURSOR_DELAY = 2000;
     Logger logger = LoggerFactory.getLogger(PresentationController.class);
 
-
     protected String xmlPath = null;
 
     protected Scene scene;
@@ -73,10 +69,15 @@ public abstract class PresentationController {
     protected Panel commentPanel;
     private boolean isShowBlack = false;
     private boolean mouseMoved = true;
+    private boolean mouseDown = false;
     private EventHandler<MouseEvent> disabledCursorFilter;
+    private BorderPane controlsPane;
     private HBox presControls;
+    private VBox drawControls;
     private Region blackRegion;
     private DrawPane drawPane;
+    private ImageView visibilityButton;
+    private Popup colourPopup;
 
     private CursorState cursorState = CursorState.DEFAULT;
 
@@ -88,7 +89,7 @@ public abstract class PresentationController {
     private double preFullscreenSlideHeight;
     private boolean isMouseOverControls = false;
     private boolean isDrawModeOn = false;
-    private boolean showDrawing = true;
+    private boolean isDrawPaneVisible = true;
 
 
     public PresentationController() {
@@ -101,17 +102,43 @@ public abstract class PresentationController {
         presentationStage.setOnCloseRequest(event -> destroyAllVisibleElements());
 
         sceneBox = new VBox();
+        sceneBox.addEventHandler(MouseEvent.MOUSE_PRESSED, event -> {
+            if(colourPopup != null) {
+                if (colourPopup.isShowing() && !event.getTarget().equals(colourPopup)) {
+                    colourPopup.hide();
+                }
+            }
+        });
         displayPane = new StackPane();
+        displayPane.addEventFilter(MouseEvent.ANY, event -> {
+            if(event.getEventType().equals(MouseEvent.MOUSE_PRESSED)) {
+                mouseDown = true;
+            } else if(event.getEventType().equals(MouseEvent.MOUSE_RELEASED)) {
+                mouseDown = false;
+            }
+        });
         sceneBox.getChildren().add(displayPane);
         VBox.setVgrow(displayPane, Priority.ALWAYS);
         displayPane.setBackground(new Background(new BackgroundFill(Color.BLACK, null, null)));
         displayPane.setAlignment(Pos.CENTER);
         blackRegion = new Region();
         blackRegion.setBackground(new Background(new BackgroundFill(Color.BLACK, null, null)));
-        drawPane = new DrawPane();
+        drawPane = new DrawPane(displayPane);
         progressBar = new ProgressBar(0);
         slideNumber = new Label();
+        controlsPane = new BorderPane();
+        controlsPane.addEventFilter(MouseEvent.ANY, event -> {
+            //logger.info("Caught event: " + event.toString());
+            if((event.getEventType().equals(MouseEvent.MOUSE_PRESSED)
+                    || event.getEventType().equals(MouseEvent.MOUSE_DRAGGED)
+                    || event.getEventType().equals(MouseEvent.MOUSE_RELEASED))
+                    && event.getTarget().equals(controlsPane)) {
+                //logger.info("Diverting event " + event.toString() + " to canvas");
+                Event.fireEvent(drawPane.getCanvas(), (Event) event.clone());
+            }
+        });
         presControls = addPresentationControls();
+        drawControls = addDrawControls();
     }
 
     /**
@@ -178,38 +205,40 @@ public abstract class PresentationController {
     }
 
     private void addKeyboardListeners() {
-        scene.setOnKeyPressed(key -> {
-            if (key.getCode().equals(KeyCode.ENTER) ||
-                    key.getCode().equals(KeyCode.SPACE) ||
-                    key.getCode().equals(KeyCode.PAGE_UP) ||
-                    key.getCode().equals(KeyCode.RIGHT) ||
-                    key.getCode().equals(KeyCode.UP)) {
+        scene.addEventFilter(KeyEvent.KEY_PRESSED, keyEvent -> {
+            if (keyEvent.getCode().equals(KeyCode.ENTER) ||
+                    keyEvent.getCode().equals(KeyCode.SPACE) ||
+                    keyEvent.getCode().equals(KeyCode.PAGE_UP) ||
+                    keyEvent.getCode().equals(KeyCode.RIGHT) ||
+                    keyEvent.getCode().equals(KeyCode.UP)) {
                 controlPresentation(Slide.SLIDE_FORWARD);
-            } else if (key.getCode().equals(KeyCode.LEFT) ||
-                    key.getCode().equals(KeyCode.BACK_SPACE) ||
-                    key.getCode().equals(KeyCode.PAGE_DOWN) ||
-                    key.getCode().equals(KeyCode.DOWN)) {
+            } else if (keyEvent.getCode().equals(KeyCode.LEFT) ||
+                    keyEvent.getCode().equals(KeyCode.BACK_SPACE) ||
+                    keyEvent.getCode().equals(KeyCode.PAGE_DOWN) ||
+                    keyEvent.getCode().equals(KeyCode.DOWN)) {
                 controlPresentation(Slide.SLIDE_BACKWARD);
-            } else if (key.getCode().equals(KeyCode.F5)) {
+            } else if (keyEvent.getCode().equals(KeyCode.F5)) {
                 toggleFullscreen();
-            } else if (key.getCode().equals(KeyCode.ESCAPE) && isFullscreen) {
+            } else if (keyEvent.getCode().equals(KeyCode.ESCAPE) && isFullscreen) {
                 setFullscreen(false);
-            } else if (key.getCode().equals(KeyCode.B)) {
+            } else if (keyEvent.getCode().equals(KeyCode.B)) {
                 if (isShowBlack) {
                     isShowBlack = false;
                 } else {
                     isShowBlack = true;
                 }
                 displayCurrentSlide();
-            } else if (key.getCode().equals(KeyCode.HOME)) {
+            } else if (keyEvent.getCode().equals(KeyCode.HOME)) {
                 while (slideAdvance(presentationElement, Slide.SLIDE_BACKWARD) != Presentation.PRESENTATION_START) ;
-            } else if (key.getCode().equals(KeyCode.END)) {
+            } else if (keyEvent.getCode().equals(KeyCode.END)) {
                 while (slideAdvance(presentationElement, Slide.SLIDE_FORWARD) != Presentation.PRESENTATION_FINISH) ;
             }
+
+            keyEvent.consume();
         });
     }
 
-    private void addMouseListeners() {
+    private void addMouseListeners() {  //TODO maybe add hide or show to context menu.
         scene.setOnMouseClicked(mouseEvent -> {
             if (mouseEvent.getButton().equals(MouseButton.SECONDARY)) {
                 ContextMenu cMenu = new ContextMenu();
@@ -259,14 +288,13 @@ public abstract class PresentationController {
                 controlPresentation(Slide.SLIDE_BACKWARD);
                 event.consume();
             }
-
         };
 
         Timer cursorHideTimer = new Timer(true);
         cursorHideTimer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
-                if (!mouseMoved && cursorState.equals(CursorState.DEFAULT) && isMouseOverSlide && !isMouseOverControls)
+                if (!mouseDown && !mouseMoved && cursorState.equals(CursorState.DEFAULT) && isMouseOverSlide && !isMouseOverControls)
                     setCursorState(CursorState.HIDDEN);
 
                 mouseMoved = false;
@@ -375,8 +403,10 @@ public abstract class PresentationController {
     private void toggleDrawingMode() {
         if(!isDrawModeOn) {
             isDrawModeOn = true;
+            setDrawPaneVisible(true);
             setCursorState(CursorState.DRAW);
             drawPane.setActive(true);
+            controlsFadeIn(drawControls);
         } else {
             isDrawModeOn = false;
             setCursorState(CursorState.DEFAULT);
@@ -385,6 +415,21 @@ public abstract class PresentationController {
         }
 
         displayCurrentSlide();
+    }
+
+    private void setDrawPaneVisible(boolean setVisible) {
+        if(setVisible) {
+            isDrawPaneVisible = true;
+            Image hiddenIcon = new Image("file:projectResources/icons/eyeHidden.png", 30, 30, true, true);
+            visibilityButton.setImage(hiddenIcon);
+            displayCurrentSlide();
+        } else {
+            isDrawPaneVisible = false;
+            presentationElement.getSlide(currentSlideNumber).setSlideDrawing(drawPane.getSlideDrawing());
+            displayPane.getChildren().remove(drawPane);
+            Image visibleIcon = new Image("file:projectResources/icons/eyeVisible.png", 30, 30, true, true);
+            visibilityButton.setImage(visibleIcon);
+        }
     }
 
     public HBox addPresentationControls() {
@@ -404,7 +449,6 @@ public abstract class PresentationController {
         backButton.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> controlPresentation(Slide.SLIDE_BACKWARD));
         backButton.addEventHandler(MouseEvent.MOUSE_ENTERED, event -> backButton.setEffect(shadow));
         backButton.addEventHandler(MouseEvent.MOUSE_EXITED, event -> backButton.setEffect(null));
-
 
         Image fullScreen = new Image("file:projectResources/icons/Fullscreen_NEW.png", 30, 30, true, true);
 
@@ -461,28 +505,121 @@ public abstract class PresentationController {
         drawButton.addEventHandler(MouseEvent.MOUSE_ENTERED, event -> drawButton.setEffect(shadow));
         drawButton.addEventHandler(MouseEvent.MOUSE_EXITED, event -> drawButton.setEffect(null));
 
-        Image visibleIcon = new Image("file:projectResources/icons/eyeVisible.png", 30, 30, true, true);
         Image hiddenIcon = new Image("file:projectResources/icons/eyeHidden.png", 30, 30, true, true);
-        ImageView visibilityButton;
-        if(showDrawing)
+        Image visibleIcon = new Image("file:projectResources/icons/eyeVisible.png", 30, 30, true, true);
+
+        if(isDrawPaneVisible)
             visibilityButton = new ImageView(hiddenIcon);
         else
             visibilityButton = new ImageView(visibleIcon);
 
         visibilityButton.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
-            if(showDrawing) {
-                showDrawing = false;
-                presentationElement.getSlide(currentSlideNumber).setSlideDrawing(drawPane.getSlideDrawing());
-                displayPane.getChildren().remove(drawPane);
-                visibilityButton.setImage(visibleIcon);
+            if(isDrawPaneVisible) {
+                setDrawPaneVisible(false);
             } else {
-                showDrawing = true;
-                visibilityButton.setImage(hiddenIcon);
-                displayCurrentSlide();
+                setDrawPaneVisible(true);
             }
         });
         visibilityButton.addEventHandler(MouseEvent.MOUSE_ENTERED, event -> visibilityButton.setEffect(shadow));
         visibilityButton.addEventHandler(MouseEvent.MOUSE_EXITED, event -> visibilityButton.setEffect(null));
+
+        StackPane progressBar = new StackPane();
+        this.progressBar.setMinSize(200, 10);
+        progressBar.getChildren().addAll(this.progressBar, slideNumber);
+
+        presControls.getChildren().addAll(backButton, nextButton, fullScreenButton, specificFeats, commentButton, drawButton, visibilityButton, progressBar);
+        if (this instanceof StudentPresentationController) {
+
+        }
+
+        addMouseHandlersToControls(presControls);
+
+        presControls.setMaxHeight(PRES_CONTROLS_HEIGHT);
+        presControls.setAlignment(Pos.BOTTOM_LEFT);
+        return presControls;
+    }
+
+    private VBox addDrawControls() {
+        VBox drawControls = new VBox(5);
+        drawControls.setStyle("-fx-background-color:transparent");//#34495e
+        drawControls.setPadding(new Insets(5, 12, 5, 12));
+
+        DropShadow shadow = new DropShadow();
+
+        Image undoIcon = new Image("file:projectResources/icons/trash.png", 30, 30, true, true);
+        ImageView undoButton = new ImageView(undoIcon);
+        undoButton.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
+            //TODO
+        });
+        undoButton.addEventHandler(MouseEvent.MOUSE_ENTERED, event -> undoButton.setEffect(shadow));
+        undoButton.addEventHandler(MouseEvent.MOUSE_EXITED, event -> undoButton.setEffect(null));
+
+        Image redoIcon = new Image("file:projectResources/icons/trash.png", 30, 30, true, true);
+        ImageView redoButton = new ImageView(redoIcon);
+        redoButton.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
+            //TODO
+        });
+        redoButton.addEventHandler(MouseEvent.MOUSE_ENTERED, event -> redoButton.setEffect(shadow));
+        redoButton.addEventHandler(MouseEvent.MOUSE_EXITED, event -> redoButton.setEffect(null));
+
+        Image eraserIcon = new Image("file:projectResources/icons/trash.png", 30, 30, true, true);
+        ImageView eraserButton = new ImageView(eraserIcon);
+        eraserButton.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
+            if(drawPane.isEraserMode()) {
+                drawPane.setEraserMode(false);
+            } else {
+                drawPane.setEraserMode(true);
+            }
+        });
+        eraserButton.addEventHandler(MouseEvent.MOUSE_ENTERED, event -> eraserButton.setEffect(shadow));
+        eraserButton.addEventHandler(MouseEvent.MOUSE_EXITED, event -> eraserButton.setEffect(null));
+
+        Image colourIcon = new Image("file:projectResources/icons/trash.png", 30, 30, true, true);
+        ImageView colourButton = new ImageView(colourIcon);
+        ColorPicker colorPicker = new ColorPicker(drawPane.getBrushColor());
+        colourButton.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
+            colourPopup = new Popup();
+            colorPicker.setOnAction(event1 -> {
+                drawPane.setBrushColor(colorPicker.getValue());
+                colourPopup.hide();
+            });
+            colourPopup.getContent().add(colorPicker);
+            colourPopup.show(presentationStage, event.getScreenX(), event.getScreenY());
+        });
+        colourButton.addEventHandler(MouseEvent.MOUSE_ENTERED, event -> colourButton.setEffect(shadow));
+        colourButton.addEventHandler(MouseEvent.MOUSE_EXITED, event -> colourButton.setEffect(null));
+
+        Image widthIcon = new Image("file:projectResources/icons/trash.png", 30, 30, true, true);
+        ImageView widthButton = new ImageView(widthIcon);
+        widthButton.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
+            Popup widthPopup = new Popup();
+            Slider widthSlider;
+            widthPopup.setAutoHide(true);
+            if(!drawPane.isEraserMode()) {
+                widthSlider = new Slider(0.1, 10, drawPane.getBrushWidth());
+            } else {
+                widthSlider = new Slider(1, 20, drawPane.getEraserSize());
+            }
+            widthPopup.setOnAutoHide(event1 -> {
+                if(!drawPane.isEraserMode()) {
+                    drawPane.setBrushWidth(widthSlider.getValue());
+                } else {
+                    drawPane.setEraserSize(widthSlider.getValue()); //TODO: adjust cursor size
+                }
+            });
+            widthSlider.setOnMouseReleased(event1 -> {
+                if(!drawPane.isEraserMode()) {
+                    drawPane.setBrushWidth(widthSlider.getValue());
+                } else {
+                    drawPane.setEraserSize(widthSlider.getValue()); //TODO: adjust cursor size
+                }
+                widthPopup.hide();
+            });
+            widthPopup.getContent().add(widthSlider);
+            widthPopup.show(presentationStage, event.getScreenX(), event.getScreenY());
+        });
+        widthButton.addEventHandler(MouseEvent.MOUSE_ENTERED, event -> widthButton.setEffect(shadow));
+        widthButton.addEventHandler(MouseEvent.MOUSE_EXITED, event -> widthButton.setEffect(null));
 
         Image deleteIcon = new Image("file:projectResources/icons/trash.png", 30, 30, true, true);
         ImageView deleteButton= new ImageView(deleteIcon);
@@ -493,46 +630,51 @@ public abstract class PresentationController {
         deleteButton.addEventHandler(MouseEvent.MOUSE_ENTERED, event -> deleteButton.setEffect(shadow));
         deleteButton.addEventHandler(MouseEvent.MOUSE_EXITED, event -> deleteButton.setEffect(null));
 
-        StackPane progressBar = new StackPane();
-        this.progressBar.setMinSize(200, 10);
-        progressBar.getChildren().addAll(this.progressBar, slideNumber);
+        drawControls.getChildren().addAll(eraserButton, colourButton, widthButton, deleteButton);
+        drawControls.setAlignment(Pos.CENTER_LEFT);
 
-        presControls.getChildren().addAll(backButton, nextButton, fullScreenButton, specificFeats, commentButton, drawButton, visibilityButton, deleteButton, progressBar);
-        if (this instanceof StudentPresentationController) {
+        addMouseHandlersToControls(drawControls);
 
-        }
+        return drawControls;
+    }
 
-        presControls.addEventHandler(MouseEvent.MOUSE_ENTERED, event -> {
-            presControls.setVisible(true);
-            FadeTransition ft0 = new FadeTransition(Duration.millis(500), presControls);
-            ft0.setFromValue(0.0);
-            ft0.setToValue(1.0);
-            ft0.play();
+    private void addMouseHandlersToControls(Node controls) {
+        controls.addEventHandler(MouseEvent.MOUSE_ENTERED, event -> {
+            controlsFadeIn(controls);
             isMouseOverControls = true;
         });
-        presControls.addEventHandler(MouseEvent.MOUSE_EXITED, event -> {
-            FadeTransition ft0 = new FadeTransition(Duration.millis(500), presControls);
-            ft0.setFromValue(1.0);
-            ft0.setToValue(0.0);
-            ft0.play();
+        controls.addEventHandler(MouseEvent.MOUSE_EXITED, event -> {
+            controlsFadeOut(controls);
             isMouseOverControls = false;
         });
 
-        Timer hidePresControlsTimer = new Timer(true);
-        hidePresControlsTimer.schedule(new TimerTask() {
+        controlsFadeIn(controls);
+    }
+
+    private void controlsFadeIn(Node controls) {
+        FadeTransition ft0 = new FadeTransition(Duration.millis(500), controls);
+        ft0.setFromValue(0.0);
+        ft0.setToValue(1.0);
+        ft0.play();
+
+        Timer hideControlsTimer = new Timer(true);
+        hideControlsTimer.schedule(new TimerTask() {
             @Override
             public void run() {
-                FadeTransition ft0 = new FadeTransition(Duration.millis(500), presControls);
+                FadeTransition ft0 = new FadeTransition(Duration.millis(500), controls);
                 ft0.setFromValue(1.0);
                 ft0.setToValue(0.0);
                 if(!isMouseOverControls)
                     ft0.play();
             }
-        }, (long) HIDE_CURSOR_DELAY); //TODO maybe add id or show to context menu.
+        }, (long) HIDE_CURSOR_DELAY);
+    }
 
-        presControls.setMaxHeight(PRES_CONTROLS_HEIGHT);
-        presControls.setAlignment(Pos.BOTTOM_LEFT);
-        return presControls;
+    private void controlsFadeOut(Node controls) {
+        FadeTransition ft0 = new FadeTransition(Duration.millis(500), controls);
+        ft0.setFromValue(1.0);
+        ft0.setToValue(0.0);
+        ft0.play();
     }
 
     protected void slideProgress(Presentation presentation) {
@@ -742,7 +884,7 @@ public abstract class PresentationController {
         slide.setBackground(new Background(new BackgroundFill(Color.valueOf(presentationElement.getTheme().getBackgroundColour()), null, null)));
         displayPane.getChildren().add(slide);
 
-        if(showDrawing) {
+        if(isDrawPaneVisible) {
             drawPane.setSlideDrawing(presentationElement.getSlide(currentSlideNumber).getSlideDrawing());
             displayPane.getChildren().add(drawPane);
         }
@@ -750,8 +892,13 @@ public abstract class PresentationController {
         if (isShowBlack)
             displayPane.getChildren().add(blackRegion);
 
-        displayPane.getChildren().add(presControls); //TODO: Fix glitch when transitioning between slides
-        StackPane.setAlignment(presControls, Pos.BOTTOM_CENTER);
+        controlsPane.setBottom(presControls); //TODO: Fix glitch when transitioning between slides
+
+        if(isDrawModeOn)
+            controlsPane.setLeft(drawControls);
+        else
+            controlsPane.setLeft(null);
+        displayPane.getChildren().add(controlsPane);
 
         resize();
     }
@@ -817,7 +964,6 @@ public abstract class PresentationController {
     public String getXmlPath() {
         return xmlPath;
     }
-
 }
 
 enum CursorState {
