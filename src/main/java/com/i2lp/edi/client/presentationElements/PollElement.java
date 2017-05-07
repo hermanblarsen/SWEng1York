@@ -76,7 +76,8 @@ public class PollElement extends InteractiveElement {
         }
 
         questionPane.setTranslateX(slideWidth * xPosition);
-        questionPane.setTranslateY(slideHeight * yPosition);
+        questionPane
+                .setTranslateY(slideHeight * yPosition);
 
     }
 
