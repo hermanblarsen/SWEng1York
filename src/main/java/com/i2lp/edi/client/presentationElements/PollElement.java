@@ -163,6 +163,7 @@ public class PollElement extends InteractiveElement {
             //pollPane.setCenter(startTimer);
             questionPane.setBody(startTimer);
         }
+        questionPane.setVisible(visibility);
     }
 
     @Override

@@ -76,6 +76,7 @@ public class TextElement extends SlideElement {
                 isReady = true;
             }
         });
+        browser.setVisible(visibility);
     }
 
     @Override

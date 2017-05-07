@@ -22,7 +22,6 @@ public class CommentPanel extends Panel {
         this.submitEnable = submitEnable;
 
         htmlEditor.setMaxWidth(Double.MAX_VALUE);
-
         VBox commentEditor = new VBox();
         commentEditor.getChildren().addAll(htmlEditor, addControls());
 

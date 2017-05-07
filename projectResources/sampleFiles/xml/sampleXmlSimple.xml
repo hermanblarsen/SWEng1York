@@ -76,7 +76,7 @@
             </text>
         </slide>
         <slide slideid="2">
-            <text elementid ="1" layer="1" visibility="true" startsequence="1" endsequence="-1">
+            <text elementid ="1" layer="1" visibility="false" startsequence="1" endsequence="-1">
                 <textcontent>
                     <h1>Poop</h1>
                 </textcontent>

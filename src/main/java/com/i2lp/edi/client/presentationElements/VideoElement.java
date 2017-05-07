@@ -112,6 +112,7 @@ public class VideoElement extends SlideElement{
             mediaPane.getChildren().add(mediaControl());
         }
         getCoreNode().setPickOnBounds(false);
+        mediaPane.setVisible(visibility);
     }
 
     @Override

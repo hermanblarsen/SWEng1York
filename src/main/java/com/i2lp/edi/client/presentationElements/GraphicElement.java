@@ -79,7 +79,7 @@ public class GraphicElement extends SlideElement {
     @Override
     public void setupElement() {
         wrapperPane = new Pane();
-
+        wrapperPane.setVisible(visibility);
 
     }
 

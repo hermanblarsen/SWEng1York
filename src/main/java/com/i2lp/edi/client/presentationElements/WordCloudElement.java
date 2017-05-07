@@ -159,7 +159,7 @@ public class WordCloudElement extends InteractiveElement {
                 .description("Seconds")
                 .descriptionAlignment(Pos.BASELINE_RIGHT)
                 .build();
-
+        wordCloudPanel.setVisible(visibility);
     }
 
     @Override
