@@ -171,7 +171,9 @@ public class SocketServer {
                 String presentationName = data.substring(0, data.lastIndexOf(" "));
                 int moduleID = Integer.parseInt(data.substring(data.lastIndexOf(" ")+1, data.length()));
 
+                //Path to file uploaded from Client
                 File fromClient = new File("/home/bscftp/Uploads/" + presentationName + ".zip");
+                //Target location of file to enable file hosting on Apache
                 File commitToLibrary = new File("/var/www/html/Edi/" + presentationName + ".zip");
 
                 logger.info("New presentation detected for processing: " + presentationName + " ModuleID: " + moduleID);
@@ -195,9 +197,8 @@ public class SocketServer {
                     UserPrincipal userPrincipal = lookupService.lookupPrincipalByName("www-data");
                     Files.setOwner(path, userPrincipal);
                 } catch (IOException e) {
-                    logger.error("Unable to move Uploaded presentation " + data + " + to host directory.", e);
+                    logger.error("Unable to move Uploaded presentation " + data + " to host directory.", e);
                 }
-
 
                 //Insert new presentation into database
                 try (PGConnection connection = (PGConnection) dataSource.getConnection()) {
@@ -205,7 +206,7 @@ public class SocketServer {
 
                     //Fill prepared statements to avoid SQL injection
                     statement.setInt(1, moduleID);
-                    statement.setString(1, "http://www.amriksadhra.com/Edi/" + presentationName + ".zip");
+                    statement.setString(2, "http://www.amriksadhra.com/Edi/" + presentationName + ".zip");
 
                     //Call stored procedure on database
                     ResultSet presentationAddStatus = statement.executeQuery();

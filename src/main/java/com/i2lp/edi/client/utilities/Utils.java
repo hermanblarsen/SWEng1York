@@ -203,7 +203,7 @@ public class Utils {
      * @return Parent directory
      */
     public static String getFileParentDirectory(String toFind){
-        return toFind.substring(0, toFind.lastIndexOf("/"));
+        return toFind.substring(0, toFind.lastIndexOf(File.separator));
     }
 
     public static String hexToRGBA(String hex){
