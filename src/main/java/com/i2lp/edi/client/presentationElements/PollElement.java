@@ -38,7 +38,7 @@ public class PollElement extends InteractiveElement {
     protected String answers;
     protected boolean answered = false;
     protected boolean timerStart = false;
-    protected int timeLimit = 20;
+    protected int timeLimit = 30;
     protected HBox pollOptions;
     protected Timeline timeline;
     protected Panel questionPane;
@@ -49,10 +49,10 @@ public class PollElement extends InteractiveElement {
     private ToggleButton[] answerButton;
     private ChartData[] chartDataArray;
     private Color assignedColour;
-    protected float xSize= 0;
-    protected float ySize= 0;
-    protected float xPosition=0;
-    protected float yPosition=0;
+    protected float xSize= 0.5f;
+    protected float ySize= 0.5f;
+    protected float xPosition=0.5f;
+    protected float yPosition=0.5f;
 
     public PollElement() {
 

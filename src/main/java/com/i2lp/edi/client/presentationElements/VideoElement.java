@@ -25,17 +25,17 @@ import java.io.File;
  */
 public class VideoElement extends SlideElement{
     protected boolean mediaControl = true;
-    protected float xPosition;
-    protected float yPosition;
-    protected float xSize = 0;
-    protected float ySize = 0;
+    protected float xPosition = 0.5f;
+    protected float yPosition = 0.5f;
+    protected float xSize = 0.5f;
+    protected float ySize = 0.5f;
     protected String path;
     protected boolean loop = false;
     protected boolean aspectRatioLock = true;
     protected float elementAspectRatio;
     protected boolean autoplay = false;
     protected boolean fullscreen = false;
-    protected Duration startTime;
+    protected Duration startTime = Duration.ZERO;
     protected Duration endTime;
     protected MediaView mediaView;
     protected MediaPlayer mediaPlayer;

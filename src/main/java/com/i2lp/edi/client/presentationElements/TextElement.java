@@ -29,18 +29,18 @@ public class TextElement extends SlideElement {
     protected String fontColour;
     protected String bgColour;
 
-    private int borderSize;
+    private int borderSize = 1;
     protected String borderColour;
 
 
-    protected boolean hasBorder;
+    protected boolean hasBorder = false;
 
     protected float xPosition = 0.25f;
     protected float yPosition = 0.25f;
     protected float xSize = 0.5f;
     protected float ySize = 0.5f;
 
-    protected boolean aspectRatioLock;
+    protected boolean aspectRatioLock = true;
     protected float elementAspectRatio;
 
     protected WebView browser;

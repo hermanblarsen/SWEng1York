@@ -44,15 +44,15 @@ public class WordCloudElement extends InteractiveElement {
     protected Panel wordCloudPanel;
     protected List<String> wordList;
     protected Label remainingTime;
-    protected int timeLimit;
+    protected int timeLimit = 30;
     protected Timeline timeline;
     protected Tile countdownTile;
     protected boolean  writingComplete = false;
     protected String cloudShapePath = null;
-    protected float xPosition =0;
-    protected float yPosition =0;
-    protected float xSize =0;
-    protected float ySize=0;
+    protected float xPosition =0.5f;
+    protected float yPosition =0.5f;
+    protected float xSize =0.5f;
+    protected float ySize=0.5f;
 
     @Override
     public void sendDataToServer() {
