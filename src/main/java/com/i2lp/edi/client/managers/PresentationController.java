@@ -51,6 +51,9 @@ public abstract class PresentationController {
     private static final int STAGE_MIN_HEIGHT = 300;
     private static final int HIDE_CURSOR_DELAY = 2000;
     private static final double MAX_ERASER_SIZE = 20;
+    private static final double DEFAULT_BUTTON_WIDTH = 30;
+    private static final double DEFAULT_BUTTON_HEIGHT = 30;
+
     Logger logger = LoggerFactory.getLogger(PresentationController.class);
 
     protected String xmlPath = null;
@@ -82,7 +85,7 @@ public abstract class PresentationController {
     private Popup colourPopup;
     private ImageView eraseCursor;
 
-    private CursorState cursorState = CursorState.DEFAULT;
+    private final CursorManager cursorManager;
 
     protected double slideWidth;
     protected double slideHeight;
@@ -97,6 +100,7 @@ public abstract class PresentationController {
 
 
     public PresentationController() {
+        cursorManager = new CursorManager();
         presentationStage = new Stage();
         Image ediLogoSmall = new Image("file:projectResources/logos/ediLogo32x32.png");
         presentationStage.getIcons().add(ediLogoSmall);
@@ -130,16 +134,6 @@ public abstract class PresentationController {
         progressBar = new ProgressBar(0);
         slideNumber = new Label();
         controlsPane = new BorderPane();
-        controlsPane.addEventFilter(MouseEvent.ANY, event -> {
-            //logger.info("Caught event: " + event.toString());
-            if((event.getEventType().equals(MouseEvent.MOUSE_PRESSED)
-                    || event.getEventType().equals(MouseEvent.MOUSE_DRAGGED)
-                    || event.getEventType().equals(MouseEvent.MOUSE_RELEASED))
-                    && event.getTarget().equals(controlsPane)) {
-                //logger.info("Diverting event " + event.toString() + " to canvas");
-                Event.fireEvent(drawPane.getCanvas(), (Event) event.clone());
-            }
-        });
         controlsPane.setPickOnBounds(false);
         presControls = addPresentationControls();
         drawControls = addDrawControls();
@@ -281,7 +275,6 @@ public abstract class PresentationController {
                     controlPresentation(Slide.SLIDE_FORWARD);
                 }
             }
-            event.consume();
         });
 
         disabledCursorFilter = event -> {
@@ -298,7 +291,7 @@ public abstract class PresentationController {
         cursorHideTimer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
-                if (!mouseDown && !mouseMoved && cursorState.equals(CursorState.DEFAULT) && isMouseOverSlide && !isMouseOverControls)
+                if (!mouseDown && !mouseMoved && cursorManager.getCurrentState().equals(CursorState.DEFAULT) && isMouseOverSlide && !isMouseOverControls)
                     setCursorState(CursorState.HIDDEN);
 
                 mouseMoved = false;
@@ -312,7 +305,7 @@ public abstract class PresentationController {
                 isMouseOverSlide = false;
             } else if (event.getEventType().equals(MouseEvent.MOUSE_MOVED)) {
                 mouseMoved = true;
-                if (cursorState.equals(CursorState.HIDDEN))
+                if (cursorManager.getCurrentState().equals(CursorState.HIDDEN))
                     setCursorState(CursorState.DEFAULT);
             }
         });
@@ -439,91 +432,47 @@ public abstract class PresentationController {
         presControls.setStyle("-fx-background-color:transparent");//#34495e
         presControls.setPadding(new Insets(5, 12, 5, 12));
         presControls.setSpacing(5);
-        DropShadow shadow = new DropShadow();
-        Image next = new Image("file:projectResources/icons/Right_NEW.png", 30, 30, true, true);
-        ImageView nextButton = new ImageView(next);
-        nextButton.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> controlPresentation(Slide.SLIDE_FORWARD));
-        nextButton.addEventHandler(MouseEvent.MOUSE_ENTERED, event -> nextButton.setEffect(shadow));
-        nextButton.addEventHandler(MouseEvent.MOUSE_EXITED, event -> nextButton.setEffect(null));
 
-        Image back = new Image("file:projectResources/icons/Left_NEW.png", 30, 30, true, true);
-        ImageView backButton = new ImageView(back);
-        backButton.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> controlPresentation(Slide.SLIDE_BACKWARD));
-        backButton.addEventHandler(MouseEvent.MOUSE_ENTERED, event -> backButton.setEffect(shadow));
-        backButton.addEventHandler(MouseEvent.MOUSE_EXITED, event -> backButton.setEffect(null));
+        ImageView nextButton = makeCustomButton("file:projectResources/icons/Right_NEW.png", event -> controlPresentation(Slide.SLIDE_FORWARD));
 
-        Image fullScreen = new Image("file:projectResources/icons/Fullscreen_NEW.png", 30, 30, true, true);
+        ImageView backButton = makeCustomButton("file:projectResources/icons/Left_NEW.png", event -> controlPresentation(Slide.SLIDE_BACKWARD));
 
-        ImageView fullScreenButton = new ImageView(fullScreen);
+        ImageView fullScreenButton = makeCustomButton("file:projectResources/icons/Fullscreen_NEW.png", event -> toggleFullscreen());
 
-        fullScreenButton.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> toggleFullscreen());
-        fullScreenButton.addEventHandler(MouseEvent.MOUSE_ENTERED, event -> fullScreenButton.setEffect(shadow));
-        fullScreenButton.addEventHandler(MouseEvent.MOUSE_EXITED, event -> fullScreenButton.setEffect(null));
-        ImageView specificFeats;
+        String specificFeatsIconURL;
         if (this instanceof StudentPresentationController) {
-            Image questionBubble = new Image("file:projectResources/icons/QM_Filled.png", 30, 30, true, true);
-            ImageView questionQ = new ImageView(questionBubble);
-            questionQ.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
-                if (!questionQueueActive) {
-                    loadSpecificFeatures();
-                    questionQueueActive = true;
-
-                } else {
-                    loadSpecificFeatures();
-                    questionQueueActive = false;
-                }
-            });
-            questionQ.addEventHandler(MouseEvent.MOUSE_ENTERED, event -> questionQ.setEffect(shadow));
-            questionQ.addEventHandler(MouseEvent.MOUSE_EXITED, event -> questionQ.setEffect(null));
-            specificFeats = questionQ;
+            specificFeatsIconURL = "file:projectResources/icons/QM_Filled.png";
         } else {
-            Image checkList = new Image("file:projectResources/icons/TeacherToolKit.png", 30, 30, true, true);
-            ImageView teacherToolKit = new ImageView(checkList);
-            teacherToolKit.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
-                if (!questionQueueActive) {
-                    loadSpecificFeatures();
-                    questionQueueActive = true;
-
-                } else {
-                    loadSpecificFeatures();
-                    questionQueueActive = false;
-                }
-            });
-            teacherToolKit.addEventHandler(MouseEvent.MOUSE_ENTERED, event -> teacherToolKit.setEffect(shadow));
-            teacherToolKit.addEventHandler(MouseEvent.MOUSE_EXITED, event -> teacherToolKit.setEffect(null));
-
-            specificFeats = teacherToolKit;
+            specificFeatsIconURL = "file:projectResources/icons/TeacherToolKit.png";
         }
+        ImageView specificFeats = makeCustomButton(specificFeatsIconURL, event -> {
+            if (!questionQueueActive) {
+                loadSpecificFeatures();
+                questionQueueActive = true;
 
-        Image commentIcon = new Image("file:projectResources/icons/SB_filled.png", 30, 30, true, true);
-        ImageView commentButton = new ImageView(commentIcon);
-        commentButton.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> toggleComments());
-        commentButton.addEventHandler(MouseEvent.MOUSE_ENTERED, event -> commentButton.setEffect(shadow));
-        commentButton.addEventHandler(MouseEvent.MOUSE_EXITED, event -> commentButton.setEffect(null));
+            } else {
+                loadSpecificFeatures();
+                questionQueueActive = false;
+            }
+        });
 
-        Image drawIcon = new Image("file:projectResources/icons/draw.png", 30, 30, true, true);
-        ImageView drawButton = new ImageView(drawIcon);
-        drawButton.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> toggleDrawingMode());
-        drawButton.addEventHandler(MouseEvent.MOUSE_ENTERED, event -> drawButton.setEffect(shadow));
-        drawButton.addEventHandler(MouseEvent.MOUSE_EXITED, event -> drawButton.setEffect(null));
+        ImageView commentButton = makeCustomButton("file:projectResources/icons/SB_filled.png", event -> toggleComments());
 
-        Image hiddenIcon = new Image("file:projectResources/icons/eyeHidden.png", 30, 30, true, true);
-        Image visibleIcon = new Image("file:projectResources/icons/eyeVisible.png", 30, 30, true, true);
+        ImageView drawButton = makeCustomButton("file:projectResources/icons/draw.png", event -> toggleDrawingMode());
 
+        String visibilityIconURL;
         if(isDrawPaneVisible)
-            visibilityButton = new ImageView(hiddenIcon);
+            visibilityIconURL = "file:projectResources/icons/eyeHidden.png";
         else
-            visibilityButton = new ImageView(visibleIcon);
+            visibilityIconURL = "file:projectResources/icons/eyeVisible.png";
 
-        visibilityButton.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
+        visibilityButton = makeCustomButton(visibilityIconURL, event -> {
             if(isDrawPaneVisible) {
                 setDrawPaneVisible(false);
             } else {
                 setDrawPaneVisible(true);
             }
         });
-        visibilityButton.addEventHandler(MouseEvent.MOUSE_ENTERED, event -> visibilityButton.setEffect(shadow));
-        visibilityButton.addEventHandler(MouseEvent.MOUSE_EXITED, event -> visibilityButton.setEffect(null));
 
         StackPane progressBar = new StackPane();
         this.progressBar.setMinSize(200, 10);
@@ -541,32 +490,35 @@ public abstract class PresentationController {
         return presControls;
     }
 
+    private ImageView makeCustomButton(String iconURL, EventHandler<MouseEvent> mouseClickedEventHandler) {
+        return makeCustomButton(iconURL, mouseClickedEventHandler, DEFAULT_BUTTON_WIDTH, DEFAULT_BUTTON_HEIGHT);
+    }
+
+    private ImageView makeCustomButton(String iconURL, EventHandler<MouseEvent> mouseClickedEventHandler, double width, double height) {
+        ImageView button = new ImageView(new Image(iconURL, width, height, true, true));
+        button.addEventHandler(MouseEvent.MOUSE_CLICKED, mouseClickedEventHandler);
+        button.addEventHandler(MouseEvent.MOUSE_ENTERED, event -> {
+            button.setEffect(new DropShadow());
+            setCursorState(CursorState.DEFAULT);
+        });
+        button.addEventHandler(MouseEvent.MOUSE_EXITED, event -> {
+            button.setEffect(null);
+            setCursorState(cursorManager.peekPreviousState());
+        });
+
+        return button;
+    }
+
     private VBox addDrawControls() {
         VBox drawControls = new VBox(5);
         drawControls.setStyle("-fx-background-color:transparent");//#34495e
         drawControls.setPadding(new Insets(5, 12, 5, 12));
 
-        DropShadow shadow = new DropShadow();
+        ImageView undoButton = makeCustomButton("file:projectResources/icons/undo.png", event -> drawPane.setSlideDrawing(presentationElement.getSlide(currentSlideNumber).getPreviousSlideDrawing()));
 
-        Image undoIcon = new Image("file:projectResources/icons/undo.png", 30, 30, true, true);
-        ImageView undoButton = new ImageView(undoIcon);
-        undoButton.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
-            drawPane.setSlideDrawing(presentationElement.getSlide(currentSlideNumber).getPreviousSlideDrawing());
-        });
-        undoButton.addEventHandler(MouseEvent.MOUSE_ENTERED, event -> undoButton.setEffect(shadow));
-        undoButton.addEventHandler(MouseEvent.MOUSE_EXITED, event -> undoButton.setEffect(null));
+        ImageView redoButton = makeCustomButton("file:projectResources/icons/redo.png", event -> drawPane.setSlideDrawing(presentationElement.getSlide(currentSlideNumber).getNextSlideDrawing()));
 
-        Image redoIcon = new Image("file:projectResources/icons/redo.png", 30, 30, true, true);
-        ImageView redoButton = new ImageView(redoIcon);
-        redoButton.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
-            drawPane.setSlideDrawing(presentationElement.getSlide(currentSlideNumber).getNextSlideDrawing());
-        });
-        redoButton.addEventHandler(MouseEvent.MOUSE_ENTERED, event -> redoButton.setEffect(shadow));
-        redoButton.addEventHandler(MouseEvent.MOUSE_EXITED, event -> redoButton.setEffect(null));
-
-        Image eraserIcon = new Image("file:projectResources/icons/erase.png", 30, 30, true, true);
-        ImageView eraserButton = new ImageView(eraserIcon);
-        eraserButton.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
+        ImageView eraserButton = makeCustomButton("file:projectResources/icons/erase.png", event -> {
             if(drawPane.isEraserMode()) {
                 drawPane.setEraserMode(false);
                 setCursorState(CursorState.DRAW);
@@ -575,13 +527,9 @@ public abstract class PresentationController {
                 //setCursorState(CursorState.ERASE); //TODO: Fix
             }
         });
-        eraserButton.addEventHandler(MouseEvent.MOUSE_ENTERED, event -> eraserButton.setEffect(shadow));
-        eraserButton.addEventHandler(MouseEvent.MOUSE_EXITED, event -> eraserButton.setEffect(null));
 
-        Image colourIcon = new Image("file:projectResources/icons/selectBrushColour.png", 30, 30, true, true);
-        ImageView colourButton = new ImageView(colourIcon);
         ColorPicker colorPicker = new ColorPicker(drawPane.getBrushColor());
-        colourButton.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
+        ImageView colourButton = makeCustomButton("file:projectResources/icons/selectBrushColour.png", event -> {
             colourPopup = new Popup();
             colorPicker.setOnAction(event1 -> {
                 drawPane.setBrushColor(colorPicker.getValue());
@@ -590,12 +538,8 @@ public abstract class PresentationController {
             colourPopup.getContent().add(colorPicker);
             colourPopup.show(presentationStage, event.getScreenX(), event.getScreenY());
         });
-        colourButton.addEventHandler(MouseEvent.MOUSE_ENTERED, event -> colourButton.setEffect(shadow));
-        colourButton.addEventHandler(MouseEvent.MOUSE_EXITED, event -> colourButton.setEffect(null));
 
-        Image widthIcon = new Image("file:projectResources/icons/selectBrushWidth.png", 30, 30, true, true);
-        ImageView widthButton = new ImageView(widthIcon);
-        widthButton.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
+        ImageView widthButton = makeCustomButton("file:projectResources/icons/selectBrushWidth.png", event -> {
             Popup widthPopup = new Popup();
             Slider widthSlider;
             widthPopup.setAutoHide(true);
@@ -624,23 +568,11 @@ public abstract class PresentationController {
             widthPopup.getContent().add(widthSlider);
             widthPopup.show(presentationStage, event.getScreenX(), event.getScreenY());
         });
-        widthButton.addEventHandler(MouseEvent.MOUSE_ENTERED, event -> {
-            widthButton.setEffect(shadow);
-            //setCursorState(CursorState.DEFAULT); //TODO: fix
-        });
-        widthButton.addEventHandler(MouseEvent.MOUSE_EXITED, event -> {
-            widthButton.setEffect(null);
-            //setCursorState(CursorState.ERASE); //TODO: fix
-        });
 
-        Image deleteIcon = new Image("file:projectResources/icons/trash.png", 30, 30, true, true);
-        ImageView deleteButton= new ImageView(deleteIcon);
-        deleteButton.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
+        ImageView deleteButton = makeCustomButton("file:projectResources/icons/trash.png", event -> {
             drawPane.clear();
             presentationElement.getSlide(currentSlideNumber).addSlideDrawing(drawPane.getSlideDrawing());
         });
-        deleteButton.addEventHandler(MouseEvent.MOUSE_ENTERED, event -> deleteButton.setEffect(shadow));
-        deleteButton.addEventHandler(MouseEvent.MOUSE_EXITED, event -> deleteButton.setEffect(null));
 
         drawControls.getChildren().addAll(undoButton, redoButton, eraserButton, colourButton, widthButton, deleteButton);
         drawControls.setAlignment(Pos.CENTER_LEFT);
@@ -887,7 +819,7 @@ public abstract class PresentationController {
     }
 
     private void setCursorState(CursorState state) {
-        cursorState = state;
+        cursorManager.setCursorState(state);
         eraseCursor = null;
         if(eraseCursorFilter != null)
             displayPane.removeEventFilter(MouseEvent.ANY, eraseCursorFilter);
@@ -1016,11 +948,4 @@ public abstract class PresentationController {
     public String getXmlPath() {
         return xmlPath;
     }
-}
-
-enum CursorState {
-    DEFAULT,
-    HIDDEN,
-    DRAW,
-    ERASE
 }

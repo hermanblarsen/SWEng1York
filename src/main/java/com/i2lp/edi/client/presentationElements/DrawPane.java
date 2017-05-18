@@ -15,6 +15,8 @@ import javafx.scene.paint.Color;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
+
 
 /**
  * Created by Kacper on 2017-04-30.
@@ -30,6 +32,7 @@ public class DrawPane extends Pane {
     private final StackPane parentPane;
     private double eraserSize = 5;
     private boolean newPathStarted = false;
+    private ArrayList<Node> mouseEnteredArrayList = new ArrayList<>();
 
     public DrawPane(StackPane parent) {
         this.parentPane = parent;
@@ -46,11 +49,19 @@ public class DrawPane extends Pane {
             if(!isActive) {
                 Node target = findEventTarget(event, (Parent) parentPane.getChildren().get(0));
                 if(target != null) {
-                    logger.debug("Target found. Diverting event to " + target.toString());
-                    Event.fireEvent(target, (Event) event.clone());
+                    Event.fireEvent(target, event.copyFor(event.getSource(), target));
+
+                    //Emulate MOUSE_ENTERED and MOUSE_EXITED events
+                    if(event.getEventType().equals(MouseEvent.MOUSE_MOVED)) {
+                        if(!mouseEnteredArrayList.contains(target)) {
+                            addToMouseEnteredList(target, event);
+                        }
+
+                        removeChildrenFromMouseEnteredList(target, event);
+
+                    }
+
                     event.consume();
-                } else {
-                    logger.debug("Event target not found");
                 }
             }
         });
@@ -68,7 +79,7 @@ public class DrawPane extends Pane {
         addEventHandler(MouseEvent.MOUSE_DRAGGED, event -> {
             if(isActive) {
                 if(!isEraserMode) {
-                    if(!newPathStarted) { //Hack to for when MOUSE_PRESSED wasn't detected first - happens sometimes for some reason
+                    if(!newPathStarted) { //Hack for when MOUSE_PRESSED wasn't detected first - happens sometimes for some reason
                         graphicsContext.beginPath();
                         graphicsContext.moveTo(event.getX(), event.getY());
                         newPathStarted = true;
@@ -91,9 +102,41 @@ public class DrawPane extends Pane {
         });
     }
 
+    private void addToMouseEnteredList(Node node, MouseEvent event) {
+        if(!mouseEnteredArrayList.contains(node)) {
+            mouseEnteredArrayList.add(node);
+            MouseEvent emulatedEnteredEvent = event.copyFor(event.getSource(), node, MouseEvent.MOUSE_ENTERED);
+            Event.fireEvent(node, emulatedEnteredEvent);
+        }
+
+        if(node.getParent() != node.getScene().getRoot())
+            addToMouseEnteredList(node.getParent(), event);
+    }
+
+    private void removeChildrenFromMouseEnteredList(Node node, MouseEvent event) {
+        Parent parent = null;
+
+        try {
+            parent = (Parent) node;
+        } catch(ClassCastException e) {
+            //The exception is thrown when the node is not a parent. Do nothing.
+        }
+
+        if(parent != null) {
+            for(Node child : parent.getChildrenUnmodifiable()) {
+                if(mouseEnteredArrayList.contains(child)) {
+                    MouseEvent emulatedExitedEvent = event.copyFor(event.getSource(), child, MouseEvent.MOUSE_EXITED);
+                    Event.fireEvent(child, emulatedExitedEvent);
+                    mouseEnteredArrayList.remove(child);
+                    removeChildrenFromMouseEnteredList(child, event);
+                }
+            }
+        }
+    }
+
     private Node findEventTarget(MouseEvent event, Parent parent) {
         logger.debug("Searching for event target in " + parent.toString());
-        Node foundTarget = null;
+        Node foundTarget = parent;
         if(parent.getChildrenUnmodifiable().size() != 0) {
             for(Node child : parent.getChildrenUnmodifiable()) {
                 Bounds boundsInScene = child.localToScene(child.getBoundsInLocal());
@@ -105,8 +148,6 @@ public class DrawPane extends Pane {
                     }
                 }
             }
-        } else {
-            foundTarget = parent;
         }
         return foundTarget;
     }
