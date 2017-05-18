@@ -350,7 +350,7 @@ public class VideoElement extends SlideElement{
         //mediaBar.getChildren().add(fullscreenButton);
         mediaBar.getChildren().addAll(playPauseButton,stopButton,videoTime,playTime,volume,volumeSlider,fullscreenButton);
         mediaBar.addEventHandler(MouseEvent.MOUSE_ENTERED, evt->{
-
+            System.out.println("MOUSE IN");
             FadeTransition ft = new FadeTransition(javafx.util.Duration.millis(500),mediaBar);
             ft.setFromValue(0.0);
             ft.setToValue(1.0);
@@ -358,6 +358,7 @@ public class VideoElement extends SlideElement{
         });
 
         mediaBar.addEventHandler(MouseEvent.MOUSE_EXITED, evt->{
+            System.out.println("MOUSE OUT");
             FadeTransition ft = new FadeTransition(javafx.util.Duration.millis(500),mediaBar);
             ft.setFromValue(1.0);
             ft.setToValue(0.0);

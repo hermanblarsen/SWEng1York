@@ -100,7 +100,6 @@ public abstract class PresentationController {
         presentationStage = new Stage();
         Image ediLogoSmall = new Image("file:projectResources/logos/ediLogo32x32.png");
         presentationStage.getIcons().add(ediLogoSmall);
-
         presentationStage.setMinWidth(STAGE_MIN_WIDTH);
         presentationStage.setMinHeight(STAGE_MIN_HEIGHT);
         presentationStage.setOnCloseRequest(event -> destroyAllElements());
@@ -141,6 +140,8 @@ public abstract class PresentationController {
                 Event.fireEvent(drawPane.getCanvas(), (Event) event.clone());
             }
         });
+        controlsPane.setPickOnBounds(false);
+        displayPane.setPickOnBounds(false);
         presControls = addPresentationControls();
         drawControls = addDrawControls();
     }
