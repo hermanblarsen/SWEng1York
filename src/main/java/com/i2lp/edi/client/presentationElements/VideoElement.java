@@ -330,20 +330,20 @@ public class VideoElement extends SlideElement{
         //final ToggleButton fullscreenButton = new ToggleButton("Fullscreen");
         Image fullscreenIcon = new Image("file:projectResources/icons/Fullscreen_NEW.png",20,20,true,true);
         ImageView fullscreenButton = new ImageView(fullscreenIcon);
-        final Rectangle2D initialBounds = new Rectangle2D(mediaView.getFitWidth(), mediaView.getFitWidth(), mediaView.getFitHeight(), mediaView.getFitWidth());
+        //final Rectangle2D initialBounds = new Rectangle2D(mediaView.getFitWidth(), mediaView.getFitWidth(), mediaView.getFitHeight(), mediaView.getFitWidth());
         fullscreenButton.addEventHandler(MouseEvent.MOUSE_CLICKED,(event) -> {
             // TODO: Implement this properly
             if (!fullscreen) {
                 mediaPane.setTranslateX(0);
                 mediaPane.setTranslateY(0);
-                mediaView.setFitHeight(slideCanvas.getHeight());
-                mediaView.setFitWidth(slideCanvas.getWidth());
+                mediaView.setFitHeight(slideHeight); //slideCanvas.getHeight()
+                mediaView.setFitWidth(slideWidth);  //slideCanvas.getWidth()
                 fullscreen = true;
             } else {
-                mediaPane.setTranslateX(xPosition);
-                mediaPane.setTranslateY(yPosition);
-                mediaView.setFitHeight(ySize);
-                mediaView.setFitWidth(xSize);
+                mediaPane.setTranslateX(slideWidth*xPosition);
+                mediaPane.setTranslateY(slideHeight*yPosition);
+                mediaView.setFitHeight(slideHeight*ySize);
+                mediaView.setFitWidth(slideWidth*xSize);
                 fullscreen = false;
             }
         });
@@ -363,7 +363,6 @@ public class VideoElement extends SlideElement{
             ft.setFromValue(1.0);
             ft.setToValue(0.0);
             ft.play();
-
         });
 
         mediaBar.setMinSize(0, 0); //TODO: Figure out what happens when mediaView is to small to contain mediaBar

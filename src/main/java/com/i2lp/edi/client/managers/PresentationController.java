@@ -141,7 +141,7 @@ public abstract class PresentationController {
             }
         });
         controlsPane.setPickOnBounds(false);
-        displayPane.setPickOnBounds(false);
+        //displayPane.setPickOnBounds(false);
         presControls = addPresentationControls();
         drawControls = addDrawControls();
     }
