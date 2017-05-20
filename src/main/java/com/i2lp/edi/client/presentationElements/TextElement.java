@@ -73,7 +73,7 @@ public class TextElement extends SlideElement {
 
         //Stage 3 Setup: DoClassSpecificRender for resizing, register State Handlers, register onClickAction method in superclass
         doClassSpecificRender();
-        getCoreNode().addEventHandler(MouseEvent.MOUSE_CLICKED, event -> performOnClickAction());
+        getCoreNode().addEventFilter(MouseEvent.MOUSE_CLICKED, event -> performOnClickAction());
 
         //If done rendering, adjust height to fit content, set isReady variable for thumbnail generation
         browser.getEngine().getLoadWorker().stateProperty().addListener((arg0, oldState, newState) -> {
