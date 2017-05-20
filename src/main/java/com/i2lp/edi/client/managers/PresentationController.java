@@ -5,6 +5,7 @@ import com.i2lp.edi.client.exceptions.SequenceNotFoundException;
 import com.i2lp.edi.client.presentationElements.*;
 import com.i2lp.edi.client.presentationViewer.StudentPresentationController;
 import com.i2lp.edi.client.presentationViewer.TeacherPresentationController;
+import com.i2lp.edi.client.utilities.CursorState;
 import com.i2lp.edi.client.utilities.ParserXML;
 import javafx.animation.FadeTransition;
 import javafx.animation.KeyFrame;
@@ -15,10 +16,7 @@ import javafx.geometry.Dimension2D;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
-import javafx.scene.Cursor;
-import javafx.scene.ImageCursor;
-import javafx.scene.Node;
-import javafx.scene.Scene;
+import javafx.scene.*;
 import javafx.scene.control.*;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
@@ -50,7 +48,8 @@ public abstract class PresentationController {
     private static final int STAGE_MIN_WIDTH = 300;
     private static final int STAGE_MIN_HEIGHT = 300;
     private static final int HIDE_CURSOR_DELAY = 2000;
-    private static final double MAX_ERASER_SIZE = 20;
+    public static final int MIN_ERASER_SIZE = 10;
+    private static final double MAX_ERASER_SIZE = 30;
     private static final double DEFAULT_BUTTON_WIDTH = 30;
     private static final double DEFAULT_BUTTON_HEIGHT = 30;
 
@@ -75,7 +74,6 @@ public abstract class PresentationController {
     private boolean mouseMoved = true;
     private boolean mouseDown = false;
     private EventHandler<MouseEvent> disabledCursorFilter;
-    private EventHandler<MouseEvent> eraseCursorFilter;
     private BorderPane controlsPane;
     private HBox presControls;
     private VBox drawControls;
@@ -83,9 +81,9 @@ public abstract class PresentationController {
     private DrawPane drawPane;
     private ImageView visibilityButton;
     private Popup colourPopup;
-    private ImageView eraseCursor;
+    private CursorState currentCursorState = CursorState.DEFAULT;
+    private Pane eraseCursorPane;
 
-    private final CursorManager cursorManager;
 
     protected double slideWidth;
     protected double slideHeight;
@@ -100,7 +98,6 @@ public abstract class PresentationController {
 
 
     public PresentationController() {
-        cursorManager = new CursorManager();
         presentationStage = new Stage();
         Image ediLogoSmall = new Image("file:projectResources/logos/ediLogo32x32.png");
         presentationStage.getIcons().add(ediLogoSmall);
@@ -119,8 +116,10 @@ public abstract class PresentationController {
         displayPane = new StackPane();
         displayPane.addEventFilter(MouseEvent.ANY, event -> {
             if(event.getEventType().equals(MouseEvent.MOUSE_PRESSED)) {
+                logger.info("Mouse down");
                 mouseDown = true;
             } else if(event.getEventType().equals(MouseEvent.MOUSE_RELEASED)) {
+                logger.info("Mouse up");
                 mouseDown = false;
             }
         });
@@ -291,7 +290,7 @@ public abstract class PresentationController {
         cursorHideTimer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
-                if (!mouseDown && !mouseMoved && cursorManager.getCurrentState().equals(CursorState.DEFAULT) && isMouseOverSlide && !isMouseOverControls)
+                if (!mouseDown && !mouseMoved && currentCursorState.equals(CursorState.DEFAULT) && isMouseOverSlide && !isMouseOverControls)
                     setCursorState(CursorState.HIDDEN);
 
                 mouseMoved = false;
@@ -305,8 +304,18 @@ public abstract class PresentationController {
                 isMouseOverSlide = false;
             } else if (event.getEventType().equals(MouseEvent.MOUSE_MOVED)) {
                 mouseMoved = true;
-                if (cursorManager.getCurrentState().equals(CursorState.HIDDEN))
+                if (currentCursorState.equals(CursorState.HIDDEN))
                     setCursorState(CursorState.DEFAULT);
+            }
+        });
+
+        drawPane.addEventFilter(MouseEvent.MOUSE_ENTERED, event -> {
+            if(isDrawModeOn) {
+                if(drawPane.isEraserMode()) {
+                    setCursorState(CursorState.ERASE);
+                } else {
+                    setCursorState(CursorState.DRAW);
+                }
             }
         });
     }
@@ -401,12 +410,10 @@ public abstract class PresentationController {
         if(!isDrawModeOn) {
             isDrawModeOn = true;
             setDrawPaneVisible(true);
-            setCursorState(CursorState.DRAW);
             drawPane.setActive(true);
             controlsFadeIn(drawControls);
         } else {
             isDrawModeOn = false;
-            setCursorState(CursorState.DEFAULT);
             drawPane.setActive(false);
         }
 
@@ -499,11 +506,9 @@ public abstract class PresentationController {
         button.addEventHandler(MouseEvent.MOUSE_CLICKED, mouseClickedEventHandler);
         button.addEventHandler(MouseEvent.MOUSE_ENTERED, event -> {
             button.setEffect(new DropShadow());
-            setCursorState(CursorState.DEFAULT);
         });
         button.addEventHandler(MouseEvent.MOUSE_EXITED, event -> {
             button.setEffect(null);
-            setCursorState(cursorManager.peekPreviousState());
         });
 
         return button;
@@ -521,10 +526,8 @@ public abstract class PresentationController {
         ImageView eraserButton = makeCustomButton("file:projectResources/icons/erase.png", event -> {
             if(drawPane.isEraserMode()) {
                 drawPane.setEraserMode(false);
-                setCursorState(CursorState.DRAW);
             } else {
                 drawPane.setEraserMode(true);
-                //setCursorState(CursorState.ERASE); //TODO: Fix
             }
         });
 
@@ -546,7 +549,7 @@ public abstract class PresentationController {
             if(!drawPane.isEraserMode()) {
                 widthSlider = new Slider(0.1, 10, drawPane.getBrushWidth());
             } else {
-                widthSlider = new Slider(1, MAX_ERASER_SIZE, drawPane.getEraserSize());
+                widthSlider = new Slider(MIN_ERASER_SIZE, MAX_ERASER_SIZE, drawPane.getEraserSize());
             }
             widthPopup.setOnAutoHide(event1 -> {
                 if(!drawPane.isEraserMode()) {
@@ -560,8 +563,8 @@ public abstract class PresentationController {
                 if(!drawPane.isEraserMode()) {
                     drawPane.setBrushWidth(widthSlider.getValue());
                 } else {
-                    drawPane.setEraserSize(widthSlider.getValue()); //TODO: adjust cursor size
-                    //setCursorState(CursorState.ERASE); //TODO: fix
+                    drawPane.setEraserSize(widthSlider.getValue());
+                    setCursorState(CursorState.ERASE);
                 }
                 widthPopup.hide();
             });
@@ -584,8 +587,11 @@ public abstract class PresentationController {
 
     private void addMouseHandlersToControls(Node controls) {
         controls.addEventHandler(MouseEvent.MOUSE_ENTERED, event -> {
-            controlsFadeIn(controls);
-            isMouseOverControls = true;
+            if(!mouseDown) {
+                controlsFadeIn(controls);
+                isMouseOverControls = true;
+                setCursorState(CursorState.DEFAULT);
+            }
         });
         controls.addEventHandler(MouseEvent.MOUSE_EXITED, event -> {
             controlsFadeOut(controls);
@@ -818,45 +824,6 @@ public abstract class PresentationController {
         }
     }
 
-    private void setCursorState(CursorState state) {
-        cursorManager.setCursorState(state);
-        eraseCursor = null;
-        if(eraseCursorFilter != null)
-            displayPane.removeEventFilter(MouseEvent.ANY, eraseCursorFilter);
-        eraseCursorFilter = null;
-        switch(state) {
-            case DEFAULT:
-                scene.getRoot().setCursor(Cursor.DEFAULT);
-                displayPane.removeEventFilter(MouseEvent.MOUSE_CLICKED, disabledCursorFilter);
-                break;
-            case HIDDEN:
-                scene.getRoot().setCursor(Cursor.NONE);
-                displayPane.addEventFilter(MouseEvent.MOUSE_CLICKED, disabledCursorFilter);
-                break;
-            case DRAW:
-                Dimension2D drawCursorDimension = ImageCursor.getBestSize(32, 32); //TODO use constants for size
-                ImageCursor drawCursor = new ImageCursor(new Image("file:projectResources/cursors/drawCursor.png", drawCursorDimension.getWidth(), drawCursorDimension.getHeight(), true, true), 0, Double.MAX_VALUE);
-                scene.getRoot().setCursor(drawCursor);
-                break;
-            case ERASE:
-                scene.getRoot().setCursor(Cursor.NONE);
-                Image eraseIcon = new Image("file:projectResources/cursors/eraseCursor.png", drawPane.getEraserSize(), drawPane.getEraserSize(), true, true);
-                eraseCursor = new ImageView(eraseIcon);
-                displayPane.getChildren().add(eraseCursor);
-                StackPane.setAlignment(eraseCursor, Pos.TOP_LEFT);
-                eraseCursorFilter = event -> {
-                    if(event.getEventType().equals(MouseEvent.MOUSE_MOVED) || event.getEventType().equals(MouseEvent.MOUSE_DRAGGED)){
-                        eraseCursor.setTranslateX(event.getX());
-                        eraseCursor.setTranslateY(event.getY());
-                    }
-                };
-                sceneBox.addEventFilter(MouseEvent.ANY, eraseCursorFilter);
-                break;
-            default:
-                //This should never be reached
-        }
-    }
-
     protected void displayCurrentSlide() {
         displayPane.getChildren().clear();
         Slide slide = presentationElement.getSlide(currentSlideNumber);
@@ -879,10 +846,8 @@ public abstract class PresentationController {
             controlsPane.setLeft(null);
         displayPane.getChildren().add(controlsPane);
 
-        if(eraseCursor != null) {
-            displayPane.getChildren().add(eraseCursor);
-            StackPane.setAlignment(eraseCursor, Pos.TOP_LEFT);
-        }
+        if(eraseCursorPane != null)
+            displayPane.getChildren().add(eraseCursorPane);
 
         resize();
     }
@@ -943,6 +908,53 @@ public abstract class PresentationController {
     private void destroyAllElements() {
         for(SlideElement slideElement : presentationElement.getSlide(currentSlideNumber).getSlideElementList())
             slideElement.destroyElement();
+    }
+
+    private void setCursorState(CursorState cursorState) {
+        logger.info("Setting cursor state to: " + cursorState.name());
+        currentCursorState = cursorState;
+        displayPane.getChildren().remove(eraseCursorPane);
+        eraseCursorPane = null;
+
+        switch(cursorState) {
+            case DEFAULT:
+                scene.getRoot().setCursor(Cursor.DEFAULT);
+                displayPane.removeEventFilter(MouseEvent.MOUSE_CLICKED, disabledCursorFilter);
+                break;
+            case HIDDEN:
+                scene.getRoot().setCursor(Cursor.NONE);
+                displayPane.addEventFilter(MouseEvent.MOUSE_CLICKED, disabledCursorFilter);
+                break;
+            case DRAW:
+                Dimension2D drawCursorDimension = ImageCursor.getBestSize(32, 32); //TODO use constants for size
+                ImageCursor drawCursor = new ImageCursor(new Image("file:projectResources/cursors/drawCursor.png", drawCursorDimension.getWidth(), drawCursorDimension.getHeight(), true, true), 0, Double.MAX_VALUE);
+                scene.getRoot().setCursor(drawCursor);
+                break;
+            case ERASE:
+                scene.getRoot().setCursor(Cursor.NONE);
+                ImageView eraseCursor = new ImageView(new Image("file:projectResources/cursors/eraseCursor.png", drawPane.getEraserSize(), drawPane.getEraserSize(), true, true));
+
+                EventTransparencyManager etm = new EventTransparencyManager();
+                etm.connectNodes(eraseCursor, controlsPane);
+
+                eraseCursor.addEventFilter(MouseEvent.ANY, event -> {
+                    if(event.getEventType().equals(MouseEvent.MOUSE_PRESSED) || event.getEventType().equals(MouseEvent.MOUSE_DRAGGED) || event.getEventType().equals(MouseEvent.MOUSE_RELEASED)) {
+                        Event.fireEvent(drawPane, event.copyFor(event.getSource(), drawPane));
+                        event.consume();
+                    }
+                });
+
+                eraseCursorPane = new Pane(eraseCursor);
+                displayPane.addEventFilter(MouseEvent.ANY, event -> {
+                    eraseCursor.setTranslateX(event.getX());
+                    eraseCursor.setTranslateY(event.getY());
+                });
+
+                displayPane.getChildren().add(eraseCursorPane);
+                break;
+            default:
+                //This should never be reached
+        }
     }
 
     public String getXmlPath() {

@@ -1,9 +1,6 @@
 package com.i2lp.edi.client.presentationElements;
 
-import javafx.event.Event;
-import javafx.geometry.Bounds;
-import javafx.scene.Node;
-import javafx.scene.Parent;
+import com.i2lp.edi.client.managers.EventTransparencyManager;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -15,7 +12,7 @@ import javafx.scene.paint.Color;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
+import static com.i2lp.edi.client.managers.PresentationController.MIN_ERASER_SIZE;
 
 
 /**
@@ -30,12 +27,14 @@ public class DrawPane extends Pane {
     private GraphicsContext graphicsContext;
     private WritableImage drawing;
     private final StackPane parentPane;
-    private double eraserSize = 5;
+    private double eraserSize = MIN_ERASER_SIZE;
     private boolean newPathStarted = false;
-    private ArrayList<Node> mouseEnteredArrayList = new ArrayList<>();
+    private final EventTransparencyManager eventTransparencyManager;
 
     public DrawPane(StackPane parent) {
         this.parentPane = parent;
+        eventTransparencyManager = new EventTransparencyManager();
+        eventTransparencyManager.connectNodes(this, parent, 0);
         canvas = new Canvas(1, 1);
         getChildren().add(canvas);
         saveCanvasToImage();
@@ -44,27 +43,6 @@ public class DrawPane extends Pane {
         canvas.heightProperty().addListener(observable -> redraw());
 
         graphicsContext = canvas.getGraphicsContext2D();
-
-        addEventFilter(MouseEvent.ANY, event -> {
-            if(!isActive) {
-                Node target = findEventTarget(event, (Parent) parentPane.getChildren().get(0));
-                if(target != null) {
-                    Event.fireEvent(target, event.copyFor(event.getSource(), target));
-
-                    //Emulate MOUSE_ENTERED and MOUSE_EXITED events
-                    if(event.getEventType().equals(MouseEvent.MOUSE_MOVED)) {
-                        if(!mouseEnteredArrayList.contains(target)) {
-                            addToMouseEnteredList(target, event);
-                        }
-
-                        removeChildrenFromMouseEnteredList(target, event);
-
-                    }
-
-                    event.consume();
-                }
-            }
-        });
 
         addEventHandler(MouseEvent.MOUSE_PRESSED, event -> {
             if(isActive) {
@@ -100,56 +78,6 @@ public class DrawPane extends Pane {
                 slide.addSlideDrawing(drawing);
             }
         });
-    }
-
-    private void addToMouseEnteredList(Node node, MouseEvent event) {
-        if(!mouseEnteredArrayList.contains(node)) {
-            mouseEnteredArrayList.add(node);
-            MouseEvent emulatedEnteredEvent = event.copyFor(event.getSource(), node, MouseEvent.MOUSE_ENTERED);
-            Event.fireEvent(node, emulatedEnteredEvent);
-        }
-
-        if(node.getParent() != node.getScene().getRoot())
-            addToMouseEnteredList(node.getParent(), event);
-    }
-
-    private void removeChildrenFromMouseEnteredList(Node node, MouseEvent event) {
-        Parent parent = null;
-
-        try {
-            parent = (Parent) node;
-        } catch(ClassCastException e) {
-            //The exception is thrown when the node is not a parent. Do nothing.
-        }
-
-        if(parent != null) {
-            for(Node child : parent.getChildrenUnmodifiable()) {
-                if(mouseEnteredArrayList.contains(child)) {
-                    MouseEvent emulatedExitedEvent = event.copyFor(event.getSource(), child, MouseEvent.MOUSE_EXITED);
-                    Event.fireEvent(child, emulatedExitedEvent);
-                    mouseEnteredArrayList.remove(child);
-                    removeChildrenFromMouseEnteredList(child, event);
-                }
-            }
-        }
-    }
-
-    private Node findEventTarget(MouseEvent event, Parent parent) {
-        logger.debug("Searching for event target in " + parent.toString());
-        Node foundTarget = parent;
-        if(parent.getChildrenUnmodifiable().size() != 0) {
-            for(Node child : parent.getChildrenUnmodifiable()) {
-                Bounds boundsInScene = child.localToScene(child.getBoundsInLocal());
-                if(boundsInScene.contains(event.getSceneX(), event.getSceneY())) {
-                    if(child instanceof Parent) {
-                        foundTarget = findEventTarget(event, (Parent) child);
-                    } else {
-                        foundTarget = child;
-                    }
-                }
-            }
-        }
-        return foundTarget;
     }
 
     private void redraw() {
@@ -208,6 +136,7 @@ public class DrawPane extends Pane {
 
     public void setActive(boolean active) {
         this.isActive = active;
+        eventTransparencyManager.setActive(!active);
     }
 
     public Canvas getCanvas() { return canvas; }
