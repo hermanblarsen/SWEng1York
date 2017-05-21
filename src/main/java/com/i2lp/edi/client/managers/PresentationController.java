@@ -134,6 +134,7 @@ public abstract class PresentationController {
         slideNumber = new Label();
         controlsPane = new BorderPane();
         controlsPane.setPickOnBounds(false);
+        displayPane.setPickOnBounds(false);
         presControls = addPresentationControls();
         drawControls = addDrawControls();
     }
@@ -908,6 +909,11 @@ public abstract class PresentationController {
     private void destroyAllElements() {
         for(SlideElement slideElement : presentationElement.getSlide(currentSlideNumber).getSlideElementList())
             slideElement.destroyElement();
+    }
+
+    public SlideElement getElement(int elementID){
+        SlideElement slideElement = presentationElement.getSlide(currentSlideNumber).getSlideElementList().get(elementID-1);
+        return slideElement;
     }
 
     private void setCursorState(CursorState cursorState) {

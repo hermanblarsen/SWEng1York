@@ -23,8 +23,8 @@
               <ysize>0.3</ysize>
               <xsize>0.3</xsize>
               <path>projectResources/sampleFiles/prometheus.mp4</path>
-              <onclickaction>openwebsite</onclickaction>
-              <onclickinfo>https://www.google.no/</onclickinfo>
+              <onclickaction>dynamicmediatoggle</onclickaction>
+              <onclickinfo>1</onclickinfo>
               <loop>false</loop>
               <autoplay>false</autoplay>
               <aspectratiolock>true</aspectratiolock>

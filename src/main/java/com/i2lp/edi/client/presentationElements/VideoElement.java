@@ -42,6 +42,7 @@ public class VideoElement extends SlideElement{
     protected Media media;
     private StackPane mediaPane;
     protected boolean started = false;
+    protected boolean controlActive = false;
 
 
     @Override
@@ -64,6 +65,12 @@ public class VideoElement extends SlideElement{
         }
         //TODO this needs to be changed to something else, we shouldn't change the presentation like that.. Added "started" to help, but needs refining
 //        setAutoplay(false); //Only autoplay on first render (prevents resizing from causing the video to play)
+            getCoreNode().addEventHandler(MouseEvent.MOUSE_CLICKED, evt -> {
+                if(!controlActive){
+                    performOnClickAction();
+                }
+            });
+
     }
 
     @Override
@@ -350,7 +357,7 @@ public class VideoElement extends SlideElement{
         //mediaBar.getChildren().add(fullscreenButton);
         mediaBar.getChildren().addAll(playPauseButton,stopButton,videoTime,playTime,volume,volumeSlider,fullscreenButton);
         mediaBar.addEventHandler(MouseEvent.MOUSE_ENTERED, evt->{
-            System.out.println("MOUSE IN");
+            controlActive = true;
             FadeTransition ft = new FadeTransition(javafx.util.Duration.millis(500),mediaBar);
             ft.setFromValue(0.0);
             ft.setToValue(1.0);
@@ -358,7 +365,7 @@ public class VideoElement extends SlideElement{
         });
 
         mediaBar.addEventHandler(MouseEvent.MOUSE_EXITED, evt->{
-            System.out.println("MOUSE OUT");
+            controlActive = false;
             FadeTransition ft = new FadeTransition(javafx.util.Duration.millis(500),mediaBar);
             ft.setFromValue(1.0);
             ft.setToValue(0.0);

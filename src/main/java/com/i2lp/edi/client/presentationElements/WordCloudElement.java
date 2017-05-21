@@ -53,6 +53,9 @@ public class WordCloudElement extends InteractiveElement {
     protected float yPosition =0.5f;
     protected float xSize =0.5f;
     protected float ySize=0.5f;
+    protected float wordCloudHeight=0.25f;
+    protected float wordCloudWidth=0.25f;
+    protected boolean buttonAcitve = false;
 
     @Override
     public void sendDataToServer() {
@@ -76,6 +79,12 @@ public class WordCloudElement extends InteractiveElement {
 
         wordCloudPanel.setTranslateX(slideWidth * xPosition);
         wordCloudPanel.setTranslateY(slideHeight * yPosition);
+
+        getCoreNode().addEventHandler(MouseEvent.MOUSE_CLICKED,evt->{
+            if(!buttonAcitve){
+                performOnClickAction();
+            }
+        });
     }
 
     @Override
@@ -97,6 +106,12 @@ public class WordCloudElement extends InteractiveElement {
                 test.getChildren().addAll(wordCloudElements(),countdownTile);
                 wordCloudPanel.setBody(test);
                 timeline.play();
+            });
+            start_Task.addEventHandler(MouseEvent.MOUSE_ENTERED,evt->{
+                buttonAcitve = true;
+            });
+            start_Task.addEventHandler(MouseEvent.MOUSE_EXITED,evt->{
+                buttonAcitve = false;
             });
             wordCloudPanel.setBody(start_Task);
         }
@@ -120,7 +135,7 @@ public class WordCloudElement extends InteractiveElement {
             FrequencyAnalyzer fa = new FrequencyAnalyzer();
             List<WordFrequency> wordFrequencies = fa.load(wordList);
 
-            Dimension dimension = new Dimension(Math.round(xSize),Math.round(ySize)); //TODO this needs to be set from the XML - Herman
+            Dimension dimension = new Dimension((int)Math.round(slideWidth*wordCloudWidth),(int)Math.round(slideWidth*wordCloudHeight));
             WordCloud wc = new WordCloud(dimension, CollisionMode.PIXEL_PERFECT);
             wc.setPadding(2);
             if(cloudShapePath != null){
@@ -153,7 +168,7 @@ public class WordCloudElement extends InteractiveElement {
 
         countdownTile = TileBuilder.create()
                 .skinType(Tile.SkinType.NUMBER)
-                .prefSize(300,300)
+                .prefSize((xSize*slideWidth)/3,(ySize*slideHeight)/3)
                 .title("Time Limit")
                 .value(timeLimit)
                 .description("Seconds")
@@ -185,6 +200,12 @@ public class WordCloudElement extends InteractiveElement {
         sendWord.addEventHandler(MouseEvent.MOUSE_CLICKED,evt->{
            wordList.add(words.getText());
            words.clear();
+        });
+        sendWord.addEventHandler(MouseEvent.MOUSE_ENTERED,evt->{
+            buttonAcitve = true;
+        });
+        sendWord.addEventHandler(MouseEvent.MOUSE_EXITED,evt->{
+            buttonAcitve = false;
         });
         container.getChildren().addAll(words,sendWord);
         return container;

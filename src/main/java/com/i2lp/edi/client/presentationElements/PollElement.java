@@ -53,6 +53,7 @@ public class PollElement extends InteractiveElement {
     protected float ySize= 0.5f;
     protected float xPosition=0.5f;
     protected float yPosition=0.5f;
+    protected boolean buttonActive = false;
 
     public PollElement() {
 
@@ -79,9 +80,13 @@ public class PollElement extends InteractiveElement {
         }
 
         questionPane.setTranslateX(slideWidth * xPosition);
-        questionPane
-                .setTranslateY(slideHeight * yPosition);
+        questionPane.setTranslateY(slideHeight * yPosition);
 
+        getCoreNode().addEventHandler(MouseEvent.MOUSE_CLICKED,evt->{
+            if(!buttonActive) {
+                performOnClickAction();
+            }
+        });
     }
 
     @Override
@@ -133,7 +138,7 @@ public class PollElement extends InteractiveElement {
 
         countdownTile = TileBuilder.create()
                                    .skinType(Tile.SkinType.NUMBER)
-                                   .prefSize(300,300)
+                                   .prefSize((xSize*slideWidth)/3,(ySize*slideHeight)/3)
                                    .title("Time Limit")
                                    .value(timeLimit)
                                    .description("Seconds")
@@ -141,7 +146,7 @@ public class PollElement extends InteractiveElement {
                                    .build();
         answerOutputTile = TileBuilder.create()
                                       .skinType(Tile.SkinType.RADIAL_CHART)
-                                      .prefSize(300,300)
+                                      .prefSize((xSize*slideWidth)/3,(ySize*slideHeight)/3)
                                       .title("Responses")
                                       .build();
         if(teacher && !timerStart) {
@@ -159,6 +164,12 @@ public class PollElement extends InteractiveElement {
                 questionPane.setBody(pollOptions);
                 //delay.play();
                 timeline.play();
+            });
+            startTimer.addEventHandler(MouseEvent.MOUSE_ENTERED,evt->{
+                buttonActive = true;
+            });
+            startTimer.addEventHandler(MouseEvent.MOUSE_EXITED,evt->{
+                buttonActive = false;
             });
             //pollPane.setCenter(startTimer);
             questionPane.setBody(startTimer);
@@ -189,9 +200,15 @@ public class PollElement extends InteractiveElement {
             answerButton[i].getStyleClass().setAll("btn","btn-default");
             answerButton[i].addEventHandler(MouseEvent.MOUSE_CLICKED, evt -> {
                 //responseIndicator.incrementResponses();
-                System.out.println("Button " + number + " clicked!");
+
                 //checkIfDone();
                 chartDataArray[number].setValue(chartDataArray[number].getValue()+1);
+            });
+            answerButton[i].addEventHandler(MouseEvent.MOUSE_ENTERED, evt->{
+                buttonActive = true;
+            });
+            answerButton[i].addEventHandler(MouseEvent.MOUSE_EXITED, evt->{
+                buttonActive = false;
             });
             answerSelection.getChildren().add(answerButton[i]);
             answerButton[i].setToggleGroup(group);

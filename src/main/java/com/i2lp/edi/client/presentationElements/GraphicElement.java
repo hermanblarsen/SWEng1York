@@ -1,6 +1,7 @@
 package com.i2lp.edi.client.presentationElements;
 
 import javafx.scene.Node;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Ellipse;
@@ -69,6 +70,7 @@ public class GraphicElement extends SlideElement {
             wrapperPane.getChildren().clear();
             wrapperPane.getChildren().add(graphicShape);
             getCoreNode().setPickOnBounds(false);
+            getCoreNode().addEventHandler(MouseEvent.MOUSE_CLICKED,evt->performOnClickAction());
     }
 
     @Override

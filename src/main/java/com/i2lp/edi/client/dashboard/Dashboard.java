@@ -123,6 +123,7 @@ public abstract class Dashboard extends Application {
                         MenuItem delete = new MenuItem("Delete");
                         delete.setOnAction(deleteEvent -> deletePresentation(previewPanel));
                         cMenu.getItems().add(delete);
+
                     }
                     cMenu.show(dashboardStage, event.getScreenX(), event.getScreenY());
                 }

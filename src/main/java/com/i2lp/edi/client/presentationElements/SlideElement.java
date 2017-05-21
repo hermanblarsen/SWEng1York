@@ -2,8 +2,11 @@ package com.i2lp.edi.client.presentationElements;
 
 import com.i2lp.edi.client.animation.Animation;
 import com.i2lp.edi.client.managers.PresentationController;
+import javafx.application.HostServices;
 import javafx.scene.Node;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
+import javafx.scene.media.MediaPlayer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,7 +34,7 @@ public abstract class SlideElement {
     protected double slideWidth;
     protected double slideHeight;
     protected boolean teacher;
-
+    protected SlideElement mediaElement;
     protected PresentationController presentationController;
 
     public abstract void doClassSpecificRender();
@@ -219,6 +222,7 @@ public abstract class SlideElement {
         logger.info("Performing onClick action: " + onClickAction + " with onClick info: " + onClickInfo);
         switch(onClickAction){
             case "openwebsite":
+                System.out.println("OPENING SITE");
                 //onclickinfo=”URL”
                 break;
             case "gotoslide":
@@ -226,7 +230,21 @@ public abstract class SlideElement {
                 break;
 
             case "dynamicmediatoggle":
-                //onclickinfo = elementid
+                SlideElement se = presentationController.getElement(Integer.parseInt(onClickInfo));
+                if(se instanceof VideoElement){
+                    if(((VideoElement) se).getMediaPlayer().getStatus()== MediaPlayer.Status.PLAYING){
+                        ((VideoElement) se).getMediaPlayer().pause();
+                    }else{
+                        ((VideoElement) se).getMediaPlayer().play();
+                    }
+                }
+                if(se instanceof AudioElement){
+                    if(((AudioElement) se).getMediaPlayer().getStatus()== MediaPlayer.Status.PLAYING){
+                        ((AudioElement) se).getMediaPlayer().pause();
+                    }else{
+                        ((AudioElement) se).getMediaPlayer().play();
+                    }
+                }
                 break;
 
             case "none":

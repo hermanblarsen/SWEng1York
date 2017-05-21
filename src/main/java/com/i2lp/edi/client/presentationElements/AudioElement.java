@@ -6,6 +6,7 @@ import javafx.collections.ObservableMap;
 import javafx.concurrent.Task;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaMarkerEvent;
 import javafx.scene.media.MediaPlayer;
