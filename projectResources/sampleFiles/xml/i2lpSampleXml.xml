@@ -22,8 +22,8 @@
             <text elementid ="0" layer="10" startsequence="1">
                 <textcontent>
                     &lt;h1&gt;Text Slide&lt;/h1&gt;
-                    <bordercolour>#ABCDEFFF</bordercolour>
-                    <bordersize>5</bordersize>
+                <bordercolour>#ABCDEF</bordercolour>
+                <bordersize>5</bordersize>
                 </textcontent>
                 <xposition>0.3</xposition>
                 <yposition>0.05</yposition>
@@ -33,7 +33,11 @@
 
             <text elementid ="1" layer="1" startsequence="1">
                 <textcontent>
-                    &lt;p&gt;Example HTML text input number 1. This is supposed to be a list: &lt;ul&gt;&lt;li&gt;&lt;i&gt;italic&lt;/i&gt;&lt;/li&gt;&lt;li&gt;&lt;b&gt;bold&lt;/b&gt;&lt;/li&gt;&lt;/ul&gt;. Furthermore, these characters are illegal in XML: &lt; &gt; &amp; &apos; &quot;, input by and &amp; followed by lt, gt, amp, apos or quot respectively, finally followed by a ';'.&lt;/p&gt;
+                    &lt;p&gt;Example HTML text input number 1. This is supposed to be a list: &lt;ul&gt;
+                    	&lt;li&gt; &lt;i&gt;italic&lt;/i&gt;&lt;/li&gt;
+                    	&lt;li&gt;&lt;b&gt;bold&lt;/b&gt;&lt;/li&gt;
+                	&lt;/ul&gt;
+                	Furthermore, these characters are illegal in XML: &lt; &gt; &amp; &apos; &quot;, input by and &amp; followed by lt, gt, amp, apos or quot respectively, finally followed by a ';'.&lt;/p&gt;
                 </textcontent>
             </text>
 
@@ -49,21 +53,32 @@
 
             <text elementid ="3" layer="3" startsequence="3">
                 <textcontent>
-                    &lt;h1&gt;Some text on top of the other two. Bigger is better!&lt;/h1&gt;
-                    &lt;p&gt;Now for a line break&lt;/p&gt;
+                    &lt;h1&gt;Some text on top of the other two, with semi transparent background!. Bigger is better!&lt;/h1&gt;
                     &lt;p&gt;Click me to go to Google!&lt;/p&gt;
                 </textcontent>
                 <xposition>0.1</xposition>
                 <yposition>0.4</yposition>
                 <xsize>0.6</xsize>
                 <ysize>0.4</ysize>
-                <fontsize>20</fontsize>
-                <fontcolour>#EEEEEEFF</fontcolour>
-                <bgcolour>#112266FF</bgcolour>
-                <bordercolour>#ABCDEFFF</bordercolour>
-                <bordersize>5</bordersize>
+                <fontsize>12</fontsize>
+                <fontcolour>#0000FFFF</fontcolour>
+                <bgcolour>#11226611</bgcolour>
                 <onclickaction>openwebsite</onclickaction>
                 <onclickinfo>https://www.google.no/</onclickinfo>
+            </text>
+
+            <text elementid ="4" layer="4" startsequence="4">
+                <textcontent>
+                    &lt;h1&gt;Some fully transparent text on top of some of the previous ones!&lt;/h1&gt;
+                    &lt;p&gt;Clicks on me will do nothing!&lt;/p&gt;
+                </textcontent>
+                <xposition>0.1</xposition>
+                <yposition>0.5</yposition>
+                <xsize>0.6</xsize>
+                <ysize>0.2</ysize>
+                <fontsize>12</fontsize>
+                <fontcolour>#FF0000FF</fontcolour>
+                <bgcolour>#00000000</bgcolour>
             </text>
 		</slide>
 

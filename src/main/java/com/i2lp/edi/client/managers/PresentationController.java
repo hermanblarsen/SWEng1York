@@ -116,10 +116,10 @@ public abstract class PresentationController {
         displayPane = new StackPane();
         displayPane.addEventFilter(MouseEvent.ANY, event -> {
             if(event.getEventType().equals(MouseEvent.MOUSE_PRESSED)) {
-                logger.info("Mouse down");
+                logger.trace("Mouse Pressed");
                 mouseDown = true;
             } else if(event.getEventType().equals(MouseEvent.MOUSE_RELEASED)) {
-                logger.info("Mouse up");
+                logger.trace("Mouse Released");
                 mouseDown = false;
             }
         });
@@ -917,7 +917,7 @@ public abstract class PresentationController {
     }
 
     private void setCursorState(CursorState cursorState) {
-        logger.info("Setting cursor state to: " + cursorState.name());
+        logger.trace("Cursor state: " + cursorState.name());
         currentCursorState = cursorState;
         displayPane.getChildren().remove(eraseCursorPane);
         eraseCursorPane = null;

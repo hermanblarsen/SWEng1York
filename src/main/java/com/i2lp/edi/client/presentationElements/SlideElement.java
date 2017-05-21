@@ -61,7 +61,7 @@ public abstract class SlideElement {
                 slideCanvas.getChildren().add(getCoreNode());
             }
             doClassSpecificRender();
-            logger.info("Bounds: " + getCoreNode().localToScene(getCoreNode().getBoundsInLocal()));
+            logger.trace("Bounds: " + getCoreNode().localToScene(getCoreNode().getBoundsInLocal()));
         }
 
         if (!(this instanceof AudioElement)) {
@@ -219,37 +219,41 @@ public abstract class SlideElement {
     }
 
     protected void performOnClickAction(){
-        logger.info("Performing onClick action: " + onClickAction + " with onClick info: " + onClickInfo);
-        switch(onClickAction){
-            case "openwebsite":
-                System.out.println("OPENING SITE");
-                //onclickinfo=”URL”
-                break;
-            case "gotoslide":
-                presentationController.goToSlide(Integer.parseInt(onClickInfo));
-                break;
 
-            case "dynamicmediatoggle":
-                SlideElement se = presentationController.getElement(Integer.parseInt(onClickInfo));
-                if(se instanceof VideoElement){
-                    if(((VideoElement) se).getMediaPlayer().getStatus()== MediaPlayer.Status.PLAYING){
-                        ((VideoElement) se).getMediaPlayer().pause();
-                    }else{
-                        ((VideoElement) se).getMediaPlayer().play();
-                    }
-                }
-                if(se instanceof AudioElement){
-                    if(((AudioElement) se).getMediaPlayer().getStatus()== MediaPlayer.Status.PLAYING){
-                        ((AudioElement) se).getMediaPlayer().pause();
-                    }else{
-                        ((AudioElement) se).getMediaPlayer().play();
-                    }
-                }
-                break;
+        if (onClickAction != null) {
+            logger.info("Performing onClick action: " + onClickAction + " with onClick info: " + onClickInfo);
+            switch (onClickAction) {
+                case "openwebsite":
+                    System.out.println("OPENING SITE");
+                    //onclickinfo=”URL”
+                    break;
+                case "gotoslide":
+                    presentationController.goToSlide(Integer.parseInt(onClickInfo));
+                    break;
 
-            case "none":
-                logger.info("No OnClickAction for ElementID: " + getElementID());
-                break;
+                case "dynamicmediatoggle":
+                    SlideElement se = presentationController.getElement(Integer.parseInt(onClickInfo));
+                    if (se instanceof VideoElement) {
+                        if (((VideoElement) se).getMediaPlayer().getStatus() == MediaPlayer.Status.PLAYING) {
+                            ((VideoElement) se).getMediaPlayer().pause();
+                        } else {
+                            ((VideoElement) se).getMediaPlayer().play();
+                        }
+                    }
+                    if (se instanceof AudioElement) {
+                        if (((AudioElement) se).getMediaPlayer().getStatus() == MediaPlayer.Status.PLAYING) {
+                            ((AudioElement) se).getMediaPlayer().pause();
+                        } else {
+                            ((AudioElement) se).getMediaPlayer().play();
+                        }
+                    }
+                    break;
+
+                default:
+                    logger.info("OnClickAction: " + onClickAction + " with onClick info: " + onClickInfo + " for ElementID: " + getElementID() + " not recognised.");
+                    break;
+            }
         }
+        else logger.info("Element with ElementID: " + getElementID() + " has no OnClickAction");
     }
 }
