@@ -1,50 +1,55 @@
 package com.i2lp.edi.client.presentationElements;
 
-import javafx.beans.property.ReadOnlyBooleanProperty;
+
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
+import javafx.scene.input.InputEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.web.HTMLEditor;
 import org.kordamp.bootstrapfx.scene.layout.Panel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Created by Luke on 19/04/2017.
  */
 public class CommentPanel extends Panel {
-
-    protected HTMLEditor htmlEditor = new HTMLEditor();
+    private static final String EMPTY_HTML_TEXT = "<html dir=\"ltr\"><head></head><body contenteditable=\"true\"></body></html>";
+    Logger logger = LoggerFactory.getLogger(CommentPanel.class);
+    protected HTMLEditor htmlEditor;
     protected String comment;
-    protected boolean submitEnable;
+    protected boolean teacher;
     protected Button saveButton;
     protected Button submitButton;
+    protected Slide currentSlide = new Slide();
 
-    public CommentPanel(boolean submitEnable) {
-        this.submitEnable = submitEnable;
-
+    public CommentPanel(boolean teacher) {
+        this.teacher = teacher;
+        htmlEditor = new HTMLEditor();
         htmlEditor.setMaxWidth(Double.MAX_VALUE);
+        htmlEditor.setHtmlText(EMPTY_HTML_TEXT);
         VBox commentEditor = new VBox();
-        commentEditor.getChildren().addAll(htmlEditor, addControls());
+        commentEditor.getChildren().addAll(htmlEditor);//, controlPanel());
+        addActionListeners();
 
         getStyleClass().add("panel-primary");
-        setMaxHeight(300);
+        setPrefHeight(300);
+        setMinHeight(100);
         setText("Comments");
         setPadding(new Insets(0,0,0,0));
         setBody(commentEditor);
     }
 
-    public String getComment() {
-        return comment;
+    private void addActionListeners() {
+        htmlEditor.addEventHandler(InputEvent.ANY, event -> currentSlide.setUserComments(htmlEditor.getHtmlText()));
     }
 
-    private HBox addControls() {
-        saveButton = new Button("Save Locally");
-        saveButton.getStyleClass().setAll("btn", "btn-default");
-        saveButton.setOnAction(event -> commentSaveFunction());
-
-        submitButton = new Button("Submit To Lecturer");
-        submitButton.getStyleClass().setAll("btn", "btn-default");
-        submitButton.setOnAction(event -> commentSubmitFunction());
+    private HBox controlPanel() {
+//        submitButton = new Button("Submit To Lecturer"); //TODO What will this submit?,
+//                                                // todo) BUT maybe a very similar thing can be implemented for question que
+//        submitButton.getStyleClass().setAll("btn", "btn-default");
 
         HBox controlBox = new HBox();
         controlBox.setStyle("-fx-background-color: #34495e;");
@@ -52,22 +57,25 @@ public class CommentPanel extends Panel {
         controlBox.setSpacing(12);
         controlBox.setMaxWidth(Double.MAX_VALUE);
 
-        if(submitEnable)
-            controlBox.getChildren().addAll(saveButton, submitButton);
-        else
-            controlBox.getChildren().add(saveButton);
+//        if(!teacher) controlBox.getChildren().addAll(submitButton);
 
         return controlBox;
     }
 
-    protected void commentSaveFunction(){
-        comment = htmlEditor.getHtmlText();
+    public String getComment() {
+        return currentSlide.getUserComments();
     }
 
-    protected void commentSubmitFunction(){
-
-        System.out.print("Not yet implemented");
+    public void setSlide(Slide currentSlide) {
+        this.currentSlide.setUserComments(htmlEditor.getHtmlText()); //Make sure the previous slide comment is stored
+        this.currentSlide = currentSlide; //Set new slide
+        updateHtmlEditor();
     }
 
+    private void updateHtmlEditor() {
+        if (currentSlide.getUserComments() != null){
+            htmlEditor.setHtmlText(currentSlide.getUserComments());
+        } else  htmlEditor.setHtmlText(EMPTY_HTML_TEXT);
+    }
 }
 

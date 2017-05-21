@@ -25,8 +25,8 @@ import static com.i2lp.edi.client.Constants.PRESENTATIONS_PATH;
 /**
  * Created by amriksadhra on 12/04/2017.
  */
-public class ThumbnailGenerationController extends PresentationController {
-    private static Logger logger = LoggerFactory.getLogger(ThumbnailGenerationController.class);
+public class ThumbnailGenerationManager extends PresentationManager {
+    private static Logger logger = LoggerFactory.getLogger(ThumbnailGenerationManager.class);
 
     public void openPresentation(String path) {
         presentationStage = new Stage();
@@ -43,23 +43,21 @@ public class ThumbnailGenerationController extends PresentationController {
     }
 
     @Override
-    protected void loadSpecificFeatures() {
-
-    }
-
+    protected void loadSpecificFeatures() {}//Empty
 
     @Override
-    protected void toggleComments() {
+    protected void toggleCommentsWindow() {}//Empty
 
-    }
+    @Override
+    protected void createCommentPanel() {}//Empty
 
     public static void generateSlideThumbnails(String presentationPath) {
-        ThumbnailGenerationController slideGenController = new ThumbnailGenerationController();
+        ThumbnailGenerationManager slideGenController = new ThumbnailGenerationManager();
         slideGenController.openPresentation(presentationPath);
         slideGenController.generateSlideThumbNail(slideGenController);
     }
 
-    public void generateSlideThumbNail(ThumbnailGenerationController slideGenController) {
+    public void generateSlideThumbNail(ThumbnailGenerationManager slideGenController) {
         Presentation presentation = slideGenController.presentationElement;
 
         //Check if thumbnail already there

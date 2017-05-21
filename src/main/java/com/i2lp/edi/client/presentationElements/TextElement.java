@@ -94,7 +94,7 @@ public class TextElement extends SlideElement {
                     page.setBackgroundColor(new java.awt.Color(Float.valueOf(m.group(1)), Float.valueOf(m.group(2)), Float.valueOf(m.group(3)),  Float.valueOf(m.group(4))).getRGB());
                 }
             } catch (Exception e) {
-                logger.error("Unable to set TextElement background colour!", e);
+                logger.error("Unable to set TextElement background colour to: " + bgColour , e);
             }
         });
         browser.setVisible(visibility);

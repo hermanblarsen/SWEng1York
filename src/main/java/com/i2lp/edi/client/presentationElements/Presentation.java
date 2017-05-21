@@ -459,4 +459,8 @@ public class Presentation extends Pane {
 
         return preview;
     }
+
+    public Slide getCurrentSlide() {
+        return currentSlide;
+    }
 }

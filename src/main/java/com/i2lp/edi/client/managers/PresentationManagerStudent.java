@@ -1,6 +1,7 @@
-package com.i2lp.edi.client.presentationViewer;
+package com.i2lp.edi.client.managers;
 
-import com.i2lp.edi.client.managers.PresentationController;
+import com.i2lp.edi.client.managers.PresentationManager;
+import com.i2lp.edi.client.presentationElements.CommentPanel;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -18,9 +19,19 @@ import javafx.stage.Stage;
 /**
  * Created by kma517 on 16/03/2017.
  */
-public class StudentPresentationController extends PresentationController {
+public class PresentationManagerStudent extends PresentationManager {
     protected Boolean elementClicked = false;
 
+    @Override
+    protected void loadSpecificFeatures() {
+        questionQueueFunction();
+    }
+
+
+    @Override
+    protected void createCommentPanel() {
+        commentPanel = new CommentPanel(false);
+    }
 
     protected void questionQueueFunction() {
         Stage questionQueueStage = new Stage();
@@ -58,11 +69,6 @@ public class StudentPresentationController extends PresentationController {
         border.setBottom(controlBox);
         questionQueueStage.setScene(scene);
         questionQueueStage.show();
-    }
-
-    @Override
-    protected void loadSpecificFeatures() {
-        questionQueueFunction();
     }
 }
 

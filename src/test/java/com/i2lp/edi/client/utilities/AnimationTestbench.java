@@ -29,12 +29,12 @@ public class AnimationTestbench extends Application {
 //
 //    @Override
 //    public void start(Stage dashboardStage){
-//        TeacherPresentationController presentationController = new TeacherPresentationController();
-//        presentationController.openPresentation("file:projectResources/sampleFiles/xml/sampleXmlSimpleAnimation.xml");
+//        PresentationManagerTeacher presentationManager = new PresentationManagerTeacher();
+//        presentationManager.openPresentation("file:projectResources/sampleFiles/xml/sampleXmlSimpleAnimation.xml");
 //        SVGPath testPath = new SVGPath();
 //        testPath.setContent("M10 10 L100 100");
 //        testPath.setStroke(Color.BLUE);
-//        presentationController.border.getChildren().add(testPath);
+//        presentationManager.border.getChildren().add(testPath);
 //        testPath.setVisible(true);
 //
 //

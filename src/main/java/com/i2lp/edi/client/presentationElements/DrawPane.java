@@ -12,7 +12,7 @@ import javafx.scene.paint.Color;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static com.i2lp.edi.client.managers.PresentationController.MIN_ERASER_SIZE;
+import static com.i2lp.edi.client.managers.PresentationManager.MIN_ERASER_SIZE;
 
 
 /**

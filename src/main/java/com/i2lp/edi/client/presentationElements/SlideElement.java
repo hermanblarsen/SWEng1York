@@ -1,10 +1,8 @@
 package com.i2lp.edi.client.presentationElements;
 
 import com.i2lp.edi.client.animation.Animation;
-import com.i2lp.edi.client.managers.PresentationController;
-import javafx.application.HostServices;
+import com.i2lp.edi.client.managers.PresentationManager;
 import javafx.scene.Node;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.media.MediaPlayer;
 import org.slf4j.Logger;
@@ -35,7 +33,7 @@ public abstract class SlideElement {
     protected double slideHeight;
     protected boolean teacher;
     protected SlideElement mediaElement;
-    protected PresentationController presentationController;
+    protected PresentationManager presentationManager;
 
     public abstract void doClassSpecificRender();
 
@@ -207,8 +205,8 @@ public abstract class SlideElement {
         this.slideHeight = slideHeight;
     }
 
-    public void setPresentationController(PresentationController presentationController) {
-        this.presentationController = presentationController;
+    public void setPresentationManager(PresentationManager presentationManager) {
+        this.presentationManager = presentationManager;
     }
 
     protected void scaleDimensions(float xPosition, float yPosition){
@@ -220,18 +218,18 @@ public abstract class SlideElement {
     protected void performOnClickAction(){
 
         if (onClickAction != null) {
-            logger.info("Performing onClick action: " + onClickAction + " with onClick info: " + onClickInfo);
+            logger.info("Performing onClickAction: \"" + onClickAction + "\" with onClickInfo: \"" + onClickInfo +"\"");
             switch (onClickAction) {
                 case "openwebsite":
-                    System.out.println("OPENING SITE");
-                    //onclickinfo=”URL”
+                    logger.info("Opening Website: " + onClickInfo);
+                    //onclickinfo=”URL” //TODO @Zain put your browser here! :D
                     break;
                 case "gotoslide":
-                    presentationController.goToSlide(Integer.parseInt(onClickInfo));
+                    presentationManager.goToSlide(Integer.parseInt(onClickInfo));
                     break;
 
                 case "dynamicmediatoggle":
-                    SlideElement se = presentationController.getElement(Integer.parseInt(onClickInfo));
+                    SlideElement se = presentationManager.getElement(Integer.parseInt(onClickInfo));
                     if (se instanceof VideoElement) {
                         if (((VideoElement) se).getMediaPlayer().getStatus() == MediaPlayer.Status.PLAYING) {
                             ((VideoElement) se).getMediaPlayer().pause();

@@ -175,6 +175,14 @@ public class Login extends Application {
             case "auth_fail":
                 loginSuccessful = false;
                 break;
+            case "noresponse":
+                loginSuccessful = false;
+                //TODO try again to connect
+                break;
+            default:
+                logger.warn("User type: " + userData.getUserType() + " not recognised.");
+                loginSuccessful = false;
+                break;
         }
 
         if (loginSuccessful) {

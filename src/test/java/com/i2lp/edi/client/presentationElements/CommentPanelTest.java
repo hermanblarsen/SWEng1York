@@ -9,6 +9,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseButton;
 import javafx.scene.web.HTMLEditor;
 import javafx.stage.Stage;
+import org.testfx.api.FxRobot;
 import org.testfx.api.FxToolkit;
 import org.testfx.framework.junit.ApplicationTest;
 
@@ -22,18 +23,20 @@ import static org.junit.Assert.*;
  * Created by Luke on 29/04/2017.
  */
 @Ignore
-public class CommentTest extends ApplicationTest {
+public class CommentPanelTest extends ApplicationTest {
 
     private CommentPanel myCommentPanel;
     private Button saveButton;
     private Button submitButton;
     private String comment;
     private HTMLEditor htmlEditor;
+    private Slide slide;
 
     @Override
     public void start(Stage stage) throws Exception {
-        myCommentPanel = new CommentPanel(true);
-
+        slide = new Slide();
+        myCommentPanel = new CommentPanel(false);
+        myCommentPanel.setSlide(slide);
         Scene scene = new Scene(myCommentPanel);
         stage.setScene(scene);
         stage.show();
@@ -49,17 +52,27 @@ public class CommentTest extends ApplicationTest {
     }
 
     @Test
-    public void saveTest() {
+    public void commentTest() {
         clickOn(myCommentPanel).write("Test 123");
-        clickOn(saveButton);
-        assertEquals( "Test 123", myCommentPanel.comment);
+//        clickOn(saveButton);
+        assertTrue(htmlEditor.getHtmlText().contains("Test 123"));
+        assertTrue(slide.getUserComments().contains("Test 123"));
+    }
+
+    @Test
+    public void reCommentTest() {
+        clickOn(myCommentPanel).write("Test 123");
+//        clickOn(saveButton);
+        assertTrue(slide.getUserComments().contains("Test 123"));
+        eraseText("Test 123".length()).write("New Test 456");
+        assertTrue(slide.getUserComments().contains("New Test 456"));
     }
 
     @Test
     public void submitTest() {
         clickOn(myCommentPanel).write("Test 123");
-        clickOn(submitButton);
-
+//        clickOn(submitButton);
+        assertTrue(true); //TODO
         //Comment submission not yet implemented
     }
 

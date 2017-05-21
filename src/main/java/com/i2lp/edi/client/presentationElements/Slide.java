@@ -27,6 +27,7 @@ public class Slide extends Pane {
 
     private ArrayList<WritableImage> slideDrawings;
     private int drawingIndex;
+    private String userComments;
 
     //Passed back up to Presentation layer, to alert on whether sequence has changed the current slide or not
     public static final int SLIDE_NO_MOVE = 0;
@@ -245,6 +246,14 @@ public class Slide extends Pane {
         for(SlideElement element : visibleSlideElementList){
             element.destroyElement();
         }
+    }
+
+    public String getUserComments() {
+        return userComments;
+    }
+
+    public void setUserComments(String userComments) {
+        this.userComments = userComments;
     }
 }
 

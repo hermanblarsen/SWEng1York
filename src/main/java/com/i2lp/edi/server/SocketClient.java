@@ -1,7 +1,6 @@
 package com.i2lp.edi.server;
 
 import com.i2lp.edi.client.managers.EdiManager;
-import com.i2lp.edi.client.presentationElements.Presentation;
 import com.i2lp.edi.client.utilities.Utils;
 import com.i2lp.edi.server.packets.Module;
 import com.i2lp.edi.server.packets.PresentationMetadata;
@@ -159,12 +158,12 @@ public class SocketClient {
 
             case "presentations":
                 logger.info("Presentation library database changed!");
-                ediManager.getPresentationManager().updatePresentations(); //Update presentation information
+                ediManager.getPresentationLibraryManager().updatePresentations(); //Update presentation information
                 break;
 
             case "jnct_users_modules":
                 logger.info("Modules user is registered for may have changed!");
-                ediManager.getPresentationManager().updatePresentations(); //Update presentation information
+                ediManager.getPresentationLibraryManager().updatePresentations(); //Update presentation information
                 break;
 
 
@@ -224,7 +223,7 @@ public class SocketClient {
         }
         //If we hit any of the catch statements
         executor.shutdownNow();
-        return new User(NO_RESPONSE, "", "", "", "", "");
+        return new User(NO_RESPONSE, "", "", "", "", "noresponse");
     }
 
     /**
@@ -439,7 +438,7 @@ public class SocketClient {
         socket.on("NewUploadStatus", objects -> {
             logger.info("Addition of " + presentationName + " presentation had the following status: " + objects[0]);
             if (((String) objects[0]).contains("Success")) {
-                ediManager.getPresentationManager().updatePresentations(); //Go and download the presentation from the server
+                ediManager.getPresentationLibraryManager().updatePresentations(); //Go and download the presentation from the server
             }
         });
     }

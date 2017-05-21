@@ -1,5 +1,5 @@
-package com.i2lp.edi.client.presentationViewer;
-import com.i2lp.edi.client.managers.PresentationController;
+package com.i2lp.edi.client.managers;
+import com.i2lp.edi.client.managers.PresentationManager;
 import com.i2lp.edi.client.presentationElements.CommentPanel;
 import javafx.animation.Animation;
 import javafx.animation.Interpolator;
@@ -28,7 +28,7 @@ import java.util.Objects;
 /**
  * Created by kma517 on 16/03/2017.
  */
-public class TeacherPresentationController extends PresentationController {
+public class PresentationManagerTeacher extends PresentationManager {
     protected boolean questionClicked = false;
     protected boolean toolkitOpen = false;
     protected String setText;
@@ -38,7 +38,40 @@ public class TeacherPresentationController extends PresentationController {
     private int numberOfTestQuestions = 10;
     private int numberOnline = 0;
 
-    protected List<String> generateTestQuestions(){
+    @Override
+    protected void loadSpecificFeatures() {
+        if(!toolkitOpen) {
+            teacherToolKit = new Stage();
+            teacherToolKit.initStyle(StageStyle.UTILITY);
+            teacherToolKit.initOwner(presentationStage);
+            teacherToolKit.setTitle("Teacher toolkit");
+            TabPane tp = new TabPane();
+            tp.setStyle("-fx-background-color: #34495e");
+            scene = new Scene(tp, 450, 450);
+            scene.getStylesheets().add("bootstrapfx.css");
+            Tab questions = new Tab();
+            questions.setText("Question Queue");
+            questionList = generateTestQuestions();
+            questions.setContent(questionQueueFunction(questionList));
+            tp.getTabs().add(questions);
+
+            Tab studentStats = new Tab();
+            studentStats.setText("Students");
+            studentList = generateTestStudents();
+            studentStats.setContent(studentStats(studentList));
+            tp.getTabs().add(studentStats);
+
+            teacherToolKit.setScene(scene);
+            teacherToolKit.show();
+            tp.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
+            toolkitOpen = true;
+
+            teacherToolKit.addEventHandler(WindowEvent.WINDOW_CLOSE_REQUEST,evt-> toolkitOpen = false);
+        }
+
+    }
+
+    protected List<String> generateTestQuestions(){ //TODO remove
         ArrayList<String> questions = new ArrayList<String>();
         questions.add("Why should I use Edi?");
         questions.add("What is 2+2?");
@@ -49,7 +82,7 @@ public class TeacherPresentationController extends PresentationController {
         return questions;
     }
 
-    protected List<Student> generateTestStudents(){
+    protected List<Student> generateTestStudents(){ //TODO remove
         ArrayList<Student> studentList = new ArrayList<Student>();
 
         Student stu1 = new Student("Koen Arroo",4,true);
@@ -153,39 +186,6 @@ public class TeacherPresentationController extends PresentationController {
         return bp;
     }
 
-    @Override
-    protected void loadSpecificFeatures() {
-        if(!toolkitOpen) {
-            teacherToolKit = new Stage();
-            teacherToolKit.initStyle(StageStyle.UTILITY);
-            teacherToolKit.initOwner(presentationStage);
-            teacherToolKit.setTitle("Teacher toolkit");
-            TabPane tp = new TabPane();
-            tp.setStyle("-fx-background-color: #34495e");
-            scene = new Scene(tp, 450, 450);
-            scene.getStylesheets().add("bootstrapfx.css");
-            Tab questions = new Tab();
-            questions.setText("Question Queue");
-            questionList = generateTestQuestions();
-            questions.setContent(questionQueueFunction(questionList));
-            tp.getTabs().add(questions);
-
-            Tab studentStats = new Tab();
-            studentStats.setText("Students");
-            studentList = generateTestStudents();
-            studentStats.setContent(studentStats(studentList));
-            tp.getTabs().add(studentStats);
-
-            teacherToolKit.setScene(scene);
-            teacherToolKit.show();
-            tp.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
-            toolkitOpen = true;
-
-            teacherToolKit.addEventHandler(WindowEvent.WINDOW_CLOSE_REQUEST,evt-> toolkitOpen = false);
-        }
-
-    }
-
     protected BorderPane studentStats(List<Student> studentList){
         BorderPane bp = new BorderPane();
         bp.setStyle("-fx-background-color: #34495e");
@@ -255,7 +255,7 @@ public class TeacherPresentationController extends PresentationController {
 
     @Override
     protected void createCommentPanel() {
-        commentPanel = new CommentPanel(false);
+        commentPanel = new CommentPanel(true);
     }
 
     public List<String> getQuestionList() {
@@ -276,7 +276,6 @@ public class TeacherPresentationController extends PresentationController {
             this.questionsAnswered = questionsAnswered;
             this.online = online;
         }
-
 
         public String getName() {
             return name;
@@ -301,7 +300,5 @@ public class TeacherPresentationController extends PresentationController {
         public void setOnline(boolean online) {
             this.online = online;
         }
-
-
     }
 }

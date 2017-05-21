@@ -1,6 +1,6 @@
 package com.i2lp.edi.client.presentationElements;
 
-import com.i2lp.edi.client.presentationViewer.TeacherPresentationController;
+import com.i2lp.edi.client.managers.PresentationManagerTeacher;
 import javafx.application.Application;
 import javafx.stage.Stage;
 
@@ -16,7 +16,7 @@ public class AudioElementIntegrationTestbench extends Application {
 
     @Override
     public void start(Stage primaryStage){
-        TeacherPresentationController presentationManager = new TeacherPresentationController();
+        PresentationManagerTeacher presentationManager = new PresentationManagerTeacher();
         presentationManager.openPresentation("file:projectResources/sampleFiles/xmlTests/audioElementTest.xml");
     }
 }

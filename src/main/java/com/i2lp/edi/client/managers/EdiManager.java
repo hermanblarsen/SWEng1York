@@ -22,12 +22,13 @@ import java.net.Socket;
 public class EdiManager extends Application {
     Logger logger = LoggerFactory.getLogger(EdiManager.class);
     private Login loginDialog;
-    private PresentationManager presentationManager;
+    private PresentationLibraryManager presentationLibraryManager;
 
 
 
     private Dashboard dashboard;
-    protected SocketClient mySocketClient;
+    protected SocketClient socketClient;
+
     protected User userData; //Store currently logged in users data
     private boolean offline = false;
 
@@ -39,7 +40,7 @@ public class EdiManager extends Application {
 
     //Temporary, so that edimanager can close the ports and prevent port-in-use errors on next execution
     public void setClient(SocketClient mySocketClient){
-        this.mySocketClient = mySocketClient;
+        this.socketClient = mySocketClient;
     }
 
     //Initialising Edi, possibly gathering information about the system and storing that locally
@@ -96,7 +97,7 @@ public class EdiManager extends Application {
         Stage dashboardStage = new Stage();
 
         setUserData(userData); //User data is now available throughout Edi
-        this.presentationManager = new PresentationManager(this);
+        this.presentationLibraryManager = new PresentationLibraryManager(this);
 
 
         //Additional com.i2lp.edi.client.login stuff
@@ -117,14 +118,22 @@ public class EdiManager extends Application {
     @Override
     public void stop() {
         logger.info("Closing client-side networking ports.");
-        mySocketClient.closeAll();
+        socketClient.closeAll();
     }
 
-    public PresentationManager getPresentationManager() {
-        return presentationManager;
+    public PresentationLibraryManager getPresentationLibraryManager() {
+        return presentationLibraryManager;
     }
 
     public Dashboard getDashboard() {
         return dashboard;
+    }
+
+    public SocketClient getSocketClient() {
+        return this.socketClient;
+    }
+
+    public User getUserData() {
+        return userData;
     }
 }

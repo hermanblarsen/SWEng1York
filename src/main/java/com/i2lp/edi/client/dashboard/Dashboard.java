@@ -3,10 +3,10 @@ package com.i2lp.edi.client.dashboard;
 import com.i2lp.edi.client.Constants;
 import com.i2lp.edi.client.editor.PresentationEditor;
 import com.i2lp.edi.client.managers.EdiManager;
-import com.i2lp.edi.client.managers.PresentationController;
+import com.i2lp.edi.client.managers.PresentationManager;
 import com.i2lp.edi.client.presentationElements.Presentation;
-import com.i2lp.edi.client.presentationViewer.StudentPresentationController;
-import com.i2lp.edi.client.presentationViewer.TeacherPresentationController;
+import com.i2lp.edi.client.managers.PresentationManagerStudent;
+import com.i2lp.edi.client.managers.PresentationManagerTeacher;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.geometry.*;
@@ -51,7 +51,7 @@ public abstract class Dashboard extends Application {
     protected Presentation myPresentationElement;
     protected static Logger logger = LoggerFactory.getLogger(Dashboard.class);
     private EdiManager ediManager;
-    protected PresentationController presentationController;
+    protected PresentationManager presentationManager;
     protected Stage dashboardStage;
     protected Presentation selectedPres;
     private ArrayList<PresentationPreviewPanel> previewPanels;
@@ -89,10 +89,10 @@ public abstract class Dashboard extends Application {
 
         presentationPreviewsFlowPane.getChildren().clear();
 
-        int numOfPresentations = ediManager.getPresentationManager().getLocalPresentationList().size();
+        int numOfPresentations = ediManager.getPresentationLibraryManager().getLocalPresentationList().size();
 
         for (int i = 0; i < numOfPresentations; i++) {
-            String presentationDocumentID = ediManager.getPresentationManager().getLocalPresentationList().get(i).getDocumentID();
+            String presentationDocumentID = ediManager.getPresentationLibraryManager().getLocalPresentationList().get(i).getDocumentID();
 
             PresentationPreviewPanel previewPanel = new PresentationPreviewPanel(presentationPreviewsFlowPane, PRESENTATIONS_PATH + presentationDocumentID + File.separator + presentationDocumentID + ".xml");
             previewPanel.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
@@ -148,7 +148,7 @@ public abstract class Dashboard extends Application {
 
         //TODO we possibly need to have module NAME and differentiate between presentation ID and presentationTITLE @Amrik
         //Try to remove the presentation from the server
-        boolean successful_removal = ediManager.getPresentationManager().removePresentation(25, 1); //TODO we needs to store this somehow in our java @Amrik
+        boolean successful_removal = ediManager.getPresentationLibraryManager().removePresentation(25, 1); //TODO we needs to store this somehow in our java @Amrik
 
         if(successful_removal) {
             previewPanels.remove(previewPanel);
@@ -230,15 +230,15 @@ public abstract class Dashboard extends Application {
      */
     private void launchPresentation(String path) {
 
-        if(presentationController != null)
-            presentationController.close();
+        if(presentationManager != null)
+            presentationManager.close();
 
         if (this instanceof StudentDashboard) {
-            presentationController = new StudentPresentationController();
+            presentationManager = new PresentationManagerStudent();
         } else if (this instanceof TeacherDashboard) {
-            presentationController = new TeacherPresentationController();
+            presentationManager = new PresentationManagerTeacher();
         }
-        presentationController.openPresentation(path);
+        presentationManager.openPresentation(path);
     }
 
     private HBox addTopPanel() {
@@ -305,7 +305,7 @@ public abstract class Dashboard extends Application {
             Button addButton = new Button("Add");
             addButton.getStyleClass().setAll("btn", "btn-success");
             addButton.setOnAction(event1 -> {
-                ediManager.getPresentationManager().uploadPresentation(xmlLocation.get().getAbsolutePath(), removeFileExtension(xmlLocation.get().getName()), 1); //TODO: Add proper ModuleID
+                ediManager.getPresentationLibraryManager().uploadPresentation(xmlLocation.get().getAbsolutePath(), removeFileExtension(xmlLocation.get().getName()), 1); //TODO: Add proper ModuleID
                 addToServerStage.close();
             });
             addToServerGridPane.add(addButton, 0, 3);
