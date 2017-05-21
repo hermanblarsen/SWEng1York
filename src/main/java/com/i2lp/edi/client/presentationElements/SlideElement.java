@@ -61,7 +61,6 @@ public abstract class SlideElement {
                 slideCanvas.getChildren().add(getCoreNode());
             }
             doClassSpecificRender();
-            logger.trace("Bounds: " + getCoreNode().localToScene(getCoreNode().getBoundsInLocal()));
         }
 
         if (!(this instanceof AudioElement)) {

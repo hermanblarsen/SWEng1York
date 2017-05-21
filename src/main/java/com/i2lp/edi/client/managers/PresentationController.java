@@ -69,7 +69,7 @@ public abstract class PresentationController {
     protected Boolean questionQueueActive = false;
     protected Stage presentationStage;
     protected Boolean isCommentPanelVisible = false;
-    protected Panel commentPanel;
+    protected CommentPanel commentPanel;
     private boolean isShowBlack = false;
     private boolean mouseMoved = true;
     private boolean mouseDown = false;
@@ -204,35 +204,37 @@ public abstract class PresentationController {
 
     private void addKeyboardListeners() {
         scene.addEventFilter(KeyEvent.KEY_PRESSED, keyEvent -> {
-            if (keyEvent.getCode().equals(KeyCode.ENTER) ||
-                    keyEvent.getCode().equals(KeyCode.SPACE) ||
-                    keyEvent.getCode().equals(KeyCode.PAGE_UP) ||
-                    keyEvent.getCode().equals(KeyCode.RIGHT) ||
-                    keyEvent.getCode().equals(KeyCode.UP)) {
-                controlPresentation(Slide.SLIDE_FORWARD);
-            } else if (keyEvent.getCode().equals(KeyCode.LEFT) ||
-                    keyEvent.getCode().equals(KeyCode.BACK_SPACE) ||
-                    keyEvent.getCode().equals(KeyCode.PAGE_DOWN) ||
-                    keyEvent.getCode().equals(KeyCode.DOWN)) {
-                controlPresentation(Slide.SLIDE_BACKWARD);
-            } else if (keyEvent.getCode().equals(KeyCode.F5)) {
-                toggleFullscreen();
-            } else if (keyEvent.getCode().equals(KeyCode.ESCAPE) && isFullscreen) {
-                setFullscreen(false);
-            } else if (keyEvent.getCode().equals(KeyCode.B)) {
-                if (isShowBlack) {
-                    isShowBlack = false;
-                } else {
-                    isShowBlack = true;
+            if(!isCommentPanelVisible){
+                if (keyEvent.getCode().equals(KeyCode.ENTER) ||
+                        keyEvent.getCode().equals(KeyCode.SPACE) ||
+                        keyEvent.getCode().equals(KeyCode.PAGE_UP) ||
+                        keyEvent.getCode().equals(KeyCode.RIGHT) ||
+                        keyEvent.getCode().equals(KeyCode.UP)) {
+                    controlPresentation(Slide.SLIDE_FORWARD);
+                } else if (keyEvent.getCode().equals(KeyCode.LEFT) ||
+                        keyEvent.getCode().equals(KeyCode.BACK_SPACE) ||
+                        keyEvent.getCode().equals(KeyCode.PAGE_DOWN) ||
+                        keyEvent.getCode().equals(KeyCode.DOWN)) {
+                    controlPresentation(Slide.SLIDE_BACKWARD);
+                } else if (keyEvent.getCode().equals(KeyCode.F5)) {
+                    toggleFullscreen();
+                } else if (keyEvent.getCode().equals(KeyCode.ESCAPE) && isFullscreen) {
+                    setFullscreen(false);
+                } else if (keyEvent.getCode().equals(KeyCode.B)) {
+                    if (isShowBlack) {
+                        isShowBlack = false;
+                    } else {
+                        isShowBlack = true;
+                    }
+                    displayCurrentSlide();
+                } else if (keyEvent.getCode().equals(KeyCode.HOME)) {
+                    while (slideAdvance(presentationElement, Slide.SLIDE_BACKWARD) != Presentation.PRESENTATION_START) ;
+                } else if (keyEvent.getCode().equals(KeyCode.END)) {
+                    while (slideAdvance(presentationElement, Slide.SLIDE_FORWARD) != Presentation.PRESENTATION_FINISH) ;
                 }
-                displayCurrentSlide();
-            } else if (keyEvent.getCode().equals(KeyCode.HOME)) {
-                while (slideAdvance(presentationElement, Slide.SLIDE_BACKWARD) != Presentation.PRESENTATION_START) ;
-            } else if (keyEvent.getCode().equals(KeyCode.END)) {
-                while (slideAdvance(presentationElement, Slide.SLIDE_FORWARD) != Presentation.PRESENTATION_FINISH) ;
-            }
 
-            keyEvent.consume();
+                keyEvent.consume();
+            }
         });
     }
 
@@ -604,16 +606,17 @@ public abstract class PresentationController {
 
     private void controlsFadeIn(Node controls) {
         FadeTransition ft0 = new FadeTransition(Duration.millis(500), controls);
-        ft0.setFromValue(0.0);
+        ft0.setFromValue(controls.getOpacity());
         ft0.setToValue(1.0);
         ft0.play();
+
 
         Timer hideControlsTimer = new Timer(true);
         hideControlsTimer.schedule(new TimerTask() {
             @Override
             public void run() {
                 FadeTransition ft0 = new FadeTransition(Duration.millis(500), controls);
-                ft0.setFromValue(1.0);
+                ft0.setFromValue(controls.getOpacity());
                 ft0.setToValue(0.0);
                 if(!isMouseOverControls)
                     ft0.play();
@@ -623,7 +626,7 @@ public abstract class PresentationController {
 
     private void controlsFadeOut(Node controls) {
         FadeTransition ft0 = new FadeTransition(Duration.millis(500), controls);
-        ft0.setFromValue(1.0);
+        ft0.setFromValue(controls.getOpacity());
         ft0.setToValue(0.0);
         ft0.play();
     }
@@ -940,9 +943,6 @@ public abstract class PresentationController {
                 scene.getRoot().setCursor(Cursor.NONE);
                 ImageView eraseCursor = new ImageView(new Image("file:projectResources/cursors/eraseCursor.png", drawPane.getEraserSize(), drawPane.getEraserSize(), true, true));
 
-                EventTransparencyManager etm = new EventTransparencyManager();
-                etm.connectNodes(eraseCursor, controlsPane);
-
                 eraseCursor.addEventFilter(MouseEvent.ANY, event -> {
                     if(event.getEventType().equals(MouseEvent.MOUSE_PRESSED) || event.getEventType().equals(MouseEvent.MOUSE_DRAGGED) || event.getEventType().equals(MouseEvent.MOUSE_RELEASED)) {
                         Event.fireEvent(drawPane, event.copyFor(event.getSource(), drawPane));
@@ -957,6 +957,9 @@ public abstract class PresentationController {
                 });
 
                 displayPane.getChildren().add(eraseCursorPane);
+
+                EventTransparencyManager etm = new EventTransparencyManager();
+                etm.connectNodes(eraseCursor, controlsPane);
                 break;
             default:
                 //This should never be reached

@@ -362,7 +362,7 @@ public class VideoElement extends SlideElement{
         mediaBar.addEventHandler(MouseEvent.MOUSE_ENTERED, evt->{
             controlActive = true;
             FadeTransition ft = new FadeTransition(javafx.util.Duration.millis(500),mediaBar);
-            ft.setFromValue(0.0);
+            ft.setFromValue(mediaBar.getOpacity());
             ft.setToValue(1.0);
             ft.play();
         });
@@ -370,7 +370,7 @@ public class VideoElement extends SlideElement{
         mediaBar.addEventHandler(MouseEvent.MOUSE_EXITED, evt->{
             controlActive = false;
             FadeTransition ft = new FadeTransition(javafx.util.Duration.millis(500),mediaBar);
-            ft.setFromValue(1.0);
+            ft.setFromValue(mediaBar.getOpacity());
             ft.setToValue(0.0);
             ft.play();
         });

@@ -49,8 +49,11 @@ public class DrawPane extends Pane {
                 graphicsContext.beginPath();
                 graphicsContext.moveTo(event.getX(), event.getY());
                 newPathStarted = true;
-                if(!isEraserMode())
-                    graphicsContext.fillRect(event.getX() - graphicsContext.getLineWidth()/2, event.getY() - graphicsContext.getLineWidth()/2, graphicsContext.getLineWidth(), graphicsContext.getLineWidth());
+                if(!isEraserMode()) {
+                    graphicsContext.fillRect(event.getX() - graphicsContext.getLineWidth() / 2, event.getY() - graphicsContext.getLineWidth() / 2, graphicsContext.getLineWidth(), graphicsContext.getLineWidth());
+                } else {
+                    graphicsContext.clearRect(event.getX(), event.getY(), eraserSize, eraserSize);
+                }
             }
         });
 

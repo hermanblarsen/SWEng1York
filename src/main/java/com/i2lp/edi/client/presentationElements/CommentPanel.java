@@ -1,5 +1,6 @@
 package com.i2lp.edi.client.presentationElements;
 
+import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.layout.HBox;
