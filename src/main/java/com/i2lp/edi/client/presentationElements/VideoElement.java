@@ -43,6 +43,7 @@ public class VideoElement extends SlideElement{
     private StackPane mediaPane;
     protected boolean started = false;
     protected boolean controlActive = false;
+    protected ImageView playPauseButton;
 
 
     @Override
@@ -125,6 +126,8 @@ public class VideoElement extends SlideElement{
     @Override
     public void destroyElement() {
         mediaView.getMediaPlayer().stop();
+        Image play = new Image("file:projectResources/icons/PLAY_WHITE.png",20,20,true,true);
+        playPauseButton.setImage(play);
     }
 
     public boolean isMediaControl() {
@@ -265,7 +268,7 @@ public class VideoElement extends SlideElement{
         //Play/Pause Button
         Image play = new Image("file:projectResources/icons/PLAY_WHITE.png",20,20,true,true);
         Image pause = new Image("file:projectResources/icons/PAUSE_WHITE.png",20,20,true,true);
-        ImageView playPauseButton = new ImageView(play);
+        playPauseButton = new ImageView(play);
         if (autoplay) {
             playPauseButton.setImage(pause);
         }

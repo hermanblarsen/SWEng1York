@@ -104,6 +104,7 @@ public class TeacherPresentationController extends PresentationController {
                     lab.setTextFill(Color.WHITE);
                     lab.setWrapText(true);
                     setText = lab.getText();
+                    slidePane.setPrefSize(slideWidth,slideHeight);
                     slidePane.getChildren().addAll(backgroundRegion,lab);
                     displayPane.getChildren().addAll(slidePane);
                     questionClicked = true;
