@@ -12,6 +12,7 @@
           </info>
         </annotation>
         <type>
+          <element name="title" type="string"/>
           <element name="author" type="string"/>
           <element name="version" type="float"/>
           <element name="documentaspectratio" type="float"/>
