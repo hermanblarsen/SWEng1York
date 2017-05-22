@@ -2,11 +2,8 @@ package com.i2lp.edi.client.dashboard;
 
 import com.i2lp.edi.client.Constants;
 import com.i2lp.edi.client.editor.PresentationEditor;
-import com.i2lp.edi.client.managers.EdiManager;
-import com.i2lp.edi.client.managers.PresentationManager;
+import com.i2lp.edi.client.managers.*;
 import com.i2lp.edi.client.presentationElements.Presentation;
-import com.i2lp.edi.client.managers.PresentationManagerStudent;
-import com.i2lp.edi.client.managers.PresentationManagerTeacher;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.geometry.*;
@@ -123,6 +120,10 @@ public abstract class Dashboard extends Application {
                         MenuItem delete = new MenuItem("Delete");
                         delete.setOnAction(deleteEvent -> deletePresentation(previewPanel));
                         cMenu.getItems().add(delete);
+
+                        MenuItem print = new MenuItem("Print");
+                        print.setOnAction(printEvent-> printPresentation(previewPanel.getPresentationPath()));
+                        cMenu.getItems().add(print);
 
                     }
                     cMenu.show(dashboardStage, event.getScreenX(), event.getScreenY());
@@ -509,6 +510,10 @@ public abstract class Dashboard extends Application {
 
     private void showPresentationEditor(String presentationPath) {
         new PresentationEditor(presentationPath);
+    }
+
+    private void printPresentation(String presentationPath){
+        ThumbnailGenerationManager.generateSlideThumbnails(presentationPath,true);
     }
 
     public void setEdiManager(EdiManager ediManager) {

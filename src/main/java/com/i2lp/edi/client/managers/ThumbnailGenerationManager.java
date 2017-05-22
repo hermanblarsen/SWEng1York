@@ -13,11 +13,20 @@ import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.PDPageContentStream;
+import org.apache.pdfbox.pdmodel.common.PDRectangle;
+import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
+import org.apache.pdfbox.util.Matrix;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.imageio.ImageIO;
+import java.awt.*;
+import java.awt.geom.AffineTransform;
 import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
 
 import static com.i2lp.edi.client.Constants.PRESENTATIONS_PATH;
@@ -27,12 +36,16 @@ import static com.i2lp.edi.client.Constants.PRESENTATIONS_PATH;
  */
 public class ThumbnailGenerationManager extends PresentationManager {
     private static Logger logger = LoggerFactory.getLogger(ThumbnailGenerationManager.class);
-
-    public void openPresentation(String path) {
+    private File thumbnailFile;
+    public void openPresentation(String path, boolean printToggle) {
         presentationStage = new Stage();
         displayPane = new StackPane();
         //Lower resolution for thumbnails
-        scene = new Scene(displayPane, 320, 240);
+        if(!printToggle) {
+            scene = new Scene(displayPane, 320, 240);
+        }else{
+            scene = new Scene(displayPane,3508,2480);
+        }
         presentationStage.setScene(scene);
         presentationStage.show();
 
@@ -51,17 +64,25 @@ public class ThumbnailGenerationManager extends PresentationManager {
     @Override
     protected void createCommentPanel() {}//Empty
 
-    public static void generateSlideThumbnails(String presentationPath) {
+    public static void generateSlideThumbnails(String presentationPath, boolean printToggle) {
         ThumbnailGenerationManager slideGenController = new ThumbnailGenerationManager();
-        slideGenController.openPresentation(presentationPath);
-        slideGenController.generateSlideThumbNail(slideGenController);
+        slideGenController.openPresentation(presentationPath, printToggle);
+        slideGenController.generateSlideThumbNail(slideGenController, printToggle);
+        if(printToggle){
+            slideGenController.printPresentation();
+        }
     }
 
-    public void generateSlideThumbNail(ThumbnailGenerationManager slideGenController) {
+    public void generateSlideThumbNail(ThumbnailGenerationManager slideGenController, boolean printToggle) {
         Presentation presentation = slideGenController.presentationElement;
 
         //Check if thumbnail already there
-        File thumbnailFile = new File(PRESENTATIONS_PATH + this.presentationElement.getDocumentID() + "/Thumbnails/" + "slide" + (slideGenController.currentSlideNumber) + "_thumbnail.png");
+        if(!printToggle) {
+            thumbnailFile = new File(PRESENTATIONS_PATH + this.presentationElement.getDocumentID() + "/Thumbnails/" + "slide" + (slideGenController.currentSlideNumber) + "_thumbnail.png");
+        }else{
+            thumbnailFile = new File(PRESENTATIONS_PATH + this.presentationElement.getDocumentID() + "/Print/" + "slide" + (slideGenController.currentSlideNumber) + "_thumbnail.png");
+
+        }
         if (!thumbnailFile.exists()) {
             thumbnailFile.getParentFile().mkdirs(); //Create directory structure if not present yet
         } else {
@@ -71,7 +92,7 @@ public class ThumbnailGenerationManager extends PresentationManager {
                 logger.info("Done generating thumbnails for presentation " + presentation.getDocumentID());
                 slideGenController.close();
             } else {
-                generateSlideThumbNail(slideGenController);
+                generateSlideThumbNail(slideGenController, printToggle);
             }
             return;
         }
@@ -127,14 +148,76 @@ public class ThumbnailGenerationManager extends PresentationManager {
                     logger.info("Done generating thumbnails for presentation " + presentation.getDocumentID());
                     slideGenController.close();
                 } else {
-                    generateSlideThumbNail(slideGenController);
+                    generateSlideThumbNail(slideGenController,printToggle);
                 }
             } catch (IOException ex) {
                 logger.error("Generating presentation thumbnail for " + presentation.getDocumentID() + " at " + thumbnailFile.getAbsolutePath() + " failed");
             }
         });
     }
+    private void printPresentation(){
+        PDDocument doc = new PDDocument();
 
+        String[] ext = {"png"};
+        File path = new File(PRESENTATIONS_PATH + this.presentationElement.getDocumentID() + "/Print/");
+        File pathPDF = new File(PRESENTATIONS_PATH + this.presentationElement.getDocumentID() + "/Print/"+"/pdf/");
+        if(!pathPDF.exists()){
+            pathPDF.mkdir();
+        }
+        File checkPDF = new File(PRESENTATIONS_PATH + this.presentationElement.getDocumentID() + "/Print/"+"/pdf/"+"output.pdf");
+        if(checkPDF.exists()){
+            checkPDF.delete();
+            logger.info("Old PDF has been Deleted");
+        }
+        FilenameFilter imageFilter = new FilenameFilter() {
+            @Override
+            public boolean accept(File dir, String name) {
+                for(final String ext: ext){
+                    if(name.endsWith("."+ext)){
+                        return true;
+                    }
+                }
+                return false;
+            }
+        };
+        if(path.isDirectory()){
+            for (File f : path.listFiles(imageFilter)){
+
+                try {
+                    logger.info("Slide Image Generation Path: "+f.getAbsolutePath().toString());
+                    PDPage page = new PDPage(PDRectangle.A4);
+                    page.setRotation(90);
+                    doc.addPage(page);
+                    PDImageXObject imageObject = PDImageXObject.createFromFile(f.getAbsolutePath(),doc);
+                    PDPageContentStream contents = new PDPageContentStream(doc,page);
+                    PDRectangle cropBox = page.getCropBox();
+                    float tx = ((cropBox.getLowerLeftX()+cropBox.getUpperRightX())/2);
+                    float ty = ((cropBox.getLowerLeftY()+cropBox.getUpperRightY())/2);
+                    contents.transform(Matrix.getTranslateInstance(tx,ty));
+                    contents.transform(Matrix.getRotateInstance(Math.toRadians(90),0,0));
+                    contents.transform(Matrix.getTranslateInstance(-tx,-ty));
+                    contents.drawImage(imageObject,-115,135,PDRectangle.A4.getHeight()-30,PDRectangle.A4.getWidth()-30);
+                    contents.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            try {
+                doc.save(PRESENTATIONS_PATH + this.presentationElement.getDocumentID() + "/Print/"+"/pdf/"+"output.pdf");
+                doc.close();
+                logger.info("PDF Generation Complete.");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+        }
+
+        try {
+            Desktop.getDesktop().open(checkPDF);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
     @Override
     protected void displayCurrentSlide() {
         displayPane.getChildren().clear();

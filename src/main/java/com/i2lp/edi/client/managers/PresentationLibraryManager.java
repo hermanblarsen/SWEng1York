@@ -174,7 +174,7 @@ public class PresentationLibraryManager {
 
     public void uploadPresentation(String fileToUpload, String filename, int moduleID) {
         //Generate thumbnails for Slides.
-        ThumbnailGenerationManager.generateSlideThumbnails(fileToUpload);
+        ThumbnailGenerationManager.generateSlideThumbnails(fileToUpload,false);
         try {
             FileUtils.copyFile(new File(fileToUpload), new File(PRESENTATIONS_PATH + filename + File.separator + filename + ".xml"));
         } catch (IOException e) {

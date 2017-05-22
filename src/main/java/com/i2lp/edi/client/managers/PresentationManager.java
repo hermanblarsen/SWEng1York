@@ -695,7 +695,8 @@ public abstract class PresentationManager {
             }
         }
         presentationToAdvance.setCurrentSlide(presentationToAdvance.getSlideList().get(currentSlideNumber));
-        commentPanel.setSlide(this.presentationElement.getCurrentSlide());
+        //Todo: Fix this line
+        //commentPanel.setSlide(this.presentationElement.getCurrentSlide());
         return presentationStatus;
     }
 
