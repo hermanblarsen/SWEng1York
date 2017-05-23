@@ -1,6 +1,5 @@
 package com.i2lp.edi.client.presentationElements;
 
-import com.i2lp.edi.client.managers.EventTransparencyManager;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -29,12 +28,11 @@ public class DrawPane extends Pane {
     private final StackPane parentPane;
     private double eraserSize = MIN_ERASER_SIZE;
     private boolean newPathStarted = false;
-    private final EventTransparencyManager eventTransparencyManager;
 
     public DrawPane(StackPane parent) {
         this.parentPane = parent;
-        eventTransparencyManager = new EventTransparencyManager();
-        eventTransparencyManager.connectNodes(this, parent, 0);
+        this.setActive(false);
+
         canvas = new Canvas(1, 1);
         getChildren().add(canvas);
         saveCanvasToImage();
@@ -139,10 +137,8 @@ public class DrawPane extends Pane {
 
     public void setActive(boolean active) {
         this.isActive = active;
-        eventTransparencyManager.setActive(!active);
+        setMouseTransparent(!active);
     }
-
-    public Canvas getCanvas() { return canvas; }
 
     public void setEraserMode(boolean eraserMode) { this.isEraserMode = eraserMode; }
 

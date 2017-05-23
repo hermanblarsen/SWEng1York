@@ -43,7 +43,7 @@ import static com.i2lp.edi.client.utilities.Utils.getFileParentDirectory;
 public abstract class PresentationManager {
     private static final float SLIDE_SIZE_ON_OPEN = 0.5f;
     private static final int PRES_CONTROLS_HEIGHT = 40;
-    private static final int STAGE_MIN_WIDTH = 300;
+    private static final int STAGE_MIN_WIDTH = 500;
     private static final int STAGE_MIN_HEIGHT = 300;
     private static final int HIDE_CURSOR_DELAY = 2000;
     public static final int MIN_ERASER_SIZE = 10;
@@ -307,8 +307,9 @@ public abstract class PresentationManager {
                 isMouseOverSlide = false;
             } else if (event.getEventType().equals(MouseEvent.MOUSE_MOVED)) {
                 mouseMoved = true;
-                if (currentCursorState.equals(CursorState.HIDDEN))
+                if (currentCursorState.equals(CursorState.HIDDEN)) {
                     setCursorState(CursorState.DEFAULT);
+                }
             }
         });
 
@@ -349,8 +350,7 @@ public abstract class PresentationManager {
             toResize.doClassSpecificRender();
         }
 
-        if(isDrawModeOn)
-            drawPane.setMaxSize(slideWidth, slideHeight);
+        drawPane.setMaxSize(slideWidth, slideHeight);
     }
 
     public void loadPresentation(String path) {
@@ -397,8 +397,10 @@ public abstract class PresentationManager {
         if (!isCommentPanelVisible) {
             commentPanel.setSlide(presentationElement.getCurrentSlide());
             sceneBox.getChildren().add(commentPanel);
+            presentationStage.setHeight(presentationStage.getHeight() + commentPanel.getMaxHeight());
             isCommentPanelVisible = true;
         } else {
+            presentationStage.setHeight(presentationStage.getHeight() - commentPanel.getHeight());
             sceneBox.getChildren().remove(commentPanel);
             isCommentPanelVisible = false;
         }
@@ -550,16 +552,15 @@ public abstract class PresentationManager {
                 if(!drawPane.isEraserMode()) {
                     drawPane.setBrushWidth(widthSlider.getValue());
                 } else {
-                    drawPane.setEraserSize(widthSlider.getValue()); //TODO: adjust cursor size
-                    //setCursorState(CursorState.ERASE); //TODO: fix
+                    drawPane.setEraserSize(widthSlider.getValue());
                 }
             });
+            widthSlider.addEventFilter(MouseEvent.MOUSE_ENTERED, event1 -> setCursorState(CursorState.DEFAULT));
             widthSlider.setOnMouseReleased(event1 -> {
                 if(!drawPane.isEraserMode()) {
                     drawPane.setBrushWidth(widthSlider.getValue());
                 } else {
                     drawPane.setEraserSize(widthSlider.getValue());
-                    setCursorState(CursorState.ERASE);
                 }
                 widthPopup.hide();
             });
@@ -647,6 +648,7 @@ public abstract class PresentationManager {
     }
 
     public int slideAdvance(Presentation presentationToAdvance, int direction) {
+        //Initialise this with something more appropriate
         int presentationStatus = Presentation.SAME_SLIDE;
         int changeStatus;
         if (direction == Slide.SLIDE_FORWARD) {
@@ -916,44 +918,38 @@ public abstract class PresentationManager {
     private void setCursorState(CursorState cursorState) {
         logger.trace("Cursor state: " + cursorState.name());
         currentCursorState = cursorState;
-        displayPane.getChildren().remove(eraseCursorPane);
+        if(displayPane.getChildren().contains(eraseCursorPane)) {
+            displayPane.getChildren().remove(eraseCursorPane);
+        }
         eraseCursorPane = null;
 
         switch(cursorState) {
             case DEFAULT:
-                scene.getRoot().setCursor(Cursor.DEFAULT);
+                scene.setCursor(Cursor.DEFAULT);
                 displayPane.removeEventFilter(MouseEvent.MOUSE_CLICKED, disabledCursorFilter);
                 break;
             case HIDDEN:
-                scene.getRoot().setCursor(Cursor.NONE);
+                scene.setCursor(Cursor.NONE);
                 displayPane.addEventFilter(MouseEvent.MOUSE_CLICKED, disabledCursorFilter);
                 break;
             case DRAW:
                 Dimension2D drawCursorDimension = ImageCursor.getBestSize(32, 32); //TODO use constants for size
                 ImageCursor drawCursor = new ImageCursor(new Image("file:projectResources/cursors/drawCursor.png", drawCursorDimension.getWidth(), drawCursorDimension.getHeight(), true, true), 0, Double.MAX_VALUE);
-                scene.getRoot().setCursor(drawCursor);
+                scene.setCursor(drawCursor);
                 break;
             case ERASE:
-                scene.getRoot().setCursor(Cursor.NONE);
+                scene.setCursor(Cursor.NONE);
                 ImageView eraseCursor = new ImageView(new Image("file:projectResources/cursors/eraseCursor.png", drawPane.getEraserSize(), drawPane.getEraserSize(), true, true));
-
-                eraseCursor.addEventFilter(MouseEvent.ANY, event -> {
-                    if(event.getEventType().equals(MouseEvent.MOUSE_PRESSED) || event.getEventType().equals(MouseEvent.MOUSE_DRAGGED) || event.getEventType().equals(MouseEvent.MOUSE_RELEASED)) {
-                        Event.fireEvent(drawPane, event.copyFor(event.getSource(), drawPane));
-                        event.consume();
-                    }
-                });
+                eraseCursor.setMouseTransparent(true);
 
                 eraseCursorPane = new Pane(eraseCursor);
+                eraseCursorPane.setMouseTransparent(true);
                 displayPane.addEventFilter(MouseEvent.ANY, event -> {
                     eraseCursor.setTranslateX(event.getX());
                     eraseCursor.setTranslateY(event.getY());
                 });
 
                 displayPane.getChildren().add(eraseCursorPane);
-
-                EventTransparencyManager etm = new EventTransparencyManager();
-                etm.connectNodes(eraseCursor, controlsPane);
                 break;
             default:
                 //This should never be reached

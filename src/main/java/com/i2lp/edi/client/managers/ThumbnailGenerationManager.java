@@ -26,7 +26,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
-import java.awt.geom.AffineTransform;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;

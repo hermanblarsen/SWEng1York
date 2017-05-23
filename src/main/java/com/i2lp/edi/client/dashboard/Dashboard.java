@@ -166,6 +166,7 @@ public abstract class Dashboard extends Application {
         presentationPreviewsFlowPane.setVgap(4);
         presentationPreviewsFlowPane.setHgap(4);
         presentationPreviewsFlowPane.setStyle("-fx-background-color: #ffffff;");
+        presentationPreviewsFlowPane.setAlignment(Pos.TOP_CENTER);
 
         scrollPane.setContent(presentationPreviewsFlowPane);
         scrollPane.setHbarPolicy(ScrollBarPolicy.NEVER);

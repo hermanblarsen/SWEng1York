@@ -1,16 +1,22 @@
 package com.i2lp.edi.client.presentationElements;
 
 
+import com.i2lp.edi.client.utilities.ResizeDirection;
 import javafx.event.EventHandler;
+import com.i2lp.edi.client.utilities.ResizeHandler;
+import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.input.InputEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.web.HTMLEditor;
 import org.kordamp.bootstrapfx.scene.layout.Panel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
 
 /**
  * Created by Luke on 19/04/2017.
@@ -40,6 +46,10 @@ public class CommentPanel extends Panel {
         setText("Comments");
         setPadding(new Insets(0,0,0,0));
         setBody(commentEditor);
+
+        ArrayList<ResizeDirection> resizeDirections = new ArrayList<>();
+        resizeDirections.add(ResizeDirection.UP);
+        addEventFilter(MouseEvent.ANY, new ResizeHandler(this, resizeDirections));
     }
 
     private void addActionListeners() {
