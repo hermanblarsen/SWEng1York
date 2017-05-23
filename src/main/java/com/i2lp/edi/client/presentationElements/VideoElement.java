@@ -5,17 +5,23 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
+import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaView;
 import javafx.scene.paint.Color;
+import javafx.stage.Screen;
+import javafx.stage.Stage;
 import javafx.util.Duration;
 
 import java.io.File;
@@ -44,6 +50,7 @@ public class VideoElement extends SlideElement{
     protected boolean started = false;
     protected boolean controlActive = false;
     protected ImageView playPauseButton;
+    protected Stage videoFullscreenStage;
 
 
     @Override
@@ -344,12 +351,47 @@ public class VideoElement extends SlideElement{
         fullscreenButton.addEventHandler(MouseEvent.MOUSE_CLICKED,(event) -> {
             // TODO: Implement this properly
             if (!fullscreen) {
-                mediaPane.setTranslateX(0);
-                mediaPane.setTranslateY(0);
-                mediaView.setFitHeight(slideHeight); //slideCanvas.getHeight()
-                mediaView.setFitWidth(slideWidth);  //slideCanvas.getWidth()
+//                mediaPane.setTranslateX(0);
+//                mediaPane.setTranslateY(0);
+//                mediaView.setFitHeight(slideHeight); //slideCanvas.getHeight()
+//                mediaView.setFitWidth(slideWidth);  //slideCanvas.getWidth()
+                videoFullscreenStage = new Stage();
+                StackPane mediaplayerPane = new StackPane();
+                mediaplayerPane.getStylesheets().add("bootstrapfx.css");
+                mediaplayerPane.setStyle("-fx-background-color: black");
+                Rectangle2D screenSize = Screen.getPrimary().getVisualBounds();
+                videoFullscreenStage.setFullScreen(true);
+                Scene videoScene = new Scene(mediaplayerPane);
+                videoFullscreenStage.setScene(videoScene);
+                mediaplayerPane.getChildren().add(mediaView);
+                if(!aspectRatioLock) {
+                    mediaView.setFitHeight(screenSize.getHeight());
+                }
+                mediaView.setFitWidth(screenSize.getWidth());
+//                if(aspectRatioLock) {
+//                    mediaView.setTranslateY((screenSize.getHeight()/8));
+//                }
+                StackPane.setAlignment(mediaView,Pos.CENTER);
+                mediaplayerPane.getChildren().add(mediaControl());
+                videoFullscreenStage.show();
+                videoFullscreenStage.addEventHandler(KeyEvent.KEY_PRESSED,evt->{
+                    KeyCode key = evt.getCode();
+                    if (key== KeyCode.ESCAPE){
+                        videoFullscreenStage.close();
+                        mediaPane.getChildren().add(mediaView);
+                        mediaPane.getChildren().add(mediaControl());
+                        mediaPane.setTranslateX(slideWidth*xPosition);
+                        mediaPane.setTranslateY(slideHeight*yPosition);
+                        mediaView.setFitHeight(slideHeight*ySize);
+                        mediaView.setFitWidth(slideWidth*xSize);
+                        fullscreen = false;
+                    }
+                });
                 fullscreen = true;
             } else {
+                videoFullscreenStage.close();
+                mediaPane.getChildren().add(mediaView);
+                mediaPane.getChildren().add(mediaControl());
                 mediaPane.setTranslateX(slideWidth*xPosition);
                 mediaPane.setTranslateY(slideHeight*yPosition);
                 mediaView.setFitHeight(slideHeight*ySize);
