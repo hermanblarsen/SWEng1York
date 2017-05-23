@@ -12,7 +12,6 @@ import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
-import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -36,22 +35,24 @@ import static com.i2lp.edi.client.Constants.PRESENTATIONS_PATH;
  * Created by amriksadhra on 12/04/2017.
  */
 public class ThumbnailGenerationManager extends PresentationManager {
+
     private static Logger logger = LoggerFactory.getLogger(ThumbnailGenerationManager.class);
     private File thumbnailFile;
+
     public void openPresentation(String path, boolean printToggle) {
         presentationStage = new Stage();
         displayPane = new StackPane();
         //Lower resolution for thumbnails
         if(!printToggle) {
-            scene = new Scene(displayPane, 320, 240);
+            scene = new Scene(displayPane, 320, 240); //TODO: Use constants
         }else{
-            scene = new Scene(displayPane,3508,2480);
+            scene = new Scene(displayPane,3508,2480); //TODO: Use constants, also what are those values, 3508?
         }
         presentationStage.setScene(scene);
         presentationStage.show();
 
         //Hide the presentation manager
-        //TODO: Put the stage in the bottom right of
+        //TODO: Put the stage in the bottom right of the screen
         presentationStage.toBack();
         loadPresentation(path);
     }
@@ -140,7 +141,8 @@ public class ThumbnailGenerationManager extends PresentationManager {
         webviewRenderChecker.setOnSucceeded(event ->
         {
             logger.info("Generating thumbnail file for " + presentation.getDocumentID() + " Slide " + (slideGenController.currentSlideNumber) + " at " + thumbnailFile.getAbsolutePath());
-            WritableImage thumbnail = presentation.getSlide(slideGenController.currentSlideNumber).snapshot(new SnapshotParameters(), null);
+            Slide slideToRender = presentation.getSlide(slideGenController.currentSlideNumber);
+            WritableImage thumbnail = slideToRender.snapshot(new SnapshotParameters(), new WritableImage((int) slideToRender.getWidth(), (int) slideToRender.getHeight()));
             try {
                 //Write the snapshot to the chosen file
                 ImageIO.write(SwingFXUtils.fromFXImage(thumbnail, null), "png", thumbnailFile);
@@ -149,13 +151,14 @@ public class ThumbnailGenerationManager extends PresentationManager {
                     logger.info("Done generating thumbnails for presentation " + presentation.getDocumentID());
                     slideGenController.close();
                 } else {
-                    generateSlideThumbNail(slideGenController,printToggle);
+                    generateSlideThumbNail(slideGenController, printToggle);
                 }
             } catch (IOException ex) {
                 logger.error("Generating presentation thumbnail for " + presentation.getDocumentID() + " at " + thumbnailFile.getAbsolutePath() + " failed");
             }
         });
     }
+
     private void printPresentation() {
         PDDocument doc = new PDDocument();
 
@@ -182,16 +185,13 @@ public class ThumbnailGenerationManager extends PresentationManager {
                 pdfPath.delete();
             }
             logger.info("PDF Save path: " + pdfPath.getAbsolutePath());
-            FilenameFilter imageFilter = new FilenameFilter() {
-                @Override
-                public boolean accept(File dir, String name) {
-                    for (final String ext : ext) {
-                        if (name.endsWith("." + ext)) {
-                            return true;
-                        }
+            FilenameFilter imageFilter = (dir, name) -> {
+                for (final String ext1 : ext) {
+                    if (name.endsWith("." + ext1)) {
+                        return true;
                     }
-                    return false;
                 }
+                return false;
             };
             if (path.isDirectory()) {
                 for (File f : path.listFiles(imageFilter)) {
@@ -233,6 +233,7 @@ public class ThumbnailGenerationManager extends PresentationManager {
             }
         }
     }
+
     @Override
     protected void displayCurrentSlide() {
         displayPane.getChildren().clear();
