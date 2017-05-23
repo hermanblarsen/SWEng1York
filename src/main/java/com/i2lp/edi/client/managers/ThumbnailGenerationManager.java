@@ -12,6 +12,8 @@ import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
+import javafx.stage.DirectoryChooser;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
@@ -164,10 +166,15 @@ public class ThumbnailGenerationManager extends PresentationManager {
         if(!pathPDF.exists()){
             pathPDF.mkdir();
         }
-        File checkPDF = new File(PRESENTATIONS_PATH + this.presentationElement.getDocumentID() + "/Print/"+"/pdf/"+"output.pdf");
-        if(checkPDF.exists()){
-            checkPDF.delete();
-            logger.info("Old PDF has been Deleted");
+
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Save PDF");
+        Stage testStage = new Stage();
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PDF","*.pdf"));
+        File pdfPath = fileChooser.showSaveDialog(testStage);
+        logger.info("PDF Save path: "+pdfPath.getAbsolutePath());
+        if(pdfPath.exists()){
+            pdfPath.delete();
         }
         FilenameFilter imageFilter = new FilenameFilter() {
             @Override
@@ -203,7 +210,8 @@ public class ThumbnailGenerationManager extends PresentationManager {
                 }
             }
             try {
-                doc.save(PRESENTATIONS_PATH + this.presentationElement.getDocumentID() + "/Print/"+"/pdf/"+"output.pdf");
+                //doc.save(PRESENTATIONS_PATH + this.presentationElement.getDocumentID() + "/Print/"+"/pdf/"+"output.pdf");
+                doc.save(pdfPath);
                 doc.close();
                 logger.info("PDF Generation Complete.");
             } catch (IOException e) {
@@ -213,7 +221,7 @@ public class ThumbnailGenerationManager extends PresentationManager {
         }
 
         try {
-            Desktop.getDesktop().open(checkPDF);
+            Desktop.getDesktop().open(pdfPath);
         } catch (IOException e) {
             e.printStackTrace();
         }
