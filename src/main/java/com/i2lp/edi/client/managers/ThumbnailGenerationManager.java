@@ -157,73 +157,81 @@ public class ThumbnailGenerationManager extends PresentationManager {
             }
         });
     }
-    private void printPresentation(){
+    private void printPresentation() {
         PDDocument doc = new PDDocument();
 
         String[] ext = {"png"};
         File path = new File(PRESENTATIONS_PATH + this.presentationElement.getDocumentID() + "/Print/");
-        File pathPDF = new File(PRESENTATIONS_PATH + this.presentationElement.getDocumentID() + "/Print/"+"/pdf/");
-        if(!pathPDF.exists()){
+        File pathPDF = new File(PRESENTATIONS_PATH + this.presentationElement.getDocumentID() + "/Print/" + "/pdf/");
+        if (!pathPDF.exists()) {
             pathPDF.mkdir();
         }
 
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Save PDF");
+        fileChooser.setInitialFileName(presentationElement.getDocumentID());
         Stage testStage = new Stage();
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PDF","*.pdf"));
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PDF", "*.pdf"));
         File pdfPath = fileChooser.showSaveDialog(testStage);
-        logger.info("PDF Save path: "+pdfPath.getAbsolutePath());
-        if(pdfPath.exists()){
-            pdfPath.delete();
+
+
+        if(pdfPath == null){
+            logger.info("Invalid path entered! PDF Not Generated");
         }
-        FilenameFilter imageFilter = new FilenameFilter() {
-            @Override
-            public boolean accept(File dir, String name) {
-                for(final String ext: ext){
-                    if(name.endsWith("."+ext)){
-                        return true;
+        if (pdfPath != null) {
+            if (pdfPath.exists()) {
+                pdfPath.delete();
+            }
+            logger.info("PDF Save path: " + pdfPath.getAbsolutePath());
+            FilenameFilter imageFilter = new FilenameFilter() {
+                @Override
+                public boolean accept(File dir, String name) {
+                    for (final String ext : ext) {
+                        if (name.endsWith("." + ext)) {
+                            return true;
+                        }
+                    }
+                    return false;
+                }
+            };
+            if (path.isDirectory()) {
+                for (File f : path.listFiles(imageFilter)) {
+
+                    try {
+                        logger.info("Slide Image Generation Path: " + f.getAbsolutePath().toString());
+                        PDPage page = new PDPage(PDRectangle.A4);
+                        page.setRotation(90);
+                        doc.addPage(page);
+                        PDImageXObject imageObject = PDImageXObject.createFromFile(f.getAbsolutePath(), doc);
+                        PDPageContentStream contents = new PDPageContentStream(doc, page);
+                        PDRectangle cropBox = page.getCropBox();
+                        float tx = ((cropBox.getLowerLeftX() + cropBox.getUpperRightX()) / 2);
+                        float ty = ((cropBox.getLowerLeftY() + cropBox.getUpperRightY()) / 2);
+                        contents.transform(Matrix.getTranslateInstance(tx, ty));
+                        contents.transform(Matrix.getRotateInstance(Math.toRadians(90), 0, 0));
+                        contents.transform(Matrix.getTranslateInstance(-tx, -ty));
+                        contents.drawImage(imageObject, -115, 135, PDRectangle.A4.getHeight() - 30, PDRectangle.A4.getWidth() - 30);
+                        contents.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
                     }
                 }
-                return false;
-            }
-        };
-        if(path.isDirectory()){
-            for (File f : path.listFiles(imageFilter)){
-
                 try {
-                    logger.info("Slide Image Generation Path: "+f.getAbsolutePath().toString());
-                    PDPage page = new PDPage(PDRectangle.A4);
-                    page.setRotation(90);
-                    doc.addPage(page);
-                    PDImageXObject imageObject = PDImageXObject.createFromFile(f.getAbsolutePath(),doc);
-                    PDPageContentStream contents = new PDPageContentStream(doc,page);
-                    PDRectangle cropBox = page.getCropBox();
-                    float tx = ((cropBox.getLowerLeftX()+cropBox.getUpperRightX())/2);
-                    float ty = ((cropBox.getLowerLeftY()+cropBox.getUpperRightY())/2);
-                    contents.transform(Matrix.getTranslateInstance(tx,ty));
-                    contents.transform(Matrix.getRotateInstance(Math.toRadians(90),0,0));
-                    contents.transform(Matrix.getTranslateInstance(-tx,-ty));
-                    contents.drawImage(imageObject,-115,135,PDRectangle.A4.getHeight()-30,PDRectangle.A4.getWidth()-30);
-                    contents.close();
+                    //doc.save(PRESENTATIONS_PATH + this.presentationElement.getDocumentID() + "/Print/"+"/pdf/"+"output.pdf");
+                    doc.save(pdfPath);
+                    doc.close();
+                    logger.info("PDF Generation Complete.");
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+
             }
+
             try {
-                //doc.save(PRESENTATIONS_PATH + this.presentationElement.getDocumentID() + "/Print/"+"/pdf/"+"output.pdf");
-                doc.save(pdfPath);
-                doc.close();
-                logger.info("PDF Generation Complete.");
+                Desktop.getDesktop().open(pdfPath);
             } catch (IOException e) {
                 e.printStackTrace();
             }
-
-        }
-
-        try {
-            Desktop.getDesktop().open(pdfPath);
-        } catch (IOException e) {
-            e.printStackTrace();
         }
     }
     @Override
@@ -235,4 +243,5 @@ public class ThumbnailGenerationManager extends PresentationManager {
 
         resize();
     }
+
 }
