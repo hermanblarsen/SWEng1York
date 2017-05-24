@@ -127,6 +127,7 @@ public class PresentationLibraryManager {
         if (!tempDir.exists()) tempDir.mkdirs(); //Create directory structure if not present yet
         if (!presDir.exists()) presDir.mkdirs();
 
+        int i=1;
         for (PresentationMetadata toDownload : downloadList) {
             logger.info("Downloading presentation from " + toDownload.getXml_url());
             try {
@@ -138,7 +139,9 @@ public class PresentationLibraryManager {
                 logger.error("Unable to download presentation " + toDownload.getDocumentID() + "!");
                 return;
             }
+            logger.info("Unzipping " + toDownload.getXml_url() + ", " + i + " / " + downloadList.size());
             ZipUtils.unzipPresentation(tempDir.getAbsolutePath() + File.separator + toDownload.getDocumentID() + ".zip", presDir.getAbsolutePath() + File.separator + toDownload.getDocumentID());
+            i++;
         }
     }
 

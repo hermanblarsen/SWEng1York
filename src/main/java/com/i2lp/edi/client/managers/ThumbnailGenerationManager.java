@@ -53,6 +53,7 @@ public class ThumbnailGenerationManager extends PresentationManager {
 
         //Hide the presentation manager
         //TODO: Put the stage in the bottom right of the screen
+        //TODO a possibility would be to only show it exactly when the snapshot is taken, and then rehide it again - Herman
         presentationStage.toBack();
         loadPresentation(path);
     }
@@ -66,20 +67,18 @@ public class ThumbnailGenerationManager extends PresentationManager {
     @Override
     protected void createCommentPanel() {}//Empty
 
-    public static void generateSlideThumbnails(String presentationPath, boolean printToggle) {
+    public static void generateSlideThumbnails(String presentationPath, boolean savePresentationToPdf) {
         ThumbnailGenerationManager slideGenController = new ThumbnailGenerationManager();
-        slideGenController.openPresentation(presentationPath, printToggle);
-        slideGenController.generateSlideThumbNail(slideGenController, printToggle);
-        if(printToggle){
-            slideGenController.printPresentation();
-        }
+        slideGenController.openPresentation(presentationPath, savePresentationToPdf);
+        slideGenController.generateSlideThumbNail(slideGenController, savePresentationToPdf);
+        if(savePresentationToPdf) slideGenController.savePresentationToPdf();
     }
 
-    public void generateSlideThumbNail(ThumbnailGenerationManager slideGenController, boolean printToggle) {
+    public void generateSlideThumbNail(ThumbnailGenerationManager slideGenController, boolean savePresentationToPdf) {
         Presentation presentation = slideGenController.presentationElement;
 
         //Check if thumbnail already there
-        if(!printToggle) {
+        if(!savePresentationToPdf) {
             thumbnailFile = new File(PRESENTATIONS_PATH + this.presentationElement.getDocumentID() + "/Thumbnails/" + "slide" + (slideGenController.currentSlideNumber) + "_thumbnail.png");
         }else{
             thumbnailFile = new File(PRESENTATIONS_PATH + this.presentationElement.getDocumentID() + "/Print/" + "slide" + (slideGenController.currentSlideNumber) + "_thumbnail.png");
@@ -94,7 +93,7 @@ public class ThumbnailGenerationManager extends PresentationManager {
                 logger.info("Done generating thumbnails for presentation " + presentation.getDocumentID());
                 slideGenController.close();
             } else {
-                generateSlideThumbNail(slideGenController, printToggle);
+                generateSlideThumbNail(slideGenController, savePresentationToPdf);
             }
             return;
         }
@@ -151,7 +150,7 @@ public class ThumbnailGenerationManager extends PresentationManager {
                     logger.info("Done generating thumbnails for presentation " + presentation.getDocumentID());
                     slideGenController.close();
                 } else {
-                    generateSlideThumbNail(slideGenController, printToggle);
+                    generateSlideThumbNail(slideGenController, savePresentationToPdf);
                 }
             } catch (IOException ex) {
                 logger.error("Generating presentation thumbnail for " + presentation.getDocumentID() + " at " + thumbnailFile.getAbsolutePath() + " failed");
@@ -159,7 +158,7 @@ public class ThumbnailGenerationManager extends PresentationManager {
         });
     }
 
-    private void printPresentation() {
+    private void savePresentationToPdf() {
         PDDocument doc = new PDDocument();
 
         String[] ext = {"png"};
@@ -243,5 +242,4 @@ public class ThumbnailGenerationManager extends PresentationManager {
 
         resize();
     }
-
 }

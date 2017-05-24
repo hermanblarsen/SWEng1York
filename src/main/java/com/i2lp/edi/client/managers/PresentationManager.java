@@ -181,7 +181,7 @@ public abstract class PresentationManager {
         loadPresentation(path);
         presentationStage.setTitle(presentationElement.getDocumentTitle());
         slideNumber.setText("Slide 1 of " + presentationElement.getSlideList().size());
-        setThumbnailGen(thumbnailGen);
+        isThumbnailGen = thumbnailGen;  
         Rectangle2D primaryScreenBounds = Screen.getPrimary().getVisualBounds();
 
         slideWidth = primaryScreenBounds.getWidth() * SLIDE_SIZE_ON_OPEN;
@@ -723,8 +723,7 @@ public abstract class PresentationManager {
             }
         }
         presentationToAdvance.setCurrentSlide(presentationToAdvance.getSlideList().get(currentSlideNumber));
-        //Todo: Fix this line
-        //commentPanel.setSlide(this.presentationElement.getCurrentSlide());
+        if (commentPanel != null) commentPanel.setSlide(this.presentationElement.getCurrentSlide());
         return presentationStatus;
     }
 
@@ -984,10 +983,6 @@ public abstract class PresentationManager {
 
     public boolean isThumbnailGen() {
         return isThumbnailGen;
-    }
-
-    public void setThumbnailGen(boolean thumbnailGen) {
-        isThumbnailGen = thumbnailGen;
     }
 
     public String getXmlPath() {

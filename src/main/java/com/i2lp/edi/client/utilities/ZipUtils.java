@@ -127,7 +127,7 @@ public class ZipUtils {
                     continue;
                 }
 
-                loggerStatic.info("Unzipping " + newFile.getAbsoluteFile());
+                loggerStatic.trace("Unzipping to: " + newFile.getAbsoluteFile());
 
                 //create all non exists folders
                 //else you will hit FileNotFoundException for compressed folder

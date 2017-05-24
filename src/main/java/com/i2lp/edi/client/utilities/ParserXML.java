@@ -62,6 +62,7 @@ public class ParserXML {
         if (faultsDetected.size() > 0) {
             myPresentation.setXmlFaults(faultsDetected);
         }
+        logger.info("Presentation Parsed. Faults found: " + this.faultsDetected.size());
 
         return myPresentation;
     }
@@ -291,7 +292,6 @@ public class ParserXML {
             faultsDetected.add("No slides found!");
         }
         myPresentation.setSlideList(slideArray);
-        logger.info("Presentation Parsed. Faults found: " + this.faultsDetected.size());
     }
 
     private void parseElementAttributes (Node slideElementNode, SlideElement slideElement) {

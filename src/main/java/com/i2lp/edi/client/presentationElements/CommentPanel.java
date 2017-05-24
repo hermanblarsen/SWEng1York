@@ -56,7 +56,7 @@ public class CommentPanel extends Panel {
         htmlEditor.addEventHandler(InputEvent.ANY, event -> currentSlide.setUserComments(htmlEditor.getHtmlText()));
     }
 
-    private HBox controlPanel() {
+    private HBox controlPanel() { //TODO delete if not used for question que tabs or something
 //        submitButton = new Button("Submit To Lecturer"); //TODO What will this submit?,
 //                                                // todo) BUT maybe a very similar thing can be implemented for question que
 //        submitButton.getStyleClass().setAll("btn", "btn-default");
