@@ -72,7 +72,7 @@ public class Login extends Application {
         backgroundFillList.add(new BackgroundFill(Color.GHOSTWHITE, CornerRadii.EMPTY, Insets.EMPTY));
         gridPane.setBackground(new Background(backgroundFillList, backgroundImageList));
 
-        Scene scene = new Scene(gridPane, 550, 275); //TODO originally: 350, 275
+        Scene scene = new Scene(gridPane, 550, 275);
 
         //sets the stylesheet to https://github.com/aalmiray/bootstrapfx, giving us access to various premade CSS styles.
         //More available on https://docs.oracle.com/javase/8/javafx/api/javafx/scene/doc-files/cssref.html
@@ -243,4 +243,6 @@ public class Login extends Application {
             }
         }
     }
+
+
 }

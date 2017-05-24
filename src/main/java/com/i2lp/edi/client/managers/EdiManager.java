@@ -8,6 +8,7 @@ import com.i2lp.edi.client.login.Login;
 import com.i2lp.edi.server.SocketClient;
 import com.i2lp.edi.server.packets.User;
 import javafx.application.Application;
+import javafx.scene.control.Button;
 import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,7 +22,7 @@ import java.net.Socket;
  */
 public class EdiManager extends Application {
     Logger logger = LoggerFactory.getLogger(EdiManager.class);
-    private Login loginDialog;
+    protected Login loginDialog;
     private PresentationLibraryManager presentationLibraryManager;
 
 
@@ -82,11 +83,11 @@ public class EdiManager extends Application {
 
     /**
      * Custom logic when user is logged in should go here. Currently displaying First name of user.
-     * @param toSet User data received from Edi server
+     * @param userToSet User data received from Edi server
      * @author Amrik Sadhra
      */
-    private void setUserData(User toSet){
-        this.userData = toSet;
+    public void setUserData(User userToSet){
+        this.userData = userToSet;
         logger.info("Welcome " + userData.getFirstName());
     }
 

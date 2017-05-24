@@ -51,9 +51,15 @@ public abstract class Dashboard extends Application {
     protected PresentationManager presentationManager;
     protected Stage dashboardStage;
     protected Presentation selectedPres;
-    private ArrayList<PresentationPreviewPanel> previewPanels;
+    protected ArrayList<PresentationPreviewPanel> previewPanels;
     private FlowPane presentationPreviewsFlowPane;
     private ComboBox<String> sortCombo;
+
+    protected TextField searchField;
+    protected Button showAllButton;
+    protected Button subjectButton0;
+    protected Button subjectButton1;
+    protected Button subjectButton2;
 
     @Override
     public void start(Stage dashboardStage) {
@@ -333,7 +339,7 @@ public abstract class Dashboard extends Application {
         Panel searchPanel = new Panel("Search");
         controlsVBox.getChildren().add(searchPanel);
         searchPanel.getStyleClass().add("panel-primary");
-        TextField searchField = new TextField();
+        searchField = new TextField();
         searchField.setOnAction(event -> search(searchField.getText()));
         searchField.textProperty().addListener(observable -> search(searchField.getText()));
         searchPanel.setBody(searchField);
@@ -346,25 +352,25 @@ public abstract class Dashboard extends Application {
         Label filterBySubjectLabel = new Label("Filter by subject:");
         subjectsVBox.getChildren().add(filterBySubjectLabel);
 
-        Button showAllButton = new Button("Show all");
+        showAllButton = new Button("Show all");
         showAllButton.getStyleClass().setAll("btn", "btn-success");
         showAllButton.setOnAction(event -> showAllPreviewPanels());
         subjectsVBox.getChildren().add(showAllButton);
 
-        Button subjectButton1 = new Button("Subject 0");
+        subjectButton0 = new Button("Subject 0");
+        subjectButton0.getStyleClass().setAll("btn", "btn-success");
+        subjectButton0.setOnAction(event -> filterBySubject(subjectButton0.getText()));
+        subjectsVBox.getChildren().add(subjectButton0);
+
+        subjectButton1 = new Button("Subject 1");
         subjectButton1.getStyleClass().setAll("btn", "btn-success");
         subjectButton1.setOnAction(event -> filterBySubject(subjectButton1.getText()));
         subjectsVBox.getChildren().add(subjectButton1);
 
-        Button subjectButton2 = new Button("Subject 1");
+        subjectButton2 = new Button("Subject 2");
         subjectButton2.getStyleClass().setAll("btn", "btn-success");
         subjectButton2.setOnAction(event -> filterBySubject(subjectButton2.getText()));
         subjectsVBox.getChildren().add(subjectButton2);
-
-        Button subjectButton3 = new Button("Subject 2");
-        subjectButton3.getStyleClass().setAll("btn", "btn-success");
-        subjectButton3.setOnAction(event -> filterBySubject(subjectButton3.getText()));
-        subjectsVBox.getChildren().add(subjectButton3);
 
         //Create Panel for subject filters
         Panel subjectsPanel = new Panel("My subjects");

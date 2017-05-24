@@ -14,12 +14,13 @@ public class ResponseIndicator extends HBox {
 
     private int numberOfStudents;
     private int numberOfResponses;
-    private ProgressIndicator progressIndicator;
-    private Text numberText;
+    protected ProgressIndicator progressIndicator;
+    protected Text numberText;
+    private static int size = 60;
 
     public ResponseIndicator() {
         progressIndicator = new ProgressIndicator(0);
-        progressIndicator.setPrefSize(60, 60);
+        progressIndicator.setPrefSize(size, size);
         progressIndicator.setStyle("-fx-background-color: rgba(0, 100, 100, 0.5)");
 
         numberText = new Text();
@@ -58,7 +59,7 @@ public class ResponseIndicator extends HBox {
             numberText.setText("");
         }
         else {
-            ratio = ((double) numberOfResponses) / ((double) numberOfStudents);
+            ratio = ((double) numberOfResponses) / ((double)numberOfStudents);
             progressIndicator.setProgress(ratio);
             if(ratio < 1)
                 numberText.setText(Integer.toString(numberOfResponses));
@@ -68,7 +69,7 @@ public class ResponseIndicator extends HBox {
             }
         }
         String red = Integer.toString(255 - (int)(ratio * 180));
-        progressIndicator.setStyle("-fx-progress-color: rgb(" + red + ", 255, 20)");
+        progressIndicator.setStyle("-fx-progress-color: rgba(" + red + ", 255, 20, 0.5)");
     }
 
     public boolean isDone() {

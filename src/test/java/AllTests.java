@@ -10,12 +10,14 @@ import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
 @SuiteClasses({
-        CommentPanelTest.class,
-        com.i2lp.edi.client.editor.PollEditorTest.class,
-        com.i2lp.edi.client.utilities.ParserXMLTest.class,
+        com.i2lp.edi.client.presentationElements.CommentPanelTest.class,
         com.i2lp.edi.client.presentationElements.VideoElementTest.class,
         com.i2lp.edi.client.presentationElements.GraphicElementTest.class,
-        com.i2lp.edi.client.presentationElements.CommentPanelTest.class,
+        com.i2lp.edi.client.presentationElements.QuestionIndicatorTest.class,
+        com.i2lp.edi.client.presentationElements.ResponseIndicatorTest.class,
+        com.i2lp.edi.client.dashboard.TeacherDashboardTest.class,
+        com.i2lp.edi.client.editor.PollEditorTest.class,
+        com.i2lp.edi.client.utilities.ParserXMLTest.class,
         com.i2lp.edi.client.login.LoginTest.class
 })
 public class AllTests {
