@@ -271,6 +271,9 @@ public class AudioElement extends SlideElement{
         if (isAutoPlay) {
             startAudio();
         }
+        if (isThumbnailGen){
+            mediaPlayer.stop();
+        }
     }
 
     @Override

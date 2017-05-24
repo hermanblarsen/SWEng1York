@@ -80,6 +80,9 @@ public class VideoElement extends SlideElement{
                     performOnClickAction();
                 }
             });
+        if(isThumbnailGen){
+            mediaPlayer.stop();
+        }
 
     }
 

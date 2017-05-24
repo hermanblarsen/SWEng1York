@@ -93,6 +93,7 @@ public abstract class PresentationManager {
     private boolean isMouseOverControls = false;
     private boolean isDrawModeOn = false;
     private boolean isDrawPaneVisible = true;
+    private boolean isThumbnailGen = false;
 
 
     public PresentationManager() {
@@ -159,6 +160,7 @@ public abstract class PresentationManager {
                 toBeAssigned.setSlideCanvas(toAssign); //Has to be called after setTeacher()
                 toBeAssigned.setSlideWidth(slideWidth);
                 toBeAssigned.setSlideHeight(slideHeight);
+                toBeAssigned.setThumbnailGen(isThumbnailGen);
             }
         }
     }
@@ -170,12 +172,11 @@ public abstract class PresentationManager {
         }
     }
 
-    public void openPresentation(String path) {
+    public void openPresentation(String path, Boolean thumbnailGen) {
         loadPresentation(path);
-
         presentationStage.setTitle(presentationElement.getDocumentTitle());
         slideNumber.setText("Slide 1 of " + presentationElement.getSlideList().size());
-
+        setThumbnailGen(thumbnailGen);
         Rectangle2D primaryScreenBounds = Screen.getPrimary().getVisualBounds();
 
         slideWidth = primaryScreenBounds.getWidth() * SLIDE_SIZE_ON_OPEN;
@@ -955,6 +956,15 @@ public abstract class PresentationManager {
                 //This should never be reached
         }
     }
+
+    public boolean isThumbnailGen() {
+        return isThumbnailGen;
+    }
+
+    public void setThumbnailGen(boolean thumbnailGen) {
+        isThumbnailGen = thumbnailGen;
+    }
+
 
     public String getXmlPath() {
         return xmlPath;

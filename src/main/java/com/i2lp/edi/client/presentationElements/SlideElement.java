@@ -34,6 +34,7 @@ public abstract class SlideElement {
     protected boolean teacher;
     protected SlideElement mediaElement;
     protected PresentationManager presentationManager;
+    protected boolean isThumbnailGen;
 
     public abstract void doClassSpecificRender();
 
@@ -253,4 +254,13 @@ public abstract class SlideElement {
         }
         else logger.info("Element with ElementID: " + getElementID() + " has no OnClickAction");
     }
+
+    public boolean isThumbnailGen() {
+        return isThumbnailGen;
+    }
+
+    public void setThumbnailGen(boolean thumbnailGen) {
+        isThumbnailGen = thumbnailGen;
+    }
+
 }

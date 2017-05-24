@@ -22,7 +22,7 @@ public class GraphicElementIntegrationTest extends Application{
         PresentationManagerTeacher presentationManager = new PresentationManagerTeacher();
         File file = new File("projectResources/sampleFiles/xmlTests/graphicElementTestXml.xml");
 
-        presentationManager.openPresentation(file.toURI().toString());
+        presentationManager.openPresentation(file.toURI().toString(),false);
     }
 
 

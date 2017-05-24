@@ -17,7 +17,7 @@ public class AudioElementIntegrationTestbench extends Application {
     @Override
     public void start(Stage primaryStage){
         PresentationManagerTeacher presentationManager = new PresentationManagerTeacher();
-        presentationManager.openPresentation("file:projectResources/sampleFiles/xmlTests/audioElementTest.xml");
+        presentationManager.openPresentation("file:projectResources/sampleFiles/xmlTests/audioElementTest.xml",false);
     }
 }
 

@@ -240,7 +240,7 @@ public abstract class Dashboard extends Application {
         } else if (this instanceof TeacherDashboard) {
             presentationManager = new PresentationManagerTeacher();
         }
-        presentationManager.openPresentation(path);
+        presentationManager.openPresentation(path,false);
     }
 
     private HBox addTopPanel() {
