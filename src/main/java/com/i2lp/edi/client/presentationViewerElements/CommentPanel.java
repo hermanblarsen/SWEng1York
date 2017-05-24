@@ -1,10 +1,9 @@
-package com.i2lp.edi.client.presentationElements;
+package com.i2lp.edi.client.presentationViewerElements;
 
 
+import com.i2lp.edi.client.presentationElements.Slide;
 import com.i2lp.edi.client.utilities.ResizeDirection;
-import javafx.event.EventHandler;
 import com.i2lp.edi.client.utilities.ResizeHandler;
-import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.input.InputEvent;

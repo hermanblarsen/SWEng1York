@@ -1,5 +1,6 @@
-package com.i2lp.edi.client.presentationElements;
+package com.i2lp.edi.client.presentationViewerElements;
 
+import com.i2lp.edi.client.presentationElements.Slide;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;

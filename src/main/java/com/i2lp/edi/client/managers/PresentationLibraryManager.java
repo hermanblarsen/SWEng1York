@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.i2lp.edi.client.Constants.*;
-import static com.i2lp.edi.client.utilities.Utils.getFilesInFolder;
+import static com.i2lp.edi.client.utilities.Utilities.getFilesInFolder;
 
 
 /**

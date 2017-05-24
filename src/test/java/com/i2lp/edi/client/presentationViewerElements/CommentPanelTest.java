@@ -1,15 +1,13 @@
-package com.i2lp.edi.client.presentationElements;
+package com.i2lp.edi.client.presentationViewerElements;
 
-import com.i2lp.edi.client.dashboard.TeacherDashboard;
-import com.i2lp.edi.client.managers.EdiManager;
-import com.i2lp.edi.client.presentationElements.CommentPanel;
+import com.i2lp.edi.client.presentationElements.Slide;
+import com.i2lp.edi.client.presentationViewerElements.CommentPanel;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseButton;
 import javafx.scene.web.HTMLEditor;
 import javafx.stage.Stage;
-import org.testfx.api.FxRobot;
 import org.testfx.api.FxToolkit;
 import org.testfx.framework.junit.ApplicationTest;
 

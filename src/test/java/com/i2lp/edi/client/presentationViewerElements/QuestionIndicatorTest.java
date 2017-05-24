@@ -1,5 +1,6 @@
-package com.i2lp.edi.client.presentationElements;
+package com.i2lp.edi.client.presentationViewerElements;
 
+import com.i2lp.edi.client.presentationViewerElements.QuestionIndicator;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseButton;

@@ -12,7 +12,7 @@ import java.io.IOException;
 import java.nio.file.InvalidPathException;
 import java.util.ArrayList;
 
-import static com.i2lp.edi.client.utilities.Utils.*;
+import static com.i2lp.edi.client.utilities.Utilities.*;
 
 /**
  * Created by habl on 23/02/2017.
@@ -278,6 +278,8 @@ public class ParserXML {
                                 parseVideoElement(slideElementNode, myVideoElement);
                                 slideElementArrayList.add(myVideoElement);
                                 break;
+                            case "comment":
+                                StringBuilder sb = new StringBuilder();
                             default:
                                 logger.warn("SlideElement Name Not Recognised! Name: " + elementName);
                                 faultsDetected.add("SlideElement Name Not Recognised! Name: " + elementName);

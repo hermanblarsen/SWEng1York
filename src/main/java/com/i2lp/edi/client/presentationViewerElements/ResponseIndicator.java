@@ -1,4 +1,4 @@
-package com.i2lp.edi.client.presentationElements;
+package com.i2lp.edi.client.presentationViewerElements;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;

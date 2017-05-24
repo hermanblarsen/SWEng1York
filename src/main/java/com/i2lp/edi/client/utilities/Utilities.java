@@ -17,8 +17,8 @@ import static com.i2lp.edi.client.Constants.*;
 /**
  * Created by amriksadhra on 21/03/2017.
  */
-public class Utils {
-    private static Logger logger = LoggerFactory.getLogger(Utils.class);
+public class Utilities {
+    private static Logger logger = LoggerFactory.getLogger(Utilities.class);
 
     static final Pattern PATTERN = Pattern.compile(
             "^(([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.){3}([01]?\\d\\d?|2[0-4]\\d|25[0-5])$");

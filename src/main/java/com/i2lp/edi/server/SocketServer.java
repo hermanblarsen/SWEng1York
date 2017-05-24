@@ -8,7 +8,7 @@ import com.corundumstudio.socketio.listener.ConnectListener;
 import com.corundumstudio.socketio.listener.DataListener;
 import com.corundumstudio.socketio.listener.DisconnectListener;
 import com.i2lp.edi.client.Constants;
-import com.i2lp.edi.client.utilities.Utils;
+import com.i2lp.edi.client.utilities.Utilities;
 import com.i2lp.edi.server.packets.User;
 import com.i2lp.edi.server.packets.UserAuth;
 import com.impossibl.postgres.api.jdbc.PGConnection;
@@ -69,7 +69,7 @@ public class SocketServer {
 
     public void startSocket(String socketHostName, int serverPort) {
         //Startup Socket.IO Server so can pump update events to clients
-        logger.info("Attempting to start up Socket.IO server on port " + Utils.buildIPAddress(socketHostName, serverPort));
+        logger.info("Attempting to start up Socket.IO server on port " + Utilities.buildIPAddress(socketHostName, serverPort));
 
         Configuration config = new Configuration();
         config.setHostname(socketHostName);

@@ -1,7 +1,7 @@
 package com.i2lp.edi.server;
 
 import com.i2lp.edi.client.managers.EdiManager;
-import com.i2lp.edi.client.utilities.Utils;
+import com.i2lp.edi.client.utilities.Utilities;
 import com.i2lp.edi.server.packets.Module;
 import com.i2lp.edi.server.packets.PresentationMetadata;
 import com.i2lp.edi.server.packets.User;
@@ -106,7 +106,7 @@ public class SocketClient {
     }
 
     public void connectToRemoteSocket(String socketHostName, int serverPort) {
-        String serverIPAddress = Utils.buildIPAddress(socketHostName, serverPort);
+        String serverIPAddress = Utilities.buildIPAddress(socketHostName, serverPort);
 
         //Alert tester that connection is being attempted
         logger.info("Client: Attempting Connection to " + serverIPAddress);

@@ -35,7 +35,7 @@ import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static com.i2lp.edi.client.Constants.PRESENTATIONS_PATH;
-import static com.i2lp.edi.client.utilities.Utils.removeFileExtension;
+import static com.i2lp.edi.client.utilities.Utilities.removeFileExtension;
 import static javafx.scene.layout.BorderPane.setAlignment;
 
 

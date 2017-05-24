@@ -3,13 +3,13 @@ package com.i2lp.edi.client.managers;
 import com.i2lp.edi.client.animation.Animation;
 import com.i2lp.edi.client.exceptions.SequenceNotFoundException;
 import com.i2lp.edi.client.presentationElements.*;
+import com.i2lp.edi.client.presentationViewerElements.CommentPanel;
+import com.i2lp.edi.client.presentationViewerElements.DrawPane;
 import com.i2lp.edi.client.utilities.CursorState;
 import com.i2lp.edi.client.utilities.ParserXML;
 import javafx.animation.FadeTransition;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
-import javafx.application.Platform;
-import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.geometry.Dimension2D;
 import javafx.geometry.Insets;
@@ -23,7 +23,6 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.*;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.stage.Popup;
 import javafx.stage.Screen;
@@ -36,7 +35,7 @@ import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import static com.i2lp.edi.client.utilities.Utils.getFileParentDirectory;
+import static com.i2lp.edi.client.utilities.Utilities.getFileParentDirectory;
 
 
 /**

@@ -1,6 +1,5 @@
 package com.i2lp.edi.client.managers;
-import com.i2lp.edi.client.managers.PresentationManager;
-import com.i2lp.edi.client.presentationElements.CommentPanel;
+import com.i2lp.edi.client.presentationViewerElements.CommentPanel;
 import javafx.animation.Animation;
 import javafx.animation.Interpolator;
 import javafx.animation.Transition;
