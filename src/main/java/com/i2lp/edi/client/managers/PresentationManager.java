@@ -377,8 +377,8 @@ public abstract class PresentationManager {
     @SuppressWarnings("ConstantConditions")
     private void controlPresentation(int direction) {
         int presentationStatus = slideAdvance(presentationElement, direction);
-        if((direction == Slide.SLIDE_BACKWARD)&& isEndPresentation){
-            displayPane.getChildren().remove(slidePane);
+
+        if((direction == Slide.SLIDE_BACKWARD) && isEndPresentation) {
             isEndPresentation = false;
         }
         //If Presentation handler told us that slide is changing, update the Slide present on Main screen
@@ -391,17 +391,8 @@ public abstract class PresentationManager {
             } else if (presentationStatus == Presentation.PRESENTATION_FINISH) {
                 logger.info("At Presentation finish");
                 if(!isEndPresentation) {
-                    Label lab = new Label("End of Presentation");
-                    Region bgRegion = new Region();
-                    bgRegion.setBackground(new Background(new BackgroundFill(Color.web("#34495e"), null, null)));
-                    slidePane = new StackPane();
-                    lab.setFont(new Font("Helvetica", 50));
-                    lab.setTextFill(Color.WHITE);
-                    lab.setWrapText(true);
-                    slidePane.setPrefSize(slideWidth, slideHeight);
-                    slidePane.getChildren().addAll(bgRegion, lab);
-                    displayPane.getChildren().add(slidePane);
                     isEndPresentation = true;
+                    displayCurrentSlide();
                 }
             } else if (presentationStatus == Presentation.SLIDE_LAST_ELEMENT) {
                 logger.info("On last element in slide");
@@ -437,7 +428,7 @@ public abstract class PresentationManager {
     protected abstract void createCommentPanel();
 
     private void toggleDrawingMode() {
-        if(!isDrawModeOn) {
+        if(!isDrawModeOn && !isEndPresentation) {
             isDrawModeOn = true;
             setDrawPaneVisible(true);
             drawPane.setActive(true);
@@ -786,6 +777,7 @@ public abstract class PresentationManager {
 
         if (slideToAdvance.getCurrentSequenceNumber() == slideToAdvance.getMaxSequenceNumber())
             return Slide.SLIDE_PRE_CHANGE;
+
         return Slide.SLIDE_NO_MOVE;
     }
 
@@ -851,9 +843,22 @@ public abstract class PresentationManager {
 
     protected void displayCurrentSlide() {
         displayPane.getChildren().clear();
-        Slide slide = presentationElement.getSlide(currentSlideNumber);
-        slide.setBackground(new Background(new BackgroundFill(Color.valueOf(presentationElement.getTheme().getBackgroundColour()), null, null)));
-        displayPane.getChildren().add(slide);
+        if (!isEndPresentation) {
+            Slide slide = presentationElement.getSlide(currentSlideNumber);
+            slide.setBackground(new Background(new BackgroundFill(Color.valueOf(presentationElement.getTheme().getBackgroundColour()), null, null)));
+            displayPane.getChildren().add(slide);
+        } else {
+            Label lab = new Label("End of Presentation");
+            Region bgRegion = new Region();
+            bgRegion.setBackground(new Background(new BackgroundFill(Color.web("#34495e"), null, null)));
+            slidePane = new StackPane();
+            lab.setFont(new Font("Helvetica", 50));
+            lab.setTextFill(Color.WHITE);
+            lab.setWrapText(true);
+            slidePane.setPrefSize(slideWidth, slideHeight);
+            slidePane.getChildren().addAll(bgRegion, lab);
+            displayPane.getChildren().add(slidePane);
+        }
 
         if(isDrawPaneVisible) {
             drawPane.setSlideDrawing(presentationElement.getSlide(currentSlideNumber).getCurrentSlideDrawing());
