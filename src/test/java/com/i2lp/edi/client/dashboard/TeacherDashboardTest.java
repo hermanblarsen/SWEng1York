@@ -31,9 +31,7 @@ public class TeacherDashboardTest extends ApplicationTest {
     private TextField searchField;
     private ArrayList<PresentationPreviewPanel> previewPanels;
     private Button showAllButton;
-    private Button subjectButton0;
-    private Button subjectButton1;
-    private Button subjectButton2;
+    private ArrayList<Button> subjectButtons;
 
     @Override
     public void start(Stage stage) throws Exception {
@@ -49,9 +47,7 @@ public class TeacherDashboardTest extends ApplicationTest {
         searchField = myDashboard.searchField;
         previewPanels = myDashboard.previewPanels;
         showAllButton = myDashboard.showAllButton;
-        subjectButton0 = myDashboard.subjectButton0;
-        subjectButton1 = myDashboard.subjectButton1;
-        subjectButton2 = myDashboard.subjectButton2;
+        subjectButtons = myDashboard.subjectButtons;
     }
 
     @Test
@@ -61,7 +57,12 @@ public class TeacherDashboardTest extends ApplicationTest {
 
     @Test
     public void testFilter() {
-        Boolean showAllFailed = false, subject0Failed = false, subject1Failed = false , subject2Failed = false;
+        Boolean showAllFailed = false;
+        Boolean[] subjectFails = new Boolean[subjectButtons.size()];
+
+        for(int i=0; i<subjectFails.length; i++) {
+            subjectFails[i] = false;
+        }
 
         clickOn(showAllButton);
         for(PresentationPreviewPanel temp : previewPanels) {
@@ -69,34 +70,21 @@ public class TeacherDashboardTest extends ApplicationTest {
                 showAllFailed = true;
         }
 
-        clickOn(subjectButton0);
-        for(PresentationPreviewPanel temp : previewPanels) {
-            if(temp.isHidden() && temp.getPresentationSubject().equals(subjectButton0.getText()))
-                    subject0Failed = true;
-            else if(!temp.isHidden() && !temp.getPresentationSubject().equals(subjectButton0.getText()))
-                    subject0Failed = true;
-        }
-
-        clickOn(subjectButton1);
-        for(PresentationPreviewPanel temp : previewPanels) {
-            if(temp.isHidden() && temp.getPresentationSubject().equals(subjectButton1.getText()))
-                subject1Failed = true;
-            else if(!temp.isHidden() && !temp.getPresentationSubject().equals(subjectButton1.getText()))
-                subject1Failed = true;
-        }
-
-        clickOn(subjectButton2);
-        for(PresentationPreviewPanel temp : previewPanels) {
-            if(temp.isHidden() && temp.getPresentationSubject().equals(subjectButton2.getText()))
-                subject2Failed = true;
-            else if(!temp.isHidden() && !temp.getPresentationSubject().equals(subjectButton2.getText()))
-                subject2Failed = true;
+        for(Button subjectButton : subjectButtons) {
+            clickOn(subjectButton);
+            for(PresentationPreviewPanel temp : previewPanels) {
+                if(temp.isHidden() && temp.getPresentationSubject().equals(subjectButton.getText()))
+                    subjectFails[subjectButtons.indexOf(subjectButton)] = true;
+                else if(!temp.isHidden() && !temp.getPresentationSubject().equals(subjectButton.getText()))
+                    subjectFails[subjectButtons.indexOf(subjectButton)] = true;
+            }
         }
 
         assertFalse("Show All filter failed", showAllFailed);
-        assertFalse("Subject 0 filter failed", subject0Failed);
-        assertFalse("Subject 1 filter failed", subject1Failed);
-        assertFalse("Subject 2 filter failed", subject2Failed);
+
+        for(int i=0; i<subjectFails.length; i++) {
+            assertFalse("Subject " + i + " (" + subjectButtons.get(i).getText() + ") filter failed", subjectFails[i]);
+        }
     }
 
     @After

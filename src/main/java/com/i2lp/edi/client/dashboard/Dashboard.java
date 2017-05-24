@@ -4,6 +4,7 @@ import com.i2lp.edi.client.Constants;
 import com.i2lp.edi.client.editor.PresentationEditor;
 import com.i2lp.edi.client.managers.*;
 import com.i2lp.edi.client.presentationElements.Presentation;
+import com.i2lp.edi.client.utilities.PresSortKey;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.geometry.*;
@@ -45,7 +46,6 @@ import static javafx.scene.layout.BorderPane.setAlignment;
 public abstract class Dashboard extends Application {
     protected Scene scene;
     protected BorderPane border;
-    protected Presentation myPresentationElement;
     protected static Logger logger = LoggerFactory.getLogger(Dashboard.class);
     private EdiManager ediManager;
     protected PresentationManager presentationManager;
@@ -53,13 +53,12 @@ public abstract class Dashboard extends Application {
     protected Presentation selectedPres;
     protected ArrayList<PresentationPreviewPanel> previewPanels;
     private FlowPane presentationPreviewsFlowPane;
-    private ComboBox<String> sortCombo;
+    private ComboBox<PresSortKey> sortCombo;
+    private Stage addToServerStage;
 
     protected TextField searchField;
     protected Button showAllButton;
-    protected Button subjectButton0;
-    protected Button subjectButton1;
-    protected Button subjectButton2;
+    protected ArrayList<Button> subjectButtons;
 
     @Override
     public void start(Stage dashboardStage) {
@@ -282,7 +281,11 @@ public abstract class Dashboard extends Application {
         addToServerButton.setOnAction(event -> {
             AtomicReference<File> xmlLocation = new AtomicReference<>(); //Store location of XML from filechooser, for upload to presentation after Thumbnail and CSS gen
 
-            Stage addToServerStage = new Stage();
+            if(addToServerStage != null) {
+                addToServerStage.close();
+            }
+
+            addToServerStage = new Stage();
             GridPane addToServerGridPane = new GridPane();
             addToServerGridPane.setAlignment(Pos.CENTER);
 
@@ -295,7 +298,7 @@ public abstract class Dashboard extends Application {
             Button selectXML = new Button("Select XML");
             selectXML.getStyleClass().setAll("btn", "btn-primary");
             selectXML.setOnAction(event1 -> {
-                File file = fileChooser.showOpenDialog(dashboardStage);
+                File file = fileChooser.showOpenDialog(addToServerStage);
                 xmlLocation.set(file);
             });
             addToServerGridPane.add(selectXML, 0, 0);
@@ -357,20 +360,21 @@ public abstract class Dashboard extends Application {
         showAllButton.setOnAction(event -> showAllPreviewPanels());
         subjectsVBox.getChildren().add(showAllButton);
 
-        subjectButton0 = new Button("Subject 0");
-        subjectButton0.getStyleClass().setAll("btn", "btn-success");
-        subjectButton0.setOnAction(event -> filterBySubject(subjectButton0.getText()));
-        subjectsVBox.getChildren().add(subjectButton0);
+        ArrayList<String> subjectArray = new ArrayList<>();
+        subjectButtons = new ArrayList<>();
 
-        subjectButton1 = new Button("Subject 1");
-        subjectButton1.getStyleClass().setAll("btn", "btn-success");
-        subjectButton1.setOnAction(event -> filterBySubject(subjectButton1.getText()));
-        subjectsVBox.getChildren().add(subjectButton1);
+        for (PresentationPreviewPanel panel : previewPanels) {
+            String subject = panel.getPresentationSubject();
+            if(subject != null && !subjectArray.contains(subject)) {
+                subjectArray.add(subject);
 
-        subjectButton2 = new Button("Subject 2");
-        subjectButton2.getStyleClass().setAll("btn", "btn-success");
-        subjectButton2.setOnAction(event -> filterBySubject(subjectButton2.getText()));
-        subjectsVBox.getChildren().add(subjectButton2);
+                Button subjectButton = new Button(subject);
+                subjectButton.getStyleClass().setAll("btn", "btn-success");
+                subjectButton.setOnAction(event -> filterBySubject(subjectButton.getText()));
+                subjectButtons.add(subjectButton);
+                subjectsVBox.getChildren().add(subjectButton);
+            }
+        }
 
         //Create Panel for subject filters
         Panel subjectsPanel = new Panel("My subjects");
@@ -383,7 +387,7 @@ public abstract class Dashboard extends Application {
         sortPanel.getStyleClass().add("panel-primary");
         VBox sortVBox = new VBox();
         sortCombo = new ComboBox<>();
-        sortCombo.getItems().addAll("Name A-Z", "Name Z-A", "Subject A-Z", "Subject Z-A");
+        PresSortKey.copyAllToList(sortCombo.getItems());
         sortCombo.setOnAction(event -> sortBy(sortCombo.getValue()));
         sortCombo.setValue(sortCombo.getItems().get(0));
         sortBy(sortCombo.getItems().get(0));
@@ -418,20 +422,16 @@ public abstract class Dashboard extends Application {
         flow.setPrefWrapLength(170); // preferred width allows for two columns
         flow.setStyle("-fx-background-color: #ffffff;");
 
-        int numSlides = 20; //TODO: Obtain number of slides from XML
+        for(int i = 0; i < selectedPres.getMaxSlideNumber(); i++) {
+            VBox vbox = new VBox(3);
+            vbox.setBorder(new Border(new BorderStroke(Color.GRAY, BorderStrokeStyle.SOLID, new CornerRadii(5), BorderStroke.DEFAULT_WIDTHS)));
+            vbox.setAlignment(Pos.CENTER);
+            vbox.setPadding(new Insets(5));
 
-        VBox[] slides = new VBox[numSlides];
-
-        for (int i = 0; i < numSlides; i++) {
-            slides[i] = new VBox(3);
-            slides[i].setBorder(new Border(new BorderStroke(Color.GRAY, BorderStrokeStyle.SOLID, new CornerRadii(5), BorderStroke.DEFAULT_WIDTHS)));
-            slides[i].setAlignment(Pos.CENTER);
-            slides[i].setPadding(new Insets(5));
-
-            slides[i].getChildren().add(selectedPres.getSlidePreview(i, 170)); //TODO: Add constant for width
-            slides[i].getChildren().add(new Label(Integer.toString(i)));
-            flow.getChildren().add(slides[i]);
-            FlowPane.setMargin(slides[i], new Insets(0, 20, 0, 5));
+            vbox.getChildren().add(selectedPres.getSlidePreview(i, 170)); //TODO: Add constant for width
+            vbox.getChildren().add(new Label(Integer.toString(i + 1)));
+            flow.getChildren().add(vbox);
+            FlowPane.setMargin(vbox, new Insets(0, 20, 0, 5));
         }
 
         ScrollPane scroll = new ScrollPane();
@@ -448,7 +448,6 @@ public abstract class Dashboard extends Application {
             panel.setHidden(false);
     }
 
-    //TODO: Will this maintain sorting order?
     private void filterBySubject(String subject) {
         for (PresentationPreviewPanel panel : previewPanels) {
             if (!subject.equals(panel.getPresentationSubject()) && !panel.isHidden())
@@ -458,22 +457,8 @@ public abstract class Dashboard extends Application {
         }
     }
 
-    //The sorting method is pretty ghetto for now, will have to refactor depending on what sorting key we'll allow
-    private void sortBy(String sortKey) {
-        previewPanels.sort((p1, p2) -> {
-            switch (sortKey) {
-                case "Name A-Z":
-                    return p1.getPresentation().getDocumentID().compareTo(p2.getPresentation().getDocumentID());
-                case "Name Z-A":
-                    return -p1.getPresentation().getDocumentID().compareTo(p2.getPresentation().getDocumentID());
-                case "Subject A-Z":
-                    return p1.getPresentationSubject().compareTo(p2.getPresentationSubject());
-                case "Subject Z-A":
-                    return -p1.getPresentationSubject().compareTo(p2.getPresentationSubject());
-                default:
-                    return 0;
-            }
-        });
+    private void sortBy(PresSortKey sortKey) {
+        previewPanels.sort((p1, p2) -> sortKey.compare(p1.getPresentation(), p2.getPresentation()));
 
         presentationPreviewsFlowPane.getChildren().clear();
         for (PresentationPreviewPanel panel : previewPanels) {

@@ -20,7 +20,6 @@ public class PresentationPreviewPanel extends Panel {
     protected static Logger logger = LoggerFactory.getLogger(Dashboard.class);
     private final Pane parentPane;
     private final String presentationPath;
-    private final String presentationSubject;
     private final Presentation presentation;
     private boolean isSelected;
     private boolean isHidden;
@@ -39,13 +38,11 @@ public class PresentationPreviewPanel extends Panel {
 
         ParserXML parser = new ParserXML(presentationPath);
         presentation = parser.parsePresentation();
-        Random random = new Random();
-        presentationSubject = "Subject " + random.nextInt(3); //TODO: Get presentation subject from XML
 
         this.setText("ID: " + this.presentation.getDocumentID());
 
         this.setBody(getPresentation().getSlidePreview(0, 170)); //TODO: Make width a constant
-        this.setFooter(new Label("Subject: " + presentationSubject));
+        this.setFooter(new Label("Subject: " + presentation.getSubject()));
 
         Tooltip tooltip = new Tooltip("Title: " + getPresentation().getDocumentTitle() + "\n" +
                                         "Author: " + getPresentation().getAuthor() + "\n" +
@@ -85,7 +82,7 @@ public class PresentationPreviewPanel extends Panel {
 
     //public String getPresentationID() { return presentation.getDocumentID(); }
 
-    public String getPresentationSubject() { return presentationSubject; }
+    public String getPresentationSubject() { return presentation.getSubject(); }
 
     public Presentation  getPresentation() { return presentation; }
 

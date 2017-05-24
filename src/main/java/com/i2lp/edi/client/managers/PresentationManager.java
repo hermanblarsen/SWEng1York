@@ -23,6 +23,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.*;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.stage.Popup;
 import javafx.stage.Screen;
@@ -62,6 +63,7 @@ public abstract class PresentationManager {
 
     protected Presentation presentationElement;
     protected ProgressBar progressBar;
+    private double slideProgress;
     protected Label slideNumber;
     protected Boolean isFullscreen = false;
     //protected Boolean buttonsRemoved = false;
@@ -199,7 +201,7 @@ public abstract class PresentationManager {
         createCommentPanel();
         commentPanel.setSlide(this.presentationElement.getCurrentSlide()); //Required for comments to work.
 
-        resize();
+        displayCurrentSlide();
 
         if (presentationElement.isAutoplayPresentation()){
             autoPlay();
@@ -347,8 +349,9 @@ public abstract class PresentationManager {
             slideHeight = width / aspectRatio;
         }
 
-        presentationElement.getSlideList().get(currentSlideNumber).setMaxSize(slideWidth, slideHeight);
-        assignSizeProperties(presentationElement.getSlide(currentSlideNumber));
+        Slide currentSlide = presentationElement.getSlideList().get(currentSlideNumber);
+        currentSlide.setMaxSize(slideWidth, slideHeight);
+        assignSizeProperties(currentSlide);
 
         for (SlideElement toResize : presentationElement.getSlide(currentSlideNumber).getVisibleSlideElementList()) {
             toResize.doClassSpecificRender();
@@ -369,7 +372,6 @@ public abstract class PresentationManager {
         //presentationElement = Presentation.generateTestPresentation();  //TODO REMOVE AND STOP USING
 
         assignAttributes(presentationElement);
-        displayCurrentSlide();
     }
 
     @SuppressWarnings("ConstantConditions")
@@ -417,10 +419,14 @@ public abstract class PresentationManager {
         if (!isCommentPanelVisible) {
             commentPanel.setSlide(presentationElement.getCurrentSlide());
             sceneBox.getChildren().add(commentPanel);
-            presentationStage.setHeight(presentationStage.getHeight() + commentPanel.getMaxHeight());
+            if (!isFullscreen && !presentationStage.isMaximized()) {
+                presentationStage.setHeight(presentationStage.getHeight() + commentPanel.getPrefHeight());
+            }
             isCommentPanelVisible = true;
         } else {
-            presentationStage.setHeight(presentationStage.getHeight() - commentPanel.getHeight());
+            if (!isFullscreen && !presentationStage.isMaximized()) {
+                presentationStage.setHeight(presentationStage.getHeight() - commentPanel.getHeight());
+            }
             sceneBox.getChildren().remove(commentPanel);
             isCommentPanelVisible = false;
         }
@@ -515,6 +521,7 @@ public abstract class PresentationManager {
 
         presControls.setMaxHeight(PRES_CONTROLS_HEIGHT);
         presControls.setAlignment(Pos.BOTTOM_LEFT);
+
         return presControls;
     }
 
@@ -645,25 +652,24 @@ public abstract class PresentationManager {
     }
 
     protected void slideProgress(Presentation presentation) {
-        //Make sure currentSlideNumber doesn't overflow
-
-        int slideNumber = currentSlideNumber + 1;
-
         //Calculate the total number of sequences in the presentation
         int sequenceNumberMax=0;
         for (Slide slide: presentation.getSlideList()) {
             sequenceNumberMax+=slide.getMaxSequenceNumber();
             sequenceNumberMax++;
         }
+
         //Make sure the current sequence doesn't go out of bounds
         if (currentSequenceNumber >= sequenceNumberMax) currentSequenceNumber = sequenceNumberMax;
         if (currentSequenceNumber <=0) currentSequenceNumber = 0;
 
-        int slideNumberMax = presentation.getSlideList().size();
+        //Calculate progress
+        slideProgress = (float) (currentSequenceNumber) / sequenceNumberMax;
+        progressBar.setProgress(slideProgress);
 
-        //Calculate progress and reset text in progressbar
-        float slideProgress = (float) (currentSequenceNumber) / sequenceNumberMax;
-        progressBar.setProgress((double)slideProgress);
+        //Make sure currentSlideNumber doesn't overflow and reset text in progressbar
+        int slideNumber = currentSlideNumber + 1;
+        int slideNumberMax = presentation.getSlideList().size();
         this.slideNumber.setText("Slide " + slideNumber + " of " + slideNumberMax);
     }
 
@@ -858,7 +864,7 @@ public abstract class PresentationManager {
         if (isShowBlack)
             displayPane.getChildren().add(blackRegion);
 
-        controlsPane.setBottom(presControls); //TODO: Fix glitch when transitioning between slides
+        controlsPane.setBottom(presControls);
 
         if(isDrawModeOn)
             controlsPane.setLeft(drawControls);
@@ -983,7 +989,6 @@ public abstract class PresentationManager {
     public void setThumbnailGen(boolean thumbnailGen) {
         isThumbnailGen = thumbnailGen;
     }
-
 
     public String getXmlPath() {
         return xmlPath;
