@@ -278,8 +278,19 @@ public class ParserXML {
                                 parseVideoElement(slideElementNode, myVideoElement);
                                 slideElementArrayList.add(myVideoElement);
                                 break;
-                            case "comment":
+                            case "comment": //Slide comment
+                                String textContent = slideElementNode.getTextContent();
                                 StringBuilder sb = new StringBuilder();
+                                if (textContent != null) sb.append("<html dir=\"ltr\"><head></head><body contenteditable=\"true\"></body></html>");
+                                else if (textContent.contains("/html")&&textContent.contains("/body")) {
+                                    textContent = reproduceIllegalXmlCharacters(textContent);
+                                } else { //If the comment is written in plain text and not HTML, convert to plain HTML
+                                    sb.append("<html dir=\"ltr\"><head></head><body contenteditable=\"true\">");
+                                    sb.append(textContent);
+                                    sb.append("</body></html>");
+
+                                }
+                                mySlide.setUserComments(textContent);
                             default:
                                 logger.warn("SlideElement Name Not Recognised! Name: " + elementName);
                                 faultsDetected.add("SlideElement Name Not Recognised! Name: " + elementName);
@@ -294,6 +305,18 @@ public class ParserXML {
             faultsDetected.add("No slides found!");
         }
         myPresentation.setSlideList(slideArray);
+    }
+
+    private String reproduceIllegalXmlCharacters(String textContent) {
+        String htmlString = "";
+        //TODO do this properly
+        return htmlString;
+    }
+
+    private String produceLegalXmlCharacters(String textContent) {
+        String xmlSafeHtmlText = "";
+        //TODO do this properly
+        return xmlSafeHtmlText;
     }
 
     private void parseElementAttributes (Node slideElementNode, SlideElement slideElement) {
