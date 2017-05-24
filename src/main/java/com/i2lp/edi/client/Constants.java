@@ -55,5 +55,11 @@ public class Constants {
     /* ELEMENT RENDERING CONSTANTS */
     public static final int TEXT_ELEMENT_ZOOM_FACTOR = 2;
 
+    /* THUMBNAIL RENDER CONSTANTS */
+    public static final int THUMBNAIL_GEN_WIDTH = 320;
+    public static final int THUMBNAIL_GEN_HEIGHT = 240;
+    public static final int PRINT_WIDTH_300DPI = 3508;
+    public static final int PRINT_HEIGHT_300DPI = 2480;
+
 }
 

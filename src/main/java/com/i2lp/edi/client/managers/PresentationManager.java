@@ -23,6 +23,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.*;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
 import javafx.stage.Popup;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
@@ -94,6 +95,8 @@ public abstract class PresentationManager {
     private boolean isDrawModeOn = false;
     private boolean isDrawPaneVisible = true;
     private boolean isThumbnailGen = false;
+    private boolean isEndPresentation = false;
+    private StackPane slidePane;
 
 
     public PresentationManager() {
@@ -372,7 +375,10 @@ public abstract class PresentationManager {
     @SuppressWarnings("ConstantConditions")
     private void controlPresentation(int direction) {
         int presentationStatus = slideAdvance(presentationElement, direction);
-
+        if((direction == Slide.SLIDE_BACKWARD)&& isEndPresentation){
+            displayPane.getChildren().remove(slidePane);
+            isEndPresentation = false;
+        }
         //If Presentation handler told us that slide is changing, update the Slide present on Main screen
         //Can do specific things when presentation reached end, or start.
         if (presentationStatus == Presentation.SLIDE_CHANGE || presentationStatus == Presentation.PRESENTATION_FINISH || presentationStatus == Presentation.PRESENTATION_START || presentationStatus == Presentation.SLIDE_LAST_ELEMENT) {
@@ -382,6 +388,19 @@ public abstract class PresentationManager {
                 logger.info("At Presentation start");
             } else if (presentationStatus == Presentation.PRESENTATION_FINISH) {
                 logger.info("At Presentation finish");
+                if(!isEndPresentation) {
+                    Label lab = new Label("End of Presentation");
+                    Region bgRegion = new Region();
+                    bgRegion.setBackground(new Background(new BackgroundFill(Color.web("#34495e"), null, null)));
+                    slidePane = new StackPane();
+                    lab.setFont(new Font("Helvetica", 50));
+                    lab.setTextFill(Color.WHITE);
+                    lab.setWrapText(true);
+                    slidePane.setPrefSize(slideWidth, slideHeight);
+                    slidePane.getChildren().addAll(bgRegion, lab);
+                    displayPane.getChildren().add(slidePane);
+                    isEndPresentation = true;
+                }
             } else if (presentationStatus == Presentation.SLIDE_LAST_ELEMENT) {
                 logger.info("On last element in slide");
             }

@@ -29,7 +29,7 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
 
-import static com.i2lp.edi.client.Constants.PRESENTATIONS_PATH;
+import static com.i2lp.edi.client.Constants.*;
 
 /**
  * Created by amriksadhra on 12/04/2017.
@@ -44,9 +44,9 @@ public class ThumbnailGenerationManager extends PresentationManager {
         displayPane = new StackPane();
         //Lower resolution for thumbnails
         if(!printToggle) {
-            scene = new Scene(displayPane, 320, 240); //TODO: Use constants
+            scene = new Scene(displayPane, THUMBNAIL_GEN_WIDTH, THUMBNAIL_GEN_HEIGHT);
         }else{
-            scene = new Scene(displayPane,3508,2480); //TODO: Use constants, also what are those values, 3508?
+            scene = new Scene(displayPane,PRINT_WIDTH_300DPI,PRINT_HEIGHT_300DPI);
         }
         presentationStage.setScene(scene);
         presentationStage.show();
