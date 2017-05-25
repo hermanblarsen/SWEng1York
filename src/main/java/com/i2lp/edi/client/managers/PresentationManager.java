@@ -180,7 +180,7 @@ public abstract class PresentationManager {
         loadPresentation(path);
         presentationStage.setTitle(presentationElement.getDocumentTitle());
         slideNumber.setText("Slide 1 of " + presentationElement.getSlideList().size());
-        isThumbnailGen = thumbnailGen;  
+        isThumbnailGen = thumbnailGen;
         Rectangle2D primaryScreenBounds = Screen.getPrimary().getVisualBounds();
 
         slideWidth = primaryScreenBounds.getWidth() * SLIDE_SIZE_ON_OPEN;
@@ -236,6 +236,8 @@ public abstract class PresentationManager {
                     while (slideAdvance(presentationElement, Slide.SLIDE_BACKWARD) != Presentation.PRESENTATION_START) ;
                 } else if (keyEvent.getCode().equals(KeyCode.END)) {
                     while (slideAdvance(presentationElement, Slide.SLIDE_FORWARD) != Presentation.PRESENTATION_FINISH) ;
+                } else if (keyEvent.getCode().equals(KeyCode.ESCAPE)){
+                    presentationStage.close();
                 }
 
                 keyEvent.consume();
@@ -847,11 +849,11 @@ public abstract class PresentationManager {
             slide.setBackground(new Background(new BackgroundFill(Color.valueOf(presentationElement.getTheme().getBackgroundColour()), null, null)));
             displayPane.getChildren().add(slide);
         } else {
-            Label lab = new Label("End of Presentation");
+            Label lab = new Label("End of Presentation. Press ESC to exit.");
             Region bgRegion = new Region();
             bgRegion.setBackground(new Background(new BackgroundFill(Color.web("#34495e"), null, null)));
             slidePane = new StackPane();
-            lab.setFont(new Font("Helvetica", 50));
+            lab.setFont(new Font("Helvetica", 20));
             lab.setTextFill(Color.WHITE);
             lab.setWrapText(true);
             slidePane.setPrefSize(slideWidth, slideHeight);

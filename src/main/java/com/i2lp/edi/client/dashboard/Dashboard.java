@@ -130,6 +130,10 @@ public abstract class Dashboard extends Application {
                         print.setOnAction(printEvent-> printPresentation(previewPanel.getPresentationPath()));
                         cMenu.getItems().add(print);
 
+                        MenuItem report = new MenuItem("Report");
+                        report.setOnAction(reportEvent -> showReport(previewPanel.getId()));
+                        cMenu.getItems().add(report);
+
                     }
                     cMenu.show(dashboardStage, event.getScreenX(), event.getScreenY());
                 }
@@ -508,8 +512,12 @@ public abstract class Dashboard extends Application {
         ThumbnailGenerationManager.generateSlideThumbnails(presentationPath,true);
     }
 
+    private void showReport(String presentationID){ReportManager.openReportPanel(presentationID);}
+
     public void setEdiManager(EdiManager ediManager) {
         this.ediManager = ediManager;
     }
+
+
 }
 
