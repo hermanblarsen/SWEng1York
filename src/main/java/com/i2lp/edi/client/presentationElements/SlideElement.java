@@ -5,6 +5,8 @@ import com.i2lp.edi.client.managers.PresentationManager;
 import javafx.scene.Node;
 import javafx.scene.layout.Pane;
 import javafx.scene.media.MediaPlayer;
+import javafx.scene.web.WebEngine;
+import javafx.scene.web.WebView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -88,7 +90,6 @@ public abstract class SlideElement {
             }
         }
         if(animationType == Animation.EXIT_ANIMATION) {
-            // Audio Element needs to be included in this
             destroyElement();
         }
     }
@@ -223,7 +224,23 @@ public abstract class SlideElement {
             switch (onClickAction) {
                 case "openwebsite":
                     logger.info("Opening Website: " + onClickInfo);
-                    //onclickinfo=”URL” //TODO @Zain put your browser here! :D
+                    logger.info("Open Website Action called");
+                    WebView webView = new WebView();
+                    WebEngine engine = webView.getEngine();
+                    engine.load(onClickInfo);
+                    slideCanvas.getChildren().add(webView);
+                    webView.setPrefWidth(getSlideWidth());
+                    webView.setPrefHeight(getSlideHeight());
+                    webView.toFront();
+
+                    slideCanvas.widthProperty().addListener(e->webView.setPrefWidth(getSlideWidth()));
+                    slideCanvas.heightProperty().addListener(e->webView.setPrefHeight(getSlideHeight()));
+                    presentationManager.addSequenceChangeListener(()-> {
+                        //Changing Sequence so close the browser
+                        engine.load(null);
+                        slideCanvas.getChildren().remove(webView);
+                    });
+
                     break;
                 case "gotoslide":
                     presentationManager.goToSlide(Integer.parseInt(onClickInfo));

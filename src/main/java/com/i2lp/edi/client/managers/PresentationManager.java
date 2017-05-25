@@ -7,6 +7,7 @@ import com.i2lp.edi.client.presentationViewerElements.CommentPanel;
 import com.i2lp.edi.client.presentationViewerElements.DrawPane;
 import com.i2lp.edi.client.utilities.CursorState;
 import com.i2lp.edi.client.utilities.ParserXML;
+import com.i2lp.edi.client.utilities.SimpleChangeListener;
 import javafx.animation.FadeTransition;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -737,6 +738,7 @@ public abstract class PresentationManager {
                 logger.warn("Failed to find Element with Sequence number of " + slideToAdvance.getCurrentSequenceNumber() + " in slideElementList.");
             }
         currentSequenceNumber++;
+        notifySequenceChangeListeners();//Notify any sequence number listeners that there has been a change
         } else if ((slideToAdvance.getCurrentSequenceNumber() > 0) && (direction == Slide.SLIDE_BACKWARD)) {  //If we're going backwards and still elements left
             try {
                 checkInVisibleSet = Slide.searchForSequenceElement(slideToAdvance.getSlideElementList(), slideToAdvance.getCurrentSequenceNumber());
@@ -751,6 +753,7 @@ public abstract class PresentationManager {
             }
             slideToAdvance.setCurrentSequenceNumber(slideToAdvance.getCurrentSequenceNumber() - 1);
             currentSequenceNumber--;
+            notifySequenceChangeListeners();//Notify any sequence number listeners that there has been a change
         } else {
             //If we're at limit of sequence number, alert calling method that we need to move to next/previous slide dependent on direction and reset sequence number
             switch (direction) {
@@ -993,5 +996,31 @@ public abstract class PresentationManager {
 
     public String getXmlPath() {
         return xmlPath;
+    }
+
+
+    //Sequence Number Listener implementations:
+    ArrayList<SimpleChangeListener> sequenceChangeListeners = new ArrayList<SimpleChangeListener>();
+
+    /**
+     * Adds a listener which will be notified whenever the sequence number changes.
+     * listeners are notified by calling notifySequenceChangeListeners()
+     * @param listener
+     */
+    public void addSequenceChangeListener(SimpleChangeListener listener){
+        sequenceChangeListeners.add(listener);
+    }
+
+    /**
+     * Notifies all of the current sequence change listeners of a change.
+     */
+    public void notifySequenceChangeListeners(){
+        for(SimpleChangeListener listener : sequenceChangeListeners){
+            listener.changed();
+        }
+    }
+
+    public void removeSequenceChangeListener(SimpleChangeListener listener){
+        sequenceChangeListeners.remove(listener);
     }
 }
