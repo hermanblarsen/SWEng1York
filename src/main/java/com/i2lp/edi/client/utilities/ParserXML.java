@@ -8,6 +8,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.*;
 import org.xml.sax.SAXException;
+
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.InvalidPathException;
 import java.util.ArrayList;
@@ -555,19 +557,24 @@ public class ParserXML {
 
                 switch (elementName){
                     case "xposition":
-                        imageElement.setxPosition(Float.valueOf(elementContent));
+                        imageElement.setPosX(Float.valueOf(elementContent));
                         break;
                     case "yposition":
-                        imageElement.setyPosition(Float.valueOf(elementContent));
+                        imageElement.setPosY(Float.valueOf(elementContent));
                         break;
                     case "xsize":
-                        imageElement.setxSize(Float.valueOf(elementContent));
+                        imageElement.setWidth(Float.valueOf(elementContent));
                         break;
                     case "ysize":
-                        imageElement.setySize(Float.valueOf(elementContent));
+                        imageElement.setHeight(Float.valueOf(elementContent));
                         break;
                     case "path":
-                        imageElement.setPath(elementContent);
+                        try {
+                            imageElement.setPath(elementContent);
+                        } catch (FileNotFoundException fnfe){
+                            logger.warn("Image File not Found: " + elementContent);
+                            faultsDetected.add("Image File not Found: " + elementContent);
+                        }
                         break;
                     case "onclickaction":
                         imageElement.setOnClickAction(checkValidOnClickAction(elementContent));
@@ -579,10 +586,10 @@ public class ParserXML {
                         imageElement.setOpacity(Float.valueOf(elementContent));
                         break;
                     case "aspectratiolock":
-                        imageElement.setAspectRatioLock(Boolean.valueOf(elementContent));
+                        imageElement.aspectRatioLock(Boolean.valueOf(elementContent));
                         break;
                     case "elementaspectratio":
-                        imageElement.setElementAspectRatio(Float.valueOf(elementContent));
+                        imageElement.setAspectRatio(Float.valueOf(elementContent));
                         break;
                     default:
                         logger.warn("Image Property Name Not Recognised! Name: " + elementName +

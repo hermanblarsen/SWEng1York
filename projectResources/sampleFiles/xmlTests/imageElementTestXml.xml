@@ -1,0 +1,52 @@
+<document documentid="sampleinput">
+	<documentdetails>
+		<author>Joe Bloggs</author>
+		<version>1.0</version>
+		<documentaspectratio>1.78</documentaspectratio>
+		<description>Sample XML input</description>
+		<tags>sample,xml,input</tags>
+		<groupformat>2</groupformat>
+	</documentdetails>
+	<slideshow>
+		<defaults>
+			<bgcolour>#FF2304FF</bgcolour>
+			<font>Arial</font>
+			<fontsize>12</fontsize>
+			<fontcolour>#F00D33FF</fontcolour>
+			<graphicscolour>#F40D33FF</graphicscolour>
+			<autoplaymedia>true</autoplaymedia>
+		</defaults>
+
+		<slide slideid="1">
+
+			<image elementid ="1" layer="1" visibility="true" startsequence="1" endsequence="3" duration="12">
+				<xposition>0.12</xposition>
+				<yposition>0.3</yposition>
+				<xsize>0.8</xsize>
+				<ysize>0.8</ysize>
+				<path>https://www.google.co.uk/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png</path>
+				<onclickaction>gotoslide</onclickaction>
+				<onclickinfo>2</onclickinfo>
+				<opacity>1</opacity>
+				<aspectratiolock>true</aspectratiolock>
+				<elementaspectratio>1.0</elementaspectratio>
+			</image>
+
+			<image elementid ="2" layer="2" visibility="true" startsequence="2" endsequence="4">
+				<xposition>0.12</xposition>
+				<yposition>0.3</yposition>
+				<xsize>0.8</xsize>
+				<ysize>0.8</ysize>
+				<path>projectResources/logos/ediLogo400x400.png</path>
+				<onclickaction>gotoslide</onclickaction>
+				<onclickinfo>2</onclickinfo>
+				<opacity>0.9</opacity>
+				<rotation>45</rotation>
+				<aspectratiolock>true</aspectratiolock>
+				<elementaspectratio>1.5</elementaspectratio>
+			</image>
+
+		</slide>
+
+	</slideshow>
+</document>
