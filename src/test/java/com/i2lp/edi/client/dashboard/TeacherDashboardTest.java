@@ -25,6 +25,7 @@ import static org.junit.Assert.*;
 /**
  * Created by Luke on 06/05/2017.
  */
+@Ignore
 public class TeacherDashboardTest extends ApplicationTest {
     private static TeacherDashboard myDashboard;
 
