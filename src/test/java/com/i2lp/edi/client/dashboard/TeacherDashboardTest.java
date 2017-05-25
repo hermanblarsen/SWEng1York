@@ -1,10 +1,6 @@
 package com.i2lp.edi.client.dashboard;
 
-import com.i2lp.edi.client.dashboard.TeacherDashboard;
-import com.i2lp.edi.client.login.Login;
 import com.i2lp.edi.client.managers.EdiManager;
-import com.i2lp.edi.client.managers.PresentationManager;
-import com.i2lp.edi.client.presentationElements.Presentation;
 import com.i2lp.edi.server.packets.User;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
@@ -30,7 +26,7 @@ public class TeacherDashboardTest extends ApplicationTest {
     private static TeacherDashboard myDashboard;
 
     private TextField searchField;
-    private ArrayList<PresentationPreviewPanel> previewPanels;
+    private ArrayList<PresentationPanel> previewPanels;
     private Button showAllButton;
     private ArrayList<Button> subjectButtons;
 
@@ -46,7 +42,7 @@ public class TeacherDashboardTest extends ApplicationTest {
     @Before
     public void setUp() {
         searchField = myDashboard.searchField;
-        previewPanels = myDashboard.previewPanels;
+        previewPanels = myDashboard.presentationPanels;
         showAllButton = myDashboard.showAllButton;
         subjectButtons = myDashboard.subjectButtons;
     }
@@ -66,14 +62,14 @@ public class TeacherDashboardTest extends ApplicationTest {
         }
 
         clickOn(showAllButton);
-        for(PresentationPreviewPanel temp : previewPanels) {
+        for(PresentationPanel temp : previewPanels) {
             if(temp.isHidden())
                 showAllFailed = true;
         }
 
         for(Button subjectButton : subjectButtons) {
             clickOn(subjectButton);
-            for(PresentationPreviewPanel temp : previewPanels) {
+            for(PresentationPanel temp : previewPanels) {
                 if(temp.isHidden() && temp.getPresentationSubject().equals(subjectButton.getText()))
                     subjectFails[subjectButtons.indexOf(subjectButton)] = true;
                 else if(!temp.isHidden() && !temp.getPresentationSubject().equals(subjectButton.getText()))

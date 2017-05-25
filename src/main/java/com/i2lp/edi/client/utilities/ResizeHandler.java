@@ -66,35 +66,35 @@ public class ResizeHandler implements EventHandler<MouseEvent> {
                 if (event.getEventType().equals(MouseEvent.MOUSE_MOVED)) {
                     if (right && !left && !up && !down) {
                         region.getScene().setCursor(Cursor.H_RESIZE);
-                        logger.info("Resize right");
+                        logger.debug("Resize right");
                         isCursorResize = true;
                     } else if (!right && left && !up && !down) {
                         region.getScene().setCursor(Cursor.H_RESIZE);
-                        logger.info("Resize left");
+                        logger.debug("Resize left");
                         isCursorResize = true;
                     } else if (!right && !left && up && !down) {
                         region.getScene().setCursor(Cursor.V_RESIZE);
-                        logger.info("Resize up");
+                        logger.debug("Resize up");
                         isCursorResize = true;
                     } else if (!right && !left && !up && down) {
                         region.getScene().setCursor(Cursor.V_RESIZE);
-                        logger.info("Resize down");
+                        logger.debug("Resize down");
                         isCursorResize = true;
                     } else if (right && !left && up && !down) {
                         region.getScene().setCursor(Cursor.NE_RESIZE);
-                        logger.info("Resize NE");
+                        logger.debug("Resize NE");
                         isCursorResize = true;
                     } else if (right && !left && !up && down) {
                         region.getScene().setCursor(Cursor.SE_RESIZE);
-                        logger.info("Resize SE");
+                        logger.debug("Resize SE");
                         isCursorResize = true;
                     } else if (!right && left && !up && down) {
                         region.getScene().setCursor(Cursor.SW_RESIZE);
-                        logger.info("Resize SW");
+                        logger.debug("Resize SW");
                         isCursorResize = true;
                     } else if (!right && left && up && !down) {
                         region.getScene().setCursor(Cursor.NW_RESIZE);
-                        logger.info("Resize NW");
+                        logger.debug("Resize NW");
                         isCursorResize = true;
                     } else {
                         isCursorResize = false;

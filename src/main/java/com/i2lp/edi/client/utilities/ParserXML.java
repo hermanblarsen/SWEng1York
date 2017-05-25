@@ -61,6 +61,8 @@ public class ParserXML {
         parseDefaultsAndTheme();
         parseSlidesAndSlideElements();
 
+        myPresentation.setPath(presentationXmlPath);
+
         if (faultsDetected.size() > 0) {
             myPresentation.setXmlFaults(faultsDetected);
         }

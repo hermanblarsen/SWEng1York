@@ -1,6 +1,7 @@
 package com.i2lp.edi.client.presentationElements;
 
 
+import com.i2lp.edi.client.dashboard.Classroom;
 import com.i2lp.edi.client.utilities.Theme;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.image.ImageView;
@@ -27,7 +28,7 @@ public class Presentation extends Pane {
     private String documentTitle;
     private boolean live;
     private int currentSlideNumber;
-    private String xmlUrl;
+    private String xmlUrl; //TODO: Unused?
 
     //From Schema
     private String documentID;
@@ -43,11 +44,14 @@ public class Presentation extends Pane {
 
     private boolean autoplayPresentation = false;
 
-
     private int maxSlideNumber = 0;
 
     private Slide currentSlide;
     private boolean autoplayMedia;
+
+    private String path;
+
+    private Classroom classroom; //Classroom (module) to which this presentation belongs
 
     private int groupFormat;
 
@@ -463,4 +467,12 @@ public class Presentation extends Pane {
     public Slide getCurrentSlide() {
         return currentSlide;
     }
+
+    public String getPath() { return path; }
+
+    public void setPath(String path) { this.path = path; }
+
+    public Classroom getClassroom() { return classroom; }
+
+    public void setClassroom(Classroom classroom) { this.classroom = classroom; }
 }

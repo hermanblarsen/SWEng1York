@@ -40,6 +40,8 @@ public class PresentationMetadata {
         else return MISSING_DOCUMENT_ID;
     }
 
+    public String getModuleName() { return "Module" + module_id; }
+
     //Temp hack for Koen offline mode
     public void setDocumentID(String documentID){
         this.documentID = documentID;

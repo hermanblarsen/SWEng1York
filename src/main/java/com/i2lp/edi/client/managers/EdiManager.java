@@ -25,14 +25,11 @@ public class EdiManager extends Application {
     protected Login loginDialog;
     private PresentationLibraryManager presentationLibraryManager;
 
-
-
     private Dashboard dashboard;
     protected SocketClient socketClient;
 
     protected User userData; //Store currently logged in users data
     private boolean offline = false;
-
 
     public static void main(String [] args) {
         //Instantiate the ediManager, which will automatically call init() and start(Stage)
