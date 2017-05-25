@@ -10,6 +10,7 @@ import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import javafx.stage.Screen;
 
+import java.awt.*;
 import java.lang.reflect.Field;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -91,7 +92,8 @@ public class TextElement extends SlideElement {
                     Field f = webEngine.getClass().getDeclaredField("page");
                     f.setAccessible(true);
                     WebPage page = (WebPage) f.get(webEngine);
-                    page.setBackgroundColor(new java.awt.Color(Float.valueOf(m.group(1)), Float.valueOf(m.group(2)), Float.valueOf(m.group(3)),  Float.valueOf(m.group(4))).getRGB());
+                    Color backgroundColor = new java.awt.Color(Integer.valueOf(m.group(1)), Integer.valueOf(m.group(2)), Integer.valueOf(m.group(3)),  (int) (Float.valueOf(m.group(4))*255));
+                    page.setBackgroundColor(backgroundColor.getRGB());
                 }
             } catch (Exception e) {
                 logger.error("Unable to set TextElement background colour to: " + bgColour , e);

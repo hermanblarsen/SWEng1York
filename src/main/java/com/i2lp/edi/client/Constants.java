@@ -14,7 +14,7 @@ public class Constants {
     public static final boolean localServer = false; //Set if making changes to server logic and wish to test locally
 
     //Build number and string for use in About dialogues.
-    private static final String BUILD_NUMBER = "38";
+    private static final String BUILD_NUMBER = "39";
     public static final String BUILD_STRING = "Version: v0." + Constants.BUILD_NUMBER;
 
     public static final String BASE_PATH = System.getProperty("java.io.tmpdir") + "Edi/";
@@ -24,6 +24,9 @@ public class Constants {
     //FTP details for presentation upload
     public static final String FTP_USER = "bscftp";
     public static final String FTP_PASS = "Combline90+";
+
+    //Work out if CircleCI is running, and skip graphical tests
+    public static final Boolean IS_CIRCLE_BUILD = Boolean.parseBoolean(System.getenv("CIRCLECI"));
 
     //Slide thumbnail size
     public static final double THUMBNAIL_WIDTH = 320;

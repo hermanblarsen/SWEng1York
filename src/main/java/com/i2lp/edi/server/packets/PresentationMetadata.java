@@ -15,6 +15,9 @@ public class PresentationMetadata {
     private String xml_url;
     private boolean live;
 
+    //Temporary
+    private String documentID;
+
     public PresentationMetadata(int presentation_id, int module_id, int current_slide_number, String xml_url, boolean live) {
         this.presentation_id = presentation_id;
         this.module_id = module_id;
@@ -35,6 +38,11 @@ public class PresentationMetadata {
 
         if (matcher.find()) return matcher.group(1);
         else return MISSING_DOCUMENT_ID;
+    }
+
+    //Temp hack for Koen offline mode
+    public void setDocumentID(String documentID){
+        this.documentID = documentID;
     }
 
     public String getXml_url() {
