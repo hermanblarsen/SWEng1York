@@ -125,6 +125,60 @@ public class ImageElement extends SlideElement {
     @Override
     public void doClassSpecificRender() {
         //Anything which requires the slide width to calculate must be done here, not in setupElement
+        //Also anything assicuared with the Image needs to go in here  due to testing requirements
+
+        if (path != null) {
+            if (image == null) {
+                if (path.startsWith("http") || path.startsWith("file")) {
+                    this.image = new Image(path);
+                } else {
+                    File file = new File(path);
+                    String mediaPath = file.toURI().toString();
+                    this.image = new Image(mediaPath);
+                }
+            }
+            if (imageView == null) {
+                this.imageView = new ImageView(image);
+            }
+
+
+            if (aspectRatioLocked != null) {
+                imageView.setPreserveRatio(aspectRatioLocked);
+            }
+            if (opacity != null) {
+                imageView.setOpacity(opacity);
+            }
+            if (viewPort != null) {
+                imageView.setViewport(viewPort);
+            }
+            if (isSmooth != null) {
+                imageView.setSmooth(isSmooth());
+            }
+            if (imagePixelWidth == null) {
+                    imagePixelWidth = (int) image.getWidth();
+            }
+            if (imagePixelHeight == null) {
+                    imagePixelHeight = (int) image.getHeight();
+            }
+            if (width == null) {
+                width = (float) 0.1;
+            }
+            if (height == null) {
+                height = (float) 0.1;
+            }
+            if (posX == null) {
+                posX = 0f;
+            }
+            if (posY == null) {
+                posY = 0f;
+            }
+            if (aspectRatio == null) {
+                aspectRatio = (getWidth()/getHeight());
+            }
+        }
+
+        coreNode.setCenter(imageView);
+
         coreNode.setTranslateX(posX*(float)getSlideWidth());
         coreNode.setTranslateY(posY*(float)getSlideHeight());
 
@@ -180,29 +234,7 @@ public class ImageElement extends SlideElement {
     public void setupElement() throws IllegalStateException {
         // Setting fields to their default values
 
-        if (image != null) {
-            if (imagePixelWidth == null) {
-                imagePixelWidth = (int) image.getWidth();
-            }
-            if (imagePixelHeight == null) {
-                imagePixelHeight = (int) image.getHeight();
-            }
-        }
-            if (width == null) {
-                width = (float) 100;
-            }
-            if (height == null) {
-                height = (float) 100;
-            }
-            if (posX == null) {
-                posX = 0f;
-            }
-            if (posY == null) {
-                posY = 0f;
-            }
-            if (aspectRatio == null) {
-                aspectRatio = (getWidth()/getHeight());
-        }
+
         if (rotation == null) {
             rotation = 0.0f;
         }
@@ -228,38 +260,11 @@ public class ImageElement extends SlideElement {
             isSmooth = false;
         }
 
-        if (path != null) {
-            if (image == null) {
-                if (path.startsWith("http") || path.startsWith("file")) {
-                    this.image = new Image(path);
-                } else {
-                    File file = new File(path);
-                    String mediaPath = file.toURI().toString();
-                    this.image = new Image(mediaPath);
-                }
-            }
-            if (imageView == null) {
-                this.imageView = new ImageView(image);
-            }
 
-
-            if (aspectRatioLocked != null) {
-                imageView.setPreserveRatio(aspectRatioLocked);
-            }
-            if (opacity != null) {
-                imageView.setOpacity(opacity);
-            }
-            if (viewPort != null) {
-                imageView.setViewport(viewPort);
-            }
-            if (isSmooth != null) {
-                imageView.setSmooth(isSmooth());
-            }
-        } //Don't throw an exception, mabey we just haven't set the path yet!
         // Borders
         if (coreNode == null) {
             coreNode = new BorderPane();
-            coreNode.setCenter(imageView);
+
         }
 
         coreNode.setRotate(rotation);

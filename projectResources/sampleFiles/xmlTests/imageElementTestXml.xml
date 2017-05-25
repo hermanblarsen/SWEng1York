@@ -41,7 +41,6 @@
 				<onclickaction>gotoslide</onclickaction>
 				<onclickinfo>2</onclickinfo>
 				<opacity>0.9</opacity>
-				<rotation>45</rotation>
 				<aspectratiolock>true</aspectratiolock>
 				<elementaspectratio>1.5</elementaspectratio>
 			</image>
