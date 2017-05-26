@@ -1,6 +1,5 @@
 package com.i2lp.edi.client.managers;
 
-import com.sun.deploy.xml.XMLable;
 import eu.hansolo.tilesfx.Tile;
 import eu.hansolo.tilesfx.TileBuilder;
 import javafx.geometry.Insets;
@@ -10,7 +9,6 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import org.kordamp.bootstrapfx.scene.layout.Panel;
