@@ -5,10 +5,14 @@ import com.i2lp.edi.client.managers.PresentationManager;
 import com.i2lp.edi.client.utilities.SimpleChangeListener;
 import de.jensd.fx.glyphs.GlyphsDude;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
+import javafx.animation.Interpolator;
+import javafx.animation.RotateTransition;
+import javafx.concurrent.Worker;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
@@ -19,6 +23,7 @@ import javafx.scene.text.Text;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebHistory;
 import javafx.scene.web.WebView;
+import javafx.util.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -287,18 +292,19 @@ public abstract class SlideElement {
         engine = webView.getEngine();
 
         //Load the page:
-        engine.load(onClickInfo);
         webView.setPrefWidth(getSlideWidth());
         webView.setPrefHeight(getSlideHeight());
 
         Text backButton = GlyphsDude.createIcon(FontAwesomeIcon.CHEVRON_LEFT);
         Text forwardButton = GlyphsDude.createIcon(FontAwesomeIcon.CHEVRON_RIGHT);
+        Text reloadButton = GlyphsDude.createIcon(FontAwesomeIcon.REFRESH);
         TextField browserLocation = new TextField(engine.getLocation());
         Text exitButton = GlyphsDude.createIcon(FontAwesomeIcon.CLOSE);
 
         //Setup the toolbar
         backButton.setFill(Color.WHITE);
         forwardButton.setFill(Color.WHITE);
+        reloadButton.setFill(Color.WHITE);
         exitButton.setFill(Color.WHITE);
         browserLocation.setEditable(false);
 
@@ -317,17 +323,37 @@ public abstract class SlideElement {
                 history.go(-1);
             }
         });
+
         forwardButton.setOnMouseClicked(event -> {
             WebHistory history = engine.getHistory();
             if(history.getCurrentIndex() != history.getEntries().size()-1) {
                 history.go(1);
             }
         });
+
+        reloadButton.setOnMouseClicked(event->{
+            engine.reload();
+        });
+
+        final RotateTransition rot = new RotateTransition(Duration.seconds(1.5), reloadButton);
+        rot.setCycleCount(javafx.animation.Animation.INDEFINITE);
+        rot.setFromAngle(0);
+        rot.setToAngle(360);
+        rot.setInterpolator(Interpolator.LINEAR);
+        engine.getLoadWorker().stateProperty().addListener((observable, oldValue, newValue) ->{
+            if(newValue == Worker.State.RUNNING){
+                rot.play();
+            } else {
+                rot.pause();
+            }
+        });
+
         exitButton.setOnMouseClicked(event -> closeEmbeddedBrowser());
 
         //Add things to the toolbar
         browserToolbar.getChildren().add(backButton);
         browserToolbar.getChildren().add(forwardButton);
+        browserToolbar.getChildren().add(reloadButton);
         browserToolbar.getChildren().add(browserLocation);
         browserToolbar.getChildren().add(exitButton);
 
@@ -335,6 +361,13 @@ public abstract class SlideElement {
         embeddedBrowserPane.setCenter(webView);
 
         presentationManager.setIsEmbeddedBrowserOpen(true); //To disable the presentation control hotkeys
+        slideCanvas.setOnKeyPressed(keyEvent -> {
+            if (keyEvent.getCode().equals(KeyCode.ESCAPE)){
+                keyEvent.consume();
+                closeEmbeddedBrowser();
+                slideCanvas.setOnKeyPressed(null);
+            }
+        });
         slideCanvas.getChildren().add(embeddedBrowserPane);
         embeddedBrowserPane.toFront();
 
@@ -342,6 +375,9 @@ public abstract class SlideElement {
         slideCanvas.widthProperty().addListener(e->webView.setPrefWidth(getSlideWidth()));
         slideCanvas.heightProperty().addListener(e->webView.setPrefHeight(getSlideHeight()));
         presentationManager.addSequenceChangeListener(sequenceChangeListener);
+
+        engine.load(onClickInfo);
+
     }
 
     public void closeEmbeddedBrowser(){
