@@ -2,10 +2,22 @@ package com.i2lp.edi.client.presentationElements;
 
 import com.i2lp.edi.client.animation.Animation;
 import com.i2lp.edi.client.managers.PresentationManager;
+import com.i2lp.edi.client.utilities.SimpleChangeListener;
+import de.jensd.fx.glyphs.GlyphsDude;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.Priority;
 import javafx.scene.media.MediaPlayer;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Text;
 import javafx.scene.web.WebEngine;
+import javafx.scene.web.WebHistory;
 import javafx.scene.web.WebView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -224,22 +236,7 @@ public abstract class SlideElement {
             switch (onClickAction) {
                 case "openwebsite":
                     logger.info("Opening Website: " + onClickInfo);
-                    logger.info("Open Website Action called");
-                    WebView webView = new WebView();
-                    WebEngine engine = webView.getEngine();
-                    engine.load(onClickInfo);
-                    slideCanvas.getChildren().add(webView);
-                    webView.setPrefWidth(getSlideWidth());
-                    webView.setPrefHeight(getSlideHeight());
-                    webView.toFront();
-
-                    slideCanvas.widthProperty().addListener(e->webView.setPrefWidth(getSlideWidth()));
-                    slideCanvas.heightProperty().addListener(e->webView.setPrefHeight(getSlideHeight()));
-                    presentationManager.addSequenceChangeListener(()-> {
-                        //Changing Sequence so close the browser
-                        engine.load(null);
-                        slideCanvas.getChildren().remove(webView);
-                    });
+                    openEmbeddedBrowser();
 
                     break;
                 case "gotoslide":
@@ -270,6 +267,88 @@ public abstract class SlideElement {
             }
         }
         else logger.info("Element with ElementID: " + getElementID() + " has no OnClickAction");
+    }
+
+    BorderPane embeddedBrowserPane;
+    WebEngine engine;
+    final SimpleChangeListener sequenceChangeListener = new SimpleChangeListener(){
+        //Changing Sequence so close the browser
+        @Override
+        public void changed() {
+            closeEmbeddedBrowser();
+        }
+    };
+
+    public void openEmbeddedBrowser(){
+        HBox browserToolbar = new HBox();
+        WebView webView = new WebView();
+
+        embeddedBrowserPane = new BorderPane();
+        engine = webView.getEngine();
+
+        //Load the page:
+        engine.load(onClickInfo);
+        webView.setPrefWidth(getSlideWidth());
+        webView.setPrefHeight(getSlideHeight());
+
+        Text backButton = GlyphsDude.createIcon(FontAwesomeIcon.CHEVRON_LEFT);
+        Text forwardButton = GlyphsDude.createIcon(FontAwesomeIcon.CHEVRON_RIGHT);
+        TextField browserLocation = new TextField(engine.getLocation());
+        Text exitButton = GlyphsDude.createIcon(FontAwesomeIcon.CLOSE);
+
+        //Setup the toolbar
+        backButton.setFill(Color.WHITE);
+        forwardButton.setFill(Color.WHITE);
+        exitButton.setFill(Color.WHITE);
+        browserLocation.setEditable(false);
+
+        //Stylise the toolbar:
+        browserToolbar.setHgrow(browserLocation, Priority.ALWAYS);
+        browserToolbar.setAlignment(Pos.CENTER_LEFT);
+        browserToolbar.setSpacing(10);
+        browserToolbar.setPadding(new Insets(5,12,5,12));
+        browserToolbar.setStyle("-fx-background-color:#34495e");
+
+        //Toolbar listeners
+        engine.locationProperty().addListener((obs, oldVal, newVal) -> browserLocation.setText(newVal));
+        backButton.setOnMouseClicked(event -> {
+            WebHistory history = engine.getHistory();
+            if(history.getCurrentIndex() > 0) {
+                history.go(-1);
+            }
+        });
+        forwardButton.setOnMouseClicked(event -> {
+            WebHistory history = engine.getHistory();
+            if(history.getCurrentIndex() != history.getEntries().size()-1) {
+                history.go(1);
+            }
+        });
+        exitButton.setOnMouseClicked(event -> closeEmbeddedBrowser());
+
+        //Add things to the toolbar
+        browserToolbar.getChildren().add(backButton);
+        browserToolbar.getChildren().add(forwardButton);
+        browserToolbar.getChildren().add(browserLocation);
+        browserToolbar.getChildren().add(exitButton);
+
+        embeddedBrowserPane.setTop(browserToolbar);
+        embeddedBrowserPane.setCenter(webView);
+
+        presentationManager.setIsEmbeddedBrowserOpen(true); //To disable the presentation control hotkeys
+        slideCanvas.getChildren().add(embeddedBrowserPane);
+        embeddedBrowserPane.toFront();
+
+        //Listeners to resize and close the browser.
+        slideCanvas.widthProperty().addListener(e->webView.setPrefWidth(getSlideWidth()));
+        slideCanvas.heightProperty().addListener(e->webView.setPrefHeight(getSlideHeight()));
+        presentationManager.addSequenceChangeListener(sequenceChangeListener);
+    }
+
+    public void closeEmbeddedBrowser(){
+        engine.load(null);
+        slideCanvas.getChildren().remove(embeddedBrowserPane);
+        presentationManager.setIsEmbeddedBrowserOpen(false);
+        presentationManager.removeSequenceChangeListener(sequenceChangeListener);
     }
 
     public boolean isThumbnailGen() {

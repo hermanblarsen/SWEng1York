@@ -35,6 +35,7 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import static com.i2lp.edi.client.utilities.Utilities.getFileParentDirectory;
 
@@ -71,6 +72,7 @@ public abstract class PresentationManager {
     protected Stage presentationStage;
     protected CommentPanel commentPanel;
     protected Boolean isCommentPanelVisible = false;
+    protected Boolean isEmbeddedBrowserOpen = false;
     private boolean isShowBlack = false;
     private boolean mouseMoved = true;
     private boolean mouseDown = false;
@@ -210,7 +212,7 @@ public abstract class PresentationManager {
 
     private void addKeyboardListeners() {
         scene.addEventFilter(KeyEvent.KEY_PRESSED, keyEvent -> {
-            if(!isCommentPanelVisible){
+            if(!isCommentPanelVisible && !isEmbeddedBrowserOpen){
                 if (keyEvent.getCode().equals(KeyCode.ENTER) ||
                         keyEvent.getCode().equals(KeyCode.SPACE) ||
                         keyEvent.getCode().equals(KeyCode.PAGE_UP) ||
@@ -278,7 +280,7 @@ public abstract class PresentationManager {
         });
 
         scene.addEventFilter(ScrollEvent.SCROLL, event -> {
-            if (isMouseOverSlide) {
+            if (isMouseOverSlide && !isEmbeddedBrowserOpen) {
                 if (event.getDeltaY() > 0) {
                     controlPresentation(Slide.SLIDE_BACKWARD);
                 } else {
@@ -998,9 +1000,13 @@ public abstract class PresentationManager {
         return xmlPath;
     }
 
+    public void setIsEmbeddedBrowserOpen(boolean isOpen){
+        isEmbeddedBrowserOpen = isOpen;
+    }
+
 
     //Sequence Number Listener implementations:
-    ArrayList<SimpleChangeListener> sequenceChangeListeners = new ArrayList<SimpleChangeListener>();
+    CopyOnWriteArrayList<SimpleChangeListener> sequenceChangeListeners = new CopyOnWriteArrayList<SimpleChangeListener>();
 
     /**
      * Adds a listener which will be notified whenever the sequence number changes.
