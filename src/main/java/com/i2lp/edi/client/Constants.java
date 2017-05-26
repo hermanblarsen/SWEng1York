@@ -57,6 +57,7 @@ public class Constants {
 
     /* ELEMENT RENDERING CONSTANTS */
     public static final int TEXT_ELEMENT_ZOOM_FACTOR = 2;
+    public static final double SLIDE_PREVIEW_WIDTH = 170;
 
     /* THUMBNAIL RENDER CONSTANTS */
     public static final int THUMBNAIL_GEN_WIDTH = 320;

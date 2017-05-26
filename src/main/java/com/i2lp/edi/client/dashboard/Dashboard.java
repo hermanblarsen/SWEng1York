@@ -8,6 +8,7 @@ import com.i2lp.edi.client.utilities.ParserXML;
 import com.i2lp.edi.client.utilities.PresSortKey;
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.collections.ListChangeListener;
 import javafx.geometry.*;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -37,6 +38,7 @@ import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static com.i2lp.edi.client.Constants.PRESENTATIONS_PATH;
+import static com.i2lp.edi.client.Constants.SLIDE_PREVIEW_WIDTH;
 import static com.i2lp.edi.client.utilities.Utilities.removeFileExtension;
 import static javafx.scene.layout.BorderPane.setAlignment;
 
@@ -57,11 +59,16 @@ public abstract class Dashboard extends Application {
     private Classroom selectedClassroom;
     protected ArrayList<PresentationPanel> presentationPanels;
     private ArrayList<ClassroomPanel> classroomPanels;
-    private FlowPane presentationPanelsFlowPane, classroomPanelsFlowPane;
+    private ArrayList<SubjectPanel> subjectPanels;
+    private FlowPane presentationPanelsFlowPane;
+    private VBox subjectPanelsVBox;
     private ComboBox<PresSortKey> sortCombo;
     private Stage addToServerStage;
     private ArrayList<Presentation> availablePresentations;
     private ArrayList<Classroom> availableClassrooms;
+    private boolean isWelcomeTextHidden = false;
+    private DashboardState currentState;
+    private Text noMatchesSubject, noMatchesPres;
 
     protected TextField searchField;
     protected Button showAllButton;
@@ -80,74 +87,428 @@ public abstract class Dashboard extends Application {
         rootBox = new VBox(addMenuBar(), border);
         scene = new Scene(rootBox, 1000, 600);
         presentationPanelsFlowPane = new FlowPane(Orientation.HORIZONTAL);
-        classroomPanelsFlowPane = new FlowPane(Orientation.HORIZONTAL);
+        subjectPanelsVBox = new VBox(5);  //TODO: move setup of global nodes to separate method
+        subjectPanelsVBox.setAlignment(Pos.TOP_CENTER);
+        noMatchesSubject = new Text("No matches found");
+        noMatchesSubject.setFill(Color.GRAY);
+        noMatchesSubject.getStyleClass().add("italic");
+        noMatchesPres = new Text("No matches found");
+        noMatchesPres.setFill(Color.GRAY);
+        noMatchesPres.getStyleClass().add("italic");
         scene.getStylesheets().add("bootstrapfx.css");
         dashboardStage.setScene(scene);
 
         updateAvailablePresentations();
 
-        goToWelcomeState();
+        goToState(DashboardState.MODULES);
 
         dashboardStage.show();
     }
 
-    public void goToWelcomeState() {
-        border.setTop(addClassroomStateBorderTop());
-        border.setCenter(addWelcomeStateBorderCenter());
-        border.setLeft(addClassroomStateBorderLeft());
+    public void goToState(DashboardState state) {
+        currentState = state;
+        logger.info("State: " + currentState.name());
+
+        if((state == DashboardState.CLASSROOM || state == DashboardState.MODULES) && searchField != null)
+            searchField.setText("");
+
+        displayBorderTop(state);
+        displayBorderCenter(state);
+        displayBorderLeft(state); //This has to be called after displayBorderCenter()
+        displayBorderRight(state);
     }
 
-    private VBox addWelcomeStateBorderCenter() {
-        VBox vbox = new VBox();
+    private void displayBorderTop(DashboardState state) {
+        HBox topPanel = new HBox();
+        topPanel.setPadding(new Insets(15, 12, 15, 12));
+        topPanel.setSpacing(10);
+        topPanel.setStyle("-fx-background-color: #34495e;");
+
+        Text platformTitle = new Text("Integrated Interactive Learning Platform");
+        platformTitle.getStyleClass().setAll("h3");
+        platformTitle.setFill(Color.WHITESMOKE);
+
+        switch (state) {
+            case MODULES:
+                topPanel.setAlignment(Pos.CENTER);
+                topPanel.getChildren().add(platformTitle);
+                break;
+
+            case CLASSROOM:
+            case SEARCH_CLASSROOM:
+            case SEARCH_ALL:
+                final FileChooser fileChooser = new FileChooser();
+                FileChooser.ExtensionFilter xmlExtensionFilter =
+                        new FileChooser.ExtensionFilter("XML Presentations (*.XML)", "*.xml", "*.XML");
+                fileChooser.getExtensionFilters().add(xmlExtensionFilter);
+                fileChooser.setSelectedExtensionFilter(xmlExtensionFilter);
+                fileChooser.setInitialDirectory(new File("projectResources/sampleFiles/xml"));
+                //fileChooser.setInitialDirectory(new File(System.getProperty("user.home"))); //TODO reinstate when tested
+                fileChooser.setTitle("Open Presentation");
+
+                Button openPresButton = new Button("Open Presentation", new ImageView(new Image("file:projectResources/icons/arrow-down.png", 10, 10, true, true)));
+                openPresButton.getStyleClass().setAll("btn", "btn-default");
+                openPresButton.setOnAction(event -> {
+                    ContextMenu menu = new ContextMenu();
+
+                    MenuItem local = new MenuItem("From this computer");
+                    local.setOnAction(event1 -> {
+                        Node source = (Node) event.getSource();
+                        Window stage = source.getScene().getWindow();
+
+
+                        File file = fileChooser.showOpenDialog(stage);
+                        if (file != null) {
+                            launchPresentation(file.getPath());
+                        } else logger.info("No presentation was selected");
+                    });
+
+                    MenuItem online = new MenuItem("Remotely (from HTTP)");
+                    online.setOnAction(event1 -> logger.info("Not yet implemented")); //TODO: open presentation from web
+
+                    menu.getItems().addAll(local, online);
+                    menu.show(openPresButton, Side.BOTTOM, 0, 0);
+                });
+
+                Button addToServerButton = new Button("Add pres to server");
+                addToServerButton.getStyleClass().setAll("btn", "btn-success");
+                addToServerButton.setOnAction(event -> {
+                    AtomicReference<File> xmlLocation = new AtomicReference<>(); //Store location of XML from filechooser, for upload to presentation after Thumbnail and CSS gen
+
+                    if(addToServerStage != null) {
+                        addToServerStage.close();
+                    }
+
+                    addToServerStage = new Stage();
+                    GridPane addToServerGridPane = new GridPane();
+                    addToServerGridPane.setAlignment(Pos.CENTER);
+
+                    addToServerGridPane.setHgap(10);
+                    addToServerGridPane.setVgap(10);
+                    addToServerGridPane.setPadding(new Insets(25, 25, 25, 25));
+                    Scene addToServerScene = new Scene(addToServerGridPane, 300, 300);
+                    addToServerScene.getStylesheets().add("bootstrapfx.css");
+
+                    Button selectXML = new Button("Select XML");
+                    selectXML.getStyleClass().setAll("btn", "btn-primary");
+                    selectXML.setOnAction(event1 -> {
+                        File file = fileChooser.showOpenDialog(addToServerStage);
+                        xmlLocation.set(file);
+                    });
+                    addToServerGridPane.add(selectXML, 0, 0);
+                    GridPane.setConstraints(selectXML, 0, 0, 1, 1, HPos.CENTER, VPos.CENTER);
+
+                    Label saveInModule = new Label("Save in module:");
+                    addToServerGridPane.add(saveInModule, 0, 1);
+                    GridPane.setConstraints(saveInModule, 0, 1, 1, 1, HPos.CENTER, VPos.CENTER);
+
+                    ComboBox<String> modulesCombo = new ComboBox<>();
+                    modulesCombo.getItems().addAll("Module 1", "Module 2", "Module 3");
+                    addToServerGridPane.add(modulesCombo, 0, 2);
+                    GridPane.setConstraints(modulesCombo, 0, 2, 1, 1, HPos.CENTER, VPos.CENTER);
+
+                    Button addButton = new Button("Add");
+                    addButton.getStyleClass().setAll("btn", "btn-success");
+                    addButton.setOnAction(event1 -> {
+                        ediManager.getPresentationLibraryManager().uploadPresentation(xmlLocation.get().getAbsolutePath(), removeFileExtension(xmlLocation.get().getName()), 1); //TODO: Add proper ModuleID
+                        addToServerStage.close();
+                    });
+                    addToServerGridPane.add(addButton, 0, 3);
+                    GridPane.setConstraints(addButton, 0, 3, 1, 1, HPos.CENTER, VPos.CENTER);
+
+                    addToServerStage.setScene(addToServerScene);
+                    addToServerStage.show();
+                });
+
+                topPanel.getChildren().addAll(openPresButton, addToServerButton, platformTitle);
+                break;
+
+            default:
+                //Do nothing
+        }
+
+        border.setTop(topPanel);
+    }
+
+    private void displayBorderCenter(DashboardState state) {
+        VBox vbox = new VBox(5);
+        vbox.setPadding(new Insets(10));
         vbox.setAlignment(Pos.TOP_CENTER);
 
-        VBox textVBox = new VBox();
-        textVBox.setAlignment(Pos.TOP_CENTER);
-        Panel textPanel = new Panel();
-        textPanel.getStyleClass().add("panel-primary");
-        textPanel.setBody(textVBox);
-
-        vbox.getChildren().add(textPanel);
-        VBox.setMargin(textPanel, new Insets(5, 0, 5, 0));
-
-        Text welcomeText = new Text("Welcome to Edi");
-        welcomeText.getStyleClass().setAll("h3");
-        textVBox.getChildren().add(welcomeText);
-        VBox.setMargin(welcomeText, new Insets(5, 0, 5, 0));
-
-        Text updateText = new Text("Here we can put some updates and stuff");
-        updateText.getStyleClass().setAll("h6", "text-justify");
-        textVBox.getChildren().add(updateText);
-        VBox.setMargin(updateText, new Insets(5, 0, 5, 0));
-
-        classroomPanelsFlowPane.setPadding(new Insets(5, 0, 5, 0));
-        classroomPanelsFlowPane.setVgap(4);
-        classroomPanelsFlowPane.setHgap(4);
-        classroomPanelsFlowPane.setStyle("-fx-background-color: #ffffff;");
-        classroomPanelsFlowPane.setAlignment(Pos.TOP_CENTER);
-
         ScrollPane modulesScrollPane = new ScrollPane();
-        modulesScrollPane.setContent(classroomPanelsFlowPane);
+        modulesScrollPane.setContent(subjectPanelsVBox);
         modulesScrollPane.setHbarPolicy(ScrollBarPolicy.NEVER);
+        modulesScrollPane.setVbarPolicy(ScrollBarPolicy.NEVER);
         modulesScrollPane.setFitToWidth(true);
+        modulesScrollPane.getStyleClass().add("edge-to-edge");
 
-        vbox.getChildren().add(modulesScrollPane);
+        ScrollPane presentationsScrollPane = new ScrollPane();
+        presentationsScrollPane.setContent(presentationPanelsFlowPane);
+        presentationsScrollPane.setHbarPolicy(ScrollBarPolicy.NEVER);
+        presentationsScrollPane.setVbarPolicy(ScrollBarPolicy.NEVER);
+        presentationsScrollPane.setFitToWidth(true);
+        presentationsScrollPane.getStyleClass().add("edge-to-edge");
 
-        return vbox;
+        presentationPanelsFlowPane.setPadding(new Insets(5, 0, 5, 0));
+        presentationPanelsFlowPane.setVgap(4);
+        presentationPanelsFlowPane.setHgap(4);
+        presentationPanelsFlowPane.getStyleClass().add("edge-to-edge");
+        presentationPanelsFlowPane.setAlignment(Pos.TOP_CENTER);
+
+        switch (state) {
+            case MODULES:
+                if (!isWelcomeTextHidden) {
+                    StackPane textStackPane = new StackPane();
+
+                    VBox textVBox = new VBox();
+                    textVBox.setAlignment(Pos.TOP_CENTER);
+                    Panel textPanel = new Panel();
+                    textPanel.getStyleClass().add("panel-primary");
+                    textPanel.setBody(textVBox);
+
+                    Button closeTextButton = new Button("X");
+                    closeTextButton.getStyleClass().setAll("btn", "btn-default");
+                    closeTextButton.setOnAction(event -> {
+                        isWelcomeTextHidden = true;
+                        vbox.getChildren().remove(textStackPane);
+                    });
+                    closeTextButton.setStyle("-fx-font-size: 10px; -fx-min-width: 0; -fx-padding: 6px 6px 6px 6px;");
+
+                    StackPane.setAlignment(closeTextButton, Pos.TOP_RIGHT);
+                    StackPane.setMargin(closeTextButton, new Insets(5));
+
+                    textStackPane.getChildren().addAll(textPanel, closeTextButton);
+
+                    Text welcomeText = new Text("Welcome to Edi");
+                    welcomeText.getStyleClass().setAll("h3");
+                    textVBox.getChildren().add(welcomeText);
+                    VBox.setMargin(welcomeText, new Insets(5, 0, 5, 0));
+
+                    Text updateText = new Text("Here we can put some updates and stuff");
+                    updateText.getStyleClass().setAll("h6", "text-justify");
+                    textVBox.getChildren().add(updateText);
+                    VBox.setMargin(updateText, new Insets(5, 0, 5, 0));
+
+                    vbox.getChildren().add(textStackPane);
+                }
+
+                vbox.getChildren().add(modulesScrollPane);
+                border.setCenter(vbox);
+                break;
+
+            case SEARCH_ALL:
+                Text modulesText = new Text("Modules");
+                modulesText.getStyleClass().setAll("h4");
+
+                Text presentationsText = new Text("Presentations");
+                presentationsText.getStyleClass().setAll("h4");
+                VBox.setMargin(presentationsText, new Insets(10, 0, 0, 0));
+
+//                subjectPanelsVBox.getChildren().addListener((ListChangeListener<? super Node>) observable -> {
+//                    if(subjectPanelsVBox.getChildren().size() == 0 && currentState == DashboardState.SEARCH_ALL) {
+//                        displayBorderCenter(currentState);
+//                    }
+//                });
+//                presentationPanelsFlowPane.getChildren().addListener((ListChangeListener<? super Node>) observable -> {
+//                    if(presentationPanelsFlowPane.getChildren().size() == 0 && currentState == DashboardState.SEARCH_ALL) {
+//                        displayBorderCenter(currentState);
+//                    }
+//                });
+
+                vbox.getChildren().add(modulesText);
+                vbox.getChildren().add(subjectPanelsVBox);
+                vbox.getChildren().add(presentationsText);
+                vbox.getChildren().add(presentationPanelsFlowPane);
+
+
+                ScrollPane searchScrollPane = new ScrollPane();
+                searchScrollPane.setContent(vbox);
+                searchScrollPane.setHbarPolicy(ScrollBarPolicy.NEVER);
+                searchScrollPane.setVbarPolicy(ScrollBarPolicy.NEVER);
+                searchScrollPane.setFitToWidth(true);
+                searchScrollPane.getStyleClass().add("edge-to-edge");
+
+                border.setCenter(searchScrollPane);
+                break;
+
+            case CLASSROOM:
+            case SEARCH_CLASSROOM:
+                Button backButton = new Button("Back to module selection");
+                backButton.getStyleClass().setAll("btn", "btn-default");
+                backButton.setOnAction(event -> goToState(DashboardState.MODULES));
+                Text moduleText = new Text(selectedClassroom.getModuleName());
+                moduleText.getStyleClass().setAll("h4");
+                Region dummy = new Region();
+                backButton.widthProperty().addListener(observable -> dummy.setPrefWidth(backButton.getWidth()));
+                BorderPane borderPane = new BorderPane();
+                borderPane.setPadding(new Insets(5, 0, 5, 0));
+                borderPane.setLeft(backButton);
+                borderPane.setRight(dummy);
+                borderPane.setCenter(moduleText);
+
+                filterPresentationPanels(selectedClassroom);
+
+                vbox.getChildren().addAll(borderPane, presentationsScrollPane);
+                border.setCenter(vbox);
+                break;
+
+            default:
+                //Do nothing
+        }
     }
 
-    private void updateClassroomPanels() {
+    private void displayBorderLeft(DashboardState state) {
+        VBox controlsVBox = new VBox(8);
+        controlsVBox.setPadding(new Insets(10));
+
+        switch (state) {
+            case MODULES:
+            case CLASSROOM:
+            case SEARCH_CLASSROOM:
+            case SEARCH_ALL:
+                Panel searchPanel = new Panel("Search");
+                controlsVBox.getChildren().add(searchPanel);
+                searchPanel.getStyleClass().add("panel-primary");
+
+                if(searchField == null) {
+                    searchField = new TextField();
+                    searchField.textProperty().addListener(observable -> search(searchField.getText()));
+                }
+
+                searchPanel.setBody(searchField);
+
+                VBox subjectsVBox = new VBox();
+                subjectsVBox.setPadding(new Insets(3, 0, 3, 0));
+                subjectsVBox.setSpacing(3);
+                subjectsVBox.setStyle("-fx-background-color: #ffffff;");
+
+                Label filterBySubjectLabel = new Label("Filter by subject:");
+                subjectsVBox.getChildren().add(filterBySubjectLabel);
+
+                showAllButton = new Button("Show all");
+                showAllButton.getStyleClass().setAll("btn", "btn-success");
+                showAllButton.setOnAction(event -> filterPresentationPanels(null));
+                subjectsVBox.getChildren().add(showAllButton);
+
+                ArrayList<String> subjectArray = new ArrayList<>();
+                subjectButtons = new ArrayList<>();
+
+                for (PresentationPanel panel : presentationPanels) {
+                    String subject = panel.getPresentationSubject();
+                    if(subject != null && !subjectArray.contains(subject)) {
+                        subjectArray.add(subject);
+
+                        Button subjectButton = new Button(subject);
+                        subjectButton.getStyleClass().setAll("btn", "btn-success");
+                        subjectButton.setOnAction(event -> filterBySubject(subjectButton.getText()));
+                        subjectButtons.add(subjectButton);
+                        subjectsVBox.getChildren().add(subjectButton);
+                    }
+                }
+
+                //Create Panel for subject filters
+                Panel subjectsPanel = new Panel("My subjects");
+                subjectsPanel.getStyleClass().add("panel-primary");
+                subjectsPanel.setBody(subjectsVBox);
+                VBox.setMargin(subjectsPanel, new Insets(0, 0, 0, 0));
+                controlsVBox.getChildren().add(subjectsPanel);
+
+                Panel sortPanel = new Panel("Sort by");
+                sortPanel.getStyleClass().add("panel-primary");
+                VBox sortVBox = new VBox();
+                sortCombo = new ComboBox<>();
+                PresSortKey.copyAllToList(sortCombo.getItems());
+                sortCombo.setOnAction(event -> sortBy(sortCombo.getValue()));
+                sortCombo.setValue(sortCombo.getItems().get(0));
+                sortBy(sortCombo.getItems().get(0));
+                sortPanel.setBody(sortCombo);
+                controlsVBox.getChildren().add(sortPanel);
+                break;
+
+            default:
+                //Do nothing
+        }
+
+        border.setLeft(controlsVBox);
+    }
+
+    private void displayBorderRight(DashboardState state) {
+        switch (state) {
+            case MODULES:
+            case SEARCH_ALL:
+                border.setRight(null);
+                break;
+
+            case CLASSROOM:
+            case SEARCH_CLASSROOM:
+                if(selectedPres != null) {
+                    VBox parentBox = new VBox(2);
+                    parentBox.setPadding(new Insets(5));
+
+                    for(int i = 0; i < selectedPres.getMaxSlideNumber(); i++) {
+                        VBox vbox = new VBox(3);
+                        vbox.setBorder(new Border(new BorderStroke(Color.GRAY, BorderStrokeStyle.SOLID, new CornerRadii(5), BorderStroke.DEFAULT_WIDTHS)));
+                        vbox.setAlignment(Pos.CENTER);
+                        vbox.setPadding(new Insets(5));
+
+                        vbox.getChildren().add(selectedPres.getSlidePreview(i, SLIDE_PREVIEW_WIDTH));
+                        vbox.getChildren().add(new Label(Integer.toString(i + 1)));
+                        vbox.setStyle("-fx-background-color: #ffffff");
+                        parentBox.getChildren().add(vbox);
+                    }
+
+                    ScrollPane scroll = new ScrollPane();
+                    scroll.setHbarPolicy(ScrollBarPolicy.NEVER);
+                    scroll.setVbarPolicy(ScrollBarPolicy.NEVER);
+                    scroll.getStyleClass().add("edge-to-edge");
+                    scroll.setContent(parentBox);
+
+                    border.setRight(scroll);
+                } else {
+                    border.setRight(null);
+                }
+                break;
+
+            default:
+                //Do nothing
+        }
+    }
+
+    private void setupClassroomPanels() {
         if(classroomPanels == null)
             classroomPanels = new ArrayList<>();
         else
             classroomPanels.clear();
 
+        if(subjectPanels == null)
+            subjectPanels = new ArrayList<>();
+        else
+            subjectPanels.clear();
+
+        ArrayList<String> subjects = new ArrayList<>();
+
         for(Classroom classroom : availableClassrooms) {
-            ClassroomPanel classroomPanel = new ClassroomPanel(classroomPanelsFlowPane, classroom);
+            SubjectPanel subjectPanel = new SubjectPanel("Empty", null);
+            String subject = classroom.getSubject();
+
+            if(!subjects.contains(subject)) {
+                subjects.add(subject);
+                subjectPanel = new SubjectPanel(subject, subjectPanelsVBox);
+                subjectPanels.add(subjectPanel);
+            } else {
+                for(Node node : subjectPanelsVBox.getChildren()) {
+                    if(((SubjectPanel)node).getSubject().equals(subject)) {
+                        subjectPanel = (SubjectPanel) node;
+                        break;
+                    }
+                }
+            }
+
+            ClassroomPanel classroomPanel = new ClassroomPanel(subjectPanel.getSubjectPanelsHBox(), classroom);
             classroomPanel.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
                 if (event.getButton() == MouseButton.PRIMARY) {
                     if (classroomPanel.isSelected()) {
-                        goToClassroomState(classroomPanel.getModuleName());
+                        goToState(DashboardState.CLASSROOM);
                     } else {
                         selectPreviewPanel(classroomPanel);
                     }
@@ -196,23 +557,15 @@ public abstract class Dashboard extends Application {
             availablePresentations.add(presentation);
         }
 
-        updateClassroomPanels();
-        updatePresentationPanels();
+        setupClassroomPanels();
+        setupPresentationPanels();
     }
 
-    public void goToClassroomState(String moduleName) {
-        border.setTop(addClassroomStateBorderTop());
-        border.setCenter(addClassroomStateBorderCenter(moduleName));
-        border.setLeft(addClassroomStateBorderLeft()); //This has to be called after setCenter()
-    }
-
-    public void updatePresentationPanels() {
+    public void setupPresentationPanels() {
         if(presentationPanels == null)
             presentationPanels = new ArrayList<>();
         else
             presentationPanels.clear();
-
-        //presentationPanelsFlowPane.getChildren().clear();
 
         for (Presentation presentation : availablePresentations) {
             PresentationPanel previewPanel = new PresentationPanel(presentationPanelsFlowPane, presentation);
@@ -271,7 +624,7 @@ public abstract class Dashboard extends Application {
                 panel.setSelected(false);
             }
             selectedPres = ((PresentationPanel) previewPanel).getPresentation();
-            border.setRight(addBorderRight());
+            displayBorderRight(DashboardState.CLASSROOM);
         } else if(previewPanel instanceof ClassroomPanel) {
             for (ClassroomPanel panel : classroomPanels) {
                 panel.setSelected(false);
@@ -285,7 +638,6 @@ public abstract class Dashboard extends Application {
     private void deletePresentation(PresentationPanel previewPanel) {
         Presentation presentationToDelete = previewPanel.getPresentation();
 
-        //TODO we possibly need to have module NAME and differentiate between presentation ID and presentationTITLE @Amrik
         //Try to remove the presentation from the server
         boolean successful_removal = ediManager.getPresentationLibraryManager().removePresentation(25, 1); //TODO we needs to store this somehow in our java @Amrik
 
@@ -296,136 +648,28 @@ public abstract class Dashboard extends Application {
         else logger.warn("Presentation Could not be removed"); //TODO improve this
     }
 
-    private VBox addClassroomStateBorderCenter(String moduleName) {
-        Button backButton = new Button("Back to module selection");
-        backButton.getStyleClass().setAll("btn", "btn-default");
-        backButton.setOnAction(event -> goToWelcomeState());
-        Text moduleText = new Text("Module: " + moduleName);
-        moduleText.getStyleClass().setAll("h4");
-        Region dummy = new Region();
-        backButton.widthProperty().addListener(observable -> dummy.setPrefWidth(backButton.getWidth()));
-        BorderPane borderPane = new BorderPane();
-        borderPane.setPadding(new Insets(5, 0, 5, 0));
-        borderPane.setLeft(backButton);
-        borderPane.setRight(dummy);
-        borderPane.setCenter(moduleText);
-
-        ScrollPane scrollPane = new ScrollPane();
-
-        presentationPanelsFlowPane.setPadding(new Insets(5, 0, 5, 0));
-        presentationPanelsFlowPane.setVgap(4);
-        presentationPanelsFlowPane.setHgap(4);
-        presentationPanelsFlowPane.setStyle("-fx-background-color: #ffffff;");
-        presentationPanelsFlowPane.setAlignment(Pos.TOP_CENTER);
-
-        scrollPane.setContent(presentationPanelsFlowPane);
-        scrollPane.setHbarPolicy(ScrollBarPolicy.NEVER);
-        scrollPane.setFitToWidth(true);
-
-        showPresentationPanels(selectedClassroom);
-
-        VBox vbox = new VBox(borderPane, scrollPane);
-        return vbox;
-    }
-
-    private HBox addClassroomStateBorderTop() {
-        HBox topPanel = new HBox();
-        topPanel.setPadding(new Insets(15, 12, 15, 12));
-        topPanel.setSpacing(10);
-        topPanel.setStyle("-fx-background-color: #34495e;");
-
-        final FileChooser fileChooser = new FileChooser();
-        FileChooser.ExtensionFilter xmlExtensionFilter =
-                new FileChooser.ExtensionFilter("XML Presentations (*.XML)", "*.xml", "*.XML");
-        fileChooser.getExtensionFilters().add(xmlExtensionFilter);
-        fileChooser.setSelectedExtensionFilter(xmlExtensionFilter);
-        fileChooser.setInitialDirectory(new File("projectResources/sampleFiles/xml"));
-//        fileChooser.setInitialDirectory(new File(System.getProperty("user.home"))); //TODO reinstate when tested
-        fileChooser.setTitle("Add Presentation");
-
-        Button loadPresButton = new Button("Add Presentation");
-        loadPresButton.getStyleClass().setAll("btn", "btn-default");
-        loadPresButton.setOnAction(event -> {
-            Node source = (Node) event.getSource();
-            Window stage = source.getScene().getWindow();
-
-
-            File file = fileChooser.showOpenDialog(stage);
-            if (file != null) {
-                launchPresentation(file.getPath());
-            } else logger.info("No presentation was selected");
-        });
-
-        Button addToServerButton = new Button("Add pres to server");
-        addToServerButton.getStyleClass().setAll("btn", "btn-success");
-        addToServerButton.setOnAction(event -> {
-            AtomicReference<File> xmlLocation = new AtomicReference<>(); //Store location of XML from filechooser, for upload to presentation after Thumbnail and CSS gen
-
-            if(addToServerStage != null) {
-                addToServerStage.close();
-            }
-
-            addToServerStage = new Stage();
-            GridPane addToServerGridPane = new GridPane();
-            addToServerGridPane.setAlignment(Pos.CENTER);
-
-            addToServerGridPane.setHgap(10);
-            addToServerGridPane.setVgap(10);
-            addToServerGridPane.setPadding(new Insets(25, 25, 25, 25));
-            Scene addToServerScene = new Scene(addToServerGridPane, 300, 300);
-            addToServerScene.getStylesheets().add("bootstrapfx.css");
-
-            Button selectXML = new Button("Select XML");
-            selectXML.getStyleClass().setAll("btn", "btn-primary");
-            selectXML.setOnAction(event1 -> {
-                File file = fileChooser.showOpenDialog(addToServerStage);
-                xmlLocation.set(file);
-            });
-            addToServerGridPane.add(selectXML, 0, 0);
-            GridPane.setConstraints(selectXML, 0, 0, 1, 1, HPos.CENTER, VPos.CENTER);
-
-            Label saveInModule = new Label("Save in module:");
-            addToServerGridPane.add(saveInModule, 0, 1);
-            GridPane.setConstraints(saveInModule, 0, 1, 1, 1, HPos.CENTER, VPos.CENTER);
-
-            ComboBox<String> modulesCombo = new ComboBox<>();
-            modulesCombo.getItems().addAll("Module 1", "Module 2", "Module 3");
-            addToServerGridPane.add(modulesCombo, 0, 2);
-            GridPane.setConstraints(modulesCombo, 0, 2, 1, 1, HPos.CENTER, VPos.CENTER);
-
-            Button addButton = new Button("Add");
-            addButton.getStyleClass().setAll("btn", "btn-success");
-            addButton.setOnAction(event1 -> {
-                ediManager.getPresentationLibraryManager().uploadPresentation(xmlLocation.get().getAbsolutePath(), removeFileExtension(xmlLocation.get().getName()), 1); //TODO: Add proper ModuleID
-                addToServerStage.close();
-            });
-            addToServerGridPane.add(addButton, 0, 3);
-            GridPane.setConstraints(addButton, 0, 3, 1, 1, HPos.CENTER, VPos.CENTER);
-
-            addToServerStage.setScene(addToServerScene);
-            addToServerStage.show();
-        });
-
-        Text platformTitle = new Text("     Integrated Interactive Learning Platform");
-        platformTitle.getStyleClass().setAll("h3");
-        platformTitle.setFill(Color.WHITESMOKE);
-
-        topPanel.getChildren().addAll(loadPresButton, addToServerButton, platformTitle);
-
-        return topPanel;
-    }
-
     private MenuBar addMenuBar() {
         MenuBar menuBar = new MenuBar();
         //Due to travis fails, this couldn't be done in the constructor:
 
         Menu fileMenu = new Menu("File");
+
         Menu editMenu = new Menu("Edit");
+
+        Menu viewMenu = new Menu("View");
+        MenuItem showWelcomeMessage = new MenuItem("Show Welcome Message");
+        showWelcomeMessage.setOnAction(event -> {
+            isWelcomeTextHidden = false;
+            goToState(DashboardState.MODULES);
+        });
+        viewMenu.getItems().add(showWelcomeMessage);
+
         Menu helpMenu = new Menu("Help");
         MenuItem aboutMenuItem = new MenuItem("About");
         aboutMenuItem.setOnAction(event -> showAboutWindow());
         helpMenu.getItems().add(aboutMenuItem);
-        menuBar.getMenus().addAll(fileMenu, editMenu, helpMenu);
+
+        menuBar.getMenus().addAll(fileMenu, editMenu, viewMenu, helpMenu);
 
         return menuBar;
     }
@@ -475,143 +719,68 @@ public abstract class Dashboard extends Application {
         presentationManager.openPresentation(path,false);
     }
 
-    private VBox addClassroomStateBorderLeft() {
-        VBox controlsVBox = new VBox(8);
-        controlsVBox.setPadding(new Insets(10));
-
-        Panel searchPanel = new Panel("Search");
-        controlsVBox.getChildren().add(searchPanel);
-        searchPanel.getStyleClass().add("panel-primary");
-        searchField = new TextField();
-        searchField.setOnAction(event -> search(searchField.getText()));
-        searchField.textProperty().addListener(observable -> search(searchField.getText()));
-        searchPanel.setBody(searchField);
-
-        VBox subjectsVBox = new VBox();
-        subjectsVBox.setPadding(new Insets(3, 0, 3, 0));
-        subjectsVBox.setSpacing(3);
-        subjectsVBox.setStyle("-fx-background-color: #ffffff;");
-
-        Label filterBySubjectLabel = new Label("Filter by subject:");
-        subjectsVBox.getChildren().add(filterBySubjectLabel);
-
-        showAllButton = new Button("Show all");
-        showAllButton.getStyleClass().setAll("btn", "btn-success");
-        showAllButton.setOnAction(event -> showPresentationPanels(selectedClassroom));
-        subjectsVBox.getChildren().add(showAllButton);
-
-        ArrayList<String> subjectArray = new ArrayList<>();
-        subjectButtons = new ArrayList<>();
-
-        for (PresentationPanel panel : presentationPanels) {
-            String subject = panel.getPresentationSubject();
-            if(subject != null && !subjectArray.contains(subject)) {
-                subjectArray.add(subject);
-
-                Button subjectButton = new Button(subject);
-                subjectButton.getStyleClass().setAll("btn", "btn-success");
-                subjectButton.setOnAction(event -> filterBySubject(subjectButton.getText()));
-                subjectButtons.add(subjectButton);
-                subjectsVBox.getChildren().add(subjectButton);
+    private void search(String text) { //TODO: show author & tags when found?
+        if(text.equals("")) {
+            if(currentState == DashboardState.SEARCH_CLASSROOM) {
+                goToState(DashboardState.CLASSROOM);
+            } else if (currentState == DashboardState.SEARCH_ALL) {
+                goToState(DashboardState.MODULES);
+            }
+        } else {
+            if(currentState == DashboardState.CLASSROOM) {
+                goToState(DashboardState.SEARCH_CLASSROOM);
+            } else if(currentState == DashboardState.MODULES) {
+                goToState(DashboardState.SEARCH_ALL);
             }
         }
 
-        //Create Panel for subject filters
-        Panel subjectsPanel = new Panel("My subjects");
-        subjectsPanel.getStyleClass().add("panel-primary");
-        subjectsPanel.setBody(subjectsVBox);
-        VBox.setMargin(subjectsPanel, new Insets(0, 0, 0, 0));
-        controlsVBox.getChildren().add(subjectsPanel);
-
-        Panel sortPanel = new Panel("Sort by");
-        sortPanel.getStyleClass().add("panel-primary");
-        VBox sortVBox = new VBox();
-        sortCombo = new ComboBox<>();
-        PresSortKey.copyAllToList(sortCombo.getItems());
-        sortCombo.setOnAction(event -> sortBy(sortCombo.getValue()));
-        sortCombo.setValue(sortCombo.getItems().get(0));
-        sortBy(sortCombo.getItems().get(0));
-        sortPanel.setBody(sortCombo);
-        controlsVBox.getChildren().add(sortPanel);
-
-        return controlsVBox;
-    }
-
-    private void search(String text) { //TODO: Improve to ignore case, test how it works with filtering by subject, show author & tags when found
-        logger.info("Searching for " + text);
-
-        for (PresentationPanel panel : presentationPanels) {
-            if (!StringUtils.containsIgnoreCase(panel.getPresentation().getDocumentID(), text) &&
-                    !StringUtils.containsIgnoreCase(panel.getPresentation().getTags(), text) &&
-                    !StringUtils.containsIgnoreCase(panel.getPresentation().getAuthor(), text) &&
-                    !panel.isHidden()) {
-                panel.setHidden(true);
-            } else if ((StringUtils.containsIgnoreCase(panel.getPresentation().getDocumentID(), text) ||
-                    StringUtils.containsIgnoreCase(panel.getPresentation().getTags(), text) ||
-                    StringUtils.containsIgnoreCase(panel.getPresentation().getAuthor(), text)) && panel.isHidden()) {
-                panel.setHidden(false);
-            }
-        }
-    }
-
-    private ScrollPane addBorderRight() {
-        FlowPane flow = new FlowPane();
-        flow.setPadding(new Insets(5, 0, 5, 0));
-        flow.setVgap(4);
-        flow.setHgap(4);
-        flow.setPrefWrapLength(170); // preferred width allows for two columns
-        flow.setStyle("-fx-background-color: #ffffff;");
-
-        for(int i = 0; i < selectedPres.getMaxSlideNumber(); i++) {
-            VBox vbox = new VBox(3);
-            vbox.setBorder(new Border(new BorderStroke(Color.GRAY, BorderStrokeStyle.SOLID, new CornerRadii(5), BorderStroke.DEFAULT_WIDTHS)));
-            vbox.setAlignment(Pos.CENTER);
-            vbox.setPadding(new Insets(5));
-
-            vbox.getChildren().add(selectedPres.getSlidePreview(i, 170)); //TODO: Add constant for width
-            vbox.getChildren().add(new Label(Integer.toString(i + 1)));
-            flow.getChildren().add(vbox);
-            FlowPane.setMargin(vbox, new Insets(0, 20, 0, 5));
+        for(PresentationPanel panel : presentationPanels) {
+            panel.search(text);
         }
 
-        ScrollPane scroll = new ScrollPane();
-        scroll.setHbarPolicy(ScrollBarPolicy.NEVER);
-        scroll.setContent(flow);
-
-        return scroll;
-    }
-
-    private void showPresentationPanels(Classroom classroom) {
-        presentationPanelsFlowPane.getChildren().clear();
-
-        for (PresentationPanel panel : presentationPanels) {
-            if (classroom == null) {
-                panel.setHidden(false);
-            } else {
-                Presentation p = panel.getPresentation();
-                Classroom c = p.getClassroom();
-                if(c == classroom) {
-                    panel.setHidden(false);
-                } else {
-                    panel.setHidden(true);
-                }
-            }
+        for(ClassroomPanel panel : classroomPanels) {
+            panel.search(text);
         }
-    }
 
-    private void showAllClassroomPanels() {
-        classroomPanelsFlowPane.getChildren().clear();
+        if(presentationPanelsFlowPane.getChildren().contains(noMatchesPres)) {
+            presentationPanelsFlowPane.getChildren().remove(noMatchesPres);
+        }
 
-        for (ClassroomPanel panel : classroomPanels)
-            panel.setHidden(false);
+        if(subjectPanelsVBox.getChildren().contains(noMatchesSubject)) {
+            subjectPanelsVBox.getChildren().remove(noMatchesSubject);
+        }
+
+        if(presentationPanelsFlowPane.getChildren().size() == 0) {
+            presentationPanelsFlowPane.getChildren().add(noMatchesPres);
+        }
+
+        if(subjectPanelsVBox.getChildren().size() == 0) {
+            subjectPanelsVBox.getChildren().add(noMatchesSubject);
+        }
     }
 
     private void filterBySubject(String subject) {
         for (PresentationPanel panel : presentationPanels) {
             if (!subject.equals(panel.getPresentationSubject()) && !panel.isHidden())
-                panel.setHidden(true);
+                panel.setFiltered(true);
             else if (subject.equals(panel.getPresentationSubject()) && panel.isHidden())
-                panel.setHidden(false);
+                panel.setFiltered(false);
+        }
+    }
+
+    private void filterPresentationPanels(Classroom classroom) {
+        for (PresentationPanel panel : presentationPanels) {
+            if (classroom == null) {
+                panel.setFiltered(false);
+            } else {
+                Presentation p = panel.getPresentation();
+                Classroom c = p.getClassroom();
+                if(c == classroom) {
+                    panel.setFiltered(false);
+                } else {
+                    panel.setFiltered(true);
+                }
+            }
         }
     }
 
@@ -662,7 +831,7 @@ public abstract class Dashboard extends Application {
         new PresentationEditor(presentationPath);
     }
 
-    private void printPresentation(String presentationPath){
+    private void printPresentation(String presentationPath) {
         ThumbnailGenerationManager.generateSlideThumbnails(presentationPath,true);
     }
 
