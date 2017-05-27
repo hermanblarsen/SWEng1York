@@ -781,6 +781,7 @@ public abstract class Dashboard extends Application {
                 }
             });
             presentationPanels.add(presentationPanel);
+            
         }
 
         if (presSortCombo != null)
