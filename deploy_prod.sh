@@ -10,7 +10,7 @@ ssh bscftp@ssh.amriksadhra.com 'sudo killall screen | rm -rf /home/bscftp/Circle
 curl --ftp-create-dirs -T target/*server-jar-with-dependencies.jar -u bscftp:Combline90+ ftp://ftp.amriksadhra.com/CircleBuilds/
 
 echo "-- Letting Server kill current SocketServer"
-sleep 5
+sleep 30
 
 echo "-- Connecting via SSH to start new SocketServer instance"
 ssh bscftp@ssh.amriksadhra.com 'sudo screen -m -d java -jar /home/bscftp/CircleBuilds/*.jar'
