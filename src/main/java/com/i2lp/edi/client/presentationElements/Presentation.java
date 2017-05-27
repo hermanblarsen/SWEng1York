@@ -23,9 +23,10 @@ import static com.i2lp.edi.client.Constants.THUMBNAIL_WIDTH;
  */
 @SuppressWarnings({"WeakerAccess", "unused"})
 public class Presentation extends Pane {
-
     protected static Logger logger = LoggerFactory.getLogger(Presentation.class);
+
     //From i2lp:
+    private int presentationID; //Database PK
     private String documentTitle;
     private boolean isLive;
     private int currentSlideNumber;
@@ -122,6 +123,10 @@ public class Presentation extends Pane {
         return version;
     }
 
+    public void setPresentationID(Integer presentationID) {
+        this.presentationID = presentationID;
+    }
+
     public void setVersion(Float version) {
         this.version = version;
     }
@@ -189,6 +194,10 @@ public class Presentation extends Pane {
     public void setDocumentTitle(String documentTitle) { this.documentTitle = documentTitle; }
 
     public Subject getSubject() { return classroom.getSubject(); }
+
+    public int getPresentationID() {
+        return presentationID;
+    }
 
     public static Presentation generateTestPresentation() {
         ArrayList<Slide> slides = new ArrayList<>();
