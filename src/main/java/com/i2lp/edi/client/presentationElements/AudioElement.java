@@ -159,10 +159,10 @@ public class AudioElement extends SlideElement{
                 mediaPlayer.play();
                 isPlaying = true;
             } else {
-                System.err.println("Error: Playback failed. Media player does not exist");
+                logger.error("Error: Playback failed. Media player does not exist or isn't ready");
             }
         } else {
-            System.err.println("Error: Playback failed. Audio path has not been set.");
+            logger.error("Error: Playback failed. Audio path has not been set.");
         }
     }
 
@@ -178,7 +178,7 @@ public class AudioElement extends SlideElement{
                 isPlaying = false;
             }
         } else {
-            System.err.println("Error: Pause failed. Media player does not exist");
+            logger.error("Error: Pause failed. Media player does not exist");
         }
     }
 
@@ -193,7 +193,7 @@ public class AudioElement extends SlideElement{
             mediaPlayer = null;
             prepared = false;
         } else {
-            System.err.println("Error: Stop failed. Media player does not exist");
+            logger.error("Error: Stop failed. Media player does not exist");
         }
     }
 
@@ -219,12 +219,12 @@ public class AudioElement extends SlideElement{
     public float getCycleDuration(){
 
         if (!prepared) {
-            System.err.println("Error: Duration cannot be determined as media not yet prepared");
+            logger.error("Error: Duration cannot be determined as media not yet prepared");
             return -1f;
         }
 
         if (path.equals("")) {
-            System.err.println("Error: Duration cannot be determined as media path is not set.");
+            logger.error("Error: Duration cannot be determined as media path is not set.");
             return -1f;
         } else {
             return (float)(endTime.toSeconds() - startTime.toSeconds());
@@ -268,54 +268,65 @@ public class AudioElement extends SlideElement{
 
     @Override
     public void doClassSpecificRender() {
-        if (isAutoPlay) {
-            startAudio();
-        }
-        if (isThumbnailGen){
-            mediaPlayer.stop();
+        if(mediaPlayer == null) {//Run Once
+            initMediaPlayer();
+
+            // Get properties from the mediaplayer
+            status = mediaPlayer.statusProperty();
+            onEndOfMedia = mediaPlayer.onEndOfMediaProperty();
+            onError = mediaPlayer.onErrorProperty();
+            onHalted = mediaPlayer.onHaltedProperty();
+            onPlaying = mediaPlayer.onPlayingProperty();
+            onPaused = mediaPlayer.onPausedProperty();
+            onReady = mediaPlayer.onReadyProperty();
+            onRepeat = mediaPlayer.onRepeatProperty();
+            onStalled = mediaPlayer.onStalledProperty();
+            onStopped = mediaPlayer.onStoppedProperty();
+            onMarker = mediaPlayer.onMarkerProperty();
+
+
+            // Set properties for media player
+            isLoop(isLoop);
+            isAutoPlay(isAutoPlay);
+
+
+            mediaPlayer.setOnReady(() -> {
+
+                // Mark the player as prepared and ready to play
+                prepared = true;
+
+                // Set default end-time to the duration of the media
+                if (endTime == null) {
+                    endTime = media.getDuration();
+                } else {
+                    setEndTime(endTime);
+                }
+                mediaPlayer.seek(startTime);
+                mediaPlayer.setStartTime(startTime);
+                mediaPlayer.setStopTime(endTime);
+                mediaPlayer.setVolume(volume);
+                if (isAutoPlay) {
+                    startAudio();
+                }
+            });
+
+            // Add player to a MediaView
+            mediaView.setMediaPlayer(mediaPlayer);
+
+        } else {
+            if (isAutoPlay) {
+                startAudio();
+            }
+
+            if (isThumbnailGen) {
+                mediaPlayer.stop();
+            }
         }
     }
 
     @Override
     public void setupElement() {
-
-        // Get properties from the mediaplayer
-        status = mediaPlayer.statusProperty();
-        onEndOfMedia = mediaPlayer.onEndOfMediaProperty();
-        onError = mediaPlayer.onErrorProperty();
-        onHalted = mediaPlayer.onHaltedProperty();
-        onPlaying = mediaPlayer.onPlayingProperty();
-        onPaused = mediaPlayer.onPausedProperty();
-        onReady = mediaPlayer.onReadyProperty();
-        onRepeat = mediaPlayer.onRepeatProperty();
-        onStalled = mediaPlayer.onStalledProperty();
-        onStopped = mediaPlayer.onStoppedProperty();
-        onMarker = mediaPlayer.onMarkerProperty();
-
-
-        // Set properties for media player
-        isLoop(isLoop);
-        isAutoPlay(isAutoPlay);
-
-        mediaPlayer.setOnReady(() -> {
-
-            // Mark the player as prepared and ready to play
-            prepared = true;
-
-            // Set default end-time to the duration of the media
-            if (endTime == null) {
-                endTime = media.getDuration();
-            } else {
-                setEndTime(endTime);
-            }
-            mediaPlayer.seek(startTime);
-            mediaPlayer.setStartTime(startTime);
-            mediaPlayer.setStopTime(endTime);
-            mediaPlayer.setVolume(volume);
-        });
-
-        // Add player to a MediaView
-        mediaView = new MediaView(mediaPlayer);
+        mediaView = new MediaView();
     }
 
 
@@ -475,11 +486,11 @@ public class AudioElement extends SlideElement{
             this.startTime = startTime;
         } else if (startTime.lessThanOrEqualTo(Duration.millis(0))) {
             this.startTime = Duration.millis(0);
-            System.err.println("Error: Cannot set start-time to less than 0 seconds. " +
+            logger.error("Error: Cannot set start-time to less than 0 seconds. " +
                     "End time set to 0 instead.");
         } else if (startTime.greaterThanOrEqualTo(this.endTime)) {
             this.startTime = this.endTime;
-            System.err.println("Error: Cannot set start-time to more than end-time. " +
+            logger.error("Error: Cannot set start-time to more than end-time. " +
                     "Start time set equal to end-time instead.");
         }
 
@@ -512,11 +523,11 @@ public class AudioElement extends SlideElement{
             this.endTime = endTime;
         } else if (endTime.lessThanOrEqualTo(this.startTime)) {
             this.endTime = this.startTime;
-            System.err.println("Error: Cannot set end-time to less than start-time. " +
+            logger.error("Error: Cannot set end-time to less than start-time. " +
                     "End time set equal to start-time instead.");
         } else if (endTime.greaterThanOrEqualTo(media.getDuration())) {
             this.endTime = media.getDuration();
-            System.err.println("Error: Cannot set end-time to greater than audio duration. " +
+            logger.error("Error: Cannot set end-time to greater than audio duration. " +
                     "End time set to full audio duration instead.");
         }
 
@@ -554,25 +565,13 @@ public class AudioElement extends SlideElement{
             if (lowercasePath.endsWith(".m4a") || lowercasePath.endsWith(".mp3") || lowercasePath.endsWith(".wav")) {
                 this.path = path;
 
-                // Check if path is an URL or local file
-                if (path.contains("http://") || path.contains("https://") || path.contains("://www")) {
-                    media = new Media(path);
-                } else {
-                    File file = new File(path);
-                    String mediaPath = file.toURI().toString();
-                    media = new Media(mediaPath);
-                }
-
-                mediaPlayer = new MediaPlayer(media);
-                mediaMarkers = media.getMarkers();
-
             }
             else {
                 throw new FileNotFoundException("Error: Path '" + path + "' is not a valid path. " +
                         "Paths must point to files of type 'mp3', 'm4a', or 'wav'");
             }
         } catch (FileNotFoundException e) {
-            System.err.println(e.getMessage());
+            logger.error(e.getMessage());
         }
     }
 
@@ -672,7 +671,7 @@ public class AudioElement extends SlideElement{
                 mediaPlayer.setVolume(volume);
             }
         } else {
-            System.err.println("Error: Cannot set volume to '" + volume +"'. Valid range is between 0 and 1.");
+            logger.error("Error: Cannot set volume to '" + volume +"'. Valid range is between 0 and 1.");
         }
     }
 
@@ -698,10 +697,10 @@ public class AudioElement extends SlideElement{
         // Check if this is how they want it to work
         if (currentTime.lessThanOrEqualTo(startTime)) {
             this.currentTime = startTime;
-            System.err.println("Error: Cannot set current time to less than the start time. " +
+            logger.error("Error: Cannot set current time to less than the start time. " +
                     "Current time has been set to the start time instead.");
         } else if (currentTime.greaterThanOrEqualTo(endTime)) {
-            System.err.println("Error: Cannot set current time to more than the end time. " +
+            logger.error("Error: Cannot set current time to more than the end time. " +
                     "Current time has been set to the end time instead.");
             this.currentTime = this.endTime;
         } else if ((currentTime.greaterThanOrEqualTo(startTime)) && (currentTime.lessThanOrEqualTo(endTime))) {
@@ -740,10 +739,10 @@ public class AudioElement extends SlideElement{
 
         } else if(playbackRate < 0) {
             this.playbackRate = 0;
-            System.err.println("Error: Cannot set playback rate to " + playbackRate + ". Rate must be between 0 and 8");
+            logger.error("Error: Cannot set playback rate to " + playbackRate + ". Rate must be between 0 and 8");
         } else if (playbackRate > 8) {
             this.playbackRate = 8;
-            System.err.println("Error: Cannot set playback rate to " + playbackRate + ". Rate must be between 0 and 8");
+            logger.error("Error: Cannot set playback rate to " + playbackRate + ". Rate must be between 0 and 8");
         }
 
         if (mediaPlayer != null) {
@@ -821,4 +820,17 @@ public class AudioElement extends SlideElement{
         mediaPlayer.stop();
     }
 
+    private void initMediaPlayer(){
+        // Check if path is an URL or local file
+        if (path.contains("http://") || path.contains("https://") || path.contains("://www")) {
+            media = new Media(path);
+        } else {
+            File file = new File(path);
+            String mediaPath = file.toURI().toString();
+            media = new Media(mediaPath);
+        }
+
+        mediaPlayer = new MediaPlayer(media);
+        mediaMarkers = media.getMarkers();
+    }
 }

@@ -21,6 +21,7 @@
 
             <audio elementid ="1" startsequence="2" endsequence="1" duration="1">
                 <path>projectResources/sampleFiles/example.mp3</path>
+                <autoplay>true</autoplay>
                 <loop>true</loop>
                 <starttime>0</starttime>
                 <endtime>1</endtime>
