@@ -75,7 +75,7 @@ public class PresentationPanel extends PreviewPanel {
 
         try {
             if(isLive) {
-                setText(getText() + " (live)");
+                setText("Title: " + this.presentation.getDocumentTitle() + " (live)");
 
             } else {
                 setText("Title: " + this.presentation.getDocumentTitle());
