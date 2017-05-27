@@ -1,6 +1,6 @@
 package com.i2lp.edi.client.utilities;
 
-import com.i2lp.edi.client.dashboard.Classroom;
+import com.i2lp.edi.client.dashboard.Module;
 
 import java.util.List;
 
@@ -8,7 +8,7 @@ import java.util.List;
  * Created by Kacper on 2017-05-26.
  */
 @SuppressWarnings("Duplicates")
-public enum ClassroomSortKey {
+public enum ModuleSortKey {
     NAME_AZ,
     NAME_ZA,
     SUBJECT_AZ,
@@ -36,7 +36,7 @@ public enum ClassroomSortKey {
         }
     }
 
-    public static void copyAllToList(List<ClassroomSortKey> list) {
+    public static void copyAllToList(List<ModuleSortKey> list) {
         list.add(NAME_AZ);
         list.add(NAME_ZA);
         list.add(SUBJECT_AZ);
@@ -45,29 +45,29 @@ public enum ClassroomSortKey {
         list.add(NO_OF_PRES_DESC);
     }
 
-    public int compare(Classroom classroom1, Classroom classroom2) {
+    public int compare(Module module1, Module module2) {
         try {
             switch (this) {
                 case NAME_AZ:
-                    return classroom1.getModuleName().compareToIgnoreCase(classroom2.getModuleName());
+                    return module1.getModuleName().compareToIgnoreCase(module2.getModuleName());
                 case NAME_ZA:
-                    return -classroom1.getModuleName().compareToIgnoreCase(classroom2.getModuleName());
+                    return -module1.getModuleName().compareToIgnoreCase(module2.getModuleName());
                 case SUBJECT_AZ:
-                    return classroom1.getSubject().getSubjectName().compareToIgnoreCase(classroom2.getSubject().getSubjectName());
+                    return module1.getSubject().getSubjectName().compareToIgnoreCase(module2.getSubject().getSubjectName());
                 case SUBJECT_ZA:
-                    return -classroom1.getSubject().getSubjectName().compareToIgnoreCase(classroom2.getSubject().getSubjectName());
+                    return -module1.getSubject().getSubjectName().compareToIgnoreCase(module2.getSubject().getSubjectName());
                 case NO_OF_PRES_ASC:
-                    if(classroom1.getPresentations().size() < classroom2.getPresentations().size()) {
+                    if(module1.getPresentations().size() < module2.getPresentations().size()) {
                         return -1;
-                    } else if(classroom1.getPresentations().size() > classroom2.getPresentations().size()){
+                    } else if(module1.getPresentations().size() > module2.getPresentations().size()){
                         return 1;
                     } else {
                         return 0;
                     }
                 case NO_OF_PRES_DESC:
-                    if(classroom1.getPresentations().size() < classroom2.getPresentations().size()) {
+                    if(module1.getPresentations().size() < module2.getPresentations().size()) {
                         return 1;
-                    } else if(classroom1.getPresentations().size() > classroom2.getPresentations().size()){
+                    } else if(module1.getPresentations().size() > module2.getPresentations().size()){
                         return -1;
                     } else {
                         return 0;

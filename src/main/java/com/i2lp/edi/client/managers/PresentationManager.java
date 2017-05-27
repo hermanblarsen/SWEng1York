@@ -179,8 +179,9 @@ public abstract class PresentationManager {
         }
     }
 
-    public void openPresentation(String path, Boolean thumbnailGen) {
-        loadPresentation(path);
+    public void openPresentation(Presentation presentation, Boolean thumbnailGen) {
+        this.presentationElement = presentation;
+        assignAttributes(presentationElement);
         presentationStage.setTitle(presentationElement.getDocumentTitle());
         slideNumber.setText("Slide 1 of " + presentationElement.getSlideList().size());
         isThumbnailGen = thumbnailGen;
@@ -364,20 +365,6 @@ public abstract class PresentationManager {
         }
 
         drawPane.setMaxSize(slideWidth, slideHeight);
-    }
-
-    public void loadPresentation(String path) {
-        logger.info("Attempting to load presentation located at: " + path);
-        this.xmlPath = getFileParentDirectory(path);
-
-        ParserXML xmlParser = new ParserXML(path);
-        presentationElement = xmlParser.parsePresentation();
-
-        //TEST PRESENTATION, STOP USING
-        //logger.info("Bypassing file located at: " + path + ", programmatically making tet presentation instead.");
-        //presentationElement = Presentation.generateTestPresentation();  //TODO REMOVE AND STOP USING
-
-        assignAttributes(presentationElement);
     }
 
     @SuppressWarnings("ConstantConditions")

@@ -39,7 +39,8 @@ public class ThumbnailGenerationManager extends PresentationManager {
     private static Logger logger = LoggerFactory.getLogger(ThumbnailGenerationManager.class);
     private File thumbnailFile;
 
-    public void openPresentation(String path, boolean printToggle) {
+    public void openPresentation(Presentation presentation, boolean printToggle) {
+        this.presentationElement = presentation;
         presentationStage = new Stage();
         displayPane = new StackPane();
         //Lower resolution for thumbnails
@@ -55,7 +56,7 @@ public class ThumbnailGenerationManager extends PresentationManager {
         //TODO: Put the stage in the bottom right of the screen
         //TODO a possibility would be to only show it exactly when the snapshot is taken, and then rehide it again - Herman
         presentationStage.toBack();
-        loadPresentation(path);
+        assignAttributes(presentationElement);
     }
 
     @Override
@@ -67,9 +68,9 @@ public class ThumbnailGenerationManager extends PresentationManager {
     @Override
     protected void createCommentPanel() {}//Empty
 
-    public static void generateSlideThumbnails(String presentationPath, boolean savePresentationToPdf) {
+    public static void generateSlideThumbnails(Presentation presentation, boolean savePresentationToPdf) {
         ThumbnailGenerationManager slideGenController = new ThumbnailGenerationManager();
-        slideGenController.openPresentation(presentationPath, savePresentationToPdf);
+        slideGenController.openPresentation(presentation, savePresentationToPdf);
         slideGenController.generateSlideThumbNail(slideGenController, savePresentationToPdf);
         if(savePresentationToPdf) slideGenController.savePresentationToPdf();
     }

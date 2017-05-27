@@ -4,10 +4,11 @@ import com.i2lp.edi.client.Constants;
 import com.i2lp.edi.client.editor.PresentationEditor;
 import com.i2lp.edi.client.managers.*;
 import com.i2lp.edi.client.presentationElements.Presentation;
-import com.i2lp.edi.client.utilities.ClassroomSortKey;
+import com.i2lp.edi.client.utilities.ModuleSortKey;
 import com.i2lp.edi.client.utilities.ParserXML;
 import com.i2lp.edi.client.utilities.PresSortKey;
 import com.i2lp.edi.client.utilities.SubjectSortKey;
+import com.i2lp.edi.server.packets.PresentationMetadata;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.geometry.*;
@@ -57,18 +58,18 @@ public abstract class Dashboard extends Application {
     protected PresentationManager presentationManager;
     protected Stage dashboardStage;
     private PresentationPanel selectedPresPanel;
-    private ClassroomPanel selectedClassroomPanel;
+    private ModulePanel selectedModulePanel;
     protected ArrayList<PresentationPanel> presentationPanels;
-    private ArrayList<ClassroomPanel> classroomPanels;
+    private ArrayList<ModulePanel> modulePanels;
     private ArrayList<SubjectPanel> subjectPanels;
     private FlowPane presentationPanelsFlowPane;
     private VBox subjectPanelsVBox;
     private ComboBox<PresSortKey> presSortCombo;
-    private ComboBox<ClassroomSortKey> classroomSortCombo;
+    private ComboBox<ModuleSortKey> moduleSortCombo;
     private ComboBox<SubjectSortKey> subjectSortCombo;
     private Stage addToServerStage;
     private ArrayList<Presentation> availablePresentations;
-    private ArrayList<Classroom> availableClassrooms;
+    private ArrayList<Module> availableModules;
     private ArrayList<Subject> availableSubjects;
     private boolean isWelcomeTextHidden = false;
     private DashboardState currentState;
@@ -76,8 +77,8 @@ public abstract class Dashboard extends Application {
     private Button addToServerButton;
     private VBox constantControlsVBox, removableControlsVBox, controlsContainerVBox;
     private ScrollPane controlsScroll;
-    private Panel searchPanel, subjectFilterPanel, presSortPanel, classroomSortPanel, subjectSortPanel;
-    private Classroom selectedModule;
+    private Panel searchPanel, subjectFilterPanel, presSortPanel, moduleSortPanel, subjectSortPanel;
+    private Module selectedModule;
 
     protected TextField searchField;
     protected Button showAllButton;
@@ -109,7 +110,7 @@ public abstract class Dashboard extends Application {
 
         updateAvailablePresentations();
 
-        goToState(DashboardState.MODULES);
+        goToState(DashboardState.TOP_LEVEL);
 
         dashboardStage.show();
     }
@@ -119,11 +120,11 @@ public abstract class Dashboard extends Application {
         logger.info("State: " + currentState.name());
 
         if (searchField != null) {
-            if (state == DashboardState.CLASSROOM || state == DashboardState.MODULES)
+            if (state == DashboardState.MODULE || state == DashboardState.TOP_LEVEL)
                 searchField.setText("");
         }
 
-        if (state == DashboardState.MODULES) {
+        if (state == DashboardState.TOP_LEVEL) {
             setSelectedPreviewPanel(selectedPresPanel, false);
         }
 
@@ -165,7 +166,8 @@ public abstract class Dashboard extends Application {
 
                 File file = fileChooser.showOpenDialog(stage);
                 if (file != null) {
-                    launchPresentation(file.getPath());
+                    ParserXML parserXML = new ParserXML(file.getPath());
+                    launchPresentation(parserXML.parsePresentation());
                 } else logger.info("No presentation was selected");
             });
 
@@ -229,9 +231,9 @@ public abstract class Dashboard extends Application {
         topPanel.getChildren().addAll(openPresButton, addToServerButton, platformTitle);
 
         switch (state) {
-            case MODULES:
-            case CLASSROOM:
-            case SEARCH_CLASSROOM:
+            case TOP_LEVEL:
+            case MODULE:
+            case SEARCH_IN_MODULE:
             case SEARCH_ALL:
             default:
                 //Do nothing
@@ -266,7 +268,7 @@ public abstract class Dashboard extends Application {
         presentationPanelsFlowPane.setAlignment(Pos.TOP_CENTER);
 
         switch (state) {
-            case MODULES:
+            case TOP_LEVEL:
                 if (!isWelcomeTextHidden) {
                     StackPane textStackPane = new StackPane();
 
@@ -326,12 +328,12 @@ public abstract class Dashboard extends Application {
                 border.setCenter(searchScrollPane);
                 break;
 
-            case CLASSROOM:
-            case SEARCH_CLASSROOM:
+            case MODULE:
+            case SEARCH_IN_MODULE:
                 Button backButton = new Button("Back to module selection");
                 backButton.getStyleClass().setAll("btn", "btn-default");
                 backButton.setOnAction(event -> {
-                    goToState(DashboardState.MODULES);
+                    goToState(DashboardState.TOP_LEVEL);
                     filterBy(null);
                 });
                 Text moduleText = new Text(selectedModule.getSubject().getSubjectName() + " -> " + selectedModule.getModuleName());
@@ -451,18 +453,18 @@ public abstract class Dashboard extends Application {
             BorderPane.setMargin(presSortCombo, panelInsets);
         }
 
-        if (classroomSortPanel == null) {
-            //Setup panel for classroom sorting
-            classroomSortPanel = new Panel("Sort modules by");
-            classroomSortPanel.getStyleClass().add("panel-primary");
-            classroomSortCombo = new ComboBox<>();
-            classroomSortCombo.setMaxWidth(Double.MAX_VALUE);
-            ClassroomSortKey.copyAllToList(classroomSortCombo.getItems());
-            classroomSortCombo.setOnAction(event -> sortClassrooms(classroomSortCombo.getValue()));
-            classroomSortCombo.setValue(classroomSortCombo.getItems().get(0));
-            sortClassrooms(classroomSortCombo.getItems().get(0));
-            classroomSortPanel.setCenter(classroomSortCombo);
-            BorderPane.setMargin(classroomSortCombo, panelInsets);
+        if (moduleSortPanel == null) {
+            //Setup panel for module sorting
+            moduleSortPanel = new Panel("Sort modules by");
+            moduleSortPanel.getStyleClass().add("panel-primary");
+            moduleSortCombo = new ComboBox<>();
+            moduleSortCombo.setMaxWidth(Double.MAX_VALUE);
+            ModuleSortKey.copyAllToList(moduleSortCombo.getItems());
+            moduleSortCombo.setOnAction(event -> sortModules(moduleSortCombo.getValue()));
+            moduleSortCombo.setValue(moduleSortCombo.getItems().get(0));
+            sortModules(moduleSortCombo.getItems().get(0));
+            moduleSortPanel.setCenter(moduleSortCombo);
+            BorderPane.setMargin(moduleSortCombo, panelInsets);
         }
 
         if (subjectSortPanel == null) {
@@ -480,13 +482,13 @@ public abstract class Dashboard extends Application {
         }
 
         switch (state) {
-            case MODULES:
+            case TOP_LEVEL:
                 searchPanel.setText("Search");
                 removableControlsVBox.getChildren().clear();
-                removableControlsVBox.getChildren().addAll(subjectFilterPanel, subjectSortPanel, classroomSortPanel);
+                removableControlsVBox.getChildren().addAll(subjectFilterPanel, subjectSortPanel, moduleSortPanel);
                 break;
-            case CLASSROOM:
-            case SEARCH_CLASSROOM:
+            case MODULE:
+            case SEARCH_IN_MODULE:
                 searchPanel.setText("Search in " + selectedModule.getModuleName());
                 removableControlsVBox.getChildren().clear();
                 removableControlsVBox.getChildren().add(presSortPanel);
@@ -494,7 +496,7 @@ public abstract class Dashboard extends Application {
             case SEARCH_ALL:
                 searchPanel.setText("Search");
                 removableControlsVBox.getChildren().clear();
-                removableControlsVBox.getChildren().addAll(subjectFilterPanel, subjectSortPanel, classroomSortPanel, presSortPanel);
+                removableControlsVBox.getChildren().addAll(subjectFilterPanel, subjectSortPanel, moduleSortPanel, presSortPanel);
                 break;
 
             default:
@@ -504,13 +506,13 @@ public abstract class Dashboard extends Application {
 
     private void displayBorderRight(DashboardState state) {
         switch (state) {
-            case MODULES:
+            case TOP_LEVEL:
             case SEARCH_ALL:
                 border.setRight(null);
                 break;
 
-            case CLASSROOM:
-            case SEARCH_CLASSROOM:
+            case MODULE:
+            case SEARCH_IN_MODULE:
                 if (selectedPresPanel != null) {
                     VBox parentBox = new VBox(2);
                     parentBox.setPadding(new Insets(5));
@@ -554,10 +556,10 @@ public abstract class Dashboard extends Application {
         else
             availablePresentations.clear();
 
-        if (availableClassrooms == null)
-            availableClassrooms = new ArrayList<>();
+        if (availableModules == null)
+            availableModules = new ArrayList<>();
         else
-            availableClassrooms.clear();
+            availableModules.clear();
 
         if (availableSubjects == null)
             availableSubjects = new ArrayList<>();
@@ -567,40 +569,34 @@ public abstract class Dashboard extends Application {
         ArrayList<String> modules = new ArrayList<>();
         ArrayList<String> subjects = new ArrayList<>();
 
+
         for (int i = 0; i < ediManager.getPresentationLibraryManager().getLocalPresentationList().size(); i++) {
-            Integer presentationID = ediManager.getPresentationLibraryManager().getLocalPresentationList().get(i).getPresentationID();
-            String moduleName = ediManager.getPresentationLibraryManager().getLocalPresentationList().get(i).getModuleName();
-            String subjectName = ediManager.getPresentationLibraryManager().getLocalPresentationList().get(i).getSubjectName();
-            boolean isLive = ediManager.getPresentationLibraryManager().getLocalPresentationList().get(i).getLive();
-            String presentationDocumentID = ediManager.getPresentationLibraryManager().getLocalPresentationList().get(i).getDocumentID();
-
-            String presentationPath = PRESENTATIONS_PATH + presentationDocumentID + File.separator + presentationDocumentID + ".xml";
-            ParserXML parser = new ParserXML(presentationPath);
+            PresentationMetadata serverSideDetails = ediManager.getPresentationLibraryManager().getLocalPresentationList().get(i);
+            ParserXML parser = new ParserXML(PRESENTATIONS_PATH + serverSideDetails.getDocumentID() + File.separator + serverSideDetails.getDocumentID() + ".xml");
             Presentation presentation = parser.parsePresentation();
-            presentation.setLive(isLive);
-            presentation.setPresentationID(presentationID);
+            presentation.setPresentationMetadata(serverSideDetails);
 
-            if (!modules.contains(moduleName)) {
-                if (!subjects.contains(subjectName)) {
-                    modules.add(moduleName);
-                    subjects.add(subjectName);
-                    Subject subject = new Subject(subjectName, availableSubjects);
-                    Classroom classroom = new Classroom(subject, moduleName, availableClassrooms);
-                    subject.addClassroom(classroom);
-                    classroom.addPresentation(presentation);
+            if (!modules.contains(serverSideDetails.getModuleName())) {
+                if (!subjects.contains(serverSideDetails.getSubjectName())) {
+                    modules.add(serverSideDetails.getModuleName());
+                    subjects.add(serverSideDetails.getSubjectName());
+                    Subject subject = new Subject(serverSideDetails.getSubjectName(), availableSubjects);
+                    Module module = new Module(subject, serverSideDetails.getModuleName(), availableModules);
+                    subject.addModule(module);
+                    module.addPresentation(presentation);
                 } else {
                     for (Subject subject : availableSubjects) {
-                        if (subject.getSubjectName().equals(subjectName)) {
-                            Classroom classroom = new Classroom(subject, moduleName, availableClassrooms);
-                            subject.addClassroom(classroom);
-                            classroom.addPresentation(presentation);
+                        if (subject.getSubjectName().equals(serverSideDetails.getSubjectName())) {
+                            Module module = new Module(subject, serverSideDetails.getModuleName(), availableModules);
+                            subject.addModule(module);
+                            module.addPresentation(presentation);
                         }
                     }
                 }
             } else {
-                for (Classroom classroom : availableClassrooms) {
-                    if (classroom.getModuleName().equals(moduleName)) {
-                        classroom.addPresentation(presentation);
+                for (Module module : availableModules) {
+                    if (module.getModuleName().equals(serverSideDetails.getModuleName())) {
+                        module.addPresentation(presentation);
                         break;
                     }
                 }
@@ -610,7 +606,7 @@ public abstract class Dashboard extends Application {
         }
 
         setupSubjectPanels();
-        setupClassroomPanels();
+        setupModulePanels();
         setupPresentationPanels();
     }
 
@@ -624,73 +620,40 @@ public abstract class Dashboard extends Application {
             SubjectPanel subjectPanel = new SubjectPanel(subject, subjectPanelsVBox);
             subjectPanels.add(subjectPanel);
         }
+
+        if (subjectSortCombo != null)
+            sortSubjects(subjectSortCombo.getValue());
     }
 
-    private void setupClassroomPanels() {
-        if (classroomPanels == null)
-            classroomPanels = new ArrayList<>();
+    private void setupModulePanels() {
+        if (modulePanels == null)
+            modulePanels = new ArrayList<>();
         else
-            classroomPanels.clear();
+            modulePanels.clear();
 
-//        if(subjectPanels == null)
-//            subjectPanels = new ArrayList<>();
-//        else
-//            subjectPanels.clear();
-//
-//        ArrayList<String> subjects = new ArrayList<>();
-//
-//        for(Classroom classroom : availableClassrooms) {
-//            String subjectName = classroom.getSubject();
-//            SubjectPanel subjectPanel = new SubjectPanel(new Subject(subjectName, classroom), null);
-//
-//            if(!subjects.contains(subjectName)) {
-//                subjects.add(subjectName);
-//                Subject subject = new Subject(subjectName, classroom);
-//                availableSubjects.add(subject);
-//                subjectPanel = new SubjectPanel(subject, subjectPanelsVBox);
-//                subjectPanels.add(subjectPanel);
-//            } else {
-//                for(Node node : subjectPanelsVBox.getChildren()) {
-//                    if(((SubjectPanel)node).getSubject().equals(subjectName)) {
-//                        subjectPanel = (SubjectPanel) node;
-//                        break;
-//                    }
-//                }
-//            }
-//
-//            ClassroomPanel classroomPanel = new ClassroomPanel(subjectPanel.getClassroomPanelsHBox(), classroom);
-//            classroomPanel.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
-//                if (event.getButton() == MouseButton.PRIMARY) {
-//                    if (classroomPanel.isSelected()) {
-//                        goToState(DashboardState.CLASSROOM);
-//                    } else {
-//                        setSelectedPreviewPanel(classroomPanel, true);
-//                    }
-//                }
-//            });
-//            classroomPanels.add(classroomPanel);
-//        }
-
-        for (Classroom classroom : availableClassrooms) {
+        for (Module module : availableModules) {
             SubjectPanel matchingSubjectPanel;
             for (SubjectPanel subjectPanel : subjectPanels) {
-                if (subjectPanel.getSubject().equals(classroom.getSubject())) {
+                if (subjectPanel.getSubject().equals(module.getSubject())) {
                     matchingSubjectPanel = subjectPanel;
-                    ClassroomPanel classroomPanel = new ClassroomPanel(classroom, matchingSubjectPanel.getClassroomPanelsHBox());
-                    classroomPanel.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
+                    ModulePanel modulePanel = new ModulePanel(module, matchingSubjectPanel.getModulePanelsHBox());
+                    modulePanel.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
                         if (event.getButton() == MouseButton.PRIMARY) {
-                            if (classroomPanel.isSelected()) {
-                                goToState(DashboardState.CLASSROOM);
+                            if (modulePanel.isSelected()) {
+                                goToState(DashboardState.MODULE);
                             } else {
-                                setSelectedPreviewPanel(classroomPanel, true);
+                                setSelectedPreviewPanel(modulePanel, true);
                             }
                         }
                     });
-                    classroomPanels.add(classroomPanel);
+                    modulePanels.add(modulePanel);
                     break;
                 }
             }
         }
+
+        if (moduleSortCombo != null)
+            sortModules(moduleSortCombo.getValue());
     }
 
     public void setupPresentationPanels() {
@@ -704,7 +667,7 @@ public abstract class Dashboard extends Application {
             presentationPanel.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
                 if (event.getButton() == MouseButton.PRIMARY) {
                     if (presentationPanel.isSelected()) {
-                        launchPresentation(presentationPanel.getPresentation().getPath());
+                        launchPresentation(presentationPanel.getPresentation());
                     } else {
                         setSelectedPreviewPanel(presentationPanel, true);
                     }
@@ -714,7 +677,7 @@ public abstract class Dashboard extends Application {
                     ContextMenu cMenu = new ContextMenu();
 
                     MenuItem open = new MenuItem("Open");
-                    open.setOnAction(openEvent -> launchPresentation(presentationPanel.getPresentation().getPath()));
+                    open.setOnAction(openEvent -> launchPresentation(presentationPanel.getPresentation()));
                     cMenu.getItems().add(open);
 
                     if (this instanceof TeacherDashboard) {
@@ -735,7 +698,7 @@ public abstract class Dashboard extends Application {
                         cMenu.getItems().add(delete);
 
                         MenuItem print = new MenuItem("Print");
-                        print.setOnAction(printEvent -> printPresentation(presentationPanel.getPresentation().getPath()));
+                        print.setOnAction(printEvent -> printPresentation(presentationPanel.getPresentation()));
                         cMenu.getItems().add(print);
 
                         MenuItem report = new MenuItem("Report");
@@ -751,6 +714,9 @@ public abstract class Dashboard extends Application {
 
         if (presSortCombo != null)
             sortPresentations(presSortCombo.getValue());
+
+        if (selectedModule != null)
+            filterBy(selectedModule);
     }
 
     private void toggleLive(PresentationPanel presPanel) {
@@ -780,25 +746,25 @@ public abstract class Dashboard extends Application {
                     selectedPresPanel.setSelected(false);
                 }
                 selectedPresPanel = (PresentationPanel) previewPanel;
-                setSelectedPreviewPanel(selectedClassroomPanel, false);
+                setSelectedPreviewPanel(selectedModulePanel, false);
             } else {
                 previewPanel.setSelected(false);
                 selectedPresPanel = null;
             }
 
-            displayBorderRight(DashboardState.CLASSROOM);
-        } else if (previewPanel instanceof ClassroomPanel) {
+            displayBorderRight(DashboardState.MODULE);
+        } else if (previewPanel instanceof ModulePanel) {
             if (setSelected) {
                 previewPanel.setSelected(true);
-                if (selectedClassroomPanel != null) {
-                    selectedClassroomPanel.setSelected(false);
+                if (selectedModulePanel != null) {
+                    selectedModulePanel.setSelected(false);
                 }
-                selectedClassroomPanel = (ClassroomPanel) previewPanel;
-                selectedModule = selectedClassroomPanel.getClassroom();
+                selectedModulePanel = (ModulePanel) previewPanel;
+                selectedModule = selectedModulePanel.getModule();
                 setSelectedPreviewPanel(selectedPresPanel, false);
             } else {
                 previewPanel.setSelected(false);
-                selectedClassroomPanel = null;
+                selectedModulePanel = null;
             }
         }
     }
@@ -827,7 +793,7 @@ public abstract class Dashboard extends Application {
         MenuItem showWelcomeMessage = new MenuItem("Show Welcome Message");
         showWelcomeMessage.setOnAction(event -> {
             isWelcomeTextHidden = false;
-            goToState(DashboardState.MODULES);
+            goToState(DashboardState.TOP_LEVEL);
         });
         viewMenu.getItems().add(showWelcomeMessage);
 
@@ -870,11 +836,10 @@ public abstract class Dashboard extends Application {
     /**
      * Helper method to launch correct Presentation manager dependent upon current object type
      *
-     * @param path Path to presentation
+     * @param presentation Presentation to open
      * @author Amrik Sadhra
      */
-    private void launchPresentation(String path) {
-
+    private void launchPresentation(Presentation presentation) {
         if (presentationManager != null)
             presentationManager.close();
 
@@ -883,20 +848,20 @@ public abstract class Dashboard extends Application {
         } else if (this instanceof TeacherDashboard) {
             presentationManager = new PresentationManagerTeacher();
         }
-        presentationManager.openPresentation(path, false);
+        presentationManager.openPresentation(presentation, false);
     }
 
     private void search(String text) { //TODO: show author & tags when found?
         if (text.equals("")) {
-            if (currentState == DashboardState.SEARCH_CLASSROOM) {
-                goToState(DashboardState.CLASSROOM);
+            if (currentState == DashboardState.SEARCH_IN_MODULE) {
+                goToState(DashboardState.MODULE);
             } else if (currentState == DashboardState.SEARCH_ALL) {
-                goToState(DashboardState.MODULES);
+                goToState(DashboardState.TOP_LEVEL);
             }
         } else {
-            if (currentState == DashboardState.CLASSROOM) {
-                goToState(DashboardState.SEARCH_CLASSROOM);
-            } else if (currentState == DashboardState.MODULES) {
+            if (currentState == DashboardState.MODULE) {
+                goToState(DashboardState.SEARCH_IN_MODULE);
+            } else if (currentState == DashboardState.TOP_LEVEL) {
                 goToState(DashboardState.SEARCH_ALL);
             }
         }
@@ -908,15 +873,15 @@ public abstract class Dashboard extends Application {
             }
         }
 
-        for (ClassroomPanel panel : classroomPanels) {
+        for (ModulePanel panel : modulePanels) {
             panel.search(text);
-            if (panel == selectedClassroomPanel && panel.isHidden()) {
+            if (panel == selectedModulePanel && panel.isHidden()) {
                 setSelectedPreviewPanel(panel, false);
             }
         }
 
         sortSubjects(subjectSortCombo.getValue());
-        sortClassrooms(classroomSortCombo.getValue());
+        sortModules(moduleSortCombo.getValue());
         sortPresentations(presSortCombo.getValue());
 
 
@@ -950,8 +915,8 @@ public abstract class Dashboard extends Application {
                         panel.setFiltered(true);
                 }
 
-                for (ClassroomPanel panel : classroomPanels) {
-                    if (subject.equals(panel.getClassroom().getSubject()))
+                for (ModulePanel panel : modulePanels) {
+                    if (subject.equals(panel.getModule().getSubject()))
                         panel.setFiltered(false);
                     else
                         panel.setFiltered(true);
@@ -963,18 +928,18 @@ public abstract class Dashboard extends Application {
                     else
                         panel.setFiltered(true);
                 }
-            } else if (filter instanceof Classroom) {
-                Classroom classroom = (Classroom) filter;
+            } else if (filter instanceof Module) {
+                Module module = (Module) filter;
 
                 for (PresentationPanel panel : presentationPanels) {
-                    if (classroom.equals(panel.getPresentation().getClassroom()))
+                    if (module.equals(panel.getPresentation().getModule()))
                         panel.setFiltered(false);
                     else
                         panel.setFiltered(true);
                 }
 
-                for (ClassroomPanel panel : classroomPanels) {
-                    if (classroom.equals(panel.getClassroom()))
+                for (ModulePanel panel : modulePanels) {
+                    if (module.equals(panel.getModule()))
                         panel.setFiltered(false);
                     else
                         panel.setFiltered(true);
@@ -985,7 +950,7 @@ public abstract class Dashboard extends Application {
                 panel.setFiltered(false);
             }
 
-            for(ClassroomPanel panel : classroomPanels) {
+            for(ModulePanel panel : modulePanels) {
                 panel.setFiltered(false);
             }
 
@@ -993,6 +958,10 @@ public abstract class Dashboard extends Application {
                 panel.setFiltered(false);
             }
         }
+
+        sortSubjects(subjectSortCombo.getValue());
+        sortModules(moduleSortCombo.getValue());
+        sortPresentations(presSortCombo.getValue());
     }
 
     private void sortPresentations(PresSortKey sortKey) {
@@ -1004,14 +973,14 @@ public abstract class Dashboard extends Application {
         }
     }
 
-    private void sortClassrooms(ClassroomSortKey sortKey) {
-        classroomPanels.sort((c1, c2) -> sortKey.compare(c1.getClassroom(), c2.getClassroom()));
+    private void sortModules(ModuleSortKey sortKey) {
+        modulePanels.sort((m1, m2) -> sortKey.compare(m1.getModule(), m2.getModule()));
 
         for (SubjectPanel panel : subjectPanels) {
-            panel.getClassroomPanelsHBox().getChildren().clear();
+            panel.getModulePanelsHBox().getChildren().clear();
         }
 
-        for (ClassroomPanel panel : classroomPanels) {
+        for (ModulePanel panel : modulePanels) {
             panel.updateVisibility();
         }
     }
@@ -1062,8 +1031,8 @@ public abstract class Dashboard extends Application {
         new PresentationEditor(presentationPath);
     }
 
-    private void printPresentation(String presentationPath) {
-        ThumbnailGenerationManager.generateSlideThumbnails(presentationPath, true);
+    private void printPresentation(Presentation presentation) {
+        ThumbnailGenerationManager.generateSlideThumbnails(presentation, true);
     }
 
     private void showReport(String presentationID) {

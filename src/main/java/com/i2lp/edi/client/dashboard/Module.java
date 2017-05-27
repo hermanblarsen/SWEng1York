@@ -3,22 +3,21 @@ package com.i2lp.edi.client.dashboard;
 import com.i2lp.edi.client.presentationElements.Presentation;
 
 import java.util.ArrayList;
-import java.util.Random;
 
 /**
  * Created by Kacper on 2017-05-25.
  */
-public class Classroom {
+public class Module {
 
     private final String moduleName;
     private ArrayList<Presentation> presentations;
     private Subject subject;
 
-    public Classroom(Subject subject, String moduleName, ArrayList<Classroom> availableClassrooms) {
+    public Module(Subject subject, String moduleName, ArrayList<Module> availableModules) {
         this.moduleName = moduleName;
         this.subject = subject;
         presentations = new ArrayList<>();
-        availableClassrooms.add(this);
+        availableModules.add(this);
     }
 
     public String getModuleName() { return moduleName; }
@@ -27,7 +26,7 @@ public class Classroom {
 
     public void addPresentation(Presentation presentation) {
         presentations.add(presentation);
-        presentation.setClassroom(this);
+        presentation.setModule(this);
     }
 
     public Subject getSubject() { return subject; }
