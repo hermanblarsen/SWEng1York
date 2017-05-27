@@ -7,6 +7,7 @@ import com.impossibl.postgres.api.jdbc.PGConnection;
 import com.impossibl.postgres.jdbc.PGDataSource;
 import io.socket.client.IO;
 import io.socket.client.Socket;
+import javafx.application.Platform;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -161,18 +162,19 @@ public class SocketClient {
                 break;
 
             case "presentations":
+                logger.info("Presentations database changed!");
                 //Update presentation list whilst no presentation is live
                 if (ediManager.getPresentationManager() == null) {
                     ediManager.getPresentationLibraryManager().updatePresentations(); //Update presentation information
                 } else {
-                    if (ediManager.getUserData().equals("student")) {
+                    if (ediManager.getUserData().getUserType().equals("student")) {
                         if (ediManager.getPresentationManager().getPresentationElement().getServerSideDetails().getLive()) {
                             //TODO: Only do this If current slide number has changed
                             int current_slide_number = getCurrentSlideForPresentation(ediManager.getPresentationManager().getPresentationElement().getServerSideDetails().getPresentationID());
                             //TODO: Enable undocking (unsync?) of Teacher/Student slide movement using UI object
                             if (ediManager.getPresentationManager().getCurrentSlideNumber() != current_slide_number) {
                                 //If the current slide number has changed, move to it
-                                ediManager.getPresentationManager().goToSlide(current_slide_number);
+                                Platform.runLater(() -> ediManager.getPresentationManager().goToSlide(current_slide_number));
                             }
                         }
                     }

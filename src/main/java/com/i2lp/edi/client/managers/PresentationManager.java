@@ -95,7 +95,6 @@ public abstract class PresentationManager {
     protected double slideHeight;
 
 
-
     protected int currentSlideNumber = 0; //Current slide number in presentation
     protected int currentSequenceNumber = 0; //Current sequence number in presentation (total)
     private boolean isMouseOverSlide = true;
@@ -116,7 +115,11 @@ public abstract class PresentationManager {
         presentationStage.getIcons().add(ediLogoSmall);
         presentationStage.setMinWidth(STAGE_MIN_WIDTH);
         presentationStage.setMinHeight(STAGE_MIN_HEIGHT);
-        presentationStage.setOnCloseRequest(event -> destroyAllElements());
+        presentationStage.setOnCloseRequest(event -> {
+            destroyAllElements();
+            close();
+        });
+
 
         sceneBox = new VBox();
         sceneBox.addEventHandler(MouseEvent.MOUSE_PRESSED, event -> {
@@ -388,7 +391,6 @@ public abstract class PresentationManager {
 
     @SuppressWarnings("ConstantConditions")
     private void controlPresentation(int direction) {
-
 
 
         int presentationStatus = slideAdvance(presentationElement, direction);

@@ -23,7 +23,7 @@ public class PresentationSession {
 
     public void endSession(){
         endDate = new Date();
-        logger.info("Live Presentation session ending. Presentation lasted " + (int)((endDate.getTime() - startDate.getTime()) / 1000) + "seconds.");
+        logger.info("Live Presentation session ending. Presentation lasted " + (int)((endDate.getTime() - startDate.getTime()) / 1000) + " seconds.");
     }
 
     ArrayList<User> activeUsers;
