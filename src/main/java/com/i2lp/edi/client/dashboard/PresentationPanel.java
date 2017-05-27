@@ -73,11 +73,15 @@ public class PresentationPanel extends PreviewPanel {
     public void updateVisibility() {
         super.updateVisibility();
 
-        if(isLive) {
-            setText(getText() + " (live)");
+        try {
+            if(isLive) {
+                setText(getText() + " (live)");
 
-        } else {
-            setText("Title: " + this.presentation.getDocumentTitle());
+            } else {
+                setText("Title: " + this.presentation.getDocumentTitle());
+            }
+        } catch (NullPointerException e) {
+            //Do nothing
         }
     }
 }
