@@ -138,6 +138,7 @@ public class PresentationLibraryManager {
                 ReadableByteChannel rbc = Channels.newChannel(website.openStream());
                 FileOutputStream fos = new FileOutputStream(tempDir.getAbsolutePath() + File.separator + toDownload.getDocumentID() + ".zip");
                 fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
+                fos.close();
             } catch (IOException e) {
                 logger.error("Unable to download presentation " + toDownload.getDocumentID() + "!");
                 return;

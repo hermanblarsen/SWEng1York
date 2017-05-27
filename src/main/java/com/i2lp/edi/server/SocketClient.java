@@ -151,9 +151,9 @@ public class SocketClient {
 
             case "users":
                 logger.info("Users database changed!");
-                if(ediManager.getUserData().getUserType() == "teacher"){
-                    if(ediManager.getPresentationManager() != null){
-                        if(ediManager.getPresentationManager().getPresentationElement().getServerSideDetails().getLive()){
+                if (ediManager.getUserData().getUserType().equals("teacher")) {
+                    if (ediManager.getPresentationManager() != null) {
+                        if (ediManager.getPresentationManager().getPresentationElement().getServerSideDetails().getLive()) {
                             ediManager.getPresentationManager().getPresentationSession().setActiveUsers(getPresentationActiveUsers(ediManager.getPresentationManager().getPresentationElement().getServerSideDetails().getPresentationID()));
                         }
                     }
@@ -161,8 +161,22 @@ public class SocketClient {
                 break;
 
             case "presentations":
-                logger.info("Presentation library database changed!");
-                ediManager.getPresentationLibraryManager().updatePresentations(); //Update presentation information
+                //Update presentation list whilst no presentation is live
+                if (ediManager.getPresentationManager() == null) {
+                    ediManager.getPresentationLibraryManager().updatePresentations(); //Update presentation information
+                } else {
+                    if (ediManager.getUserData().equals("student")) {
+                        if (ediManager.getPresentationManager().getPresentationElement().getServerSideDetails().getLive()) {
+                            //TODO: Only do this If current slide number has changed
+                            int current_slide_number = getCurrentSlideForPresentation(ediManager.getPresentationManager().getPresentationElement().getServerSideDetails().getPresentationID());
+                            //TODO: Enable undocking (unsync?) of Teacher/Student slide movement using UI object
+                            if (ediManager.getPresentationManager().getCurrentSlideNumber() != current_slide_number) {
+                                //If the current slide number has changed, move to it
+                                ediManager.getPresentationManager().goToSlide(current_slide_number);
+                            }
+                        }
+                    }
+                }
                 break;
 
             case "jnct_users_modules":
@@ -418,10 +432,8 @@ public class SocketClient {
             //Call stored procedure on database
             ResultSet rs = statement.executeQuery();
 
-            //TODO: Log this
             while (rs.next()) {
                 modulesForUser.add(new Module(rs.getInt("module_id"), rs.getString("description"), rs.getString("subject"), rs.getTime("time_last_updated"), rs.getTimestamp("time_created"), rs.getString("module_name")));
-
             }
 
             statement.close();
@@ -446,7 +458,8 @@ public class SocketClient {
     }
 
     /**
-     *  Delete the requested presentation from the respective module, deleting the data base table reference and the server zip contents
+     * Delete the requested presentation from the respective module, deleting the data base table reference and the server zip contents
+     *
      * @param presentationID
      * @param moduleID
      * @return
@@ -486,7 +499,7 @@ public class SocketClient {
         return return_status_removal;
     }
 
-    public ArrayList<Interaction> getInteractionsForInteractiveElement(int interactiveElementID){
+    public ArrayList<Interaction> getInteractionsForInteractiveElement(int interactiveElementID) {
         ArrayList<Interaction> interactionsForElement = new ArrayList<>();
 
         //Attempt to add a user using stored procedure
@@ -523,7 +536,7 @@ public class SocketClient {
             //Call stored procedure on database
             statementSuccess = statement.execute();
 
-            if(statementSuccess){
+            if (statementSuccess) {
                 logger.error("Unable to set presentation live. Connectivity issues may have been encountered.");
             } else {
                 logger.info("Presentation successfully set to live.");
@@ -537,7 +550,7 @@ public class SocketClient {
         return statementSuccess;
     }
 
-    public ArrayList<User> getPresentationActiveUsers(int presentationID){
+    public ArrayList<User> getPresentationActiveUsers(int presentationID) {
         ArrayList<User> activeUsers = new ArrayList<>();
 
         try (PGConnection connection = (PGConnection) dataSource.getConnection()) {
@@ -551,12 +564,12 @@ public class SocketClient {
 
             int size = 0;
 
-            while(rs.next()){
-                activeUsers.add(new User(rs.getInt("user_id"), rs.getString("first_name"), rs.getString("second_name"), rs.getString("email_address"), rs.getString("user_type")));
+            while (rs.next()) {
+                activeUsers.add(new User(rs.getInt("user_id"), rs.getString("first_name"), rs.getString("last_name"), rs.getString("email_address"), rs.getString("user_type")));
                 size++;
             }
 
-            if(size == 0){
+            if (size == 0) {
                 logger.warn("No users active for presentationID: " + presentationID);
             }
 
@@ -568,7 +581,57 @@ public class SocketClient {
         return activeUsers;
     }
 
-    public boolean setUserActivePresentation(int presentationID, int userID){
+    public boolean setCurrentSlideForPresentation(int presentationID, int currentSlide) {
+        boolean statementSuccess = false;
+        try (PGConnection connection = (PGConnection) dataSource.getConnection()) {
+            PreparedStatement statement = connection.prepareStatement("UPDATE presentations SET current_slide_number = ? WHERE presentation_id = ?;");
+
+            //Fill prepared statements to avoid SQL injection
+            statement.setInt(1, currentSlide);
+            statement.setInt(2, presentationID);
+
+            //Call stored procedure on database
+            statementSuccess = statement.execute();
+
+            if (statementSuccess) {
+                logger.error("Unable to set current slide number.");
+            } else {
+                logger.info("Successfully changed current slide number.");
+            }
+
+            statement.close();
+        } catch (Exception e) {
+            logger.error("Unable to connect to PostgreSQL on port 5432. PJDBC dump:", e);
+        }
+
+        return statementSuccess;
+    }
+
+    public int getCurrentSlideForPresentation(int presentationID) {
+        int currentSlide = 0;
+
+        try (PGConnection connection = (PGConnection) dataSource.getConnection()) {
+            PreparedStatement statement = connection.prepareStatement("SELECT current_slide_number FROM presentations WHERE presentation_id = ?;");
+
+            //Fill prepared statements to avoid SQL injection
+            statement.setInt(1, presentationID);
+
+            //Call stored procedure on database
+            ResultSet rs = statement.executeQuery();
+
+            while (rs.next()) {
+                currentSlide = rs.getInt("current_slide_number");
+            }
+
+            statement.close();
+        } catch (Exception e) {
+            logger.error("Unable to connect to PostgreSQL on port 5432. PJDBC dump:", e);
+        }
+
+        return currentSlide;
+    }
+
+    public boolean setUserActivePresentation(int presentationID, int userID) {
         boolean statementSuccess = false;
         try (PGConnection connection = (PGConnection) dataSource.getConnection()) {
             PreparedStatement statement = connection.prepareStatement("UPDATE users SET active_presentation_id = ? WHERE user_id = ?;");
@@ -580,7 +643,7 @@ public class SocketClient {
             //Call stored procedure on database
             statementSuccess = statement.execute();
 
-            if(statementSuccess){
+            if (statementSuccess) {
                 logger.error("Unable to set active presentation for user.");
             } else {
                 logger.info("User: " + userID + " is now active in presentation: " + presentationID);

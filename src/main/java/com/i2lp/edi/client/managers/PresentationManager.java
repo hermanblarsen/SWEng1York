@@ -93,6 +93,9 @@ public abstract class PresentationManager {
 
     protected double slideWidth;
     protected double slideHeight;
+
+
+
     protected int currentSlideNumber = 0; //Current slide number in presentation
     protected int currentSequenceNumber = 0; //Current sequence number in presentation (total)
     private boolean isMouseOverSlide = true;
@@ -219,7 +222,7 @@ public abstract class PresentationManager {
         if (presentationElement.getServerSideDetails().getLive()) {
             if (this instanceof PresentationManagerTeacher) {
                 presentationSession = new PresentationSession();
-            } else if (this instanceof PresentationManagerStudent){
+            } else if (this instanceof PresentationManagerStudent) {
                 ediManager.getSocketClient().setUserActivePresentation(ediManager.getPresentationManager().getPresentationElement().getServerSideDetails().getPresentationID(), ediManager.getUserData().getUserID());
             }
         }
@@ -385,6 +388,9 @@ public abstract class PresentationManager {
 
     @SuppressWarnings("ConstantConditions")
     private void controlPresentation(int direction) {
+
+
+
         int presentationStatus = slideAdvance(presentationElement, direction);
 
         if ((direction == Slide.SLIDE_BACKWARD) && isEndPresentation) {
@@ -395,6 +401,12 @@ public abstract class PresentationManager {
         if (presentationStatus == Presentation.SLIDE_CHANGE || presentationStatus == Presentation.PRESENTATION_FINISH || presentationStatus == Presentation.PRESENTATION_START || presentationStatus == Presentation.SLIDE_LAST_ELEMENT) {
             if (presentationStatus == Presentation.SLIDE_CHANGE) {
                 logger.info("Changing Slides");
+                //If we are live, send updated current slide to database
+                if (presentationElement.getServerSideDetails().getLive()) {
+                    if (this instanceof PresentationManagerTeacher) {
+                        ediManager.getSocketClient().setCurrentSlideForPresentation(presentationElement.getServerSideDetails().getPresentationID(), currentSlideNumber);
+                    }
+                }
             } else if (presentationStatus == Presentation.PRESENTATION_START) {
                 logger.info("At Presentation start");
             } else if (presentationStatus == Presentation.PRESENTATION_FINISH) {
@@ -849,10 +861,10 @@ public abstract class PresentationManager {
                 if (this instanceof PresentationManagerTeacher) {
                     //Update Presentation record to offline
                     ediManager.getSocketClient().setPresentationLive(presentationElement.getServerSideDetails().getPresentationID(), false);
-                    //TODO: End Presentation Session
-                } else if (this instanceof PresentationManagerStudent){
+                    //TODO: End Presentation Properly
+                    presentationSession.endSession();
+                } else if (this instanceof PresentationManagerStudent) {
                     //TODO: Do other session termination stuff
-
                     //Set active presentation for user to 0 (no active presentation)
                     ediManager.getSocketClient().setUserActivePresentation(0, ediManager.getUserData().getUserID());
                 }
@@ -1041,5 +1053,9 @@ public abstract class PresentationManager {
 
     public Presentation getPresentationElement() {
         return presentationElement;
+    }
+
+    public int getCurrentSlideNumber() {
+        return currentSlideNumber;
     }
 }
