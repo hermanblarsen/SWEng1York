@@ -151,14 +151,13 @@ public class SocketClient {
 
             case "users":
                 logger.info("Users database changed!");
-                if(ediManager.getUserData().getUserType() == "Teacher"){
+                if(ediManager.getUserData().getUserType() == "teacher"){
                     if(ediManager.getPresentationManager() != null){
                         if(ediManager.getPresentationManager().getPresentationElement().getServerSideDetails().getLive()){
                             ediManager.getPresentationManager().getPresentationSession().setActiveUsers(getPresentationActiveUsers(ediManager.getPresentationManager().getPresentationElement().getServerSideDetails().getPresentationID()));
                         }
                     }
                 }
-                //TODO: Update Local User information
                 break;
 
             case "presentations":

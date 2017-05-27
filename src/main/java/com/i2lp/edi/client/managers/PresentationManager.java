@@ -845,11 +845,10 @@ public abstract class PresentationManager {
     @SuppressWarnings("FinalizeCalledExplicitly")
     public void close() {
         if (ediManager != null) {
-            //Reset EdiManager presentation manager reference to null
-            ediManager.setPresentationManager(null);
-
             if (presentationElement.getServerSideDetails().getLive()) {
                 if (this instanceof PresentationManagerTeacher) {
+                    //Update Presentation record to offline
+                    ediManager.getSocketClient().setPresentationLive(presentationElement.getServerSideDetails().getPresentationID(), false);
                     //TODO: End Presentation Session
                 } else if (this instanceof PresentationManagerStudent){
                     //TODO: Do other session termination stuff
@@ -858,6 +857,9 @@ public abstract class PresentationManager {
                     ediManager.getSocketClient().setUserActivePresentation(0, ediManager.getUserData().getUserID());
                 }
             }
+
+            //Reset EdiManager presentation manager reference to null
+            ediManager.setPresentationManager(null);
         }
         presentationStage.close();
     }
