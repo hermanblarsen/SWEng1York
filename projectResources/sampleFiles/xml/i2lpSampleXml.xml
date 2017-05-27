@@ -21,17 +21,16 @@
             <!--Title-->
             <text elementid ="0" layer="10" startsequence="1">
                 <textcontent>
-                    &lt;h1&gt;Text Slide&lt;/h1&gt;
-                <bordercolour>#ABCDEF</bordercolour>
+                    &lt;h1&gt;Text Slide&lt;/h1&gt;</textcontent>
+                <bordercolour>#ABCDEFFF</bordercolour>
                 <bordersize>5</bordersize>
-                </textcontent>
                 <xposition>0.3</xposition>
                 <yposition>0.05</yposition>
                 <xsize>0.5</xsize>
                 <ysize>0.1</ysize>
             </text>
 
-            <text elementid ="1" layer="1" startsequence="1">
+            <text elementid ="1" layer="1" startsequence="2">
                 <textcontent>
                     &lt;p&gt;Example HTML text input number 1. This is supposed to be a list: &lt;ul&gt;
                     	&lt;li&gt; &lt;i&gt;italic&lt;/i&gt;&lt;/li&gt;
@@ -39,21 +38,27 @@
                 	&lt;/ul&gt;
                 	Furthermore, these characters are illegal in XML: &lt; &gt; &amp; &apos; &quot;, input by and &amp; followed by lt, gt, amp, apos or quot respectively, finally followed by a ';'.&lt;/p&gt;
                 </textcontent>
+				<xposition>0.1</xposition>
+				<yposition>0.3</yposition>
+				<xsize>0.8</xsize>
+				<ysize>0.4</ysize>
             </text>
 
-            <text elementid ="2" layer="2" startsequence="2">
+            <text elementid ="2" layer="2" startsequence="3">
                 <textcontent>
                     &lt;p&gt;Example HTML Number 2! Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.&lt;/p&gt;
                 </textcontent>
                 <xposition>0.1</xposition>
                 <yposition>0.6</yposition>
-                <xsize>0.9</xsize>
+				<bordercolour>#ABCDEF22</bordercolour>
+				<bordersize>15</bordersize>
+                <xsize>0.8</xsize>
                 <ysize>0.4</ysize>
             </text>
 
-            <text elementid ="3" layer="3" startsequence="3">
+            <text elementid ="3" layer="1" startsequence="4">
                 <textcontent>
-                    &lt;h1&gt;Some text on top of the other two, with semi transparent background!. Bigger is better!&lt;/h1&gt;
+                    &lt;h1&gt;Some text on top of everything, with semi transparent background!. Bigger is better!&lt;/h1&gt;
                     &lt;p&gt;Click me to go to Google!&lt;/p&gt;
                 </textcontent>
                 <xposition>0.1</xposition>
@@ -69,22 +74,24 @@
 
             <text elementid ="4" layer="4" startsequence="4">
                 <textcontent>
-                    &lt;h1&gt;Some fully transparent text on top of some of the previous ones!&lt;/h1&gt;
-                    &lt;p&gt;Clicks on me will do nothing!&lt;/p&gt;
+                    &lt;h4&gt;Some fully transparent text on top of everything squared!&lt;/h4&gt;
+                    &lt;p&gt;Clicks on me will do nothing, but I should have a border!&lt;/p&gt;
                 </textcontent>
-                <xposition>0.1</xposition>
+                <xposition>0.4</xposition>
                 <yposition>0.5</yposition>
                 <xsize>0.6</xsize>
                 <ysize>0.2</ysize>
-                <fontsize>12</fontsize>
+                <fontsize>20</fontsize>
                 <fontcolour>#FF0000FF</fontcolour>
                 <bgcolour>#00000000</bgcolour>
+                <bordercolour>#ABCDEFFF</bordercolour>
+                <bordersize>5</bordersize>
             </text>
 		</slide>
 
 
 		<slide slideid="2">
-            <graphic elementid ="0" layer="2" visibility="true" startsequence="3">
+            <graphic elementid ="0" layer="1" visibility="true" startsequence="1">
                 <onclickaction>dynamicmediatoggle</onclickaction>
                 <onclickinfo>3</onclickinfo>
                 <aspectratiolock>true</aspectratiolock>
@@ -98,9 +105,7 @@
                 </polygon>
             </graphic>
 
-			<graphic elementid ="1" layer="2" visibility="false" startsequence="1">
-				<onclickaction>gotoslide</onclickaction>
-				<onclickinfo>1</onclickinfo>
+			<graphic elementid ="1" layer="2" visibility="true" startsequence="2">
 				<aspectratiolock>false</aspectratiolock>
 				<elementaspectratio>1.5</elementaspectratio>
 				<linecolour>#FF000066</linecolour>
@@ -112,9 +117,11 @@
 					<rvertical>0.3</rvertical>
 					<rotation>45</rotation>
 				</oval>
+				<onclickaction>dynamicmediatoggle</onclickaction>
+				<onclickinfo>3</onclickinfo>
 			</graphic>
 
-			<audio elementid ="3" startsequence="2" endsequence="3">
+			<audio elementid ="3" startsequence="3">
 				<path>projectResources/sampleFiles/NeverGonnaGiveYouUp.mp3</path>
 				<loop>true</loop>
 				<autoplay>true</autoplay>
@@ -122,49 +129,83 @@
 				<endtime>15</endtime>
 			</audio>
 
+
+			<text elementid ="4" layer="3" startsequence="3">
+				<textcontent>
+					&lt;h1&gt;Click me to Toggle the Video playing!&lt;/h1&gt;</textcontent>
+				<bordercolour>#ABCDEFFF</bordercolour>
+				<bordersize>5</bordersize>
+				<xposition>0.3</xposition>
+				<yposition>0.6</yposition>
+				<xsize>0.5</xsize>
+				<ysize>0.2</ysize>
+				<onclickaction>dynamicmediatoggle</onclickaction>
+				<onclickinfo>3</onclickinfo>
+			</text>
 		</slide>
+
+
+
+
 		<slide slideid="3">
-			<image elementid ="0" layer="1" visibility="true" startsequence="1" >
+			<image elementid ="0" layer="2" visibility="true" startsequence="1" >
 				<xposition>0.1</xposition>
 				<yposition>0.1</yposition>
 				<xsize>0.8</xsize>
 				<ysize>0.8</ysize>
 				<path>projectResources/logos/ediLogo1000x1000.png</path>
 				<onclickaction>gotoslide</onclickaction>
-				<onclickinfo>2</onclickinfo>
+				<onclickinfo>1</onclickinfo>
 				<opacity>0.3</opacity>
 				<aspectratiolock>true</aspectratiolock>
 				<elementaspectratio>1.0</elementaspectratio>
 			</image>
-			<image elementid ="1" layer="2" visibility="true" startsequence="2">
+			<image elementid ="1" layer="1" visibility="true" startsequence="2">
 				<xposition>0.2</xposition>
 				<yposition>0.2</yposition>
 				<xsize>0.8</xsize>
 				<ysize>0.8</ysize>
 				<path>projectResources/logos/ediLogo1000x1000.png</path>
 				<onclickaction>gotoslide</onclickaction>
-				<onclickinfo>2</onclickinfo>
+				<onclickinfo>3</onclickinfo>
 				<opacity>1</opacity>
 				<aspectratiolock>true</aspectratiolock>
 				<elementaspectratio>1.5</elementaspectratio>
 			</image>
 		</slide>
+
+
+
+
 		<slide slideid="4">
-			<video elementid ="0" layer="1" visibility="true" startsequence="1" endsequence="2">
+			<video elementid ="0" layer="1" visibility="true" startsequence="1">
 				<xposition>0</xposition>
 				<yposition>0</yposition>
 				<xsize>1</xsize>
 				<ysize>1</ysize>
 				<path>projectResources/sampleFiles/prometheus.mp4</path>
-				<onclickaction>openwebsite</onclickaction>
-				<onclickinfo>https://www.google.no/</onclickinfo>
 				<loop>true</loop>
 				<aspectratiolock>true</aspectratiolock>
 				<elementaspectratio>2</elementaspectratio>
 				<autoplay>true</autoplay>
 				<starttime>0</starttime>
 				<endtime>15000</endtime>
+				<onclickaction>openwebsite</onclickaction>
+				<onclickinfo>https://www.google.no/</onclickinfo>
 			</video>
+
+			<text elementid ="1" layer="2" startsequence="1">
+				<textcontent>
+					&lt;h1&gt;Click me to Toggle the Video playing!&lt;/h1&gt;</textcontent>
+				<bordercolour>#ABCDEFFF</bordercolour>
+				<bordersize>5</bordersize>
+				<xposition>0.3</xposition>
+				<yposition>0.6</yposition>
+				<xsize>0.5</xsize>
+				<ysize>0.2</ysize>
+				<onclickaction>dynamicmediatoggle</onclickaction>
+				<onclickinfo>0</onclickinfo>
+			</text>
 		</slide>
 	</slideshow>
 </document>
