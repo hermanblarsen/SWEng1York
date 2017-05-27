@@ -74,9 +74,10 @@ public abstract class Dashboard extends Application {
     private DashboardState currentState;
     private Text noMatchesSubject, noMatchesPres;
     private Button addToServerButton;
-    private VBox controlsVBox;
+    private VBox constantControlsVBox, removableControlsVBox, controlsContainerVBox;
     private ScrollPane controlsScroll;
     private Panel searchPanel, subjectFilterPanel, presSortPanel, classroomSortPanel, subjectSortPanel;
+    private Classroom selectedModule;
 
     protected TextField searchField;
     protected Button showAllButton;
@@ -329,8 +330,11 @@ public abstract class Dashboard extends Application {
             case SEARCH_CLASSROOM:
                 Button backButton = new Button("Back to module selection");
                 backButton.getStyleClass().setAll("btn", "btn-default");
-                backButton.setOnAction(event -> goToState(DashboardState.MODULES));
-                Text moduleText = new Text(selectedClassroomPanel.getClassroom().getSubject().getSubjectName() + " -> " + selectedClassroomPanel.getClassroom().getModuleName());
+                backButton.setOnAction(event -> {
+                    goToState(DashboardState.MODULES);
+                    filterBy(null);
+                });
+                Text moduleText = new Text(selectedModule.getSubject().getSubjectName() + " -> " + selectedModule.getModuleName());
                 moduleText.getStyleClass().setAll("h4");
                 Region dummy = new Region();
                 backButton.widthProperty().addListener(observable -> dummy.setPrefWidth(backButton.getWidth()));
@@ -340,7 +344,7 @@ public abstract class Dashboard extends Application {
                 borderPane.setRight(dummy);
                 borderPane.setCenter(moduleText);
 
-                filterBy(selectedClassroomPanel.getClassroom().getSubject());
+                filterBy(selectedModule.getSubject());
 
                 vbox.getChildren().addAll(borderPane, presentationsScrollPane);
                 border.setCenter(vbox);
@@ -353,9 +357,20 @@ public abstract class Dashboard extends Application {
 
     private void displayBorderLeft(DashboardState state) {
         //Setup VBox for all panels
-        if (controlsVBox == null) {
-            controlsVBox = new VBox(8);
-            controlsVBox.setPadding(new Insets(10));
+        if(controlsContainerVBox == null) {
+            controlsContainerVBox = new VBox(8);
+        }
+
+        if(constantControlsVBox == null) {
+            constantControlsVBox = new VBox(8);
+            constantControlsVBox.setPadding(new Insets(10, 10, 0, 10));
+            controlsContainerVBox.getChildren().add(constantControlsVBox);
+        }
+
+        if(removableControlsVBox == null) {
+            removableControlsVBox = new VBox(8);
+            removableControlsVBox.setPadding(new Insets(0, 10, 10, 10));
+            controlsContainerVBox.getChildren().add(removableControlsVBox);
         }
 
         if (controlsScroll == null) {
@@ -363,7 +378,7 @@ public abstract class Dashboard extends Application {
             controlsScroll.setHbarPolicy(ScrollBarPolicy.NEVER);
             controlsScroll.setVbarPolicy(ScrollBarPolicy.NEVER);
             controlsScroll.getStyleClass().add("edge-to-edge");
-            controlsScroll.setContent(controlsVBox);
+            controlsScroll.setContent(controlsContainerVBox);
             controlsScroll.setFitToWidth(true);
             controlsScroll.setMaxWidth(LEFT_PANEL_SIZE);
             border.setLeft(controlsScroll);
@@ -381,6 +396,8 @@ public abstract class Dashboard extends Application {
             }
             searchPanel.setCenter(searchField);
             BorderPane.setMargin(searchField, panelInsets);
+
+            constantControlsVBox.getChildren().add(searchPanel);
         }
 
         if (subjectFilterPanel == null) {
@@ -464,71 +481,20 @@ public abstract class Dashboard extends Application {
 
         switch (state) {
             case MODULES:
-                if (!controlsVBox.getChildren().contains(searchPanel)) {
-                    searchPanel.setText("Search");
-                    controlsVBox.getChildren().add(searchPanel);
-                }
-
-                if (!controlsVBox.getChildren().contains(subjectSortPanel)) {
-                    controlsVBox.getChildren().add(subjectSortPanel);
-                }
-
-                if (!controlsVBox.getChildren().contains(classroomSortPanel)) {
-                    controlsVBox.getChildren().add(classroomSortPanel);
-                }
-
-                if (controlsVBox.getChildren().contains(presSortPanel)) {
-                    controlsVBox.getChildren().remove(presSortPanel);
-                }
-
-                if (controlsVBox.getChildren().contains(subjectFilterPanel)) {
-                    controlsVBox.getChildren().remove(subjectFilterPanel);
-                }
+                searchPanel.setText("Search");
+                removableControlsVBox.getChildren().clear();
+                removableControlsVBox.getChildren().addAll(subjectFilterPanel, subjectSortPanel, classroomSortPanel);
                 break;
             case CLASSROOM:
             case SEARCH_CLASSROOM:
-                if (!controlsVBox.getChildren().contains(searchPanel)) {
-                    searchPanel.setText("Search in " + selectedClassroomPanel.getModuleName());
-                    controlsVBox.getChildren().add(searchPanel);
-                }
-
-                if (!controlsVBox.getChildren().contains(presSortPanel)) {
-                    controlsVBox.getChildren().add(presSortPanel);
-                }
-
-                if (controlsVBox.getChildren().contains(subjectSortPanel)) {
-                    controlsVBox.getChildren().remove(subjectSortPanel);
-                }
-
-                if (controlsVBox.getChildren().contains(classroomSortPanel)) {
-                    controlsVBox.getChildren().remove(classroomSortPanel);
-                }
-
-                if (controlsVBox.getChildren().contains(subjectFilterPanel)) {
-                    controlsVBox.getChildren().remove(subjectFilterPanel);
-                }
+                searchPanel.setText("Search in " + selectedModule.getModuleName());
+                removableControlsVBox.getChildren().clear();
+                removableControlsVBox.getChildren().add(presSortPanel);
                 break;
             case SEARCH_ALL:
-                if (!controlsVBox.getChildren().contains(searchPanel)) {
-                    searchPanel.setText("Search");
-                    controlsVBox.getChildren().add(searchPanel);
-                }
-
-                if (!controlsVBox.getChildren().contains(subjectFilterPanel)) {
-                    controlsVBox.getChildren().add(subjectFilterPanel);
-                }
-
-                if (!controlsVBox.getChildren().contains(subjectSortPanel)) {
-                    controlsVBox.getChildren().add(subjectSortPanel);
-                }
-
-                if (!controlsVBox.getChildren().contains(classroomSortPanel)) {
-                    controlsVBox.getChildren().add(classroomSortPanel);
-                }
-
-                if (!controlsVBox.getChildren().contains(presSortPanel)) {
-                    controlsVBox.getChildren().add(presSortPanel);
-                }
+                searchPanel.setText("Search");
+                removableControlsVBox.getChildren().clear();
+                removableControlsVBox.getChildren().addAll(subjectFilterPanel, subjectSortPanel, classroomSortPanel, presSortPanel);
                 break;
 
             default:
@@ -578,7 +544,7 @@ public abstract class Dashboard extends Application {
         }
     }
 
-    private void addUserPane() {
+    private void addUserPanel() {
         //TODO: add a pane with user info to the top of the left panel
     }
 
@@ -781,7 +747,6 @@ public abstract class Dashboard extends Application {
                 }
             });
             presentationPanels.add(presentationPanel);
-            
         }
 
         if (presSortCombo != null)
@@ -829,6 +794,7 @@ public abstract class Dashboard extends Application {
                     selectedClassroomPanel.setSelected(false);
                 }
                 selectedClassroomPanel = (ClassroomPanel) previewPanel;
+                selectedModule = selectedClassroomPanel.getClassroom();
                 setSelectedPreviewPanel(selectedPresPanel, false);
             } else {
                 previewPanel.setSelected(false);
@@ -1015,15 +981,15 @@ public abstract class Dashboard extends Application {
                 }
             }
         } else {
-            for (PresentationPanel panel : presentationPanels) {
+            for(PresentationPanel panel : presentationPanels) {
                 panel.setFiltered(false);
             }
 
-            for (ClassroomPanel panel : classroomPanels) {
+            for(ClassroomPanel panel : classroomPanels) {
                 panel.setFiltered(false);
             }
 
-            for (SubjectPanel panel : subjectPanels) {
+            for(SubjectPanel panel : subjectPanels) {
                 panel.setFiltered(false);
             }
         }

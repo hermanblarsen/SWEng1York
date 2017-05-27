@@ -5,20 +5,19 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-
-import static com.i2lp.edi.client.Constants.SLIDE_PREVIEW_WIDTH;
 
 
 /**
  * Created by Kacper on 2017-04-08.
  */
 public class PresentationPanel extends PreviewPanel {
-    private static final double MAX_PRES_PANEL_WIDTH = 200;
-    private static final double MAX_PRES_PANEL_HEIGHT = 200;
+    private static final double MAX_PRES_PREVIEW_WIDTH = 200;
+    private static final double MAX_PRES_PREVIEW_HEIGHT = 100;
     protected static Logger logger = LoggerFactory.getLogger(PresentationPanel.class);
     private final Presentation presentation;
     private boolean isLive;
@@ -27,13 +26,19 @@ public class PresentationPanel extends PreviewPanel {
         super(parentPane);
         this.presentation = presentation;
         this.setText("Title: " + this.presentation.getDocumentTitle());
-        this.setMaxSize(MAX_PRES_PANEL_WIDTH, MAX_PRES_PANEL_HEIGHT);
+        this.setPrefWidth(MAX_PRES_PREVIEW_WIDTH + 10);
 
         isLive = presentation.isLive();
 
-        ImageView preview = getPresentation().getSlidePreview(0, SLIDE_PREVIEW_WIDTH);
-        this.setBody(preview); //TODO: set this so that all panels are the same size (fit width/height)
-        this.setFooter(new Label("Subject: " + presentation.getSubject()));
+        double previewWidth = MAX_PRES_PREVIEW_WIDTH;
+
+        if(presentation.getDocumentAspectRatio() < MAX_PRES_PREVIEW_WIDTH/MAX_PRES_PREVIEW_HEIGHT)
+            previewWidth = presentation.getDocumentAspectRatio() * MAX_PRES_PREVIEW_HEIGHT;
+
+        ImageView preview = getPresentation().getSlidePreview(0, previewWidth);
+        StackPane bodyPane = new StackPane(preview);
+        this.setBody(bodyPane);
+        this.setFooter(new Label("Subject: " + presentation.getSubject().getSubjectName()));
 
         Tooltip tooltip = new Tooltip("Title: " + getPresentation().getDocumentTitle() + "\n" +
                                         "Author: " + getPresentation().getAuthor() + "\n" +
@@ -61,8 +66,14 @@ public class PresentationPanel extends PreviewPanel {
     public void setLive(boolean live) {
         presentation.setLive(live);
         isLive = live;
+        updateVisibility();
+    }
 
-        if(live) {
+    @Override
+    public void updateVisibility() {
+        super.updateVisibility();
+
+        if(isLive) {
             setText(getText() + " (live)");
 
         } else {
