@@ -6,10 +6,8 @@ import eu.hansolo.tilesfx.TileBuilder;
 import eu.hansolo.tilesfx.tools.ChartData;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
-import javafx.beans.DefaultProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
@@ -17,8 +15,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -27,18 +23,17 @@ import org.kordamp.bootstrapfx.scene.layout.Panel;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 /**
  * Created by Koen on 06/04/2017.
  */
 public class PollElement extends InteractiveElement {
-    protected String pollQuestion;
+    protected String question;
     protected List<String> possibleAnswers;
     protected String answers;
     protected boolean answered = false;
     protected boolean timerStart = false;
-    protected int timeLimit = 30;
+    protected int timeLimit = 30; //TODO get from server
     protected HBox pollOptions;
     protected Timeline timeline;
     protected Panel questionPane;
@@ -49,10 +44,10 @@ public class PollElement extends InteractiveElement {
     private ToggleButton[] answerButton;
     private ChartData[] chartDataArray;
     private Color assignedColour;
-    protected float xSize= 0.5f;
-    protected float ySize= 0.5f;
-    protected float xPosition=0.5f;
-    protected float yPosition=0.5f;
+    protected float xSize= 0.8f;
+    protected float ySize= 0.8f;
+    protected float xPosition=0.1f;
+    protected float yPosition=0.1f;
     protected boolean buttonActive = false;
 
     public PollElement() {
@@ -96,8 +91,8 @@ public class PollElement extends InteractiveElement {
 
     @Override
     public void setupElement() {
-        //Label question = new Label(pollQuestion);
-        questionPane = new Panel(pollQuestion);
+        //Label question = new Label(question);
+        questionPane = new Panel(question);
 
         questionPane.getStyleClass().add("panel-primary");
        //questionPane.setBackground(new Background(new BackgroundFill(Tile.BACKGROUND, null, null)));
@@ -237,12 +232,12 @@ public class PollElement extends InteractiveElement {
         }
     }
 
-    public String getPollQuestion() {
-        return pollQuestion;
+    public String getQuestion() {
+        return question;
     }
 
-    public void setPollQuestion(String pollQuestion) {
-        this.pollQuestion = pollQuestion;
+    public void setQuestion(String question) {
+        this.question = question;
     }
 
     public List<String> getPossibleAnswers() {

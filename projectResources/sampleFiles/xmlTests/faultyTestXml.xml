@@ -9,8 +9,8 @@
 	</documentdetails>
 	<slideshow>
 		<defaults>
-			<bgcolour>#FF2304</bgcolour>
-			<font>Arial</font>
+			<bgcolour>#FF2304FF</bgcolour>
+			<font>Arial, Helvetica, sans-serif</font>
 			<fontsizeTEST>12</fontsizeTEST>
 			<fontcolour>#F00D33FF</fontcolour>
 			<graphicscolour>#F40D33FF</graphicscolour>
@@ -25,7 +25,7 @@
 				<yposition>0.3</yposition>
 				<xsize>0.05</xsize>
 				<ysize>0.6</ysize>
-				<font>Comic Sans</font>
+				<font>Arial, Helvetica, sans-serif</font>
 				<fontsize>12</fontsize>
 				<fontcolour>#EEEEEEFF</fontcolour>
 				<bgcolour>#000000FF</bgcolour>
@@ -42,7 +42,7 @@
 				<yposition>0.3</yposition>
 				<xsize>0.1</xsize>
 				<ysize>0.4</ysize>
-				<font>Comic Sans</font>
+				<font>Arial, Helvetica, sans-serif</font>
 				<fontsize>12</fontsize>
 				<fontcolour>#EEEEEEFF</fontcolour>
 				<bgcolour>#000000FF</bgcolour>

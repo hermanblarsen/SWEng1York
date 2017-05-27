@@ -181,7 +181,7 @@ public class ParserXML {
 
                     switch (elementName) {
                         case "bgcolour":
-                            theme.setBackgroundColour(checkValidColour(elementContent, null, true));
+                            theme.setBackgroundColour(checkValidColour(elementContent, null, "slidebackground"));
                             break;
                         case "font":
                             theme.setFont(checkValidFont(elementContent, null));
@@ -190,10 +190,10 @@ public class ParserXML {
                             theme.setFontSize(checkValidFontSize(Integer.parseInt(elementContent), null));
                             break;
                         case "fontcolour":
-                            theme.setFontColour(checkValidColour(elementContent, null, false));
+                            theme.setFontColour(checkValidColour(elementContent, null, "font"));
                             break;
                         case "graphicscolour":
-                            theme.setGraphicsColour(checkValidColour(elementContent, null, false));
+                            theme.setGraphicsColour(checkValidColour(elementContent, null, "graphics"));
                             break;
                         case "autoplaymedia":
                             myPresentation.setAutoplayMedia(Boolean.valueOf(elementContent));
@@ -286,15 +286,26 @@ public class ParserXML {
                                 String textContent = slideElementNode.getTextContent();
                                 StringBuilder sb = new StringBuilder();
                                 if (textContent != null) sb.append("<html dir=\"ltr\"><head></head><body contenteditable=\"true\"></body></html>");
-                                else if (textContent.contains("/html")&&textContent.contains("/body")) {
-                                    textContent = reproduceIllegalXmlCharacters(textContent);
-                                } else { //If the comment is written in plain text and not HTML, convert to plain HTML
+                                else { //If the comment is written in plain text and not HTML, convert to plain HTML
                                     sb.append("<html dir=\"ltr\"><head></head><body contenteditable=\"true\">");
                                     sb.append(textContent);
                                     sb.append("</body></html>");
 
                                 }
                                 mySlide.setUserComments(textContent);
+                            case "poll":
+                                PollElement pollElement = new PollElement();
+                                parseElementAttributes(slideElementNode, pollElement);
+                                parsePollElement(slideElementNode, pollElement);
+                                slideElementArrayList.add(pollElement);
+                                break;
+                            case "wordcloud":
+                                WordCloudElement wordCloudElement = new WordCloudElement();
+                                parseElementAttributes(slideElementNode, wordCloudElement);
+                                parseWordCloudElement(slideElementNode, wordCloudElement);
+                                slideElementArrayList.add(wordCloudElement);
+                                break;
+
                             default:
                                 logger.warn("SlideElement Name Not Recognised! Name: " + elementName);
                                 faultsDetected.add("SlideElement Name Not Recognised! Name: " + elementName);
@@ -309,18 +320,6 @@ public class ParserXML {
             faultsDetected.add("No slides found!");
         }
         myPresentation.setSlideList(slideArray);
-    }
-
-    private String reproduceIllegalXmlCharacters(String textContent) {
-        String htmlString = "";
-        //TODO do this properly
-        return htmlString;
-    }
-
-    private String produceLegalXmlCharacters(String textContent) {
-        String xmlSafeHtmlText = "";
-        //TODO do this properly
-        return xmlSafeHtmlText;
     }
 
     private void parseElementAttributes (Node slideElementNode, SlideElement slideElement) {
@@ -402,13 +401,13 @@ public class ParserXML {
                         textElement.setFontSize(checkValidFontSize(Integer.valueOf(elementContent), myPresentation.getTheme()));
                         break;
                     case "fontcolour":
-                        textElement.setFontColour(hexToRGBA(checkValidColour(elementContent, myPresentation.getTheme(), false)));
+                        textElement.setFontColour(hexToRGBA(checkValidColour(elementContent, myPresentation.getTheme(), "font")));
                         break;
                     case "bgcolour":
-                        textElement.setBgColour(hexToRGBA(checkValidColour(elementContent, myPresentation.getTheme(), true)));
+                        textElement.setBgColour(hexToRGBA(checkValidColour(elementContent, myPresentation.getTheme(), "elementbackground")));
                         break;
                     case "bordercolour":
-                        textElement.setBorderColour(hexToRGBA(checkValidColour(elementContent, myPresentation.getTheme(), true)));
+                        textElement.setBorderColour(hexToRGBA(checkValidColour(elementContent, myPresentation.getTheme(), "graphics")));
                         break;
                     case "onclickaction":
                         textElement.setOnClickAction(checkValidOnClickAction(elementContent));
@@ -461,10 +460,10 @@ public class ParserXML {
                         graphicElement.setElementAspectRatio(Float.valueOf(elementContent));
                         break;
                     case "linecolour":
-                        graphicElement.setLineColour(checkValidColour(elementContent, myPresentation.getTheme(), true));
+                        graphicElement.setLineColour(checkValidColour(elementContent, myPresentation.getTheme(), "graphics"));
                         break;
                     case "fillcolour":
-                        graphicElement.setFillColour(checkValidColour(elementContent, myPresentation.getTheme(), true));
+                        graphicElement.setFillColour(checkValidColour(elementContent, myPresentation.getTheme(), "elementbackground"));
                         break;
                     case "polygon":
                         NodeList polygonNodeChildrenList = elementNode.getChildNodes();
@@ -706,6 +705,92 @@ public class ParserXML {
         }
     }
 
+    private void parseWordCloudElement(Node wordCloudElementNode, WordCloudElement wordCloudElement) {
+        //Find and store all elements of the wordcloud element
+        NodeList textNodeChildrenList = wordCloudElementNode.getChildNodes();
+        for (int i = 0; i < textNodeChildrenList.getLength(); i++) {
+            //Find the current element node
+            Node elementNode = textNodeChildrenList.item(i);
+            if (elementNode.getNodeType() == Node.ELEMENT_NODE) {
+                //Find the element name and its content, and store this in the wordCloudElement
+                String elementName = elementNode.getNodeName();
+                String elementContent = elementNode.getTextContent();
+
+                switch (elementName){
+                    case "cloudshapepath":
+                        wordCloudElement.setCloudShapePath(elementContent);
+                        break;
+                    case "question":
+                        wordCloudElement.setQuestion(elementContent);
+                        break;
+                    case "timelimit":
+                        wordCloudElement.setTimeLimit(Integer.valueOf(elementContent));
+                        break;
+                    case "xposition":
+                        wordCloudElement.setxPosition(Float.valueOf(elementContent));
+                        break;
+                    case "yposition":
+                        wordCloudElement.setyPosition(Float.valueOf(elementContent));
+                        break;
+                    case "xsize":
+                        wordCloudElement.setxSize(Float.valueOf(elementContent));
+                        break;
+                    case "ysize":
+                        wordCloudElement.setySize(Float.valueOf(elementContent));
+                        break;
+                    default:
+                        logger.warn("Wordcloud Element Property Name Not Recognised! Name: " + elementName +
+                                ", Value: " + elementContent + ", and XML-Type: " + elementNode.getNodeType());
+                        faultsDetected.add("Wordcloud Element Property Name Not Recognised! Name: " + elementName +
+                                ", Value: " + elementContent + ", and XML-Type: " + elementNode.getNodeType());
+                }
+            }
+        }
+    }
+
+    private void parsePollElement(Node pollElementNode, PollElement pollElement) {
+        //Find and store all elements of the poll element
+        NodeList textNodeChildrenList = pollElementNode.getChildNodes();
+        for (int i = 0; i < textNodeChildrenList.getLength(); i++) {
+            //Find the current element node
+            Node elementNode = textNodeChildrenList.item(i);
+            if (elementNode.getNodeType() == Node.ELEMENT_NODE) {
+                //Find the element name and its content, and store this in the pollElement
+                String elementName = elementNode.getNodeName();
+                String elementContent = elementNode.getTextContent();
+
+                switch (elementName){
+                    case "question":
+                        pollElement.setQuestion(elementContent);
+                        break;
+                    case "answers":
+                        pollElement.setAnswers(elementContent);
+                        break;
+                    case "timelimit":
+                        pollElement.setTimeLimit(Integer.valueOf(elementContent));
+                        break;
+                    case "xposition":
+                        pollElement.setxPosition(Float.valueOf(elementContent));
+                        break;
+                    case "yposition":
+                        pollElement.setyPosition(Float.valueOf(elementContent));
+                        break;
+                    case "xsize":
+                        pollElement.setxSize(Float.valueOf(elementContent));
+                        break;
+                    case "ysize":
+                        pollElement.setySize(Float.valueOf(elementContent));
+                        break;
+                    default:
+                        logger.warn("Poll Element Property Name Not Recognised! Name: " + elementName +
+                                ", Value: " + elementContent + ", and XML-Type: " + elementNode.getNodeType());
+                        faultsDetected.add("Poll Element Property Name Not Recognised! Name: " + elementName +
+                                ", Value: " + elementContent + ", and XML-Type: " + elementNode.getNodeType());
+                }
+            }
+        }
+    }
+
     public Boolean validateExtension(String path) {
         Boolean validated = false;
         if(path.lastIndexOf(".") != -1 && path.lastIndexOf(".") != 0) {
@@ -714,5 +799,11 @@ public class ParserXML {
             else logger.warn("File Extension " + extension + " not accepted");
         }
         return validated;
+    }
+
+    private String produceLegalXmlCharacters(String textContent) {
+        String xmlSafeHtmlText = "";
+        //TODO do this properly, but not needed until writing
+        return xmlSafeHtmlText;
     }
 }

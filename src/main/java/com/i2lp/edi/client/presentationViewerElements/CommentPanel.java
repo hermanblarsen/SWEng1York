@@ -57,7 +57,7 @@ public class CommentPanel extends Panel {
 
     private HBox controlPanel() { //TODO delete if not used for question que tabs or something
 //        submitButton = new Button("Submit To Lecturer"); //TODO What will this submit?,
-//                                                // todo) BUT maybe a very similar thing can be implemented for question que
+//                                                // TODO) BUT maybe a very similar thing can be implemented for question que
 //        submitButton.getStyleClass().setAll("btn", "btn-default");
 
         HBox controlBox = new HBox();

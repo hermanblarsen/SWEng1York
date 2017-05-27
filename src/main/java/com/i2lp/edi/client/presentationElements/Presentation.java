@@ -312,7 +312,7 @@ public class Presentation extends Pane {
         answers.add(2,"ANS 3");
         answers.add(3,"ANS 4");
         poll.setPossibleAnswers(answers);
-        poll.setPollQuestion("HERE IS A SAMPLE QUESTION!");
+        poll.setQuestion("HERE IS A SAMPLE QUESTION!");
         poll.setTimeLimit(15);
 
         poll.setLayer(6);
@@ -324,7 +324,7 @@ public class Presentation extends Pane {
         slideElementsSlide1.add(poll);
 
         WordCloudElement myWordCloudElement = new WordCloudElement();
-        myWordCloudElement.setTask("Enter Words about Edi");
+        myWordCloudElement.setQuestion("Enter Words about Edi");
         myWordCloudElement.setTimeLimit(10);
         myWordCloudElement.setLayer(7);
         myWordCloudElement.setStartSequence(11);

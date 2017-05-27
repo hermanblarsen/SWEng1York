@@ -26,7 +26,7 @@
 				<yposition>0.3</yposition>
 				<xsize>0.05</xsize>
 				<ysize>0.6</ysize>
-				<font>Comic Sans</font>
+				<font>"Times New Roman", Times, serif</font>
 				<fontsize>12</fontsize>
 				<fontcolour>#EEEEEEFF</fontcolour>
 				<bgcolour>#000000FF</bgcolour>
@@ -43,7 +43,7 @@
 				<yposition>0.3</yposition>
 				<xsize>0.1</xsize>
 				<ysize>0.4</ysize>
-				<font>Comic Sans</font>
+				<font>"Times New Roman", Times, serif</font>
 				<fontsize>12</fontsize>
 				<fontcolour>#EEEEEEFF</fontcolour>
 				<bgcolour>#000000FF</bgcolour>
@@ -133,6 +133,19 @@
 				<starttime>0</starttime>
 				<endtime>55</endtime>
 			</video>
+
+			<wordcloud elementid ="2" layer="2" visibility="true" startsequence="2" endsequence="4">
+				<cloudshapepath>aCloudPath</cloudshapepath>
+				<question>Insert Words Here</question>
+				<timelimit>20</timelimit>
+			</wordcloud>
+
+			<poll elementid ="2" layer="2" visibility="true" startsequence="2" endsequence="4">
+				<timelimit>20</timelimit>
+				<question>Insert Longer Question Here</question>
+				<answers>answer1,answer2,answer3,answer4</answers>
+			</poll>
+
 		</slide>
 	</slideshow>
 </document>

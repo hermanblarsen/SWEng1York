@@ -20,10 +20,6 @@ public class Slide extends Pane {
     protected List<SlideElement> slideElementList;
     protected List<SlideElement> visibleSlideElementList;
     protected List<TextElement> textElementList = new ArrayList<>();
-    protected List<GraphicElement> graphicElementList = new ArrayList<>();
-    protected List<ImageElement> imageElementList = new ArrayList<>();
-    protected List<VideoElement> videoElementList = new ArrayList<>();
-    protected List<AudioElement> audioElementList = new ArrayList<>();
 
     private ArrayList<WritableImage> slideDrawings;
     private int drawingIndex;
@@ -101,10 +97,10 @@ public class Slide extends Pane {
         //Add slideElements to specific arraylists
         for (SlideElement slideElement : slideElementList) {
             if (slideElement instanceof TextElement) textElementList.add((TextElement) slideElement);
-            if (slideElement instanceof GraphicElement) graphicElementList.add((GraphicElement) slideElement);
-            if (slideElement instanceof ImageElement) imageElementList.add((ImageElement) slideElement);
-            if (slideElement instanceof VideoElement) videoElementList.add((VideoElement) slideElement);
-            if (slideElement instanceof AudioElement) audioElementList.add((AudioElement) slideElement);
+//            if (slideElement instanceof GraphicElement) graphicElementList.add((GraphicElement) slideElement);
+//            if (slideElement instanceof ImageElement) imageElementList.add((ImageElement) slideElement);
+//            if (slideElement instanceof VideoElement) videoElementList.add((VideoElement) slideElement);
+//            if (slideElement instanceof AudioElement) audioElementList.add((AudioElement) slideElement);
         }
     }
 
@@ -176,37 +172,37 @@ public class Slide extends Pane {
         this.textElementList = textElementList;
     }
 
-    public List<GraphicElement> getGraphicElementList() {
-        return graphicElementList;
-    }
-
-    public void setGraphicElementList(List<GraphicElement> graphicElementList) {
-        this.graphicElementList = graphicElementList;
-    }
-
-    public List<ImageElement> getImageElementList() {
-        return imageElementList;
-    }
-
-    public void setImageElementList(List<ImageElement> imageElementList) {
-        this.imageElementList = imageElementList;
-    }
-
-    public List<VideoElement> getVideoElementList() {
-        return videoElementList;
-    }
-
-    public void setVideoElementList(List<VideoElement> videoElementList) {
-        this.videoElementList = videoElementList;
-    }
-
-    public List<AudioElement> getAudioElementList() {
-        return audioElementList;
-    }
-
-    public void setAudioElementList(List<AudioElement> audioElementList) {
-        this.audioElementList = audioElementList;
-    }
+//    public List<GraphicElement> getGraphicElementList() {
+//        return graphicElementList;
+//    }
+//
+//    public void setGraphicElementList(List<GraphicElement> graphicElementList) {
+//        this.graphicElementList = graphicElementList;
+//    }
+//
+//    public List<ImageElement> getImageElementList() {
+//        return imageElementList;
+//    }
+//
+//    public void setImageElementList(List<ImageElement> imageElementList) {
+//        this.imageElementList = imageElementList;
+//    }
+//
+//    public List<VideoElement> getVideoElementList() {
+//        return videoElementList;
+//    }
+//
+//    public void setVideoElementList(List<VideoElement> videoElementList) {
+//        this.videoElementList = videoElementList;
+//    }
+//
+//    public List<AudioElement> getAudioElementList() {
+//        return audioElementList;
+//    }
+//
+//    public void setAudioElementList(List<AudioElement> audioElementList) {
+//        this.audioElementList = audioElementList;
+//    }
 
     public List<SlideElement> getVisibleSlideElementList() {
         return visibleSlideElementList;

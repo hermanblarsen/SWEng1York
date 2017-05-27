@@ -31,7 +31,7 @@ public class ParserXMLTest {
     private ArrayList<SlideElement> slideElementArray3;
     private ArrayList<SlideElement> slideElementArray4;
     private ArrayList<SlideElement> slideElementArray2;
-    private String examplePath = "projectResources/sampleFiles/xmlTests/sampleXml.xml";
+    private String examplePath = "projectResources/sampleFiles/xmlTests/testSampleXml.xml";
 
     @Before
     public void setUp() throws Exception {
@@ -109,7 +109,7 @@ public class ParserXMLTest {
         assertEquals(2, slideElementArray1.size(), ERROR_MARGIN );
         assertEquals(3, slideElementArray2.size(), ERROR_MARGIN );
         assertEquals(2, slideElementArray3.size(), ERROR_MARGIN );
-        assertEquals(1, slideElementArray4.size(), ERROR_MARGIN );
+        assertEquals(3, slideElementArray4.size(), ERROR_MARGIN );
     }
 
     @Test
@@ -149,7 +149,7 @@ public class ParserXMLTest {
         assert(slideElementArray2.get(1) instanceof GraphicElement);
         assert(slideElementArray2.get(2) instanceof AudioElement);
 
-        GraphicElement polygonGraphic = slide2.getGraphicElementList().get(0);
+        GraphicElement polygonGraphic = (GraphicElement) slideElementArray2.get(0);
         assertEquals(1, polygonGraphic.getElementID());
         assertEquals(1, polygonGraphic.getStartSequence());
         Float[] xPositions = {0.12f, 0.02f, 0.02f};
@@ -162,12 +162,12 @@ public class ParserXMLTest {
         }
         assertEquals(Boolean.TRUE, polygonGraphic.isClosed());
 
-        GraphicElement ovalGraphic = slide2.getGraphicElementList().get(1);
+        GraphicElement ovalGraphic = (GraphicElement) slideElementArray2.get(1);
         assertEquals(0.05, ovalGraphic.getrHorizontal(), ERROR_MARGIN);
         assertEquals(0.1, ovalGraphic.getrVertical(), ERROR_MARGIN);
         assertEquals(45f, ovalGraphic.getRotation(), ERROR_MARGIN);
 
-        AudioElement audioElement = slide2.getAudioElementList().get(0);
+        AudioElement audioElement = (AudioElement) slideElementArray2.get(2);
         assertEquals("projectResources/sampleFiles/example.mp3", audioElement.getPath());
         assertEquals(Boolean.TRUE, audioElement.getLoop());
         assertEquals(Boolean.FALSE, audioElement.getAutoPlay());
@@ -179,16 +179,28 @@ public class ParserXMLTest {
         assert(slideElementArray3.get(0) instanceof ImageElement);
         assert(slideElementArray3.get(1) instanceof ImageElement);
 
-        ImageElement imageElement = slide3.getImageElementList().get(0);
+        ImageElement imageElement = (ImageElement) slideElementArray3.get(0);
         assertEquals("http://www.amp.york.ac.uk/myImage.jpg", imageElement.getPath());
         assertEquals(0.9f, imageElement.getOpacity(), ERROR_MARGIN);
 
-
         //Slide 4
         assert(slideElementArray4.get(0) instanceof VideoElement);
-        VideoElement videoElement = slide4.getVideoElementList().get(0);
+        assert(slideElementArray4.get(1) instanceof WordCloudElement);
+        assert(slideElementArray4.get(2) instanceof PollElement);
+        
+        VideoElement videoElement = (VideoElement) slideElementArray4.get(0);
         assertEquals(1, videoElement.getElementID());
         assertEquals(367.43f, videoElement.getDuration(), ERROR_MARGIN);
+
+        WordCloudElement wordCloudElement = (WordCloudElement) slideElementArray4.get(1);
+        assertEquals("Insert Words Here", wordCloudElement.getQuestion());
+        assertEquals("aCloudPath", wordCloudElement.getCloudShapePath());
+        assertEquals(20, wordCloudElement.getTimeLimit());
+
+        PollElement pollElement = (PollElement) slideElementArray4.get(2);
+        assertEquals("Insert Longer Question Here", pollElement.getQuestion());
+        assertEquals("answer1,answer2,answer3,answer4", pollElement.getAnswers());
+        assertEquals(20, pollElement.getTimeLimit());
     }
 
     @Test
@@ -209,6 +221,8 @@ public class ParserXMLTest {
         assertTrue(faultyPresentation.getXmlFaults().size() > 0);
     }
 
+
+
     @Ignore
     @Test
     public void testWritingXML() {
@@ -218,6 +232,5 @@ public class ParserXMLTest {
     @After
     public void tearDown() throws Exception {
         System.out.println(""); //Space out log
-        // Do nothing
     }
 }
