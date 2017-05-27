@@ -868,7 +868,7 @@ public abstract class PresentationManager {
                 } else if (this instanceof PresentationManagerStudent) {
                     //TODO: Do other session termination stuff
                     //Set active presentation for user to 0 (no active presentation)
-                    ediManager.getSocketClient().setUserActivePresentation(0, ediManager.getUserData().getUserID());
+                    ediManager.getSocketClient().setUserActivePresentation(0 , ediManager.getUserData().getUserID());
                 }
             }
 

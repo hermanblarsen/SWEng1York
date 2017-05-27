@@ -171,7 +171,7 @@ public class SocketClient {
                         if (ediManager.getPresentationManager().getPresentationElement().getServerSideDetails().getLive()) {
                             //TODO: Only do this If current slide number has changed
                             int current_slide_number = getCurrentSlideForPresentation(ediManager.getPresentationManager().getPresentationElement().getServerSideDetails().getPresentationID());
-                            //TODO: Enable undocking (unsync?) of Teacher/Student slide movement using UI object
+                            //TODO: Enable undocking (unsync?) of Teacher/Student slide movement using UI toggle
                             if (ediManager.getPresentationManager().getCurrentSlideNumber() != current_slide_number) {
                                 //If the current slide number has changed, move to it
                                 Platform.runLater(() -> ediManager.getPresentationManager().goToSlide(current_slide_number));
@@ -638,9 +638,14 @@ public class SocketClient {
         try (PGConnection connection = (PGConnection) dataSource.getConnection()) {
             PreparedStatement statement = connection.prepareStatement("UPDATE users SET active_presentation_id = ? WHERE user_id = ?;");
 
-            //Fill prepared statements to avoid SQL injection
-            statement.setInt(1, presentationID);
-            statement.setInt(2, userID);
+            //If set to no presentation
+            if(presentationID == 0){
+               statement.setNull(1, 0);
+            } else {
+                //Fill prepared statements to avoid SQL injection
+                statement.setInt(1, presentationID);
+                statement.setInt(2, userID);
+            }
 
             //Call stored procedure on database
             statementSuccess = statement.execute();
