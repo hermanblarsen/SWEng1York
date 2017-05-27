@@ -42,6 +42,12 @@
 				<yposition>0.3</yposition>
 				<xsize>0.8</xsize>
 				<ysize>0.4</ysize>
+				<animation type="in">
+					<simpletranslate startx="-200" starty="-200" endx="200" endy="200" duration="1000"/>
+				</animation>
+				<animation type="out">
+					<simpletranslate startx="100" starty="100" endx="-200" endy="-200" duration="1000"/>
+				</animation>
             </text>
 
             <text elementid ="2" layer="2" startsequence="3">
@@ -91,7 +97,7 @@
 
 
 		<slide slideid="2">
-            <graphic elementid ="0" layer="1" visibility="true" startsequence="1">
+            <graphic elementid ="0" layer="1" visibility="true" startsequence="1" endsequence="3">
                 <onclickaction>dynamicmediatoggle</onclickaction>
                 <onclickinfo>3</onclickinfo>
                 <aspectratiolock>true</aspectratiolock>
@@ -103,6 +109,10 @@
                     <ypositions>0.2, 0.4, 0.4, 0.5, 0.9, 0.7, 0.9, 0.5, 0.4, 0.4, 0.2</ypositions>
                     <isclosed>true</isclosed>
                 </polygon>
+				<animation type="in">
+					<simplescale start="0" end="1" duration="500"/>
+				</animation>
+
             </graphic>
 
 			<graphic elementid ="1" layer="2" visibility="true" startsequence="2">
@@ -119,6 +129,9 @@
 				</oval>
 				<onclickaction>dynamicmediatoggle</onclickaction>
 				<onclickinfo>3</onclickinfo>
+				<animation type="in">
+					<pathtransition duration="1000" path="m74.5,163c73,-96 151,-167 291,-116c140,51 193,230 81,261c-112,31 -341,96 -318,-34c23,-130 110,-178 149,-147c39,31 92,124 38,134c-54,10 -121,-57 -105,-74"/>
+				</animation>
 			</graphic>
 
 			<audio elementid ="3" startsequence="3">
@@ -159,6 +172,7 @@
 				<opacity>0.3</opacity>
 				<aspectratiolock>true</aspectratiolock>
 				<elementaspectratio>1.0</elementaspectratio>
+
 			</image>
 			<image elementid ="1" layer="1" visibility="true" startsequence="2">
 				<xposition>0.2</xposition>
@@ -171,6 +185,9 @@
 				<opacity>1</opacity>
 				<aspectratiolock>true</aspectratiolock>
 				<elementaspectratio>1.5</elementaspectratio>
+				<animation type="in">
+					<simplefade start="0" end="1" duration="1000"/>
+				</animation>
 			</image>
 		</slide>
 

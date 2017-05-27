@@ -89,6 +89,7 @@ public abstract class SlideElement {
                     break;
                 case Animation.ENTRY_ANIMATION: //Entry animation (playback)
                     if (startAnimation != null) {//animation Exists as StartSequence Present
+                        startAnimation.setCoreNodeToAnimate(getCoreNode());
                         startAnimation.play();
                         logger.info("Entry animation playing");
                     } else {
@@ -98,7 +99,9 @@ public abstract class SlideElement {
                     break;
                 case Animation.EXIT_ANIMATION: //Exit animation (playback)
                     if (endAnimation != null) {//animation Exists as EndSequence Present
+                        endAnimation.setCoreNodeToAnimate(getCoreNode());
                         endAnimation.play();
+
                         logger.info("Exit animation playing");
                     } else {
                         getCoreNode().setVisible(false);
@@ -395,4 +398,11 @@ public abstract class SlideElement {
         isThumbnailGen = thumbnailGen;
     }
 
+    public void setStartAnimation(Animation startAnimation){
+        this.startAnimation = startAnimation;
+    }
+
+    public void setEndAnimation(Animation endAnimation){
+        this.endAnimation = endAnimation;
+    }
 }

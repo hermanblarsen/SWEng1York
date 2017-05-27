@@ -1,5 +1,6 @@
 package com.i2lp.edi.client.utilities;
 
+import com.i2lp.edi.client.animation.*;
 import com.i2lp.edi.client.presentationElements.*;
 import com.sun.org.apache.xerces.internal.parsers.DOMParser;
 import javafx.scene.media.MediaException;
@@ -11,6 +12,7 @@ import org.xml.sax.SAXException;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.FloatBuffer;
 import java.nio.file.InvalidPathException;
 import java.util.ArrayList;
 
@@ -424,6 +426,9 @@ public class ParserXML {
                     case "bordersize":
                         textElement.setBorderSize(Integer.valueOf(elementContent));
                         break;
+                    case "animation":
+                        parseAnimationElement(elementNode, textElement);
+                        break;
                     default:
                         logger.warn("Text Element Property Name Not Recognised! Name: " + elementName +
                                 ", Value: " + elementContent + ", and XML-Type: " + elementNode.getNodeType());
@@ -464,6 +469,9 @@ public class ParserXML {
                         break;
                     case "fillcolour":
                         graphicElement.setFillColour(checkValidColour(elementContent, myPresentation.getTheme(), "elementbackground"));
+                        break;
+                    case "animation":
+                        parseAnimationElement(elementNode, graphicElement);
                         break;
                     case "polygon":
                         NodeList polygonNodeChildrenList = elementNode.getChildNodes();
@@ -592,6 +600,9 @@ public class ParserXML {
                     case "elementaspectratio":
                         imageElement.setAspectRatio(Float.valueOf(elementContent));
                         break;
+                    case "animation":
+                        parseAnimationElement(elementNode, imageElement);
+                        break;
                     default:
                         logger.warn("Image Property Name Not Recognised! Name: " + elementName +
                                 ", Value: " + elementContent + ", and XML-Type: " + elementNode.getNodeType());
@@ -633,6 +644,9 @@ public class ParserXML {
                         break;
                     case "endtime":
                         audioElement.setEndTime(Duration.seconds(Integer.valueOf(elementContent)));
+                        break;
+                    case "animation":
+                        parseAnimationElement(elementNode, audioElement);
                         break;
                     default:
                         logger.warn("Audio Property Name Not Recognised! Name: " + elementName +
@@ -694,6 +708,9 @@ public class ParserXML {
                         break;
                     case "endtime":
                         videoElement.setEndTime(new Duration(Double.valueOf(elementContent)));
+                        break;
+                    case "animation":
+                        parseAnimationElement(elementNode, videoElement);
                         break;
                     default:
                         logger.warn("Video Property Name Not Recognised! Name: " + elementName +
@@ -788,6 +805,171 @@ public class ParserXML {
                                 ", Value: " + elementContent + ", and XML-Type: " + elementNode.getNodeType());
                 }
             }
+        }
+    }
+
+    private void parseSimpleTranslateAnimation(Node animationNode, TranslationAnimation animation){
+        for (int i = 0; i < animationNode.getAttributes().getLength(); i++) {
+            Node attributeNode = animationNode.getAttributes().item(i);
+
+            if (attributeNode.getNodeType() == Node.ATTRIBUTE_NODE) {
+                //Find the attribute name and its content, and store this in the element
+                String attributeName = attributeNode.getNodeName();
+                String attributeContent = attributeNode.getNodeValue();
+
+                switch (attributeName) {
+                    case "startx":
+                        animation.setStartX(Float.parseFloat(attributeContent));
+                        break;
+                    case "starty":
+                        animation.setStartY(Float.parseFloat(attributeContent));
+                        break;
+                    case "endx":
+                        animation.setEndX(Float.parseFloat(attributeContent));
+                        break;
+                    case "endy":
+                        animation.setEndY(Float.parseFloat(attributeContent));
+                        break;
+                    case "duration":
+                        animation.setDuration(Duration.millis(Float.parseFloat(attributeContent)));
+                        break;
+                    default:
+                        logger.warn("Unrecognised simple translate attribute: " + attributeContent);
+                        break;
+                }
+            }
+        }
+    }
+
+    private void parseFadeAnimation(Node animationNode, OpacityAnimation animation){
+        for (int i = 0; i < animationNode.getAttributes().getLength(); i++) {
+            Node attributeNode = animationNode.getAttributes().item(i);
+
+            if (attributeNode.getNodeType() == Node.ATTRIBUTE_NODE) {
+                //Find the attribute name and its content, and store this in the element
+                String attributeName = attributeNode.getNodeName();
+                String attributeContent = attributeNode.getNodeValue();
+
+                switch (attributeName) {
+                    case "start":
+                        animation.setStartOpacity(Float.parseFloat(attributeContent));
+                        break;
+                    case "end":
+                        animation.setEndOpacity(Float.parseFloat(attributeContent));
+                        break;
+                    case "duration":
+                        animation.setDuration(Duration.millis(Float.parseFloat(attributeContent)));
+                        break;
+                    default:
+                        logger.warn("Unrecognised simple Fade attribute: " + attributeContent);
+                        break;
+                }
+            }
+        }
+    }
+
+    private void parseScaleAnimation(Node animationNode, ScaleAnimation animation){
+        for (int i = 0; i < animationNode.getAttributes().getLength(); i++) {
+            Node attributeNode = animationNode.getAttributes().item(i);
+
+            if (attributeNode.getNodeType() == Node.ATTRIBUTE_NODE) {
+                //Find the attribute name and its content, and store this in the element
+                String attributeName = attributeNode.getNodeName();
+                String attributeContent = attributeNode.getNodeValue();
+
+                switch (attributeName) {
+                    case "start":
+                        animation.setStartScale(Float.parseFloat(attributeContent));
+                        break;
+                    case "end":
+                        animation.setEndScale(Float.parseFloat(attributeContent));
+                        break;
+                    case "duration":
+                        animation.setDuration(Duration.millis(Float.parseFloat(attributeContent)));
+                        break;
+                    default:
+                        logger.warn("Unrecognised simple Fade attribute: " + attributeContent);
+                        break;
+                }
+            }
+        }
+    }
+
+    private void parsePathAnimation(Node animationNode, PathAnimation animation){
+        for (int i = 0; i < animationNode.getAttributes().getLength(); i++) {
+            Node attributeNode = animationNode.getAttributes().item(i);
+
+            if (attributeNode.getNodeType() == Node.ATTRIBUTE_NODE) {
+                //Find the attribute name and its content, and store this in the element
+                String attributeName = attributeNode.getNodeName();
+                String attributeContent = attributeNode.getNodeValue();
+
+                switch (attributeName) {
+                    case "path":
+                        animation.setPath(attributeContent);
+                        break;
+                    case "duration":
+                        animation.setDuration(Duration.millis(Float.parseFloat(attributeContent)));
+                        break;
+                    default:
+                        logger.warn("Unrecognised simple Fade attribute: " + attributeContent);
+                        break;
+                }
+            }
+        }
+    }
+
+    private void parseAnimationElement(Node animationElementNode, SlideElement slideElement){
+        NamedNodeMap animationAttributes;
+        Animation animation = null;
+
+        NodeList animationNodeChildrenList = animationElementNode.getChildNodes();
+        for (int i = 0; i < animationNodeChildrenList.getLength(); i++) {
+            //Find the current element node
+            Node elementNode = animationNodeChildrenList.item(i);
+            if (elementNode.getNodeType() == Node.ELEMENT_NODE) {
+                //Find the element name and its content, and store this in the audioElement
+                String elementName = elementNode.getNodeName();
+
+                switch (elementName) {
+                    case "simpletranslate":
+                        animation = new TranslationAnimation();
+                        parseSimpleTranslateAnimation(elementNode, (TranslationAnimation)animation);
+                        break;
+                    case "simplescale":
+                        animation = new ScaleAnimation();
+                        parseScaleAnimation(elementNode, (ScaleAnimation)animation);
+                        break;
+                    case "simplefade":
+                        animation = new OpacityAnimation();
+                        parseFadeAnimation(elementNode, (OpacityAnimation)animation);
+                        break;
+                    case "pathtransition":
+                        animation = new PathAnimation();
+                        parsePathAnimation(elementNode, (PathAnimation)animation);
+                        break;
+                    default:
+                }
+            }
+        }
+
+
+
+        if(((animationAttributes=animationElementNode.getAttributes()) != null) && (animation != null)){
+            //Depending on whether this is a start or end animation, set the animation in the slide element it's associated with.
+            String type = animationAttributes.getNamedItem("type").getNodeValue();
+            if(type.equals("in")){
+                slideElement.setStartAnimation(animation);
+            } else if (type.equals("out")){
+                slideElement.setEndAnimation(animation);
+            } else {
+                logger.warn("Invalid animation direction.  Should be either 'in' or 'out'. We got: " + type);
+                faultsDetected.add("Invalid animation direction.  Should be either 'in' or 'out' we got: " + type);
+            }
+
+        } else {
+            logger.warn("Missing Attributes for animation node.");
+            faultsDetected.add("Missing Attributes for animation node.");
         }
     }
 
