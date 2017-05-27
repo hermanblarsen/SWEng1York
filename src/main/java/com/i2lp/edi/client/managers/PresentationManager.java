@@ -207,6 +207,8 @@ public abstract class PresentationManager {
 
         if (presentationElement.isAutoplayPresentation()){
             autoPlay();
+        } else{
+            controlPresentation(Slide.SLIDE_FORWARD); //Move to start sequence 1 so slides can s
         }
     }
 

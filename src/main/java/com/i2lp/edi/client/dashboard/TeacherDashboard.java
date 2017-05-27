@@ -5,5 +5,10 @@ package com.i2lp.edi.client.dashboard;
  */
 public class TeacherDashboard extends Dashboard {
 
+    public void goLive(){
+       /* SocketClient socketClient = new SocketClient();
+        if(socketClient.setPresentationLive()){
 
+        }*/
+    }
 }

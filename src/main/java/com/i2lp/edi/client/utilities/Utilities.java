@@ -129,7 +129,7 @@ public class Utilities {
      * @return true valid hex, false invalid hex
      * @author Amrik Sadhra
      */
-    public static String checkValidColour(String colour, Theme presentationDefaults) {
+    public static String checkValidColour(String colour, Theme presentationDefaults, boolean isBackground) {
         String HEX_PATTERN = "^#([A-Fa-f0-9]{8})$";
         Pattern pattern = Pattern.compile(HEX_PATTERN);
         Matcher matcher = pattern.matcher(colour);
@@ -143,7 +143,11 @@ public class Utilities {
             return FALLBACK_COLOUR;
         } else {
             logger.warn("Invalid RGBA Colour specified in XML: " + colour + ", defaulting to XML Default");
-            return presentationDefaults.getFontColour();
+            if(isBackground){
+                return presentationDefaults.getBackgroundColour();
+            } else {
+                return presentationDefaults.getFontColour();
+            }
         }
     }
 

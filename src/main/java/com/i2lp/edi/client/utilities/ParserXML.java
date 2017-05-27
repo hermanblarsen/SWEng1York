@@ -181,7 +181,7 @@ public class ParserXML {
 
                     switch (elementName) {
                         case "bgcolour":
-                            theme.setBackgroundColour(checkValidColour(elementContent, null));
+                            theme.setBackgroundColour(checkValidColour(elementContent, null, true));
                             break;
                         case "font":
                             theme.setFont(checkValidFont(elementContent, null));
@@ -190,10 +190,10 @@ public class ParserXML {
                             theme.setFontSize(checkValidFontSize(Integer.parseInt(elementContent), null));
                             break;
                         case "fontcolour":
-                            theme.setFontColour(checkValidColour(elementContent, null));
+                            theme.setFontColour(checkValidColour(elementContent, null, false));
                             break;
                         case "graphicscolour":
-                            theme.setGraphicsColour(checkValidColour(elementContent, null));
+                            theme.setGraphicsColour(checkValidColour(elementContent, null, false));
                             break;
                         case "autoplaymedia":
                             myPresentation.setAutoplayMedia(Boolean.valueOf(elementContent));
@@ -402,13 +402,13 @@ public class ParserXML {
                         textElement.setFontSize(checkValidFontSize(Integer.valueOf(elementContent), myPresentation.getTheme()));
                         break;
                     case "fontcolour":
-                        textElement.setFontColour(hexToRGBA(checkValidColour(elementContent, myPresentation.getTheme())));
+                        textElement.setFontColour(hexToRGBA(checkValidColour(elementContent, myPresentation.getTheme(), false)));
                         break;
                     case "bgcolour":
-                        textElement.setBgColour(hexToRGBA(checkValidColour(elementContent, myPresentation.getTheme())));
+                        textElement.setBgColour(hexToRGBA(checkValidColour(elementContent, myPresentation.getTheme(), true)));
                         break;
                     case "bordercolour":
-                        textElement.setBorderColour(hexToRGBA(checkValidColour(elementContent, myPresentation.getTheme())));
+                        textElement.setBorderColour(hexToRGBA(checkValidColour(elementContent, myPresentation.getTheme(), true)));
                         break;
                     case "onclickaction":
                         textElement.setOnClickAction(checkValidOnClickAction(elementContent));
@@ -461,10 +461,10 @@ public class ParserXML {
                         graphicElement.setElementAspectRatio(Float.valueOf(elementContent));
                         break;
                     case "linecolour":
-                        graphicElement.setLineColour(checkValidColour(elementContent, myPresentation.getTheme()));
+                        graphicElement.setLineColour(checkValidColour(elementContent, myPresentation.getTheme(), true));
                         break;
                     case "fillcolour":
-                        graphicElement.setFillColour(checkValidColour(elementContent, myPresentation.getTheme()));
+                        graphicElement.setFillColour(checkValidColour(elementContent, myPresentation.getTheme(), true));
                         break;
                     case "polygon":
                         NodeList polygonNodeChildrenList = elementNode.getChildNodes();

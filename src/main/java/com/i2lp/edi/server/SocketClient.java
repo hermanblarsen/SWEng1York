@@ -2,10 +2,7 @@ package com.i2lp.edi.server;
 
 import com.i2lp.edi.client.managers.EdiManager;
 import com.i2lp.edi.client.utilities.Utilities;
-import com.i2lp.edi.server.packets.Module;
-import com.i2lp.edi.server.packets.PresentationMetadata;
-import com.i2lp.edi.server.packets.User;
-import com.i2lp.edi.server.packets.UserAuth;
+import com.i2lp.edi.server.packets.*;
 import com.impossibl.postgres.api.jdbc.PGConnection;
 import com.impossibl.postgres.jdbc.PGDataSource;
 import io.socket.client.IO;
@@ -143,6 +140,7 @@ public class SocketClient {
         switch ((String) tableToUpdate) {
             case "interactions":
                 logger.info("New responses to act upon registered on edi server!");
+                ArrayList<Interaction> Interactions = getInteractionsForInteractiveElement(1);
                 //updateResponses(current_presentation_id, current_question_id);
                 break;
 
@@ -253,7 +251,6 @@ public class SocketClient {
         executor.shutdownNow();
         return "USER_ADD_FAILED";
     }
-
 
     class UserAuthTask implements Callable<User> {
         UserAuth toAuth;
@@ -482,5 +479,82 @@ public class SocketClient {
             logger.error("Unable to connect to PostgreSQL on port 5432. PJDBC dump:", e);
         }
         return return_status_removal;
+    }
+
+    public ArrayList<Interaction> getInteractionsForInteractiveElement(int interactiveElementID){
+        ArrayList<Interaction> interactionsForElement = new ArrayList<>();
+
+        //Attempt to add a user using stored procedure
+        try (PGConnection connection = (PGConnection) dataSource.getConnection()) {
+            PreparedStatement statement = connection.prepareStatement("SELECT * FROM public.sp_getinteractionsforinteractiveelement(?);");
+
+            //Fill prepared statements to avoid SQL injection
+            statement.setInt(1, interactiveElementID);
+
+            //Call stored procedure on database
+            ResultSet rs = statement.executeQuery();
+
+            while (rs.next()) {
+                interactionsForElement.add(new Interaction(rs.getInt("interaction_id"), rs.getInt("user_id"), rs.getInt("interactive_element_id"), rs.getString("interaction_data"), rs.getTimestamp("time_created")));
+            }
+
+            statement.close();
+        } catch (Exception e) {
+            logger.error("Unable to connect to PostgreSQL on port 5432. PJDBC dump:", e);
+        }
+
+        return interactionsForElement;
+    }
+
+    public boolean setPresentationLive(int presentationID, boolean live) {
+        boolean statementSuccess = false;
+        try (PGConnection connection = (PGConnection) dataSource.getConnection()) {
+            PreparedStatement statement = connection.prepareStatement("UPDATE presentations SET live = ? WHERE presentation_id = ?;");
+
+            //Fill prepared statements to avoid SQL injection
+            statement.setBoolean(1, live);
+            statement.setInt(1, presentationID);
+
+            //Call stored procedure on database
+            statementSuccess = statement.execute();
+
+            if(statementSuccess){
+                logger.info("Presentation successfully set to live.");
+            } else {
+                logger.error("Unable to set presentation live. Connectivity issues may have been encountered.");
+            }
+
+            statement.close();
+        } catch (Exception e) {
+            logger.error("Unable to connect to PostgreSQL on port 5432. PJDBC dump:", e);
+        }
+
+        return statementSuccess;
+    }
+
+    public boolean setUserActivePresentation(int presentationID, int userID){
+        boolean statementSuccess = false;
+        try (PGConnection connection = (PGConnection) dataSource.getConnection()) {
+            PreparedStatement statement = connection.prepareStatement("UPDATE users SET active_presentation_id = ? WHERE user_id = ?;");
+
+            //Fill prepared statements to avoid SQL injection
+            statement.setInt(1, presentationID);
+            statement.setInt(2, userID);
+
+            //Call stored procedure on database
+            statementSuccess = statement.execute();
+
+            if(statementSuccess){
+                logger.info("User: " + userID + " is now active in presentation: " + presentationID);
+            } else {
+                logger.error("Unable to set active presentation for user.");
+            }
+
+            statement.close();
+        } catch (Exception e) {
+            logger.error("Unable to connect to PostgreSQL on port 5432. PJDBC dump:", e);
+        }
+
+        return statementSuccess;
     }
 }

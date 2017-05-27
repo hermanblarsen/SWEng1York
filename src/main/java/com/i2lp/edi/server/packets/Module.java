@@ -15,6 +15,30 @@ public class Module {
     Timestamp time_created;
     String module_name;
 
+    public int getModule_id() {
+        return module_id;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public String getSubject() {
+        return subject;
+    }
+
+    public Time getTime_last_updated() {
+        return time_last_updated;
+    }
+
+    public Timestamp getTime_created() {
+        return time_created;
+    }
+
+    public String getModule_name() {
+        return module_name;
+    }
+
 
     public Module(int module_id, String description, String subject, Time time_last_updated, Timestamp time_created, String module_name) {
         this.module_id = module_id;

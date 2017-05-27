@@ -43,6 +43,8 @@ public class PresentationLibraryManager {
         this.socketClient = ediManager.getSocketClient();
 
         updatePresentations();
+
+
     }
 
     /**
@@ -185,7 +187,7 @@ public class PresentationLibraryManager {
         }
         final String zipPath = TEMP_PATH + filename + ".zip";
 
-        //Create zip after thumbnail and CSS generation are done
+        //Create zip after thumbnail and CSS generation are done-
         Task zipCreationTask = new Task() {
             @Override
             protected Object call() throws Exception {

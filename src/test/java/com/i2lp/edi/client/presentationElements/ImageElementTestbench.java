@@ -3,7 +3,6 @@ package com.i2lp.edi.client.presentationElements;
 import com.i2lp.edi.client.animation.Animation;
 import javafx.application.Application;
 import javafx.scene.Scene;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
@@ -30,7 +29,7 @@ public class ImageElementTestbench extends Application{
         BorderPane root = new BorderPane();
         Scene scene = new Scene(root, 1000, 1000);
 
-        //Setup the element
+        //Setup the Element
         try {
             ImageElement imageElement = new ImageElement();
             imageElement.setLayer(1);
