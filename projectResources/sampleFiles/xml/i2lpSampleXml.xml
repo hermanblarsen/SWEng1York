@@ -72,7 +72,7 @@
                 <onclickinfo>https://www.google.no/</onclickinfo>
             </text>
 
-            <text elementid ="4" layer="4" startsequence="4">
+            <text elementid ="4" layer="4" startsequence="5">
                 <textcontent>
                     &lt;h4&gt;Some fully transparent text on top of everything squared!&lt;/h4&gt;
                     &lt;p&gt;Clicks on me will do nothing, but I should have a border!&lt;/p&gt;
@@ -207,5 +207,22 @@
 				<onclickinfo>0</onclickinfo>
 			</text>
 		</slide>
+
+        <slide slideid="4">
+            <wordcloud elementid ="0" layer="1" visibility="true" startsequence="1">
+                <question>Insert Words About Edi Here</question>
+                <timelimit>20</timelimit>
+            </wordcloud>
+        </slide>
+
+
+
+        <slide slideid="4">
+            <poll elementid ="0" layer="1" visibility="true" startsequence="1" endsequence="2">
+                <timelimit>20</timelimit>
+                <question>Insert Longer Question Here</question>
+                <answers>answer1,answer2,answer3,answer4</answers>
+            </poll>
+        </slide>
 	</slideshow>
 </document>
