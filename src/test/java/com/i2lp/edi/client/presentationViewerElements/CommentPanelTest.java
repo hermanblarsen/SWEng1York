@@ -15,6 +15,7 @@ import org.junit.*;
 
 import java.util.concurrent.TimeoutException;
 
+import static com.i2lp.edi.client.Constants.IS_CIRCLE_BUILD;
 import static org.junit.Assert.*;
 
 /**
@@ -32,6 +33,11 @@ public class CommentPanelTest extends ApplicationTest {
 
     @Override
     public void start(Stage stage) throws Exception {
+        if (IS_CIRCLE_BUILD) {
+            System.out.println("Skipping test requiring graphics on circle.ci (CI server is headless)");
+            return;
+        }
+
         slide = new Slide();
         myCommentPanel = new CommentPanel(false);
         myCommentPanel.setSlide(slide);
@@ -43,6 +49,9 @@ public class CommentPanelTest extends ApplicationTest {
 
     @Before
     public void setUp() {
+        //Ignores the test if the build is run from circle (headless) environment
+        Assume.assumeTrue(!IS_CIRCLE_BUILD);
+
         saveButton = myCommentPanel.saveButton;
         submitButton = myCommentPanel.submitButton;
         comment = myCommentPanel.comment;

@@ -7,21 +7,19 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseButton;
 import javafx.stage.Stage;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.*;
 import org.testfx.api.FxToolkit;
 import org.testfx.framework.junit.ApplicationTest;
 
 import java.util.ArrayList;
 import java.util.concurrent.TimeoutException;
+
+import static com.i2lp.edi.client.Constants.IS_CIRCLE_BUILD;
 import static org.junit.Assert.*;
 
 /**
  * Created by Luke on 06/05/2017.
  */
-@Ignore
 public class TeacherDashboardTest extends ApplicationTest {
     private static TeacherDashboard myDashboard;
 
@@ -32,6 +30,11 @@ public class TeacherDashboardTest extends ApplicationTest {
 
     @Override
     public void start(Stage stage) throws Exception {
+        if (IS_CIRCLE_BUILD) {
+            System.out.println("Skipping test requiring graphics on circle.ci (CI server is headless)");
+            return;
+        }
+
         EdiManager ediManager = new EdiManager();
         ediManager.start(stage);
         ediManager.loginSucceded(true, new User(1, "First", "Last", "email", "teacher"));
@@ -41,6 +44,9 @@ public class TeacherDashboardTest extends ApplicationTest {
 
     @Before
     public void setUp() {
+        //Ignores the test if the build is run from circle (headless) environment
+        Assume.assumeTrue(!IS_CIRCLE_BUILD);
+
         searchField = myDashboard.searchField;
         previewPanels = myDashboard.presentationPanels;
         showAllButton = myDashboard.showAllButton;

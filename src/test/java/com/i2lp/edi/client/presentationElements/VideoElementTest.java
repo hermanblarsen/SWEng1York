@@ -7,22 +7,19 @@ import javafx.scene.layout.Pane;
 import javafx.scene.media.MediaPlayer;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.*;
 import org.testfx.api.FxToolkit;
 import org.testfx.framework.junit.ApplicationTest;
 
 import java.io.File;
 import java.util.concurrent.TimeoutException;
 
+import static com.i2lp.edi.client.Constants.IS_CIRCLE_BUILD;
 import static org.junit.Assert.*;
 
 /**
  * Created by kma517 on 08/03/2017.
  */
-@Ignore
 public class VideoElementTest extends ApplicationTest {
     private VideoElement myVideoElement;
     Pane videoPane;
@@ -30,16 +27,23 @@ public class VideoElementTest extends ApplicationTest {
     //This operation comes from ApplicationTest and loads the GUI to test.
     @Override
     public void start(Stage stage) throws Exception {
+        if (IS_CIRCLE_BUILD) {
+            System.out.println("Skipping test requiring graphics on circle.ci (CI server is headless)");
+            return;
+        }
         videoPane = new Pane();
         // Put the GUI in front of windows
-//        stage.toFront();
-//        stage.show();
+        stage.toFront();
+        stage.show();
     }
 
     @Before
     public void setUp() throws Exception {
+        //Ignores the test if the build is run from circle (headless) environment
+        Assume.assumeTrue(!IS_CIRCLE_BUILD);
+
         myVideoElement = new VideoElement();
-//        myVideoElement.setPath("http://download.oracle.com/otndocs/products/javafx/oow2010-2.flv");
+        myVideoElement.setPath("http://download.oracle.com/otndocs/products/javafx/oow2010-2.flv");
         myVideoElement.setPath("projectResources/sampleFiles/prometheus.mp4");
         myVideoElement.setAutoplay(true);
         myVideoElement.setAspectRatioLock(true);
@@ -98,8 +102,8 @@ public class VideoElementTest extends ApplicationTest {
 
     @After
     public void tearDown()  {
-//        myVideoElement.getMediaPlayer().stop();
-//        myVideoElement.getMediaPlayer().dispose();
+        myVideoElement.getMediaPlayer().stop();
+        myVideoElement.getMediaPlayer().dispose();
         try {
             FxToolkit.hideStage();
         } catch (TimeoutException e) {

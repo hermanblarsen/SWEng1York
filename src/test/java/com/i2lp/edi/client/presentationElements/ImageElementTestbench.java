@@ -7,8 +7,11 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
+import org.junit.Test;
 
 import java.io.FileNotFoundException;
+
+import static org.junit.Assert.assertTrue;
 
 /**
  * Created by Zain on 07/05/2017.
@@ -75,5 +78,11 @@ public class ImageElementTestbench extends Application{
         primaryStage.setTitle("Image Element Test");
         primaryStage.setScene(scene);
         primaryStage.show();
+    }
+
+    @Test
+    public void emptyTest() {
+        // this is to satisfy JUnits need for runnable methods
+        assertTrue(true);
     }
 }

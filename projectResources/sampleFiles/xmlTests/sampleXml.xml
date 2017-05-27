@@ -1,5 +1,6 @@
 <document documentid="sampleinput">
 	<documentdetails>
+		<title>Test Sample XML</title>
 		<author>Joe Bloggs</author>
 		<version>1.0</version>
 		<documentaspectratio>1.78</documentaspectratio>
@@ -19,7 +20,7 @@
 		<slide slideid="1">
 			<text elementid ="1" layer="1" visibility="true" startsequence="2" endsequence="4" duration="20.5">
 				<textcontent>
-					<html><h1 style='background : rgba(0,0,0,0);'><b><font color="red">IILP </font><font color="blue">HTML</font> <font color="green">Support Test</font></b></h1></html>
+					&lt;p&gt;Test HTML Paragraph&lt;/p&gt;
 				</textcontent>
 				<xposition>0.12</xposition>
 				<yposition>0.3</yposition>
@@ -83,7 +84,7 @@
 				</oval>
 			</graphic>
 			<audio elementid ="3" startsequence="2" endsequence="4" duration="12.0">
-				<path>audio.mp3</path>
+				<path>projectResources/sampleFiles/example.mp3</path>
 				<loop>true</loop>
 				<autoplay>false</autoplay>
 				<starttime>1</starttime>
