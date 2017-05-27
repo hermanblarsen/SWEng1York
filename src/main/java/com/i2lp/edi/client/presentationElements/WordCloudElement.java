@@ -152,7 +152,7 @@ public class WordCloudElement extends InteractiveElement {
             wc.build(wordFrequencies);
 
             String pathName = presentationID+Integer.toString(slideID);
-            File wordcloudPath = new File(PRESENTATIONS_PATH + "/Wordclouds/"+pathName+".png");
+            File wordcloudPath = new File(PRESENTATIONS_PATH + "/Wordclouds/"+presentationID+"/"+pathName+".png");
             if (!wordcloudPath.exists()) {
                 wordcloudPath.getParentFile().mkdirs(); //Create directory structure if not present yet
             }
