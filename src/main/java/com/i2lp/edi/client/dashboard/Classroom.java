@@ -12,14 +12,13 @@ public class Classroom {
 
     private final String moduleName;
     private ArrayList<Presentation> presentations;
-    private String subject;
+    private Subject subject;
 
-    public Classroom(String moduleName, Presentation presentation) {
+    public Classroom(Subject subject, String moduleName, ArrayList<Classroom> availableClassrooms) {
         this.moduleName = moduleName;
-        Random random = new Random();
-        subject = "Subject: " + random.nextInt(2);
+        this.subject = subject;
         presentations = new ArrayList<>();
-        addPresentation(presentation);
+        availableClassrooms.add(this);
     }
 
     public String getModuleName() { return moduleName; }
@@ -31,5 +30,5 @@ public class Classroom {
         presentation.setClassroom(this);
     }
 
-    public String getSubject() { return subject; }
+    public Subject getSubject() { return subject; }
 }

@@ -4,11 +4,12 @@ import com.i2lp.edi.client.Constants;
 import com.i2lp.edi.client.editor.PresentationEditor;
 import com.i2lp.edi.client.managers.*;
 import com.i2lp.edi.client.presentationElements.Presentation;
+import com.i2lp.edi.client.utilities.ClassroomSortKey;
 import com.i2lp.edi.client.utilities.ParserXML;
 import com.i2lp.edi.client.utilities.PresSortKey;
+import com.i2lp.edi.client.utilities.SubjectSortKey;
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.collections.ListChangeListener;
 import javafx.geometry.*;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -26,7 +27,6 @@ import javafx.stage.FileChooser;
 import javafx.stage.Popup;
 import javafx.stage.Stage;
 import javafx.stage.Window;
-import org.apache.commons.lang3.StringUtils;
 import org.kordamp.bootstrapfx.scene.layout.Panel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,6 +48,7 @@ import static javafx.scene.layout.BorderPane.setAlignment;
  */
 @SuppressWarnings({"WeakerAccess", "unused", "Duplicates"})
 public abstract class Dashboard extends Application {
+    private static final double LEFT_PANEL_SIZE = 200;
     protected Scene scene;
     protected BorderPane border;
     private VBox rootBox;
@@ -55,20 +56,27 @@ public abstract class Dashboard extends Application {
     private EdiManager ediManager;
     protected PresentationManager presentationManager;
     protected Stage dashboardStage;
-    protected Presentation selectedPres;
-    private Classroom selectedClassroom;
+    private PresentationPanel selectedPresPanel;
+    private ClassroomPanel selectedClassroomPanel;
     protected ArrayList<PresentationPanel> presentationPanels;
     private ArrayList<ClassroomPanel> classroomPanels;
     private ArrayList<SubjectPanel> subjectPanels;
     private FlowPane presentationPanelsFlowPane;
     private VBox subjectPanelsVBox;
-    private ComboBox<PresSortKey> sortCombo;
+    private ComboBox<PresSortKey> presSortCombo;
+    private ComboBox<ClassroomSortKey> classroomSortCombo;
+    private ComboBox<SubjectSortKey> subjectSortCombo;
     private Stage addToServerStage;
     private ArrayList<Presentation> availablePresentations;
     private ArrayList<Classroom> availableClassrooms;
+    private ArrayList<Subject> availableSubjects;
     private boolean isWelcomeTextHidden = false;
     private DashboardState currentState;
     private Text noMatchesSubject, noMatchesPres;
+    private Button addToServerButton;
+    private VBox controlsVBox;
+    private ScrollPane controlsScroll;
+    private Panel searchPanel, subjectFilterPanel, presSortPanel, classroomSortPanel, subjectSortPanel;
 
     protected TextField searchField;
     protected Button showAllButton;
@@ -109,8 +117,14 @@ public abstract class Dashboard extends Application {
         currentState = state;
         logger.info("State: " + currentState.name());
 
-        if((state == DashboardState.CLASSROOM || state == DashboardState.MODULES) && searchField != null)
-            searchField.setText("");
+        if(searchField != null) {
+            if(state == DashboardState.CLASSROOM || state == DashboardState.MODULES)
+                searchField.setText("");
+        }
+
+        if(state == DashboardState.MODULES) {
+            setSelectedPreviewPanel(selectedPresPanel, false);
+        }
 
         displayBorderTop(state);
         displayBorderCenter(state);
@@ -128,101 +142,96 @@ public abstract class Dashboard extends Application {
         platformTitle.getStyleClass().setAll("h3");
         platformTitle.setFill(Color.WHITESMOKE);
 
+        final FileChooser fileChooser = new FileChooser();
+        FileChooser.ExtensionFilter xmlExtensionFilter =
+                new FileChooser.ExtensionFilter("XML Presentations (*.XML)", "*.xml", "*.XML");
+        fileChooser.getExtensionFilters().add(xmlExtensionFilter);
+        fileChooser.setSelectedExtensionFilter(xmlExtensionFilter);
+        fileChooser.setInitialDirectory(new File("projectResources/sampleFiles/xml"));
+        //fileChooser.setInitialDirectory(new File(System.getProperty("user.home"))); //TODO reinstate when tested
+        fileChooser.setTitle("Open Presentation");
+
+        Button openPresButton = new Button("Open Presentation", new ImageView(new Image("file:projectResources/icons/arrow-down.png", 10, 10, true, true)));
+        openPresButton.getStyleClass().setAll("btn", "btn-default");
+        openPresButton.setOnAction(event -> {
+            ContextMenu menu = new ContextMenu();
+
+            MenuItem local = new MenuItem("From this computer");
+            local.setOnAction(event1 -> {
+                Node source = (Node) event.getSource();
+                Window stage = source.getScene().getWindow();
+
+
+                File file = fileChooser.showOpenDialog(stage);
+                if (file != null) {
+                    launchPresentation(file.getPath());
+                } else logger.info("No presentation was selected");
+            });
+
+            MenuItem online = new MenuItem("Remotely (from HTTP)");
+            online.setOnAction(event1 -> logger.info("Not yet implemented")); //TODO: open presentation from web
+
+            menu.getItems().addAll(local, online);
+            menu.show(openPresButton, Side.BOTTOM, 0, 0);
+        });
+
+        addToServerButton = new Button("Add pres to server");
+        addToServerButton.getStyleClass().setAll("btn", "btn-success");
+        addToServerButton.setOnAction(event -> {
+            AtomicReference<File> xmlLocation = new AtomicReference<>(); //Store location of XML from filechooser, for upload to presentation after Thumbnail and CSS gen
+
+            if(addToServerStage != null) {
+                addToServerStage.close();
+            }
+
+            addToServerStage = new Stage();
+            GridPane addToServerGridPane = new GridPane();
+            addToServerGridPane.setAlignment(Pos.CENTER);
+
+            addToServerGridPane.setHgap(10);
+            addToServerGridPane.setVgap(10);
+            addToServerGridPane.setPadding(new Insets(25, 25, 25, 25));
+            Scene addToServerScene = new Scene(addToServerGridPane, 300, 300);
+            addToServerScene.getStylesheets().add("bootstrapfx.css");
+
+            Button selectXML = new Button("Select XML");
+            selectXML.getStyleClass().setAll("btn", "btn-primary");
+            selectXML.setOnAction(event1 -> {
+                File file = fileChooser.showOpenDialog(addToServerStage);
+                xmlLocation.set(file);
+            });
+            addToServerGridPane.add(selectXML, 0, 0);
+            GridPane.setConstraints(selectXML, 0, 0, 1, 1, HPos.CENTER, VPos.CENTER);
+
+            Label saveInModule = new Label("Save in module:");
+            addToServerGridPane.add(saveInModule, 0, 1);
+            GridPane.setConstraints(saveInModule, 0, 1, 1, 1, HPos.CENTER, VPos.CENTER);
+
+            ComboBox<String> modulesCombo = new ComboBox<>();
+            modulesCombo.getItems().addAll("Module 1", "Module 2", "Module 3");
+            addToServerGridPane.add(modulesCombo, 0, 2);
+            GridPane.setConstraints(modulesCombo, 0, 2, 1, 1, HPos.CENTER, VPos.CENTER);
+
+            Button addButton = new Button("Add");
+            addButton.getStyleClass().setAll("btn", "btn-success");
+            addButton.setOnAction(event1 -> {
+                ediManager.getPresentationLibraryManager().uploadPresentation(xmlLocation.get().getAbsolutePath(), removeFileExtension(xmlLocation.get().getName()), 1); //TODO: Add proper ModuleID
+                addToServerStage.close();
+            });
+            addToServerGridPane.add(addButton, 0, 3);
+            GridPane.setConstraints(addButton, 0, 3, 1, 1, HPos.CENTER, VPos.CENTER);
+
+            addToServerStage.setScene(addToServerScene);
+            addToServerStage.show();
+        });
+
+        topPanel.getChildren().addAll(openPresButton, addToServerButton, platformTitle);
+
         switch (state) {
             case MODULES:
-                topPanel.setAlignment(Pos.CENTER);
-                topPanel.getChildren().add(platformTitle);
-                break;
-
             case CLASSROOM:
             case SEARCH_CLASSROOM:
             case SEARCH_ALL:
-                final FileChooser fileChooser = new FileChooser();
-                FileChooser.ExtensionFilter xmlExtensionFilter =
-                        new FileChooser.ExtensionFilter("XML Presentations (*.XML)", "*.xml", "*.XML");
-                fileChooser.getExtensionFilters().add(xmlExtensionFilter);
-                fileChooser.setSelectedExtensionFilter(xmlExtensionFilter);
-                fileChooser.setInitialDirectory(new File("projectResources/sampleFiles/xml"));
-                //fileChooser.setInitialDirectory(new File(System.getProperty("user.home"))); //TODO reinstate when tested
-                fileChooser.setTitle("Open Presentation");
-
-                Button openPresButton = new Button("Open Presentation", new ImageView(new Image("file:projectResources/icons/arrow-down.png", 10, 10, true, true)));
-                openPresButton.getStyleClass().setAll("btn", "btn-default");
-                openPresButton.setOnAction(event -> {
-                    ContextMenu menu = new ContextMenu();
-
-                    MenuItem local = new MenuItem("From this computer");
-                    local.setOnAction(event1 -> {
-                        Node source = (Node) event.getSource();
-                        Window stage = source.getScene().getWindow();
-
-
-                        File file = fileChooser.showOpenDialog(stage);
-                        if (file != null) {
-                            launchPresentation(file.getPath());
-                        } else logger.info("No presentation was selected");
-                    });
-
-                    MenuItem online = new MenuItem("Remotely (from HTTP)");
-                    online.setOnAction(event1 -> logger.info("Not yet implemented")); //TODO: open presentation from web
-
-                    menu.getItems().addAll(local, online);
-                    menu.show(openPresButton, Side.BOTTOM, 0, 0);
-                });
-
-                Button addToServerButton = new Button("Add pres to server");
-                addToServerButton.getStyleClass().setAll("btn", "btn-success");
-                addToServerButton.setOnAction(event -> {
-                    AtomicReference<File> xmlLocation = new AtomicReference<>(); //Store location of XML from filechooser, for upload to presentation after Thumbnail and CSS gen
-
-                    if(addToServerStage != null) {
-                        addToServerStage.close();
-                    }
-
-                    addToServerStage = new Stage();
-                    GridPane addToServerGridPane = new GridPane();
-                    addToServerGridPane.setAlignment(Pos.CENTER);
-
-                    addToServerGridPane.setHgap(10);
-                    addToServerGridPane.setVgap(10);
-                    addToServerGridPane.setPadding(new Insets(25, 25, 25, 25));
-                    Scene addToServerScene = new Scene(addToServerGridPane, 300, 300);
-                    addToServerScene.getStylesheets().add("bootstrapfx.css");
-
-                    Button selectXML = new Button("Select XML");
-                    selectXML.getStyleClass().setAll("btn", "btn-primary");
-                    selectXML.setOnAction(event1 -> {
-                        File file = fileChooser.showOpenDialog(addToServerStage);
-                        xmlLocation.set(file);
-                    });
-                    addToServerGridPane.add(selectXML, 0, 0);
-                    GridPane.setConstraints(selectXML, 0, 0, 1, 1, HPos.CENTER, VPos.CENTER);
-
-                    Label saveInModule = new Label("Save in module:");
-                    addToServerGridPane.add(saveInModule, 0, 1);
-                    GridPane.setConstraints(saveInModule, 0, 1, 1, 1, HPos.CENTER, VPos.CENTER);
-
-                    ComboBox<String> modulesCombo = new ComboBox<>();
-                    modulesCombo.getItems().addAll("Module 1", "Module 2", "Module 3");
-                    addToServerGridPane.add(modulesCombo, 0, 2);
-                    GridPane.setConstraints(modulesCombo, 0, 2, 1, 1, HPos.CENTER, VPos.CENTER);
-
-                    Button addButton = new Button("Add");
-                    addButton.getStyleClass().setAll("btn", "btn-success");
-                    addButton.setOnAction(event1 -> {
-                        ediManager.getPresentationLibraryManager().uploadPresentation(xmlLocation.get().getAbsolutePath(), removeFileExtension(xmlLocation.get().getName()), 1); //TODO: Add proper ModuleID
-                        addToServerStage.close();
-                    });
-                    addToServerGridPane.add(addButton, 0, 3);
-                    GridPane.setConstraints(addButton, 0, 3, 1, 1, HPos.CENTER, VPos.CENTER);
-
-                    addToServerStage.setScene(addToServerScene);
-                    addToServerStage.show();
-                });
-
-                topPanel.getChildren().addAll(openPresButton, addToServerButton, platformTitle);
-                break;
-
             default:
                 //Do nothing
         }
@@ -304,22 +313,7 @@ public abstract class Dashboard extends Application {
                 presentationsText.getStyleClass().setAll("h4");
                 VBox.setMargin(presentationsText, new Insets(10, 0, 0, 0));
 
-//                subjectPanelsVBox.getChildren().addListener((ListChangeListener<? super Node>) observable -> {
-//                    if(subjectPanelsVBox.getChildren().size() == 0 && currentState == DashboardState.SEARCH_ALL) {
-//                        displayBorderCenter(currentState);
-//                    }
-//                });
-//                presentationPanelsFlowPane.getChildren().addListener((ListChangeListener<? super Node>) observable -> {
-//                    if(presentationPanelsFlowPane.getChildren().size() == 0 && currentState == DashboardState.SEARCH_ALL) {
-//                        displayBorderCenter(currentState);
-//                    }
-//                });
-
-                vbox.getChildren().add(modulesText);
-                vbox.getChildren().add(subjectPanelsVBox);
-                vbox.getChildren().add(presentationsText);
-                vbox.getChildren().add(presentationPanelsFlowPane);
-
+                vbox.getChildren().addAll(modulesText, subjectPanelsVBox, presentationsText, presentationPanelsFlowPane);
 
                 ScrollPane searchScrollPane = new ScrollPane();
                 searchScrollPane.setContent(vbox);
@@ -336,7 +330,7 @@ public abstract class Dashboard extends Application {
                 Button backButton = new Button("Back to module selection");
                 backButton.getStyleClass().setAll("btn", "btn-default");
                 backButton.setOnAction(event -> goToState(DashboardState.MODULES));
-                Text moduleText = new Text(selectedClassroom.getModuleName());
+                Text moduleText = new Text(selectedClassroomPanel.getClassroom().getSubject().getSubjectName() + " -> " + selectedClassroomPanel.getClassroom().getModuleName());
                 moduleText.getStyleClass().setAll("h4");
                 Region dummy = new Region();
                 backButton.widthProperty().addListener(observable -> dummy.setPrefWidth(backButton.getWidth()));
@@ -346,7 +340,7 @@ public abstract class Dashboard extends Application {
                 borderPane.setRight(dummy);
                 borderPane.setCenter(moduleText);
 
-                filterPresentationPanels(selectedClassroom);
+                filterBy(selectedClassroomPanel.getClassroom().getSubject());
 
                 vbox.getChildren().addAll(borderPane, presentationsScrollPane);
                 border.setCenter(vbox);
@@ -358,78 +352,188 @@ public abstract class Dashboard extends Application {
     }
 
     private void displayBorderLeft(DashboardState state) {
-        VBox controlsVBox = new VBox(8);
-        controlsVBox.setPadding(new Insets(10));
+        //Setup VBox for all panels
+        if(controlsVBox == null) {
+            controlsVBox = new VBox(8);
+            controlsVBox.setPadding(new Insets(10));
+        }
+
+        if(controlsScroll == null) {
+            controlsScroll = new ScrollPane();
+            controlsScroll.setHbarPolicy(ScrollBarPolicy.NEVER);
+            controlsScroll.setVbarPolicy(ScrollBarPolicy.NEVER);
+            controlsScroll.getStyleClass().add("edge-to-edge");
+            controlsScroll.setContent(controlsVBox);
+            controlsScroll.setFitToWidth(true);
+            controlsScroll.setMaxWidth(LEFT_PANEL_SIZE);
+            border.setLeft(controlsScroll);
+        }
+
+        Insets panelInsets = new Insets(5);
+
+        //Setup search panel
+        if(searchPanel == null) {
+            searchPanel = new Panel();
+            searchPanel.getStyleClass().add("panel-primary");
+            if(searchField == null) {
+                searchField = new TextField();
+                searchField.textProperty().addListener(observable -> search(searchField.getText()));
+            }
+            searchPanel.setCenter(searchField);
+            BorderPane.setMargin(searchField, panelInsets);
+        }
+
+        if(subjectFilterPanel == null) {
+            //Setup filtering panel
+            VBox subjectsVBox = new VBox();
+            subjectsVBox.setPadding(new Insets(3, 0, 3, 0));
+            subjectsVBox.setSpacing(3);
+            subjectsVBox.setStyle("-fx-background-color: #ffffff;");
+
+            showAllButton = new Button("Show all");
+            showAllButton.getStyleClass().setAll("btn", "btn-success");
+            showAllButton.setMaxWidth(Double.MAX_VALUE);
+            showAllButton.setAlignment(Pos.CENTER);
+            showAllButton.setOnAction(event -> filterBy(null));
+            subjectsVBox.getChildren().add(showAllButton);
+
+            subjectButtons = new ArrayList<>();
+
+            //Sort subjects alphabetically without affecting the displayed subjects
+            ArrayList<Subject> subjectsForButtons = (ArrayList<Subject>) availableSubjects.clone();
+            subjectsForButtons.sort((s1, s2) -> SubjectSortKey.NAME_AZ.compare(s1, s2));
+
+            for (Subject subject : subjectsForButtons) { //TODO: add method for refreshing buttons, call it when refreshing subjects
+                Button subjectButton = new Button(subject.getSubjectName());
+                subjectButton.getStyleClass().setAll("btn", "btn-success");
+                subjectButton.setMaxWidth(Double.MAX_VALUE);
+                subjectButton.setAlignment(Pos.CENTER);
+                subjectButton.setOnAction(event -> filterBy(subject));
+                subjectButtons.add(subjectButton);
+                subjectsVBox.getChildren().add(subjectButton);
+            }
+
+            subjectFilterPanel = new Panel("Filter by subject:");
+            subjectFilterPanel.getStyleClass().add("panel-primary");
+            subjectFilterPanel.setCenter(subjectsVBox);
+            BorderPane.setMargin(subjectsVBox, panelInsets);
+            VBox.setMargin(subjectFilterPanel, new Insets(0, 0, 0, 0));
+        }
+
+        if(presSortPanel == null) {
+            //Setup panel for presentation sorting
+            presSortPanel = new Panel("Sort presentations by");
+            presSortPanel.getStyleClass().add("panel-primary");
+            presSortCombo = new ComboBox<>();
+            presSortCombo.setMaxWidth(Double.MAX_VALUE);
+            PresSortKey.copyAllToList(presSortCombo.getItems());
+            presSortCombo.setOnAction(event -> sortPresentations(presSortCombo.getValue()));
+            presSortCombo.setValue(presSortCombo.getItems().get(0));
+            sortPresentations(presSortCombo.getItems().get(0));
+            presSortPanel.setCenter(presSortCombo);
+            BorderPane.setMargin(presSortCombo, panelInsets);
+        }
+
+        if(classroomSortPanel == null) {
+            //Setup panel for classroom sorting
+            classroomSortPanel = new Panel("Sort modules by");
+            classroomSortPanel.getStyleClass().add("panel-primary");
+            classroomSortCombo = new ComboBox<>();
+            classroomSortCombo.setMaxWidth(Double.MAX_VALUE);
+            ClassroomSortKey.copyAllToList(classroomSortCombo.getItems());
+            classroomSortCombo.setOnAction(event -> sortClassrooms(classroomSortCombo.getValue()));
+            classroomSortCombo.setValue(classroomSortCombo.getItems().get(0));
+            sortClassrooms(classroomSortCombo.getItems().get(0));
+            classroomSortPanel.setCenter(classroomSortCombo);
+            BorderPane.setMargin(classroomSortCombo, panelInsets);
+        }
+
+        if(subjectSortPanel == null) {
+            //Setup panel for subject sorting
+            subjectSortPanel = new Panel("Sort subjects by");
+            subjectSortPanel.getStyleClass().add("panel-primary");
+            subjectSortCombo = new ComboBox<>();
+            subjectSortCombo.setMaxWidth(Double.MAX_VALUE);
+            SubjectSortKey.copyAllToList(subjectSortCombo.getItems());
+            subjectSortCombo.setOnAction(event -> sortSubjects(subjectSortCombo.getValue()));
+            subjectSortCombo.setValue(subjectSortCombo.getItems().get(0));
+            sortSubjects(subjectSortCombo.getItems().get(0));
+            subjectSortPanel.setCenter(subjectSortCombo);
+            BorderPane.setMargin(subjectSortCombo, panelInsets);
+        }
 
         switch (state) {
             case MODULES:
+                if(!controlsVBox.getChildren().contains(searchPanel)) {
+                    searchPanel.setText("Search");
+                    controlsVBox.getChildren().add(searchPanel);
+                }
+
+                if(!controlsVBox.getChildren().contains(subjectSortPanel)) {
+                    controlsVBox.getChildren().add(subjectSortPanel);
+                }
+
+                if(!controlsVBox.getChildren().contains(classroomSortPanel)) {
+                    controlsVBox.getChildren().add(classroomSortPanel);
+                }
+
+                if(controlsVBox.getChildren().contains(presSortPanel)) {
+                    controlsVBox.getChildren().remove(presSortPanel);
+                }
+
+                if(controlsVBox.getChildren().contains(subjectFilterPanel)) {
+                    controlsVBox.getChildren().remove(subjectFilterPanel);
+                }
+                break;
             case CLASSROOM:
             case SEARCH_CLASSROOM:
+                if(!controlsVBox.getChildren().contains(searchPanel)) {
+                    searchPanel.setText("Search in " + selectedClassroomPanel.getModuleName());
+                    controlsVBox.getChildren().add(searchPanel);
+                }
+
+                if(!controlsVBox.getChildren().contains(presSortPanel)) {
+                    controlsVBox.getChildren().add(presSortPanel);
+                }
+
+                if(controlsVBox.getChildren().contains(subjectSortPanel)) {
+                    controlsVBox.getChildren().remove(subjectSortPanel);
+                }
+
+                if(controlsVBox.getChildren().contains(classroomSortPanel)) {
+                    controlsVBox.getChildren().remove(classroomSortPanel);
+                }
+
+                if(controlsVBox.getChildren().contains(subjectFilterPanel)) {
+                    controlsVBox.getChildren().remove(subjectFilterPanel);
+                }
+                break;
             case SEARCH_ALL:
-                Panel searchPanel = new Panel("Search");
-                controlsVBox.getChildren().add(searchPanel);
-                searchPanel.getStyleClass().add("panel-primary");
-
-                if(searchField == null) {
-                    searchField = new TextField();
-                    searchField.textProperty().addListener(observable -> search(searchField.getText()));
+                if(!controlsVBox.getChildren().contains(searchPanel)) {
+                    searchPanel.setText("Search");
+                    controlsVBox.getChildren().add(searchPanel);
                 }
 
-                searchPanel.setBody(searchField);
-
-                VBox subjectsVBox = new VBox();
-                subjectsVBox.setPadding(new Insets(3, 0, 3, 0));
-                subjectsVBox.setSpacing(3);
-                subjectsVBox.setStyle("-fx-background-color: #ffffff;");
-
-                Label filterBySubjectLabel = new Label("Filter by subject:");
-                subjectsVBox.getChildren().add(filterBySubjectLabel);
-
-                showAllButton = new Button("Show all");
-                showAllButton.getStyleClass().setAll("btn", "btn-success");
-                showAllButton.setOnAction(event -> filterPresentationPanels(null));
-                subjectsVBox.getChildren().add(showAllButton);
-
-                ArrayList<String> subjectArray = new ArrayList<>();
-                subjectButtons = new ArrayList<>();
-
-                for (PresentationPanel panel : presentationPanels) {
-                    String subject = panel.getPresentationSubject();
-                    if(subject != null && !subjectArray.contains(subject)) {
-                        subjectArray.add(subject);
-
-                        Button subjectButton = new Button(subject);
-                        subjectButton.getStyleClass().setAll("btn", "btn-success");
-                        subjectButton.setOnAction(event -> filterBySubject(subjectButton.getText()));
-                        subjectButtons.add(subjectButton);
-                        subjectsVBox.getChildren().add(subjectButton);
-                    }
+                if(!controlsVBox.getChildren().contains(subjectFilterPanel)) {
+                    controlsVBox.getChildren().add(subjectFilterPanel);
                 }
 
-                //Create Panel for subject filters
-                Panel subjectsPanel = new Panel("My subjects");
-                subjectsPanel.getStyleClass().add("panel-primary");
-                subjectsPanel.setBody(subjectsVBox);
-                VBox.setMargin(subjectsPanel, new Insets(0, 0, 0, 0));
-                controlsVBox.getChildren().add(subjectsPanel);
+                if(!controlsVBox.getChildren().contains(subjectSortPanel)) {
+                    controlsVBox.getChildren().add(subjectSortPanel);
+                }
 
-                Panel sortPanel = new Panel("Sort by");
-                sortPanel.getStyleClass().add("panel-primary");
-                VBox sortVBox = new VBox();
-                sortCombo = new ComboBox<>();
-                PresSortKey.copyAllToList(sortCombo.getItems());
-                sortCombo.setOnAction(event -> sortBy(sortCombo.getValue()));
-                sortCombo.setValue(sortCombo.getItems().get(0));
-                sortBy(sortCombo.getItems().get(0));
-                sortPanel.setBody(sortCombo);
-                controlsVBox.getChildren().add(sortPanel);
+                if(!controlsVBox.getChildren().contains(classroomSortPanel)) {
+                    controlsVBox.getChildren().add(classroomSortPanel);
+                }
+
+                if(!controlsVBox.getChildren().contains(presSortPanel)) {
+                    controlsVBox.getChildren().add(presSortPanel);
+                }
                 break;
 
             default:
                 //Do nothing
         }
-
-        border.setLeft(controlsVBox);
     }
 
     private void displayBorderRight(DashboardState state) {
@@ -441,17 +545,17 @@ public abstract class Dashboard extends Application {
 
             case CLASSROOM:
             case SEARCH_CLASSROOM:
-                if(selectedPres != null) {
+                if(selectedPresPanel != null) {
                     VBox parentBox = new VBox(2);
                     parentBox.setPadding(new Insets(5));
 
-                    for(int i = 0; i < selectedPres.getMaxSlideNumber(); i++) {
+                    for(int i = 0; i < selectedPresPanel.getPresentation().getMaxSlideNumber(); i++) {
                         VBox vbox = new VBox(3);
                         vbox.setBorder(new Border(new BorderStroke(Color.GRAY, BorderStrokeStyle.SOLID, new CornerRadii(5), BorderStroke.DEFAULT_WIDTHS)));
                         vbox.setAlignment(Pos.CENTER);
                         vbox.setPadding(new Insets(5));
 
-                        vbox.getChildren().add(selectedPres.getSlidePreview(i, SLIDE_PREVIEW_WIDTH));
+                        vbox.getChildren().add(selectedPresPanel.getPresentation().getSlidePreview(i, SLIDE_PREVIEW_WIDTH));
                         vbox.getChildren().add(new Label(Integer.toString(i + 1)));
                         vbox.setStyle("-fx-background-color: #ffffff");
                         parentBox.getChildren().add(vbox);
@@ -474,50 +578,6 @@ public abstract class Dashboard extends Application {
         }
     }
 
-    private void setupClassroomPanels() {
-        if(classroomPanels == null)
-            classroomPanels = new ArrayList<>();
-        else
-            classroomPanels.clear();
-
-        if(subjectPanels == null)
-            subjectPanels = new ArrayList<>();
-        else
-            subjectPanels.clear();
-
-        ArrayList<String> subjects = new ArrayList<>();
-
-        for(Classroom classroom : availableClassrooms) {
-            SubjectPanel subjectPanel = new SubjectPanel("Empty", null);
-            String subject = classroom.getSubject();
-
-            if(!subjects.contains(subject)) {
-                subjects.add(subject);
-                subjectPanel = new SubjectPanel(subject, subjectPanelsVBox);
-                subjectPanels.add(subjectPanel);
-            } else {
-                for(Node node : subjectPanelsVBox.getChildren()) {
-                    if(((SubjectPanel)node).getSubject().equals(subject)) {
-                        subjectPanel = (SubjectPanel) node;
-                        break;
-                    }
-                }
-            }
-
-            ClassroomPanel classroomPanel = new ClassroomPanel(subjectPanel.getSubjectPanelsHBox(), classroom);
-            classroomPanel.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
-                if (event.getButton() == MouseButton.PRIMARY) {
-                    if (classroomPanel.isSelected()) {
-                        goToState(DashboardState.CLASSROOM);
-                    } else {
-                        selectPreviewPanel(classroomPanel);
-                    }
-                }
-            });
-            classroomPanels.add(classroomPanel);
-        }
-    }
-
     private void addUserPane() {
         //TODO: add a pane with user info to the top of the left panel
     }
@@ -533,18 +593,42 @@ public abstract class Dashboard extends Application {
         else
             availableClassrooms.clear();
 
+        if(availableSubjects == null)
+            availableSubjects = new ArrayList<>();
+        else
+            availableSubjects.clear();
+
         ArrayList<String> modules = new ArrayList<>();
+        ArrayList<String> subjects = new ArrayList<>();
 
         for(int i=0; i < ediManager.getPresentationLibraryManager().getLocalPresentationList().size(); i++) {
             String moduleName = ediManager.getPresentationLibraryManager().getLocalPresentationList().get(i).getModuleName();
+            String subjectName = ediManager.getPresentationLibraryManager().getLocalPresentationList().get(i).getSubjectName();
+            boolean isLive = ediManager.getPresentationLibraryManager().getLocalPresentationList().get(i).getLive();
             String presentationDocumentID = ediManager.getPresentationLibraryManager().getLocalPresentationList().get(i).getDocumentID();
+
             String presentationPath = PRESENTATIONS_PATH + presentationDocumentID + File.separator + presentationDocumentID + ".xml";
             ParserXML parser = new ParserXML(presentationPath);
             Presentation presentation = parser.parsePresentation();
+            presentation.setLive(isLive);
 
             if(!modules.contains(moduleName)) {
-                modules.add(moduleName);
-                availableClassrooms.add(new Classroom(moduleName, presentation));
+                if(!subjects.contains(subjectName)) {
+                    modules.add(moduleName);
+                    subjects.add(subjectName);
+                    Subject subject = new Subject(subjectName, availableSubjects);
+                    Classroom classroom = new Classroom(subject, moduleName, availableClassrooms);
+                    subject.addClassroom(classroom);
+                    classroom.addPresentation(presentation);
+                } else {
+                    for(Subject subject : availableSubjects) {
+                        if(subject.getSubjectName().equals(subjectName)) {
+                            Classroom classroom = new Classroom(subject, moduleName, availableClassrooms);
+                            subject.addClassroom(classroom);
+                            classroom.addPresentation(presentation);
+                        }
+                    }
+                }
             } else {
                 for(Classroom classroom : availableClassrooms) {
                     if (classroom.getModuleName().equals(moduleName)) {
@@ -557,8 +641,88 @@ public abstract class Dashboard extends Application {
             availablePresentations.add(presentation);
         }
 
+        setupSubjectPanels();
         setupClassroomPanels();
         setupPresentationPanels();
+    }
+
+    private void setupSubjectPanels() {
+        if(subjectPanels == null)
+            subjectPanels = new ArrayList<>();
+        else
+            subjectPanels.clear();
+
+        for(Subject subject : availableSubjects) {
+            SubjectPanel subjectPanel = new SubjectPanel(subject, subjectPanelsVBox);
+            subjectPanels.add(subjectPanel);
+        }
+    }
+
+    private void setupClassroomPanels() {
+        if(classroomPanels == null)
+            classroomPanels = new ArrayList<>();
+        else
+            classroomPanels.clear();
+
+//        if(subjectPanels == null)
+//            subjectPanels = new ArrayList<>();
+//        else
+//            subjectPanels.clear();
+//
+//        ArrayList<String> subjects = new ArrayList<>();
+//
+//        for(Classroom classroom : availableClassrooms) {
+//            String subjectName = classroom.getSubject();
+//            SubjectPanel subjectPanel = new SubjectPanel(new Subject(subjectName, classroom), null);
+//
+//            if(!subjects.contains(subjectName)) {
+//                subjects.add(subjectName);
+//                Subject subject = new Subject(subjectName, classroom);
+//                availableSubjects.add(subject);
+//                subjectPanel = new SubjectPanel(subject, subjectPanelsVBox);
+//                subjectPanels.add(subjectPanel);
+//            } else {
+//                for(Node node : subjectPanelsVBox.getChildren()) {
+//                    if(((SubjectPanel)node).getSubject().equals(subjectName)) {
+//                        subjectPanel = (SubjectPanel) node;
+//                        break;
+//                    }
+//                }
+//            }
+//
+//            ClassroomPanel classroomPanel = new ClassroomPanel(subjectPanel.getClassroomPanelsHBox(), classroom);
+//            classroomPanel.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
+//                if (event.getButton() == MouseButton.PRIMARY) {
+//                    if (classroomPanel.isSelected()) {
+//                        goToState(DashboardState.CLASSROOM);
+//                    } else {
+//                        setSelectedPreviewPanel(classroomPanel, true);
+//                    }
+//                }
+//            });
+//            classroomPanels.add(classroomPanel);
+//        }
+
+        for(Classroom classroom : availableClassrooms) {
+            SubjectPanel matchingSubjectPanel;
+            for(SubjectPanel subjectPanel : subjectPanels) {
+                if(subjectPanel.getSubject().equals(classroom.getSubject())) {
+                    matchingSubjectPanel = subjectPanel;
+                    ClassroomPanel classroomPanel = new ClassroomPanel(classroom, matchingSubjectPanel.getClassroomPanelsHBox());
+                    classroomPanel.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
+                        if (event.getButton() == MouseButton.PRIMARY) {
+                            if (classroomPanel.isSelected()) {
+                                goToState(DashboardState.CLASSROOM);
+                            } else {
+                                setSelectedPreviewPanel(classroomPanel, true);
+                            }
+                        }
+                    });
+                    classroomPanels.add(classroomPanel);
+                    break;
+                }
+            }
+        }
     }
 
     public void setupPresentationPanels() {
@@ -567,27 +731,31 @@ public abstract class Dashboard extends Application {
         else
             presentationPanels.clear();
 
-        for (Presentation presentation : availablePresentations) {
-            PresentationPanel previewPanel = new PresentationPanel(presentationPanelsFlowPane, presentation);
-            previewPanel.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
+        for(Presentation presentation : availablePresentations) {
+            PresentationPanel presentationPanel = new PresentationPanel(presentation, presentationPanelsFlowPane);
+            presentationPanel.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
                 if (event.getButton() == MouseButton.PRIMARY) {
-                    if (previewPanel.isSelected()) {
-                        launchPresentation(previewPanel.getPresentationPath());
+                    if (presentationPanel.isSelected()) {
+                        launchPresentation(presentationPanel.getPresentation().getPath());
                     } else {
-                        selectPreviewPanel(previewPanel);
+                        setSelectedPreviewPanel(presentationPanel, true);
                     }
                 } else if (event.getButton() == MouseButton.SECONDARY) {
-                    selectPreviewPanel(previewPanel);
+                    setSelectedPreviewPanel(presentationPanel, true);
 
                     ContextMenu cMenu = new ContextMenu();
 
                     MenuItem open = new MenuItem("Open");
-                    open.setOnAction(openEvent -> launchPresentation(previewPanel.getPresentationPath()));
+                    open.setOnAction(openEvent -> launchPresentation(presentationPanel.getPresentation().getPath()));
                     cMenu.getItems().add(open);
 
                     if (this instanceof TeacherDashboard) {
+                        MenuItem goLive = new MenuItem("Toggle Live Mode");
+                        goLive.setOnAction(goLiveEvent -> toggleLive(presentationPanel));
+                        cMenu.getItems().add(goLive);
+
                         MenuItem edit = new MenuItem("Edit");
-                        edit.setOnAction(editEvent -> showPresentationEditor(previewPanel.getPresentationPath()));
+                        edit.setOnAction(editEvent -> showPresentationEditor(presentationPanel.getPresentation().getPath()));
                         cMenu.getItems().add(edit);
 
                         MenuItem schedule = new MenuItem("Schedule");
@@ -595,44 +763,63 @@ public abstract class Dashboard extends Application {
                         cMenu.getItems().add(schedule);
 
                         MenuItem delete = new MenuItem("Delete");
-                        delete.setOnAction(deleteEvent -> deletePresentation(previewPanel));
+                        delete.setOnAction(deleteEvent -> deletePresentation(presentationPanel));
                         cMenu.getItems().add(delete);
 
                         MenuItem print = new MenuItem("Print");
-                        print.setOnAction(printEvent-> printPresentation(previewPanel.getPresentationPath()));
+                        print.setOnAction(printEvent-> printPresentation(presentationPanel.getPresentation().getPath()));
                         cMenu.getItems().add(print);
 
                         MenuItem report = new MenuItem("Report");
-                        report.setOnAction(reportEvent -> showReport(previewPanel.getId()));
+                        report.setOnAction(reportEvent -> showReport(presentationPanel.getId()));
                         cMenu.getItems().add(report);
 
                     }
                     cMenu.show(dashboardStage, event.getScreenX(), event.getScreenY());
                 }
             });
-            presentationPanels.add(previewPanel);
+            presentationPanels.add(presentationPanel);
         }
 
-        if(sortCombo != null)
-            sortBy(sortCombo.getValue());
+        if(presSortCombo != null)
+            sortPresentations(presSortCombo.getValue());
     }
 
-    private void selectPreviewPanel(PreviewPanel previewPanel) {
+    private void toggleLive(PresentationPanel presPanel) {
+        if(presPanel.isLive())
+            presPanel.setLive(false);
+        else
+            presPanel.setLive(true);
+    }
 
+    private void setSelectedPreviewPanel(PreviewPanel previewPanel, boolean setSelected) {
         if (previewPanel instanceof PresentationPanel) {
-            for (PresentationPanel panel : presentationPanels) {
-                panel.setSelected(false);
+            if(setSelected) {
+                previewPanel.setSelected(true);
+                if(selectedPresPanel != null) {
+                    selectedPresPanel.setSelected(false);
+                }
+                selectedPresPanel = (PresentationPanel) previewPanel;
+                setSelectedPreviewPanel(selectedClassroomPanel, false);
+            } else {
+                previewPanel.setSelected(false);
+                selectedPresPanel = null;
             }
-            selectedPres = ((PresentationPanel) previewPanel).getPresentation();
+
             displayBorderRight(DashboardState.CLASSROOM);
         } else if(previewPanel instanceof ClassroomPanel) {
-            for (ClassroomPanel panel : classroomPanels) {
-                panel.setSelected(false);
+            if(setSelected) {
+                previewPanel.setSelected(true);
+                if (selectedClassroomPanel != null) {
+                    selectedClassroomPanel.setSelected(false);
+                }
+                selectedClassroomPanel = (ClassroomPanel) previewPanel;
+                setSelectedPreviewPanel(selectedPresPanel, false);
+            } else {
+                previewPanel.setSelected(false);
+                selectedClassroomPanel = null;
             }
-            selectedClassroom = ((ClassroomPanel) previewPanel).getClassroom();
         }
-
-        previewPanel.setSelected(true);
     }
 
     private void deletePresentation(PresentationPanel previewPanel) {
@@ -736,12 +923,24 @@ public abstract class Dashboard extends Application {
 
         for(PresentationPanel panel : presentationPanels) {
             panel.search(text);
+            if(panel == selectedPresPanel && panel.isHidden()) {
+                setSelectedPreviewPanel(panel, false);
+            }
         }
 
         for(ClassroomPanel panel : classroomPanels) {
             panel.search(text);
+            if(panel == selectedClassroomPanel && panel.isHidden()) {
+                setSelectedPreviewPanel(panel, false);
+            }
         }
 
+        sortSubjects(subjectSortCombo.getValue());
+        sortClassrooms(classroomSortCombo.getValue());
+        sortPresentations(presSortCombo.getValue());
+
+
+        //Displaying "No matches" has to be the last thing in this method
         if(presentationPanelsFlowPane.getChildren().contains(noMatchesPres)) {
             presentationPanelsFlowPane.getChildren().remove(noMatchesPres);
         }
@@ -759,38 +958,90 @@ public abstract class Dashboard extends Application {
         }
     }
 
-    private void filterBySubject(String subject) {
-        for (PresentationPanel panel : presentationPanels) {
-            if (!subject.equals(panel.getPresentationSubject()) && !panel.isHidden())
-                panel.setFiltered(true);
-            else if (subject.equals(panel.getPresentationSubject()) && panel.isHidden())
-                panel.setFiltered(false);
-        }
-    }
+    private void filterBy(Object filter) {
+        if(filter != null) {
+            if(filter instanceof Subject) {
+                Subject subject = (Subject) filter;
 
-    private void filterPresentationPanels(Classroom classroom) {
-        for (PresentationPanel panel : presentationPanels) {
-            if (classroom == null) {
-                panel.setFiltered(false);
-            } else {
-                Presentation p = panel.getPresentation();
-                Classroom c = p.getClassroom();
-                if(c == classroom) {
-                    panel.setFiltered(false);
-                } else {
-                    panel.setFiltered(true);
+                for(PresentationPanel panel : presentationPanels) {
+                    if(subject.equals(panel.getPresentation().getSubject()))
+                        panel.setFiltered(false);
+                    else
+                        panel.setFiltered(true);
                 }
+
+                for(ClassroomPanel panel : classroomPanels) {
+                    if(subject.equals(panel.getClassroom().getSubject()))
+                        panel.setFiltered(false);
+                    else
+                        panel.setFiltered(true);
+                }
+
+                for(SubjectPanel panel : subjectPanels) {
+                    if(subject.equals(panel.getSubject()))
+                        panel.setFiltered(false);
+                    else
+                        panel.setFiltered(true);
+                }
+            } else if(filter instanceof Classroom) {
+                Classroom classroom = (Classroom) filter;
+
+                for(PresentationPanel panel : presentationPanels) {
+                    if(classroom.equals(panel.getPresentation().getClassroom()))
+                        panel.setFiltered(false);
+                    else
+                        panel.setFiltered(true);
+                }
+
+                for(ClassroomPanel panel : classroomPanels) {
+                    if(classroom.equals(panel.getClassroom()))
+                        panel.setFiltered(false);
+                    else
+                        panel.setFiltered(true);
+                }
+            }
+        } else {
+            for(PresentationPanel panel : presentationPanels) {
+                    panel.setFiltered(false);
+            }
+
+            for(ClassroomPanel panel : classroomPanels) {
+                    panel.setFiltered(false);
+            }
+
+            for(SubjectPanel panel : subjectPanels) {
+                    panel.setFiltered(false);
             }
         }
     }
 
-    private void sortBy(PresSortKey sortKey) {
+    private void sortPresentations(PresSortKey sortKey) {
         presentationPanels.sort((p1, p2) -> sortKey.compare(p1.getPresentation(), p2.getPresentation()));
 
         presentationPanelsFlowPane.getChildren().clear();
         for (PresentationPanel panel : presentationPanels) {
-            if (!panel.isHidden())
-                presentationPanelsFlowPane.getChildren().add(panel);
+            panel.updateVisibility();
+        }
+    }
+
+    private void sortClassrooms(ClassroomSortKey sortKey) {
+        classroomPanels.sort((c1, c2) -> sortKey.compare(c1.getClassroom(), c2.getClassroom()));
+
+        for (SubjectPanel panel : subjectPanels) {
+            panel.getClassroomPanelsHBox().getChildren().clear();
+        }
+
+        for (ClassroomPanel panel : classroomPanels) {
+            panel.updateVisibility();
+        }
+    }
+
+    private void sortSubjects(SubjectSortKey sortKey) {
+        subjectPanels.sort((s1, s2) -> sortKey.compare(s1.getSubject(), s2.getSubject()));
+
+        subjectPanelsVBox.getChildren().clear();
+        for (SubjectPanel panel : subjectPanels) {
+            panel.updateVisibility();
         }
     }
 

@@ -76,9 +76,9 @@ public class TeacherDashboardTest extends ApplicationTest {
         for(Button subjectButton : subjectButtons) {
             clickOn(subjectButton);
             for(PresentationPanel temp : previewPanels) {
-                if(temp.isHidden() && temp.getPresentationSubject().equals(subjectButton.getText()))
+                if(temp.isHidden() && temp.getPresentation().getSubject().equals(subjectButton.getText()))
                     subjectFails[subjectButtons.indexOf(subjectButton)] = true;
-                else if(!temp.isHidden() && !temp.getPresentationSubject().equals(subjectButton.getText()))
+                else if(!temp.isHidden() && !temp.getPresentation().getSubject().equals(subjectButton.getText()))
                     subjectFails[subjectButtons.indexOf(subjectButton)] = true;
             }
         }

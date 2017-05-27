@@ -2,6 +2,7 @@ package com.i2lp.edi.client.presentationElements;
 
 
 import com.i2lp.edi.client.dashboard.Classroom;
+import com.i2lp.edi.client.dashboard.Subject;
 import com.i2lp.edi.client.utilities.Theme;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.image.ImageView;
@@ -26,7 +27,7 @@ public class Presentation extends Pane {
     protected static Logger logger = LoggerFactory.getLogger(Presentation.class);
     //From i2lp:
     private String documentTitle;
-    private boolean live;
+    private boolean isLive;
     private int currentSlideNumber;
     private String xmlUrl; //TODO: Unused?
 
@@ -38,7 +39,6 @@ public class Presentation extends Pane {
     private String description;
     private String tags;
     private Theme theme;
-    private String subject;
     private boolean isI2lpFormat;
     private ArrayList<String> xmlFaults = null;
 
@@ -188,9 +188,7 @@ public class Presentation extends Pane {
 
     public void setDocumentTitle(String documentTitle) { this.documentTitle = documentTitle; }
 
-    public String getSubject() { return subject; }
-
-    public void setSubject(String subject) { this.subject = subject; }
+    public Subject getSubject() { return classroom.getSubject(); }
 
     public static Presentation generateTestPresentation() {
         ArrayList<Slide> slides = new ArrayList<>();
@@ -475,4 +473,8 @@ public class Presentation extends Pane {
     public Classroom getClassroom() { return classroom; }
 
     public void setClassroom(Classroom classroom) { this.classroom = classroom; }
+
+    public void setLive(boolean live) { isLive = live; }
+
+    public boolean isLive() { return isLive; }
 }

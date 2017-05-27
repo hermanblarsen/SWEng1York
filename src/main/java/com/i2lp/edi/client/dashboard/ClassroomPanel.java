@@ -12,7 +12,7 @@ public class ClassroomPanel extends PreviewPanel {
 
     private final Classroom classroom;
 
-    public ClassroomPanel(Pane parentPane, Classroom classroom) {
+    public ClassroomPanel(Classroom classroom, Pane parentPane) {
         super(parentPane);
         this.classroom = classroom;
 
@@ -28,7 +28,7 @@ public class ClassroomPanel extends PreviewPanel {
     public ArrayList<String> getSearchableTerms() {
         ArrayList<String> searchableTerms = new ArrayList<>();
         searchableTerms.add(classroom.getModuleName());
-        searchableTerms.add(classroom.getSubject());
+        searchableTerms.add(classroom.getSubject().getSubjectName());
 
         return searchableTerms;
     }
