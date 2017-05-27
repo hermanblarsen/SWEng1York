@@ -117,12 +117,12 @@ public abstract class Dashboard extends Application {
         currentState = state;
         logger.info("State: " + currentState.name());
 
-        if(searchField != null) {
-            if(state == DashboardState.CLASSROOM || state == DashboardState.MODULES)
+        if (searchField != null) {
+            if (state == DashboardState.CLASSROOM || state == DashboardState.MODULES)
                 searchField.setText("");
         }
 
-        if(state == DashboardState.MODULES) {
+        if (state == DashboardState.MODULES) {
             setSelectedPreviewPanel(selectedPresPanel, false);
         }
 
@@ -180,7 +180,7 @@ public abstract class Dashboard extends Application {
         addToServerButton.setOnAction(event -> {
             AtomicReference<File> xmlLocation = new AtomicReference<>(); //Store location of XML from filechooser, for upload to presentation after Thumbnail and CSS gen
 
-            if(addToServerStage != null) {
+            if (addToServerStage != null) {
                 addToServerStage.close();
             }
 
@@ -353,12 +353,12 @@ public abstract class Dashboard extends Application {
 
     private void displayBorderLeft(DashboardState state) {
         //Setup VBox for all panels
-        if(controlsVBox == null) {
+        if (controlsVBox == null) {
             controlsVBox = new VBox(8);
             controlsVBox.setPadding(new Insets(10));
         }
 
-        if(controlsScroll == null) {
+        if (controlsScroll == null) {
             controlsScroll = new ScrollPane();
             controlsScroll.setHbarPolicy(ScrollBarPolicy.NEVER);
             controlsScroll.setVbarPolicy(ScrollBarPolicy.NEVER);
@@ -372,10 +372,10 @@ public abstract class Dashboard extends Application {
         Insets panelInsets = new Insets(5);
 
         //Setup search panel
-        if(searchPanel == null) {
+        if (searchPanel == null) {
             searchPanel = new Panel();
             searchPanel.getStyleClass().add("panel-primary");
-            if(searchField == null) {
+            if (searchField == null) {
                 searchField = new TextField();
                 searchField.textProperty().addListener(observable -> search(searchField.getText()));
             }
@@ -383,7 +383,7 @@ public abstract class Dashboard extends Application {
             BorderPane.setMargin(searchField, panelInsets);
         }
 
-        if(subjectFilterPanel == null) {
+        if (subjectFilterPanel == null) {
             //Setup filtering panel
             VBox subjectsVBox = new VBox();
             subjectsVBox.setPadding(new Insets(3, 0, 3, 0));
@@ -420,7 +420,7 @@ public abstract class Dashboard extends Application {
             VBox.setMargin(subjectFilterPanel, new Insets(0, 0, 0, 0));
         }
 
-        if(presSortPanel == null) {
+        if (presSortPanel == null) {
             //Setup panel for presentation sorting
             presSortPanel = new Panel("Sort presentations by");
             presSortPanel.getStyleClass().add("panel-primary");
@@ -434,7 +434,7 @@ public abstract class Dashboard extends Application {
             BorderPane.setMargin(presSortCombo, panelInsets);
         }
 
-        if(classroomSortPanel == null) {
+        if (classroomSortPanel == null) {
             //Setup panel for classroom sorting
             classroomSortPanel = new Panel("Sort modules by");
             classroomSortPanel.getStyleClass().add("panel-primary");
@@ -448,7 +448,7 @@ public abstract class Dashboard extends Application {
             BorderPane.setMargin(classroomSortCombo, panelInsets);
         }
 
-        if(subjectSortPanel == null) {
+        if (subjectSortPanel == null) {
             //Setup panel for subject sorting
             subjectSortPanel = new Panel("Sort subjects by");
             subjectSortPanel.getStyleClass().add("panel-primary");
@@ -464,69 +464,69 @@ public abstract class Dashboard extends Application {
 
         switch (state) {
             case MODULES:
-                if(!controlsVBox.getChildren().contains(searchPanel)) {
+                if (!controlsVBox.getChildren().contains(searchPanel)) {
                     searchPanel.setText("Search");
                     controlsVBox.getChildren().add(searchPanel);
                 }
 
-                if(!controlsVBox.getChildren().contains(subjectSortPanel)) {
+                if (!controlsVBox.getChildren().contains(subjectSortPanel)) {
                     controlsVBox.getChildren().add(subjectSortPanel);
                 }
 
-                if(!controlsVBox.getChildren().contains(classroomSortPanel)) {
+                if (!controlsVBox.getChildren().contains(classroomSortPanel)) {
                     controlsVBox.getChildren().add(classroomSortPanel);
                 }
 
-                if(controlsVBox.getChildren().contains(presSortPanel)) {
+                if (controlsVBox.getChildren().contains(presSortPanel)) {
                     controlsVBox.getChildren().remove(presSortPanel);
                 }
 
-                if(controlsVBox.getChildren().contains(subjectFilterPanel)) {
+                if (controlsVBox.getChildren().contains(subjectFilterPanel)) {
                     controlsVBox.getChildren().remove(subjectFilterPanel);
                 }
                 break;
             case CLASSROOM:
             case SEARCH_CLASSROOM:
-                if(!controlsVBox.getChildren().contains(searchPanel)) {
+                if (!controlsVBox.getChildren().contains(searchPanel)) {
                     searchPanel.setText("Search in " + selectedClassroomPanel.getModuleName());
                     controlsVBox.getChildren().add(searchPanel);
                 }
 
-                if(!controlsVBox.getChildren().contains(presSortPanel)) {
+                if (!controlsVBox.getChildren().contains(presSortPanel)) {
                     controlsVBox.getChildren().add(presSortPanel);
                 }
 
-                if(controlsVBox.getChildren().contains(subjectSortPanel)) {
+                if (controlsVBox.getChildren().contains(subjectSortPanel)) {
                     controlsVBox.getChildren().remove(subjectSortPanel);
                 }
 
-                if(controlsVBox.getChildren().contains(classroomSortPanel)) {
+                if (controlsVBox.getChildren().contains(classroomSortPanel)) {
                     controlsVBox.getChildren().remove(classroomSortPanel);
                 }
 
-                if(controlsVBox.getChildren().contains(subjectFilterPanel)) {
+                if (controlsVBox.getChildren().contains(subjectFilterPanel)) {
                     controlsVBox.getChildren().remove(subjectFilterPanel);
                 }
                 break;
             case SEARCH_ALL:
-                if(!controlsVBox.getChildren().contains(searchPanel)) {
+                if (!controlsVBox.getChildren().contains(searchPanel)) {
                     searchPanel.setText("Search");
                     controlsVBox.getChildren().add(searchPanel);
                 }
 
-                if(!controlsVBox.getChildren().contains(subjectFilterPanel)) {
+                if (!controlsVBox.getChildren().contains(subjectFilterPanel)) {
                     controlsVBox.getChildren().add(subjectFilterPanel);
                 }
 
-                if(!controlsVBox.getChildren().contains(subjectSortPanel)) {
+                if (!controlsVBox.getChildren().contains(subjectSortPanel)) {
                     controlsVBox.getChildren().add(subjectSortPanel);
                 }
 
-                if(!controlsVBox.getChildren().contains(classroomSortPanel)) {
+                if (!controlsVBox.getChildren().contains(classroomSortPanel)) {
                     controlsVBox.getChildren().add(classroomSortPanel);
                 }
 
-                if(!controlsVBox.getChildren().contains(presSortPanel)) {
+                if (!controlsVBox.getChildren().contains(presSortPanel)) {
                     controlsVBox.getChildren().add(presSortPanel);
                 }
                 break;
@@ -545,11 +545,11 @@ public abstract class Dashboard extends Application {
 
             case CLASSROOM:
             case SEARCH_CLASSROOM:
-                if(selectedPresPanel != null) {
+                if (selectedPresPanel != null) {
                     VBox parentBox = new VBox(2);
                     parentBox.setPadding(new Insets(5));
 
-                    for(int i = 0; i < selectedPresPanel.getPresentation().getMaxSlideNumber(); i++) {
+                    for (int i = 0; i < selectedPresPanel.getPresentation().getMaxSlideNumber(); i++) {
                         VBox vbox = new VBox(3);
                         vbox.setBorder(new Border(new BorderStroke(Color.GRAY, BorderStrokeStyle.SOLID, new CornerRadii(5), BorderStroke.DEFAULT_WIDTHS)));
                         vbox.setAlignment(Pos.CENTER);
@@ -583,17 +583,17 @@ public abstract class Dashboard extends Application {
     }
 
     private void updateAvailablePresentations() {
-        if(availablePresentations == null)
+        if (availablePresentations == null)
             availablePresentations = new ArrayList<>();
         else
             availablePresentations.clear();
 
-        if(availableClassrooms == null)
+        if (availableClassrooms == null)
             availableClassrooms = new ArrayList<>();
         else
             availableClassrooms.clear();
 
-        if(availableSubjects == null)
+        if (availableSubjects == null)
             availableSubjects = new ArrayList<>();
         else
             availableSubjects.clear();
@@ -601,7 +601,8 @@ public abstract class Dashboard extends Application {
         ArrayList<String> modules = new ArrayList<>();
         ArrayList<String> subjects = new ArrayList<>();
 
-        for(int i=0; i < ediManager.getPresentationLibraryManager().getLocalPresentationList().size(); i++) {
+        for (int i = 0; i < ediManager.getPresentationLibraryManager().getLocalPresentationList().size(); i++) {
+            Integer presentationID = ediManager.getPresentationLibraryManager().getLocalPresentationList().get(i).getPresentationID();
             String moduleName = ediManager.getPresentationLibraryManager().getLocalPresentationList().get(i).getModuleName();
             String subjectName = ediManager.getPresentationLibraryManager().getLocalPresentationList().get(i).getSubjectName();
             boolean isLive = ediManager.getPresentationLibraryManager().getLocalPresentationList().get(i).getLive();
@@ -611,9 +612,10 @@ public abstract class Dashboard extends Application {
             ParserXML parser = new ParserXML(presentationPath);
             Presentation presentation = parser.parsePresentation();
             presentation.setLive(isLive);
+            presentation.setPresentationID(presentationID);
 
-            if(!modules.contains(moduleName)) {
-                if(!subjects.contains(subjectName)) {
+            if (!modules.contains(moduleName)) {
+                if (!subjects.contains(subjectName)) {
                     modules.add(moduleName);
                     subjects.add(subjectName);
                     Subject subject = new Subject(subjectName, availableSubjects);
@@ -621,8 +623,8 @@ public abstract class Dashboard extends Application {
                     subject.addClassroom(classroom);
                     classroom.addPresentation(presentation);
                 } else {
-                    for(Subject subject : availableSubjects) {
-                        if(subject.getSubjectName().equals(subjectName)) {
+                    for (Subject subject : availableSubjects) {
+                        if (subject.getSubjectName().equals(subjectName)) {
                             Classroom classroom = new Classroom(subject, moduleName, availableClassrooms);
                             subject.addClassroom(classroom);
                             classroom.addPresentation(presentation);
@@ -630,7 +632,7 @@ public abstract class Dashboard extends Application {
                     }
                 }
             } else {
-                for(Classroom classroom : availableClassrooms) {
+                for (Classroom classroom : availableClassrooms) {
                     if (classroom.getModuleName().equals(moduleName)) {
                         classroom.addPresentation(presentation);
                         break;
@@ -647,19 +649,19 @@ public abstract class Dashboard extends Application {
     }
 
     private void setupSubjectPanels() {
-        if(subjectPanels == null)
+        if (subjectPanels == null)
             subjectPanels = new ArrayList<>();
         else
             subjectPanels.clear();
 
-        for(Subject subject : availableSubjects) {
+        for (Subject subject : availableSubjects) {
             SubjectPanel subjectPanel = new SubjectPanel(subject, subjectPanelsVBox);
             subjectPanels.add(subjectPanel);
         }
     }
 
     private void setupClassroomPanels() {
-        if(classroomPanels == null)
+        if (classroomPanels == null)
             classroomPanels = new ArrayList<>();
         else
             classroomPanels.clear();
@@ -703,10 +705,10 @@ public abstract class Dashboard extends Application {
 //            classroomPanels.add(classroomPanel);
 //        }
 
-        for(Classroom classroom : availableClassrooms) {
+        for (Classroom classroom : availableClassrooms) {
             SubjectPanel matchingSubjectPanel;
-            for(SubjectPanel subjectPanel : subjectPanels) {
-                if(subjectPanel.getSubject().equals(classroom.getSubject())) {
+            for (SubjectPanel subjectPanel : subjectPanels) {
+                if (subjectPanel.getSubject().equals(classroom.getSubject())) {
                     matchingSubjectPanel = subjectPanel;
                     ClassroomPanel classroomPanel = new ClassroomPanel(classroom, matchingSubjectPanel.getClassroomPanelsHBox());
                     classroomPanel.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
@@ -726,12 +728,12 @@ public abstract class Dashboard extends Application {
     }
 
     public void setupPresentationPanels() {
-        if(presentationPanels == null)
+        if (presentationPanels == null)
             presentationPanels = new ArrayList<>();
         else
             presentationPanels.clear();
 
-        for(Presentation presentation : availablePresentations) {
+        for (Presentation presentation : availablePresentations) {
             PresentationPanel presentationPanel = new PresentationPanel(presentation, presentationPanelsFlowPane);
             presentationPanel.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
                 if (event.getButton() == MouseButton.PRIMARY) {
@@ -767,7 +769,7 @@ public abstract class Dashboard extends Application {
                         cMenu.getItems().add(delete);
 
                         MenuItem print = new MenuItem("Print");
-                        print.setOnAction(printEvent-> printPresentation(presentationPanel.getPresentation().getPath()));
+                        print.setOnAction(printEvent -> printPresentation(presentationPanel.getPresentation().getPath()));
                         cMenu.getItems().add(print);
 
                         MenuItem report = new MenuItem("Report");
@@ -781,22 +783,34 @@ public abstract class Dashboard extends Application {
             presentationPanels.add(presentationPanel);
         }
 
-        if(presSortCombo != null)
+        if (presSortCombo != null)
             sortPresentations(presSortCombo.getValue());
     }
 
     private void toggleLive(PresentationPanel presPanel) {
-        if(presPanel.isLive())
+        if (presPanel.isLive()) {
             presPanel.setLive(false);
-        else
+            if(ediManager.getSocketClient().setPresentationLive(presPanel.getPresentation().getPresentationID(), false)){
+                //TODO: Stub for succesful go offline
+            } else {
+                //TODO: Stub for unsuccessful go offline
+            }
+        } else {
             presPanel.setLive(true);
+            //Update server database to indicate presentation is Live
+            if(ediManager.getSocketClient().setPresentationLive(presPanel.getPresentation().getPresentationID(), true)){
+                //TODO: Stub for successful go live
+            } else {
+                //TODO: Stub for unsuccesfful go live
+            }
+        }
     }
 
     private void setSelectedPreviewPanel(PreviewPanel previewPanel, boolean setSelected) {
         if (previewPanel instanceof PresentationPanel) {
-            if(setSelected) {
+            if (setSelected) {
                 previewPanel.setSelected(true);
-                if(selectedPresPanel != null) {
+                if (selectedPresPanel != null) {
                     selectedPresPanel.setSelected(false);
                 }
                 selectedPresPanel = (PresentationPanel) previewPanel;
@@ -807,8 +821,8 @@ public abstract class Dashboard extends Application {
             }
 
             displayBorderRight(DashboardState.CLASSROOM);
-        } else if(previewPanel instanceof ClassroomPanel) {
-            if(setSelected) {
+        } else if (previewPanel instanceof ClassroomPanel) {
+            if (setSelected) {
                 previewPanel.setSelected(true);
                 if (selectedClassroomPanel != null) {
                     selectedClassroomPanel.setSelected(false);
@@ -828,11 +842,10 @@ public abstract class Dashboard extends Application {
         //Try to remove the presentation from the server
         boolean successful_removal = ediManager.getPresentationLibraryManager().removePresentation(25, 1); //TODO we needs to store this somehow in our java @Amrik
 
-        if(successful_removal) {
+        if (successful_removal) {
             updateAvailablePresentations();
             presentationPanelsFlowPane.getChildren().remove(previewPanel);
-        }
-        else logger.warn("Presentation Could not be removed"); //TODO improve this
+        } else logger.warn("Presentation Could not be removed"); //TODO improve this
     }
 
     private MenuBar addMenuBar() {
@@ -895,7 +908,7 @@ public abstract class Dashboard extends Application {
      */
     private void launchPresentation(String path) {
 
-        if(presentationManager != null)
+        if (presentationManager != null)
             presentationManager.close();
 
         if (this instanceof StudentDashboard) {
@@ -903,34 +916,34 @@ public abstract class Dashboard extends Application {
         } else if (this instanceof TeacherDashboard) {
             presentationManager = new PresentationManagerTeacher();
         }
-        presentationManager.openPresentation(path,false);
+        presentationManager.openPresentation(path, false);
     }
 
     private void search(String text) { //TODO: show author & tags when found?
-        if(text.equals("")) {
-            if(currentState == DashboardState.SEARCH_CLASSROOM) {
+        if (text.equals("")) {
+            if (currentState == DashboardState.SEARCH_CLASSROOM) {
                 goToState(DashboardState.CLASSROOM);
             } else if (currentState == DashboardState.SEARCH_ALL) {
                 goToState(DashboardState.MODULES);
             }
         } else {
-            if(currentState == DashboardState.CLASSROOM) {
+            if (currentState == DashboardState.CLASSROOM) {
                 goToState(DashboardState.SEARCH_CLASSROOM);
-            } else if(currentState == DashboardState.MODULES) {
+            } else if (currentState == DashboardState.MODULES) {
                 goToState(DashboardState.SEARCH_ALL);
             }
         }
 
-        for(PresentationPanel panel : presentationPanels) {
+        for (PresentationPanel panel : presentationPanels) {
             panel.search(text);
-            if(panel == selectedPresPanel && panel.isHidden()) {
+            if (panel == selectedPresPanel && panel.isHidden()) {
                 setSelectedPreviewPanel(panel, false);
             }
         }
 
-        for(ClassroomPanel panel : classroomPanels) {
+        for (ClassroomPanel panel : classroomPanels) {
             panel.search(text);
-            if(panel == selectedClassroomPanel && panel.isHidden()) {
+            if (panel == selectedClassroomPanel && panel.isHidden()) {
                 setSelectedPreviewPanel(panel, false);
             }
         }
@@ -941,76 +954,76 @@ public abstract class Dashboard extends Application {
 
 
         //Displaying "No matches" has to be the last thing in this method
-        if(presentationPanelsFlowPane.getChildren().contains(noMatchesPres)) {
+        if (presentationPanelsFlowPane.getChildren().contains(noMatchesPres)) {
             presentationPanelsFlowPane.getChildren().remove(noMatchesPres);
         }
 
-        if(subjectPanelsVBox.getChildren().contains(noMatchesSubject)) {
+        if (subjectPanelsVBox.getChildren().contains(noMatchesSubject)) {
             subjectPanelsVBox.getChildren().remove(noMatchesSubject);
         }
 
-        if(presentationPanelsFlowPane.getChildren().size() == 0) {
+        if (presentationPanelsFlowPane.getChildren().size() == 0) {
             presentationPanelsFlowPane.getChildren().add(noMatchesPres);
         }
 
-        if(subjectPanelsVBox.getChildren().size() == 0) {
+        if (subjectPanelsVBox.getChildren().size() == 0) {
             subjectPanelsVBox.getChildren().add(noMatchesSubject);
         }
     }
 
     private void filterBy(Object filter) {
-        if(filter != null) {
-            if(filter instanceof Subject) {
+        if (filter != null) {
+            if (filter instanceof Subject) {
                 Subject subject = (Subject) filter;
 
-                for(PresentationPanel panel : presentationPanels) {
-                    if(subject.equals(panel.getPresentation().getSubject()))
+                for (PresentationPanel panel : presentationPanels) {
+                    if (subject.equals(panel.getPresentation().getSubject()))
                         panel.setFiltered(false);
                     else
                         panel.setFiltered(true);
                 }
 
-                for(ClassroomPanel panel : classroomPanels) {
-                    if(subject.equals(panel.getClassroom().getSubject()))
+                for (ClassroomPanel panel : classroomPanels) {
+                    if (subject.equals(panel.getClassroom().getSubject()))
                         panel.setFiltered(false);
                     else
                         panel.setFiltered(true);
                 }
 
-                for(SubjectPanel panel : subjectPanels) {
-                    if(subject.equals(panel.getSubject()))
+                for (SubjectPanel panel : subjectPanels) {
+                    if (subject.equals(panel.getSubject()))
                         panel.setFiltered(false);
                     else
                         panel.setFiltered(true);
                 }
-            } else if(filter instanceof Classroom) {
+            } else if (filter instanceof Classroom) {
                 Classroom classroom = (Classroom) filter;
 
-                for(PresentationPanel panel : presentationPanels) {
-                    if(classroom.equals(panel.getPresentation().getClassroom()))
+                for (PresentationPanel panel : presentationPanels) {
+                    if (classroom.equals(panel.getPresentation().getClassroom()))
                         panel.setFiltered(false);
                     else
                         panel.setFiltered(true);
                 }
 
-                for(ClassroomPanel panel : classroomPanels) {
-                    if(classroom.equals(panel.getClassroom()))
+                for (ClassroomPanel panel : classroomPanels) {
+                    if (classroom.equals(panel.getClassroom()))
                         panel.setFiltered(false);
                     else
                         panel.setFiltered(true);
                 }
             }
         } else {
-            for(PresentationPanel panel : presentationPanels) {
-                    panel.setFiltered(false);
+            for (PresentationPanel panel : presentationPanels) {
+                panel.setFiltered(false);
             }
 
-            for(ClassroomPanel panel : classroomPanels) {
-                    panel.setFiltered(false);
+            for (ClassroomPanel panel : classroomPanels) {
+                panel.setFiltered(false);
             }
 
-            for(SubjectPanel panel : subjectPanels) {
-                    panel.setFiltered(false);
+            for (SubjectPanel panel : subjectPanels) {
+                panel.setFiltered(false);
             }
         }
     }
@@ -1083,10 +1096,12 @@ public abstract class Dashboard extends Application {
     }
 
     private void printPresentation(String presentationPath) {
-        ThumbnailGenerationManager.generateSlideThumbnails(presentationPath,true);
+        ThumbnailGenerationManager.generateSlideThumbnails(presentationPath, true);
     }
 
-    private void showReport(String presentationID){ReportManager.openReportPanel(presentationID);}
+    private void showReport(String presentationID) {
+        ReportManager.openReportPanel(presentationID);
+    }
 
     public void setEdiManager(EdiManager ediManager) {
         this.ediManager = ediManager;

@@ -513,15 +513,15 @@ public class SocketClient {
 
             //Fill prepared statements to avoid SQL injection
             statement.setBoolean(1, live);
-            statement.setInt(1, presentationID);
+            statement.setInt(2, presentationID);
 
             //Call stored procedure on database
             statementSuccess = statement.execute();
 
             if(statementSuccess){
-                logger.info("Presentation successfully set to live.");
-            } else {
                 logger.error("Unable to set presentation live. Connectivity issues may have been encountered.");
+            } else {
+                logger.info("Presentation successfully set to live.");
             }
 
             statement.close();
@@ -545,9 +545,9 @@ public class SocketClient {
             statementSuccess = statement.execute();
 
             if(statementSuccess){
-                logger.info("User: " + userID + " is now active in presentation: " + presentationID);
-            } else {
                 logger.error("Unable to set active presentation for user.");
+            } else {
+                logger.info("User: " + userID + " is now active in presentation: " + presentationID);
             }
 
             statement.close();

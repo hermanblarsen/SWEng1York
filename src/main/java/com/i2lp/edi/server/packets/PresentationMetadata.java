@@ -1,6 +1,5 @@
 package com.i2lp.edi.server.packets;
 
-import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -44,6 +43,10 @@ public class PresentationMetadata {
     }
 
     public String getModuleName() { return "Module" + module_id; }
+
+    public int getPresentationID() {
+        return presentation_id;
+    }
 
     //Temp hack for Koen offline mode
     public void setDocumentID(String documentID){
