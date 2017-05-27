@@ -1,9 +1,10 @@
 package com.i2lp.edi.client.presentationElements;
 
 
-import com.i2lp.edi.client.dashboard.Classroom;
+import com.i2lp.edi.client.dashboard.Module;
 import com.i2lp.edi.client.dashboard.Subject;
 import com.i2lp.edi.client.utilities.Theme;
+import com.i2lp.edi.server.packets.PresentationMetadata;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
@@ -30,7 +31,7 @@ public class Presentation extends Pane {
     private String documentTitle;
     private boolean isLive;
     private int currentSlideNumber;
-    private String xmlUrl; //TODO: Unused?
+    private String documentFilePath;
 
     //From Schema
     private String documentID;
@@ -50,9 +51,7 @@ public class Presentation extends Pane {
     private Slide currentSlide;
     private boolean autoplayMedia;
 
-    private String path;
-
-    private Classroom classroom; //Classroom (module) to which this presentation belongs
+    private Module module; //Module to which this presentation belongs
 
     private int groupFormat;
 
@@ -64,6 +63,10 @@ public class Presentation extends Pane {
 
     private List<Slide> slideList;
 
+    public Presentation() {
+        slideList = new ArrayList<>();
+        this.theme = new Theme();
+    } //this.xmlPath = getFileParentDirectory(path);
 
     //---------- Getters and setters required for presentation sequencing ---------------
     public int getMaxSlideNumber() {
@@ -72,11 +75,6 @@ public class Presentation extends Pane {
 
     public void setMaxSlideNumber(int maxSlideNumber) {
         this.maxSlideNumber = maxSlideNumber;
-    }
-
-    public Presentation() {
-        slideList = new ArrayList<>();
-        this.theme = new Theme();
     }
 
     public void setCurrentSlide(Slide currentSlide) {
@@ -193,7 +191,7 @@ public class Presentation extends Pane {
 
     public void setDocumentTitle(String documentTitle) { this.documentTitle = documentTitle; }
 
-    public Subject getSubject() { return classroom.getSubject(); }
+    public Subject getSubject() { return module.getSubject(); }
 
     public int getPresentationID() {
         return presentationID;
@@ -475,15 +473,20 @@ public class Presentation extends Pane {
         return currentSlide;
     }
 
-    public String getPath() { return path; }
+    public String getPath() { return documentFilePath; }
 
-    public void setPath(String path) { this.path = path; }
+    public void setPath(String path) { this.documentFilePath = path; }
 
-    public Classroom getClassroom() { return classroom; }
+    public Module getModule() { return module; }
 
-    public void setClassroom(Classroom classroom) { this.classroom = classroom; }
+    public void setModule(Module module) { this.module = module; }
 
     public void setLive(boolean live) { isLive = live; }
 
     public boolean isLive() { return isLive; }
+
+    public void setPresentationMetadata(PresentationMetadata serverSideDetails) {
+        setPresentationID(serverSideDetails.getPresentationID());
+        setLive(serverSideDetails.getLive());
+    }
 }

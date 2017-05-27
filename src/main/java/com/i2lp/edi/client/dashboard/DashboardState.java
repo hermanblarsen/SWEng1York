@@ -4,8 +4,8 @@ package com.i2lp.edi.client.dashboard;
  * Created by Kacper on 2017-05-26.
  */
 public enum DashboardState {
-    MODULES,
-    CLASSROOM,
+    TOP_LEVEL,
+    MODULE,
     SEARCH_ALL,
-    SEARCH_CLASSROOM;
+    SEARCH_IN_MODULE
 }

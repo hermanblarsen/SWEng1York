@@ -1,6 +1,7 @@
 package com.i2lp.edi.client.presentationElements;
 
 import com.i2lp.edi.client.managers.PresentationManagerTeacher;
+import com.i2lp.edi.client.utilities.ParserXML;
 import javafx.application.Application;
 import javafx.stage.Stage;
 import org.junit.Test;
@@ -20,7 +21,9 @@ public class AudioElementIntegrationTestbench extends Application {
     @Override
     public void start(Stage primaryStage){
         PresentationManagerTeacher presentationManager = new PresentationManagerTeacher();
-        presentationManager.openPresentation("file:projectResources/sampleFiles/xmlTests/audioElementTest.xml",false);
+        ParserXML parserXML = new ParserXML("file:projectResources/sampleFiles/xmlTests/audioElementTest.xml");
+
+        presentationManager.openPresentation(parserXML.parsePresentation(),false);
     }
 
     @Test

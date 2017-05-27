@@ -53,17 +53,17 @@ public enum SubjectSortKey {
                 case NAME_ZA:
                     return -subject1.getSubjectName().compareToIgnoreCase(subject2.getSubjectName());
                 case NO_OF_MODULES_ASC:
-                    if(subject1.getClassrooms().size() < subject2.getClassrooms().size()) {
+                    if(subject1.getModules().size() < subject2.getModules().size()) {
                         return -1;
-                    } else if(subject1.getClassrooms().size() > subject2.getClassrooms().size()){
+                    } else if(subject1.getModules().size() > subject2.getModules().size()){
                         return 1;
                     } else {
                         return 0;
                     }
                 case NO_OF_MODULES_DESC:
-                    if(subject1.getClassrooms().size() < subject2.getClassrooms().size()) {
+                    if(subject1.getModules().size() < subject2.getModules().size()) {
                         return 1;
-                    } else if(subject1.getClassrooms().size() > subject2.getClassrooms().size()){
+                    } else if(subject1.getModules().size() > subject2.getModules().size()){
                         return -1;
                     } else {
                         return 0;

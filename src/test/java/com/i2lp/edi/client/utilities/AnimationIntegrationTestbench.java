@@ -19,6 +19,8 @@ public class AnimationIntegrationTestbench extends Application {
     @Override
     public void start(Stage primaryStage){
         PresentationManagerTeacher presentationManager = new PresentationManagerTeacher();
-        presentationManager.openPresentation("file:projectResources/sampleFiles/xml/i2lpSampleXml.xml", false);
+        ParserXML parserXML = new ParserXML("file:projectResources/sampleFiles/xml/i2lpSampleXml.xml");
+
+        presentationManager.openPresentation(parserXML.parsePresentation(), false);
     }
 }

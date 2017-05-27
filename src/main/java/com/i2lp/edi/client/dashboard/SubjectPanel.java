@@ -17,21 +17,21 @@ public class SubjectPanel extends PreviewPanel {
 
     private static double SPACING = 5;
     private final Subject subject;
-    private HBox classroomPanels;
+    private HBox modulePanels;
 
     public SubjectPanel(Subject subject, Pane parentPane) {
         super(parentPane, false);
         this.subject = subject;
-        classroomPanels = new HBox(SPACING);
-        BorderPane.setMargin(classroomPanels, new Insets(5));
+        modulePanels = new HBox(SPACING);
+        BorderPane.setMargin(modulePanels, new Insets(5));
         getStyleClass().add("panel-primary");
 
         Text title = new Text(subject.getSubjectName());
         title.getStyleClass().setAll("h4");
         BorderPane.setMargin(title, new Insets(5));
 
-        classroomPanels.getChildren().addListener((ListChangeListener<? super Node>) observable -> {
-            if(classroomPanels.getChildren().size() == 0) {
+        modulePanels.getChildren().addListener((ListChangeListener<? super Node>) observable -> {
+            if(modulePanels.getChildren().size() == 0) {
                 this.setHidden(true);
             } else {
                 this.setHidden(false);
@@ -39,12 +39,12 @@ public class SubjectPanel extends PreviewPanel {
         });
 
         setTop(title);
-        setCenter(classroomPanels);
+        setCenter(modulePanels);
     }
 
     public Subject getSubject() { return subject; }
 
-    public HBox getClassroomPanelsHBox() { return classroomPanels; }
+    public HBox getModulePanelsHBox() { return modulePanels; }
 
     @Override
     public ArrayList<String> getSearchableTerms() {

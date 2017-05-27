@@ -1,6 +1,5 @@
 package com.i2lp.edi.client.dashboard;
 
-import javax.rmi.CORBA.StubDelegate;
 import java.util.ArrayList;
 
 /**
@@ -9,16 +8,16 @@ import java.util.ArrayList;
 public class Subject {
 
     private final String subjectName;
-    private ArrayList<Classroom> classrooms;
+    private ArrayList<Module> modules;
 
     public Subject(String subjectName, ArrayList<Subject> availableSubjects) {
         this.subjectName = subjectName;
-        classrooms = new ArrayList<>();
+        modules = new ArrayList<>();
         availableSubjects.add(this);
     }
 
-    public void addClassroom(Classroom classroom) {
-        classrooms.add(classroom);
+    public void addModule(Module module) {
+        modules.add(module);
     }
 
     public String getSubjectName() { return subjectName; }
@@ -26,12 +25,12 @@ public class Subject {
     public int getNumberOfPresentations() {
         int numOfPres = 0;
 
-        for(Classroom classroom : classrooms) {
-            numOfPres += classroom.getPresentations().size();
+        for(Module module : modules) {
+            numOfPres += module.getPresentations().size();
         }
 
         return numOfPres;
     }
 
-    public ArrayList<Classroom> getClassrooms() { return classrooms; }
+    public ArrayList<Module> getModules() { return modules; }
 }

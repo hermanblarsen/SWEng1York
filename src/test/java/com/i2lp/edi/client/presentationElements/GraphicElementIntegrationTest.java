@@ -1,6 +1,7 @@
 package com.i2lp.edi.client.presentationElements;
 
 import com.i2lp.edi.client.managers.PresentationManagerTeacher;
+import com.i2lp.edi.client.utilities.ParserXML;
 import javafx.application.Application;
 import javafx.stage.Stage;
 import org.junit.Before;
@@ -27,7 +28,9 @@ public class GraphicElementIntegrationTest extends Application{
         PresentationManagerTeacher presentationManager = new PresentationManagerTeacher();
         File file = new File("projectResources/sampleFiles/xmlTests/graphicElementTestXml.xml");
 
-        presentationManager.openPresentation(file.toURI().toString(),false);
+        ParserXML parserXML = new ParserXML(file.toURI().toString());
+
+        presentationManager.openPresentation(parserXML.parsePresentation(),false);
     }
 
     @Test
