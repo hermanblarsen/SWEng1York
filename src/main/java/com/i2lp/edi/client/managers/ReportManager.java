@@ -3,7 +3,6 @@ package com.i2lp.edi.client.managers;
 import eu.hansolo.tilesfx.Tile;
 import eu.hansolo.tilesfx.TileBuilder;
 import eu.hansolo.tilesfx.skins.BarChartItem;
-import eu.hansolo.tilesfx.tools.ChartData;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
@@ -13,7 +12,6 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
@@ -21,11 +19,7 @@ import org.kordamp.bootstrapfx.scene.layout.Panel;
 
 import java.io.File;
 import java.io.FilenameFilter;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.List;
-
-import com.i2lp.edi.client.Constants;
 
 import static com.i2lp.edi.client.Constants.PRESENTATIONS_PATH;
 
@@ -44,32 +38,32 @@ public class ReportManager {
         HBox reportPanels = new HBox();
 
         Tile studentsInPresentation = TileBuilder.create()
-                                                 .skinType(Tile.SkinType.NUMBER)
-                                                 .prefSize(250,250)
-                                                 .title("Students")
-                                                 .value(25)
-                                                 .decimals(0)
-                                                 .description("of 30")
-                                                 .textVisible(true)
-                                                 .build();
+                .skinType(Tile.SkinType.NUMBER)
+                .prefSize(250,250)
+                .title("Students")
+                .value(25)
+                .decimals(0)
+                .description("of 30")
+                .textVisible(true)
+                .build();
 
         Tile questionsAsked = TileBuilder.create()
-                                         .skinType(Tile.SkinType.NUMBER)
-                                         .prefSize(250,250)
-                                         .title("Question Queue")
-                                         .value(8)
-                                         .decimals(0)
-                                         .description("Click to see questions")
-                                         .textVisible(true)
-                                         .build();
+                .skinType(Tile.SkinType.NUMBER)
+                .prefSize(250,250)
+                .title("Question Queue")
+                .value(8)
+                .decimals(0)
+                .description("Click to see questions")
+                .textVisible(true)
+                .build();
 
         Tile presentationParticipation = TileBuilder.create()
-                                                    .skinType(Tile.SkinType.CIRCULAR_PROGRESS)
-                                                    .prefSize(250,250)
-                                                    .title("Average Participation")
-                                                    .value(70)
-                                                    .unit("\u0025")
-                                                    .build();
+                .skinType(Tile.SkinType.CIRCULAR_PROGRESS)
+                .prefSize(250,250)
+                .title("Average Participation")
+                .value(70)
+                .unit("\u0025")
+                .build();
         reportPanels.getChildren().addAll(studentsInPresentation,questionsAsked,presentationParticipation);
         questionsAsked.addEventHandler(MouseEvent.MOUSE_CLICKED,evt-> {new ReportManager().showQuestions();});
         studentsInPresentation.addEventHandler(MouseEvent.MOUSE_CLICKED,evt->{new ReportManager().showStudents();});
@@ -303,5 +297,3 @@ public class ReportManager {
         }
     }
 }
-
-

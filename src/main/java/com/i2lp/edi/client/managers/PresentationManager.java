@@ -840,20 +840,26 @@ public abstract class PresentationManager {
     }
 
     /**
-     * Shutdown the presentation manager cleanly.
+     * Shutdown the presentation manager cleanly. End Teacher/Student Session
      */
     @SuppressWarnings("FinalizeCalledExplicitly")
     public void close() {
-        //Reset EdiManager presentation manager reference to null
         if (ediManager != null) {
+            //Reset EdiManager presentation manager reference to null
             ediManager.setPresentationManager(null);
+
+            if (presentationElement.getServerSideDetails().getLive()) {
+                if (this instanceof PresentationManagerTeacher) {
+                    //TODO: End Presentation Session
+                } else if (this instanceof PresentationManagerStudent){
+                    //TODO: Do other session termination stuff
+
+                    //Set active presentation for user to 0 (no active presentation)
+                    ediManager.getSocketClient().setUserActivePresentation(0, ediManager.getUserData().getUserID());
+                }
+            }
         }
         presentationStage.close();
-        try {
-            finalize();
-        } catch (Throwable throwable) {
-            logger.error("Couldn't finalize PresCon"); //TODO fix error message
-        }
     }
 
     protected void displayCurrentSlide() {

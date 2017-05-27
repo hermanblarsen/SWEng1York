@@ -359,17 +359,17 @@ public abstract class Dashboard extends Application {
 
     private void displayBorderLeft(DashboardState state) {
         //Setup VBox for all panels
-        if(controlsContainerVBox == null) {
+        if (controlsContainerVBox == null) {
             controlsContainerVBox = new VBox(8);
         }
 
-        if(constantControlsVBox == null) {
+        if (constantControlsVBox == null) {
             constantControlsVBox = new VBox(8);
             constantControlsVBox.setPadding(new Insets(10, 10, 0, 10));
             controlsContainerVBox.getChildren().add(constantControlsVBox);
         }
 
-        if(removableControlsVBox == null) {
+        if (removableControlsVBox == null) {
             removableControlsVBox = new VBox(8);
             removableControlsVBox.setPadding(new Insets(0, 10, 10, 10));
             controlsContainerVBox.getChildren().add(removableControlsVBox);
@@ -722,7 +722,7 @@ public abstract class Dashboard extends Application {
     private void toggleLive(PresentationPanel presPanel) {
         if (presPanel.isLive()) {
             presPanel.setLive(false);
-            if(ediManager.getSocketClient().setPresentationLive(presPanel.getPresentation().getServerSideDetails().getPresentationID(), false)){
+            if (ediManager.getSocketClient().setPresentationLive(presPanel.getPresentation().getServerSideDetails().getPresentationID(), false)) {
                 //TODO: Stub for succesful go offline
             } else {
                 //TODO: Stub for unsuccessful go offline
@@ -730,7 +730,7 @@ public abstract class Dashboard extends Application {
         } else {
             presPanel.setLive(true);
             //Update server database to indicate presentation is Live
-            if(ediManager.getSocketClient().setPresentationLive(presPanel.getPresentation().getServerSideDetails().getPresentationID(), true)){
+            if (ediManager.getSocketClient().setPresentationLive(presPanel.getPresentation().getServerSideDetails().getPresentationID(), true)) {
                 //TODO: Stub for successful go live
             } else {
                 //TODO: Stub for unsuccesfful go live
@@ -947,15 +947,15 @@ public abstract class Dashboard extends Application {
                 }
             }
         } else {
-            for(PresentationPanel panel : presentationPanels) {
+            for (PresentationPanel panel : presentationPanels) {
                 panel.setFiltered(false);
             }
 
-            for(ModulePanel panel : modulePanels) {
+            for (ModulePanel panel : modulePanels) {
                 panel.setFiltered(false);
             }
 
-            for(SubjectPanel panel : subjectPanels) {
+            for (SubjectPanel panel : subjectPanels) {
                 panel.setFiltered(false);
             }
         }
@@ -1037,7 +1037,8 @@ public abstract class Dashboard extends Application {
     }
 
     private void showReport(String presentationID) {
-        ReportManager.openReportPanel(presentationID);
+        ReportManager rm = new ReportManager();
+        rm.openReportPanel(presentationID);
     }
 
     public void setEdiManager(EdiManager ediManager) {
