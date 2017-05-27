@@ -195,7 +195,7 @@ public class Login extends Application {
                 logger.warn("Closing of Login Dialog unsuccessful!");
             }
             finally {
-                ediManager.loginSucceded(isTeacher, userData); //Do this after shutting down the login window.
+                ediManager.loginSucceeded(isTeacher, userData); //Do this after shutting down the login window.
             }
         } else {
             logger.info("Login unsuccessful");

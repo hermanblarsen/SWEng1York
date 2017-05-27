@@ -37,7 +37,7 @@ public class TeacherDashboardTest extends ApplicationTest {
 
         EdiManager ediManager = new EdiManager();
         ediManager.start(stage);
-        ediManager.loginSucceded(true, new User(1, "First", "Last", "email", "teacher"));
+        ediManager.loginSucceeded(true, new User(1, "First", "Last", "email", "teacher"));
         stage.toFront();
         myDashboard = (TeacherDashboard) ediManager.getDashboard();
     }

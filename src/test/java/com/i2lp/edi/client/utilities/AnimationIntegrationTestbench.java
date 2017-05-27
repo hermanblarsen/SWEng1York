@@ -2,8 +2,6 @@ package com.i2lp.edi.client.utilities;
 
 import com.i2lp.edi.client.managers.PresentationManagerTeacher;
 import javafx.application.Application;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.SVGPath;
 import javafx.stage.Stage;
 
 /**
@@ -18,7 +16,7 @@ public class AnimationIntegrationTestbench extends Application {
 
     @Override
     public void start(Stage primaryStage){
-        PresentationManagerTeacher presentationManager = new PresentationManagerTeacher();
+        PresentationManagerTeacher presentationManager = new PresentationManagerTeacher(null);
         ParserXML parserXML = new ParserXML("file:projectResources/sampleFiles/xml/i2lpSampleXml.xml");
 
         presentationManager.openPresentation(parserXML.parsePresentation(), false);

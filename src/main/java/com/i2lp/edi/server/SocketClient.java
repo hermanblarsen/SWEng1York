@@ -151,6 +151,13 @@ public class SocketClient {
 
             case "users":
                 logger.info("Users database changed!");
+                if(ediManager.getUserData().getUserType() == "Teacher"){
+                    if(ediManager.getPresentationManager() != null){
+                        if(ediManager.getPresentationManager().getPresentationElement().getServerSideDetails().getLive()){
+                            ediManager.getPresentationManager().getPresentationSession().setActiveUsers(getPresentationActiveUsers(ediManager.getPresentationManager().getPresentationElement().getServerSideDetails().getPresentationID()));
+                        }
+                    }
+                }
                 //TODO: Update Local User information
                 break;
 
@@ -387,7 +394,6 @@ public class SocketClient {
             //Call stored procedure on database
             ResultSet rs = statement.executeQuery();
 
-            //TODO: Log this
             while (rs.next()) {
                 presentationsForUser.add(new PresentationMetadata(rs.getInt("presentation_id"), rs.getInt("module_id"), rs.getInt("current_slide_number"), rs.getString("xml_url"), rs.getBoolean(("live"))));
             }
@@ -530,6 +536,37 @@ public class SocketClient {
         }
 
         return statementSuccess;
+    }
+
+    public ArrayList<User> getPresentationActiveUsers(int presentationID){
+        ArrayList<User> activeUsers = new ArrayList<>();
+
+        try (PGConnection connection = (PGConnection) dataSource.getConnection()) {
+            PreparedStatement statement = connection.prepareStatement("SELECT * FROM USERS WHERE active_presentation_id = ?;");
+
+            //Fill prepared statements to avoid SQL injection
+            statement.setInt(1, presentationID);
+
+            //Call stored procedure on database
+            ResultSet rs = statement.executeQuery();
+
+            int size = 0;
+
+            while(rs.next()){
+                activeUsers.add(new User(rs.getInt("user_id"), rs.getString("first_name"), rs.getString("second_name"), rs.getString("email_address"), rs.getString("user_type")));
+                size++;
+            }
+
+            if(size == 0){
+                logger.warn("No users active for presentationID: " + presentationID);
+            }
+
+            statement.close();
+        } catch (Exception e) {
+            logger.error("Unable to connect to PostgreSQL on port 5432. PJDBC dump:", e);
+        }
+
+        return activeUsers;
     }
 
     public boolean setUserActivePresentation(int presentationID, int userID){

@@ -8,7 +8,6 @@ import com.i2lp.edi.client.login.Login;
 import com.i2lp.edi.server.SocketClient;
 import com.i2lp.edi.server.packets.User;
 import javafx.application.Application;
-import javafx.scene.control.Button;
 import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,11 +22,12 @@ import java.net.Socket;
 public class EdiManager extends Application {
     Logger logger = LoggerFactory.getLogger(EdiManager.class);
     protected Login loginDialog;
-    private PresentationLibraryManager presentationLibraryManager;
 
+    private PresentationManager presentationManager;
+
+    private PresentationLibraryManager presentationLibraryManager;
     private Dashboard dashboard;
     protected SocketClient socketClient;
-
     protected User userData; //Store currently logged in users data
     private boolean offline = false;
 
@@ -90,7 +90,7 @@ public class EdiManager extends Application {
 
 
     //This is called from loginWindow when the user has input valid credentials
-    public void loginSucceded(boolean isTeacher, User userData) {
+    public void loginSucceeded(boolean isTeacher, User userData) {
         logger.info("Login succeeded");
         Stage dashboardStage = new Stage();
 
@@ -117,6 +117,14 @@ public class EdiManager extends Application {
     public void stop() {
         logger.info("Closing client-side networking ports.");
         socketClient.closeAll();
+    }
+
+    public void setPresentationManager(PresentationManager presentationManager) {
+        this.presentationManager = presentationManager;
+    }
+
+    public PresentationManager getPresentationManager(){
+        return this.presentationManager;
     }
 
     public PresentationLibraryManager getPresentationLibraryManager() {

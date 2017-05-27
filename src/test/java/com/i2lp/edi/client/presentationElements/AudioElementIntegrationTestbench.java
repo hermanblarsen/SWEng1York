@@ -20,7 +20,7 @@ public class AudioElementIntegrationTestbench extends Application {
 
     @Override
     public void start(Stage primaryStage){
-        PresentationManagerTeacher presentationManager = new PresentationManagerTeacher();
+        PresentationManagerTeacher presentationManager = new PresentationManagerTeacher(null);
         ParserXML parserXML = new ParserXML("file:projectResources/sampleFiles/xmlTests/audioElementTest.xml");
 
         presentationManager.openPresentation(parserXML.parsePresentation(),false);

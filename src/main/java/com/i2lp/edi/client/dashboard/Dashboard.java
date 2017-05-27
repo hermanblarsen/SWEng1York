@@ -550,7 +550,7 @@ public abstract class Dashboard extends Application {
         //TODO: add a pane with user info to the top of the left panel
     }
 
-    private void updateAvailablePresentations() {
+    public void updateAvailablePresentations() {
         if (availablePresentations == null)
             availablePresentations = new ArrayList<>();
         else
@@ -656,7 +656,7 @@ public abstract class Dashboard extends Application {
             sortModules(moduleSortCombo.getValue());
     }
 
-    public void setupPresentationPanels() {
+    private void setupPresentationPanels() {
         if (presentationPanels == null)
             presentationPanels = new ArrayList<>();
         else
@@ -722,7 +722,7 @@ public abstract class Dashboard extends Application {
     private void toggleLive(PresentationPanel presPanel) {
         if (presPanel.isLive()) {
             presPanel.setLive(false);
-            if(ediManager.getSocketClient().setPresentationLive(presPanel.getPresentation().getPresentationID(), false)){
+            if(ediManager.getSocketClient().setPresentationLive(presPanel.getPresentation().getServerSideDetails().getPresentationID(), false)){
                 //TODO: Stub for succesful go offline
             } else {
                 //TODO: Stub for unsuccessful go offline
@@ -730,7 +730,7 @@ public abstract class Dashboard extends Application {
         } else {
             presPanel.setLive(true);
             //Update server database to indicate presentation is Live
-            if(ediManager.getSocketClient().setPresentationLive(presPanel.getPresentation().getPresentationID(), true)){
+            if(ediManager.getSocketClient().setPresentationLive(presPanel.getPresentation().getServerSideDetails().getPresentationID(), true)){
                 //TODO: Stub for successful go live
             } else {
                 //TODO: Stub for unsuccesfful go live
@@ -844,10 +844,11 @@ public abstract class Dashboard extends Application {
             presentationManager.close();
 
         if (this instanceof StudentDashboard) {
-            presentationManager = new PresentationManagerStudent();
+            presentationManager = new PresentationManagerStudent(ediManager);
         } else if (this instanceof TeacherDashboard) {
-            presentationManager = new PresentationManagerTeacher();
+            presentationManager = new PresentationManagerTeacher(ediManager);
         }
+        ediManager.setPresentationManager(presentationManager);
         presentationManager.openPresentation(presentation, false);
     }
 

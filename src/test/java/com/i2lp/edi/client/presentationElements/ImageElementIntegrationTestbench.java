@@ -21,7 +21,7 @@ public class ImageElementIntegrationTestbench extends Application{
 
 	@Override
 	public void start(Stage primaryStage){
-		PresentationManagerTeacher presentationManager = new PresentationManagerTeacher();
+		PresentationManagerTeacher presentationManager = new PresentationManagerTeacher(null);
 		File file = new File("projectResources/sampleFiles/xmlTests/imageElementTestXml.xml");
         ParserXML parserXML = new ParserXML(file.toURI().toString());
 

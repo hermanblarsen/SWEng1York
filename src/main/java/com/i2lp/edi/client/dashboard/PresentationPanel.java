@@ -28,7 +28,7 @@ public class PresentationPanel extends PreviewPanel {
         this.setText("Title: " + this.presentation.getDocumentTitle());
         this.setPrefWidth(MAX_PRES_PREVIEW_WIDTH + 10);
 
-        isLive = presentation.isLive();
+        isLive = presentation.getServerSideDetails().getLive();
 
         double previewWidth = MAX_PRES_PREVIEW_WIDTH;
 
@@ -64,7 +64,7 @@ public class PresentationPanel extends PreviewPanel {
     public boolean isLive() { return isLive; }
 
     public void setLive(boolean live) {
-        presentation.setLive(live);
+        presentation.getServerSideDetails().setLive(live);
         isLive = live;
         updateVisibility();
     }

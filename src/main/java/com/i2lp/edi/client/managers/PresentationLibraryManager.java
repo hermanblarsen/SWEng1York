@@ -91,7 +91,7 @@ public class PresentationLibraryManager {
         updateLocalPresentationList(remotePresentationList); //Metadata matches that available on server, so set.
         //If dashboard created, update the dashboard UI
         if(ediManager.getDashboard() != null){
-            Platform.runLater(() -> ediManager.getDashboard().setupPresentationPanels());
+            Platform.runLater(() -> ediManager.getDashboard().updateAvailablePresentations());
         }
     }
 

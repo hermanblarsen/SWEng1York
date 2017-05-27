@@ -13,6 +13,9 @@ public class PresentationMetadata {
     private int module_id;
     private int current_slide_number;
     private String xml_url;
+
+
+
     private boolean live;
     private String subjectName; //TODO: Get from database
 
@@ -60,4 +63,8 @@ public class PresentationMetadata {
     public String getSubjectName() { return subjectName; }
 
     public boolean getLive() { return live; }
+
+    public void setLive(boolean live) {
+        this.live = live;
+    }
 }

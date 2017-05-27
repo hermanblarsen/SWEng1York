@@ -27,9 +27,8 @@ public class Presentation extends Pane {
     protected static Logger logger = LoggerFactory.getLogger(Presentation.class);
 
     //From i2lp:
-    private int presentationID; //Database PK
+    private PresentationMetadata serverSideDetails;
     private String documentTitle;
-    private boolean isLive;
     private int currentSlideNumber;
     private String documentFilePath;
 
@@ -121,10 +120,6 @@ public class Presentation extends Pane {
         return version;
     }
 
-    public void setPresentationID(Integer presentationID) {
-        this.presentationID = presentationID;
-    }
-
     public void setVersion(Float version) {
         this.version = version;
     }
@@ -192,10 +187,6 @@ public class Presentation extends Pane {
     public void setDocumentTitle(String documentTitle) { this.documentTitle = documentTitle; }
 
     public Subject getSubject() { return module.getSubject(); }
-
-    public int getPresentationID() {
-        return presentationID;
-    }
 
     public static Presentation generateTestPresentation() {
         ArrayList<Slide> slides = new ArrayList<>();
@@ -481,12 +472,11 @@ public class Presentation extends Pane {
 
     public void setModule(Module module) { this.module = module; }
 
-    public void setLive(boolean live) { isLive = live; }
-
-    public boolean isLive() { return isLive; }
-
     public void setPresentationMetadata(PresentationMetadata serverSideDetails) {
-        setPresentationID(serverSideDetails.getPresentationID());
-        setLive(serverSideDetails.getLive());
+        this.serverSideDetails = serverSideDetails;
+    }
+
+    public PresentationMetadata getServerSideDetails() {
+        return serverSideDetails;
     }
 }

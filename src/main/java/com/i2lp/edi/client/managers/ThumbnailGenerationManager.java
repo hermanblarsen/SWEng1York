@@ -39,6 +39,10 @@ public class ThumbnailGenerationManager extends PresentationManager {
     private static Logger logger = LoggerFactory.getLogger(ThumbnailGenerationManager.class);
     private File thumbnailFile;
 
+    public ThumbnailGenerationManager(EdiManager ediManager) {
+        super(ediManager);
+    }
+
     public void openPresentation(Presentation presentation, boolean printToggle) {
         this.presentationElement = presentation;
         presentationStage = new Stage();
@@ -69,7 +73,7 @@ public class ThumbnailGenerationManager extends PresentationManager {
     protected void createCommentPanel() {}//Empty
 
     public static void generateSlideThumbnails(Presentation presentation, boolean savePresentationToPdf) {
-        ThumbnailGenerationManager slideGenController = new ThumbnailGenerationManager();
+        ThumbnailGenerationManager slideGenController = new ThumbnailGenerationManager(null);
         slideGenController.openPresentation(presentation, savePresentationToPdf);
         slideGenController.generateSlideThumbNail(slideGenController, savePresentationToPdf);
         if(savePresentationToPdf) slideGenController.savePresentationToPdf();

@@ -4,12 +4,10 @@ import com.i2lp.edi.client.managers.PresentationManagerTeacher;
 import com.i2lp.edi.client.utilities.ParserXML;
 import javafx.application.Application;
 import javafx.stage.Stage;
-import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 
@@ -25,7 +23,7 @@ public class GraphicElementIntegrationTest extends Application{
 
 	@Override
     public void start(Stage primaryStage){
-        PresentationManagerTeacher presentationManager = new PresentationManagerTeacher();
+        PresentationManagerTeacher presentationManager = new PresentationManagerTeacher(null);
         File file = new File("projectResources/sampleFiles/xmlTests/graphicElementTestXml.xml");
 
         ParserXML parserXML = new ParserXML(file.toURI().toString());

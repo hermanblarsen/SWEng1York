@@ -1,12 +1,14 @@
 package com.i2lp.edi.client.managers;
 
+import com.i2lp.edi.client.PresentationSession;
 import com.i2lp.edi.client.animation.Animation;
 import com.i2lp.edi.client.exceptions.SequenceNotFoundException;
-import com.i2lp.edi.client.presentationElements.*;
+import com.i2lp.edi.client.presentationElements.Presentation;
+import com.i2lp.edi.client.presentationElements.Slide;
+import com.i2lp.edi.client.presentationElements.SlideElement;
 import com.i2lp.edi.client.presentationViewerElements.CommentPanel;
 import com.i2lp.edi.client.presentationViewerElements.DrawPane;
 import com.i2lp.edi.client.utilities.CursorState;
-import com.i2lp.edi.client.utilities.ParserXML;
 import com.i2lp.edi.client.utilities.SimpleChangeListener;
 import javafx.animation.FadeTransition;
 import javafx.animation.KeyFrame;
@@ -16,7 +18,10 @@ import javafx.geometry.Dimension2D;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
-import javafx.scene.*;
+import javafx.scene.Cursor;
+import javafx.scene.ImageCursor;
+import javafx.scene.Node;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
@@ -37,8 +42,6 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import static com.i2lp.edi.client.utilities.Utilities.getFileParentDirectory;
-
 
 /**
  * Created by kma517 on 16/03/2017.
@@ -56,7 +59,8 @@ public abstract class PresentationManager {
 
     Logger logger = LoggerFactory.getLogger(PresentationManager.class);
 
-    protected String xmlPath = null;
+    private EdiManager ediManager;
+    private PresentationSession presentationSession;
 
     protected Scene scene;
     protected StackPane displayPane;
@@ -87,7 +91,6 @@ public abstract class PresentationManager {
     private CursorState currentCursorState = CursorState.DEFAULT;
     private Pane eraseCursorPane;
 
-
     protected double slideWidth;
     protected double slideHeight;
     protected int currentSlideNumber = 0; //Current slide number in presentation
@@ -102,8 +105,9 @@ public abstract class PresentationManager {
     private boolean isEndPresentation = false;
     private StackPane slidePane;
 
+    public PresentationManager(EdiManager ediManager) {
+        this.ediManager = ediManager;
 
-    public PresentationManager() {
         presentationStage = new Stage();
         Image ediLogoSmall = new Image("file:projectResources/logos/ediLogo32x32.png");
         presentationStage.getIcons().add(ediLogoSmall);
@@ -113,7 +117,7 @@ public abstract class PresentationManager {
 
         sceneBox = new VBox();
         sceneBox.addEventHandler(MouseEvent.MOUSE_PRESSED, event -> {
-            if(colourPopup != null) {
+            if (colourPopup != null) {
                 if (colourPopup.isShowing() && !event.getTarget().equals(colourPopup)) {
                     colourPopup.hide();
                 }
@@ -121,10 +125,10 @@ public abstract class PresentationManager {
         });
         displayPane = new StackPane();
         displayPane.addEventFilter(MouseEvent.ANY, event -> {
-            if(event.getEventType().equals(MouseEvent.MOUSE_PRESSED)) {
+            if (event.getEventType().equals(MouseEvent.MOUSE_PRESSED)) {
                 logger.trace("Mouse Pressed");
                 mouseDown = true;
-            } else if(event.getEventType().equals(MouseEvent.MOUSE_RELEASED)) {
+            } else if (event.getEventType().equals(MouseEvent.MOUSE_RELEASED)) {
                 logger.trace("Mouse Released");
                 mouseDown = false;
             }
@@ -167,7 +171,6 @@ public abstract class PresentationManager {
                 toBeAssigned.setSlideCanvas(toAssign); //Has to be called after setTeacher()
                 toBeAssigned.setSlideWidth(slideWidth);
                 toBeAssigned.setSlideHeight(slideHeight);
-                toBeAssigned.setThumbnailGen(isThumbnailGen);
             }
         }
     }
@@ -206,16 +209,29 @@ public abstract class PresentationManager {
 
         displayCurrentSlide();
 
-        if (presentationElement.isAutoplayPresentation()){
+        if (presentationElement.isAutoplayPresentation()) {
             autoPlay();
-        } else{
-            controlPresentation(Slide.SLIDE_FORWARD); //Move to start sequence 1 so slides can s
+        } else {
+            controlPresentation(Slide.SLIDE_FORWARD); //Move to start sequence 1 so slides can begin with content.
         }
+
+        //If we are live, start up a PresentationSession in which to track connectivity data
+        if (presentationElement.getServerSideDetails().getLive()) {
+            if (this instanceof PresentationManagerTeacher) {
+                presentationSession = new PresentationSession();
+            } else if (this instanceof PresentationManagerStudent){
+                ediManager.getSocketClient().setUserActivePresentation(ediManager.getPresentationManager().getPresentationElement().getServerSideDetails().getPresentationID(), ediManager.getUserData().getUserID());
+            }
+        }
+    }
+
+    public PresentationSession getPresentationSession() {
+        return presentationSession;
     }
 
     private void addKeyboardListeners() {
         scene.addEventFilter(KeyEvent.KEY_PRESSED, keyEvent -> {
-            if(!isCommentPanelVisible && !isEmbeddedBrowserOpen){
+            if (!isCommentPanelVisible && !isEmbeddedBrowserOpen) {
                 if (keyEvent.getCode().equals(KeyCode.ENTER) ||
                         keyEvent.getCode().equals(KeyCode.SPACE) ||
                         keyEvent.getCode().equals(KeyCode.PAGE_UP) ||
@@ -242,7 +258,7 @@ public abstract class PresentationManager {
                     while (slideAdvance(presentationElement, Slide.SLIDE_BACKWARD) != Presentation.PRESENTATION_START) ;
                 } else if (keyEvent.getCode().equals(KeyCode.END)) {
                     while (slideAdvance(presentationElement, Slide.SLIDE_FORWARD) != Presentation.PRESENTATION_FINISH) ;
-                } else if (keyEvent.getCode().equals(KeyCode.ESCAPE)){
+                } else if (keyEvent.getCode().equals(KeyCode.ESCAPE)) {
                     presentationStage.close();
                 }
 
@@ -266,7 +282,7 @@ public abstract class PresentationManager {
 
                 MenuItem firstSequence = new MenuItem("First sequence");
                 firstSequence.setOnAction(firstEvent -> {
-                    while (slideAdvance(presentationElement, Slide.SLIDE_BACKWARD) != Presentation.PRESENTATION_START);
+                    while (slideAdvance(presentationElement, Slide.SLIDE_BACKWARD) != Presentation.PRESENTATION_START) ;
                     slideProgress(presentationElement);
                 });
                 cMenu.getItems().add(firstSequence);
@@ -293,10 +309,10 @@ public abstract class PresentationManager {
         });
 
         disabledCursorFilter = event -> {
-            if(event.getEventType().equals(MouseEvent.MOUSE_CLICKED) && event.getButton().equals(MouseButton.PRIMARY)) {
+            if (event.getEventType().equals(MouseEvent.MOUSE_CLICKED) && event.getButton().equals(MouseButton.PRIMARY)) {
                 controlPresentation(Slide.SLIDE_FORWARD);
                 event.consume();
-            } else if(event.getEventType().equals(MouseEvent.MOUSE_CLICKED) && event.getButton().equals(MouseButton.SECONDARY)) {
+            } else if (event.getEventType().equals(MouseEvent.MOUSE_CLICKED) && event.getButton().equals(MouseButton.SECONDARY)) {
                 controlPresentation(Slide.SLIDE_BACKWARD);
                 event.consume();
             }
@@ -327,8 +343,8 @@ public abstract class PresentationManager {
         });
 
         drawPane.addEventFilter(MouseEvent.MOUSE_ENTERED, event -> {
-            if(isDrawModeOn) {
-                if(drawPane.isEraserMode()) {
+            if (isDrawModeOn) {
+                if (drawPane.isEraserMode()) {
                     setCursorState(CursorState.ERASE);
                 } else {
                     setCursorState(CursorState.DRAW);
@@ -371,7 +387,7 @@ public abstract class PresentationManager {
     private void controlPresentation(int direction) {
         int presentationStatus = slideAdvance(presentationElement, direction);
 
-        if((direction == Slide.SLIDE_BACKWARD) && isEndPresentation) {
+        if ((direction == Slide.SLIDE_BACKWARD) && isEndPresentation) {
             isEndPresentation = false;
         }
         //If Presentation handler told us that slide is changing, update the Slide present on Main screen
@@ -383,7 +399,7 @@ public abstract class PresentationManager {
                 logger.info("At Presentation start");
             } else if (presentationStatus == Presentation.PRESENTATION_FINISH) {
                 logger.info("At Presentation finish");
-                if(!isEndPresentation) {
+                if (!isEndPresentation) {
                     isEndPresentation = true;
                     displayCurrentSlide();
                 }
@@ -421,7 +437,7 @@ public abstract class PresentationManager {
     protected abstract void createCommentPanel();
 
     private void toggleDrawingMode() {
-        if(!isDrawModeOn && !isEndPresentation) {
+        if (!isDrawModeOn && !isEndPresentation) {
             isDrawModeOn = true;
             setDrawPaneVisible(true);
             drawPane.setActive(true);
@@ -435,7 +451,7 @@ public abstract class PresentationManager {
     }
 
     private void setDrawPaneVisible(boolean setVisible) {
-        if(setVisible) {
+        if (setVisible) {
             isDrawPaneVisible = true;
             Image hiddenIcon = new Image("file:projectResources/icons/eyeHidden.png", 30, 30, true, true);
             visibilityButton.setImage(hiddenIcon);
@@ -482,13 +498,13 @@ public abstract class PresentationManager {
         ImageView drawButton = makeCustomButton("file:projectResources/icons/draw.png", event -> toggleDrawingMode());
 
         String visibilityIconURL;
-        if(isDrawPaneVisible)
+        if (isDrawPaneVisible)
             visibilityIconURL = "file:projectResources/icons/eyeHidden.png";
         else
             visibilityIconURL = "file:projectResources/icons/eyeVisible.png";
 
         visibilityButton = makeCustomButton(visibilityIconURL, event -> {
-            if(isDrawPaneVisible) {
+            if (isDrawPaneVisible) {
                 setDrawPaneVisible(false);
             } else {
                 setDrawPaneVisible(true);
@@ -532,7 +548,7 @@ public abstract class PresentationManager {
         ImageView redoButton = makeCustomButton("file:projectResources/icons/redo.png", event -> drawPane.setSlideDrawing(presentationElement.getSlide(currentSlideNumber).getNextSlideDrawing()));
 
         ImageView eraserButton = makeCustomButton("file:projectResources/icons/erase.png", event -> {
-            if(drawPane.isEraserMode()) {
+            if (drawPane.isEraserMode()) {
                 drawPane.setEraserMode(false);
             } else {
                 drawPane.setEraserMode(true);
@@ -554,13 +570,13 @@ public abstract class PresentationManager {
             Popup widthPopup = new Popup();
             Slider widthSlider;
             widthPopup.setAutoHide(true);
-            if(!drawPane.isEraserMode()) {
+            if (!drawPane.isEraserMode()) {
                 widthSlider = new Slider(0.1, 10, drawPane.getBrushWidth());
             } else {
                 widthSlider = new Slider(MIN_ERASER_SIZE, MAX_ERASER_SIZE, drawPane.getEraserSize());
             }
             widthPopup.setOnAutoHide(event1 -> {
-                if(!drawPane.isEraserMode()) {
+                if (!drawPane.isEraserMode()) {
                     drawPane.setBrushWidth(widthSlider.getValue());
                 } else {
                     drawPane.setEraserSize(widthSlider.getValue());
@@ -568,7 +584,7 @@ public abstract class PresentationManager {
             });
             widthSlider.addEventFilter(MouseEvent.MOUSE_ENTERED, event1 -> setCursorState(CursorState.DEFAULT));
             widthSlider.setOnMouseReleased(event1 -> {
-                if(!drawPane.isEraserMode()) {
+                if (!drawPane.isEraserMode()) {
                     drawPane.setBrushWidth(widthSlider.getValue());
                 } else {
                     drawPane.setEraserSize(widthSlider.getValue());
@@ -594,7 +610,7 @@ public abstract class PresentationManager {
 
     private void addMouseHandlersToControls(Node controls) {
         controls.addEventHandler(MouseEvent.MOUSE_ENTERED, event -> {
-            if(!mouseDown) {
+            if (!mouseDown) {
                 controlsFadeIn(controls);
                 isMouseOverControls = true;
                 setCursorState(CursorState.DEFAULT);
@@ -622,7 +638,7 @@ public abstract class PresentationManager {
                 FadeTransition ft0 = new FadeTransition(Duration.millis(500), controls);
                 ft0.setFromValue(controls.getOpacity());
                 ft0.setToValue(0.0);
-                if(!isMouseOverControls)
+                if (!isMouseOverControls)
                     ft0.play();
             }
         }, (long) HIDE_CURSOR_DELAY);
@@ -637,15 +653,15 @@ public abstract class PresentationManager {
 
     protected void slideProgress(Presentation presentation) {
         //Calculate the total number of sequences in the presentation
-        int sequenceNumberMax=0;
-        for (Slide slide: presentation.getSlideList()) {
-            sequenceNumberMax+=slide.getMaxSequenceNumber();
+        int sequenceNumberMax = 0;
+        for (Slide slide : presentation.getSlideList()) {
+            sequenceNumberMax += slide.getMaxSequenceNumber();
             sequenceNumberMax++;
         }
 
         //Make sure the current sequence doesn't go out of bounds
         if (currentSequenceNumber >= sequenceNumberMax) currentSequenceNumber = sequenceNumberMax;
-        if (currentSequenceNumber <=0) currentSequenceNumber = 0;
+        if (currentSequenceNumber <= 0) currentSequenceNumber = 0;
 
         //Calculate progress
         slideProgress = (float) (currentSequenceNumber) / sequenceNumberMax;
@@ -728,8 +744,8 @@ public abstract class PresentationManager {
             } catch (SequenceNotFoundException e) {
                 logger.warn("Failed to find Element with Sequence number of " + slideToAdvance.getCurrentSequenceNumber() + " in slideElementList.");
             }
-        currentSequenceNumber++;
-        notifySequenceChangeListeners();//Notify any sequence number listeners that there has been a change
+            currentSequenceNumber++;
+            notifySequenceChangeListeners();//Notify any sequence number listeners that there has been a change
         } else if ((slideToAdvance.getCurrentSequenceNumber() > 0) && (direction == Slide.SLIDE_BACKWARD)) {  //If we're going backwards and still elements left
             try {
                 checkInVisibleSet = Slide.searchForSequenceElement(slideToAdvance.getSlideElementList(), slideToAdvance.getCurrentSequenceNumber());
@@ -763,11 +779,11 @@ public abstract class PresentationManager {
         //Fire animations
         for (SlideElement elementToAnimate : slideToAdvance.getVisibleSlideElementList()) {
 //            if(direction == Slide.SLIDE_FORWARD) {
-                if (elementToAnimate.getStartSequence() == slideToAdvance.getCurrentSequenceNumber()) {
+            if (elementToAnimate.getStartSequence() == slideToAdvance.getCurrentSequenceNumber()) {
                 elementToAnimate.renderElement(Animation.ENTRY_ANIMATION); //Entry Sequence
-                } else if (elementToAnimate.getEndSequence() == slideToAdvance.getCurrentSequenceNumber()) {
-                    elementToAnimate.renderElement(Animation.EXIT_ANIMATION); //Exit Sequence
-                }
+            } else if (elementToAnimate.getEndSequence() == slideToAdvance.getCurrentSequenceNumber()) {
+                elementToAnimate.renderElement(Animation.EXIT_ANIMATION); //Exit Sequence
+            }
         }
 
         if (slideToAdvance.getCurrentSequenceNumber() == slideToAdvance.getMaxSequenceNumber())
@@ -776,10 +792,10 @@ public abstract class PresentationManager {
         return Slide.SLIDE_NO_MOVE;
     }
 
-    private void autoPlay(){
+    private void autoPlay() {
         Slide currentSlide = presentationElement.getSlide(currentSlideNumber);
 
-        try{
+        try {
             float longestDuration = 0;
             boolean isAnyNewElements = false;
 
@@ -796,7 +812,7 @@ public abstract class PresentationManager {
                 }
             }
 
-            boolean isLastSlide =  currentSlideNumber == presentationElement.getMaxSlideNumber()-1;
+            boolean isLastSlide = currentSlideNumber == presentationElement.getMaxSlideNumber() - 1;
             boolean isLastElement = currentSlide.getCurrentSequenceNumber() == currentSlide.getMaxSequenceNumber();
             if (!(isLastElement && isLastSlide)) {
                 // If this isn't the last element in the presentation.
@@ -816,7 +832,7 @@ public abstract class PresentationManager {
                     autoPlay();
                 }
             }
-        } catch (SequenceNotFoundException snfe){
+        } catch (SequenceNotFoundException snfe) {
             // Most likely we've gone past max sequence number
             controlPresentation(Slide.SLIDE_FORWARD);
             autoPlay();
@@ -828,6 +844,10 @@ public abstract class PresentationManager {
      */
     @SuppressWarnings("FinalizeCalledExplicitly")
     public void close() {
+        //Reset EdiManager presentation manager reference to null
+        if (ediManager != null) {
+            ediManager.setPresentationManager(null);
+        }
         presentationStage.close();
         try {
             finalize();
@@ -855,7 +875,7 @@ public abstract class PresentationManager {
             displayPane.getChildren().add(slidePane);
         }
 
-        if(isDrawPaneVisible) {
+        if (isDrawPaneVisible) {
             drawPane.setSlideDrawing(presentationElement.getSlide(currentSlideNumber).getCurrentSlideDrawing());
             displayPane.getChildren().add(drawPane);
         }
@@ -865,13 +885,13 @@ public abstract class PresentationManager {
 
         controlsPane.setBottom(presControls);
 
-        if(isDrawModeOn)
+        if (isDrawModeOn)
             controlsPane.setLeft(drawControls);
         else
             controlsPane.setLeft(null);
         displayPane.getChildren().add(controlsPane);
 
-        if(eraseCursorPane != null)
+        if (eraseCursorPane != null)
             displayPane.getChildren().add(eraseCursorPane);
 
         resize();
@@ -908,7 +928,7 @@ public abstract class PresentationManager {
     private void setFullscreen(boolean fullscreen) {
         presentationStage.setFullScreen(fullscreen);
         isFullscreen = fullscreen;
-        if(fullscreen) {
+        if (fullscreen) {
             preFullscreenSlideWidth = slideWidth;
             preFullscreenSlideHeight = slideHeight;
 
@@ -931,24 +951,24 @@ public abstract class PresentationManager {
     }
 
     private void destroyAllElements() {
-        for(SlideElement slideElement : presentationElement.getSlide(currentSlideNumber).getSlideElementList())
+        for (SlideElement slideElement : presentationElement.getSlide(currentSlideNumber).getSlideElementList())
             slideElement.destroyElement();
     }
 
-    public SlideElement getElement(int elementID){
-        SlideElement slideElement = presentationElement.getSlide(currentSlideNumber).getSlideElementList().get(elementID-1);
+    public SlideElement getElement(int elementID) {
+        SlideElement slideElement = presentationElement.getSlide(currentSlideNumber).getSlideElementList().get(elementID - 1);
         return slideElement;
     }
 
     private void setCursorState(CursorState cursorState) {
         logger.trace("Cursor state: " + cursorState.name());
         currentCursorState = cursorState;
-        if(displayPane.getChildren().contains(eraseCursorPane)) {
+        if (displayPane.getChildren().contains(eraseCursorPane)) {
             displayPane.getChildren().remove(eraseCursorPane);
         }
         eraseCursorPane = null;
 
-        switch(cursorState) {
+        switch (cursorState) {
             case DEFAULT:
                 scene.setCursor(Cursor.DEFAULT);
                 displayPane.removeEventFilter(MouseEvent.MOUSE_CLICKED, disabledCursorFilter);
@@ -981,18 +1001,9 @@ public abstract class PresentationManager {
         }
     }
 
-    public boolean isThumbnailGen() {
-        return isThumbnailGen;
-    }
-
-    public String getXmlPath() {
-        return xmlPath;
-    }
-
-    public void setIsEmbeddedBrowserOpen(boolean isOpen){
+    public void setIsEmbeddedBrowserOpen(boolean isOpen) {
         isEmbeddedBrowserOpen = isOpen;
     }
-
 
     //Sequence Number Listener implementations:
     CopyOnWriteArrayList<SimpleChangeListener> sequenceChangeListeners = new CopyOnWriteArrayList<SimpleChangeListener>();
@@ -1000,22 +1011,27 @@ public abstract class PresentationManager {
     /**
      * Adds a listener which will be notified whenever the sequence number changes.
      * listeners are notified by calling notifySequenceChangeListeners()
+     *
      * @param listener
      */
-    public void addSequenceChangeListener(SimpleChangeListener listener){
+    public void addSequenceChangeListener(SimpleChangeListener listener) {
         sequenceChangeListeners.add(listener);
     }
 
     /**
      * Notifies all of the current sequence change listeners of a change.
      */
-    public void notifySequenceChangeListeners(){
-        for(SimpleChangeListener listener : sequenceChangeListeners){
+    public void notifySequenceChangeListeners() {
+        for (SimpleChangeListener listener : sequenceChangeListeners) {
             listener.changed();
         }
     }
 
-    public void removeSequenceChangeListener(SimpleChangeListener listener){
+    public void removeSequenceChangeListener(SimpleChangeListener listener) {
         sequenceChangeListeners.remove(listener);
+    }
+
+    public Presentation getPresentationElement() {
+        return presentationElement;
     }
 }

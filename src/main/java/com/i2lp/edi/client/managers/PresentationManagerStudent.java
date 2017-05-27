@@ -21,6 +21,10 @@ import javafx.stage.Stage;
 public class PresentationManagerStudent extends PresentationManager {
     protected Boolean elementClicked = false;
 
+    public PresentationManagerStudent(EdiManager ediManager) {
+        super(ediManager);
+    }
+
     @Override
     protected void loadSpecificFeatures() {
         questionQueueFunction();

@@ -37,6 +37,10 @@ public class PresentationManagerTeacher extends PresentationManager {
     private int numberOfTestQuestions = 10;
     private int numberOnline = 0;
 
+    public PresentationManagerTeacher(EdiManager ediManager) {
+        super(ediManager);
+    }
+
     @Override
     protected void loadSpecificFeatures() {
         if(!toolkitOpen) {
