@@ -58,6 +58,7 @@ public class TeacherDashboardTest extends ApplicationTest {
         clickOn(searchField).write("test");
     }
 
+    @Ignore //TODO @Luke redo this
     @Test
     public void testFilter() {
         Boolean showAllFailed = false;

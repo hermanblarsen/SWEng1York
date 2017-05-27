@@ -142,7 +142,7 @@
 
 			<poll elementid ="2" layer="2" visibility="true" startsequence="2" endsequence="4">
 				<timelimit>20</timelimit>
-				<question>HERE IS A SAMPLE QUESTION!</question>
+				<question>Insert Longer Question Here</question>
 				<answers>answer1,answer2,answer3,answer4</answers>
 			</poll>
 
