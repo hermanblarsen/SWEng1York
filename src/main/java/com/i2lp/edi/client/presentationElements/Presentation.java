@@ -454,7 +454,7 @@ public class Presentation extends Pane {
             try {
                 preview = new ImageView("file:" + PRESENTATIONS_PATH + getDocumentID() + "/Thumbnails/" + "slide" + slideNumber + "_thumbnail.png");
                 Rectangle2D viewport = new Rectangle2D(0, 0, THUMBNAIL_WIDTH, THUMBNAIL_WIDTH/getDocumentAspectRatio());
-                preview.setViewport(viewport); //TODO: Move creating ImageView for thumbnails to a separate method and use it in PreviewPanel
+                preview.setViewport(viewport);
             } catch (NullPointerException | IllegalArgumentException e) {
                 logger.debug("Couldn't open thumbnail" + thumbnailFile.toString());
                 preview = new ImageView("file:projectResources/icons/emptyThumbnail.png");
