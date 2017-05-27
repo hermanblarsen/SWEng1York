@@ -1035,8 +1035,9 @@ public abstract class Dashboard extends Application {
         ThumbnailGenerationManager.generateSlideThumbnails(presentation, true);
     }
 
-    private void showReport(String presentationID) {
-        ReportManager.openReportPanel(presentationID);
+    private void showReport(String presentationID){
+        ReportManager rm = new ReportManager();
+        rm.openReportPanel(presentationID);
     }
 
     public void setEdiManager(EdiManager ediManager) {
