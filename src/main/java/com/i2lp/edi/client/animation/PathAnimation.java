@@ -17,10 +17,11 @@ public class PathAnimation extends Animation{
 
     public PathAnimation(String pathString, double durationMillis){
         duration = Duration.millis(durationMillis);
-        this.path = new SVGPath();
-        this.path.setContent(pathString);
-        this.path.setStroke(Color.RED);
-        this.path.setStrokeWidth(5);
+        setPath(pathString);
+    }
+
+    public PathAnimation(){
+
     }
 
     public void play(){
@@ -28,5 +29,12 @@ public class PathAnimation extends Animation{
         transition.setCycleCount(1);
         transition.setInterpolator(Interpolator.EASE_BOTH);
         transition.play();
+    }
+
+    public void setPath(String pathString) {
+        this.path = new SVGPath();
+        this.path.setContent(pathString);
+        this.path.setStroke(Color.RED);
+        this.path.setStrokeWidth(5);
     }
 }

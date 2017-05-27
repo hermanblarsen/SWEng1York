@@ -16,6 +16,10 @@ public class OpacityAnimation extends Animation{
         this.duration = Duration.millis(durationMillis);
     }
 
+    public OpacityAnimation(){
+
+    }
+
     @Override
     public void play() {
         FadeTransition transition = new FadeTransition(duration, getCoreNodeToAnimate());
@@ -24,5 +28,13 @@ public class OpacityAnimation extends Animation{
 
         transition.setCycleCount(1);
         transition.play();
+    }
+
+    public void setStartOpacity(double startOpacity) {
+        this.startOpacity = startOpacity;
+    }
+
+    public void setEndOpacity(double endOpacity) {
+        this.endOpacity = endOpacity;
     }
 }

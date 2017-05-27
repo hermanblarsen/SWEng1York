@@ -3,6 +3,8 @@ package com.i2lp.edi.client.animation;
 
 import javafx.scene.Node;
 import javafx.util.Duration;
+import sun.plugin.dom.exception.InvalidStateException;
+
 /**
  * Created by amriksadhra on 02/03/2017.
  */
@@ -24,30 +26,6 @@ public abstract class Animation {
      */
     public abstract void play();
 
-//            case SVG_MOVEMENT_TEST://Will be moved to a different class for complex animation.
-//                final Path path = new Path();
-//                path.getElements().add(new MoveTo(20, 20));
-//                path.getElements().add(new CubicCurveTo(30, 10, 380, 120, 200, 120));
-//                path.getElements().add(new CubicCurveTo(200, 1120, 110, 240, 380, 240));
-//                path.setOpacity(0.5);
-//                final SVGPath path = new SVGPath();
-//                path.setContent("M10 10 L100 100");
-//                path.setStroke(Color.BLACK);
-//
-//
-//                //group.getChildren().add(path);
-//                //group.getChildren().add(circle);
-//                final PathTransition pathTransition = new PathTransition();
-//
-//                pathTransition.setDuration(Duration.seconds(1.0));
-//                pathTransition.setDelay(Duration.seconds(.5));
-//                pathTransition.setPath(path);
-//                pathTransition.setNode(getCoreNodeToAnimate());
-//                pathTransition.setOrientation(PathTransition.OrientationType.ORTHOGONAL_TO_TANGENT);
-//                pathTransition.setCycleCount(Timeline.INDEFINITE);
-//                //pathTransition.setAutoReverse(true);
-//                pathTransition.play();
-
 
     public Node getCoreNodeToAnimate() {
         return coreNodeToAnimate;
@@ -57,5 +35,11 @@ public abstract class Animation {
         this.coreNodeToAnimate = coreNodeToAnimate;
     }
 
+    public void setDuration(Duration duration) {
+        this.duration = duration;
+    }
 
+    public Duration getDuration() {
+        return duration;
+    }
 }

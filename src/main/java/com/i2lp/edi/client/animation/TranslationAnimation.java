@@ -20,6 +20,12 @@ public class TranslationAnimation extends Animation{
         this.duration = Duration.millis(durationMillis);
     }
 
+    public TranslationAnimation(){
+
+    }
+
+
+
     @Override
     public void play() {
         TranslateTransition transition = new TranslateTransition(duration, getCoreNodeToAnimate());
@@ -30,5 +36,21 @@ public class TranslationAnimation extends Animation{
 
         transition.setCycleCount(1);
         transition.play();
+    }
+
+    public void setStartX(double startX) {
+        this.startX = startX;
+    }
+
+    public void setStartY(double startY) {
+        this.startY = startY;
+    }
+
+    public void setEndX(double endX) {
+        this.endX = endX;
+    }
+
+    public void setEndY(double endY) {
+        this.endY = endY;
     }
 }

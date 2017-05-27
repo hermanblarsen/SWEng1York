@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+    <xs:annotation>
+        <xs:documentation>
+            Schema for Animations defined using proper XSD 1.0. (This means we can automatically validate Animation XMLs)
+            An Example use is:
+
+            <animation type="in">
+                <simplefade start="0" end="1" duration="1000"/>
+            </animation>
+            <animation type="out">
+                <pathtransition path="M150 0 l75 200 l225 200 Z" duration="3000"/>
+            </animation>
+
+            Which would make an xs:element fade in over the course of 1 second when it starts and will make it follow the
+            defined path when it ends.
+
+            All durations are in milliseconds.  Scales/Opacities are 0-1.  0 is transparent or scaled to 0, 1 is completely
+            visible or full-scale.
+        </xs:documentation>
+    </xs:annotation>
+
+        <xs:complexType name="Animation">
+            <xs:choice>
+                <xs:element name="simpletranslate" type="SimpleTranslate"/>
+                <xs:element name="simplescale" type="SimpleScale"/>
+                <xs:element name="simplefade" type="SimpleFade"/>
+                <xs:element name="pathtransition" type="PathTranslate"/>
+            </xs:choice>
+            <xs:attribute name="type">
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:enumeration value="in"/>
+                        <xs:enumeration value="out"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:attribute>
+        </xs:complexType>
+
+    <xs:complexType name="SimpleTranslate">
+        <xs:attribute name="xstart" type="xs:int" use="required"/>
+        <xs:attribute name="ystart" type="xs:int" use="required"/>
+        <xs:attribute name="xend" type="xs:int" use="required"/>
+        <xs:attribute name="yend" type="xs:int" use="required"/>
+        <xs:attribute name="duration" type="xs:float" use="required"/>
+    </xs:complexType>
+
+    <xs:complexType name="SimpleScale">
+        <xs:attribute name="start" type="unitfloat" use="required"/>
+        <xs:attribute name="end" type="unitfloat" use="required"/>
+        <xs:attribute name="duration" type="xs:float" use="required"/>
+    </xs:complexType>
+
+    <xs:complexType name="SimpleFade">
+        <xs:attribute name="start" type="unitfloat" use="required"/>
+        <xs:attribute name="end" type="unitfloat" use="required"/>
+        <xs:attribute name="duration" type="xs:float" use="required"/>
+    </xs:complexType>
+
+    <xs:complexType name="PathTranslate">
+        <xs:annotation>
+            <xs:documentation>
+                The path taken is defined using the SVG path specification.
+                https://www.w3.org/TR/SVG/paths.html
+            </xs:documentation>
+        </xs:annotation>
+        <xs:attribute name="path" type="xs:string" use="required"/>
+        <xs:attribute name="duration" type="xs:float" use="required"/>
+    </xs:complexType>
+
+    <xs:simpleType name="unitfloat">
+        <xs:restriction base="xs:float">
+            <xs:minInclusive value="0"/>
+            <xs:maxInclusive value="1"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+</xs:schema>
+

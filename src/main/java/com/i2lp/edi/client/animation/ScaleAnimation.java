@@ -16,6 +16,10 @@ public class ScaleAnimation extends Animation{
         this.duration = Duration.millis(durationMillis);
     }
 
+    public ScaleAnimation(){
+
+    }
+
     @Override
     public void play() {
         ScaleTransition transition = new ScaleTransition(duration, getCoreNodeToAnimate());
@@ -27,5 +31,13 @@ public class ScaleAnimation extends Animation{
 
         transition.setCycleCount(1);
         transition.play();
+    }
+
+    public void setStartScale(double startScale) {
+        this.startScale = startScale;
+    }
+
+    public void setEndScale(double endScale) {
+        this.endScale = endScale;
     }
 }
