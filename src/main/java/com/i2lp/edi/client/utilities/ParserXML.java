@@ -619,8 +619,8 @@ public class ParserXML {
                         try {
                             audioElement.setPath(elementContent);
                         } catch (MediaException e){
-                            logger.warn("Auto element error: " + e.getMessage());
-                            faultsDetected.add("Media Error: " + e.getMessage());
+                            logger.warn("Audio element error: " + e.getMessage());
+                            faultsDetected.add("Audio Media Error: " + e.getMessage());
                         }
                         break;
                     case "loop":

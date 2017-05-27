@@ -102,8 +102,10 @@ public class VideoElementTest extends ApplicationTest {
 
     @After
     public void tearDown()  {
-        myVideoElement.getMediaPlayer().stop();
-        myVideoElement.getMediaPlayer().dispose();
+        if (!IS_CIRCLE_BUILD) {
+            myVideoElement.getMediaPlayer().stop();
+            myVideoElement.getMediaPlayer().dispose();
+        }
         try {
             FxToolkit.hideStage();
         } catch (TimeoutException e) {
