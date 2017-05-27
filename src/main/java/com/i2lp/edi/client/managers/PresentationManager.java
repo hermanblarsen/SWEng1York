@@ -406,7 +406,7 @@ public abstract class PresentationManager {
                 //If we are live, send updated current slide to database
                 if (presentationElement.getServerSideDetails().getLive()) {
                     if (this instanceof PresentationManagerTeacher) {
-                        ediManager.getSocketClient().setCurrentSlideForPresentation(presentationElement.getServerSideDetails().getPresentationID(), currentSlideNumber);
+                        ediManager.getSocketClient().setCurrentSlideForPresentation(presentationElement.getServerSideDetails().getPresentationID(), currentSlideNumber + 1);
                     }
                 }
             } else if (presentationStatus == Presentation.PRESENTATION_START) {

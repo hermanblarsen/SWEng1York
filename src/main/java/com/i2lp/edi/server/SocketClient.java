@@ -162,7 +162,6 @@ public class SocketClient {
                 break;
 
             case "presentations":
-                logger.info("Presentations database changed!");
                 //Update presentation list whilst no presentation is live
                 if (ediManager.getPresentationManager() == null) {
                     ediManager.getPresentationLibraryManager().updatePresentations(); //Update presentation information
@@ -174,6 +173,7 @@ public class SocketClient {
                             //TODO: Enable undocking (unsync?) of Teacher/Student slide movement using UI toggle
                             if (ediManager.getPresentationManager().getCurrentSlideNumber() != current_slide_number) {
                                 //If the current slide number has changed, move to it
+                                logger.info("Slide change request from teacher received. Changing to target slide.");
                                 Platform.runLater(() -> ediManager.getPresentationManager().goToSlide(current_slide_number));
                             }
                         }
