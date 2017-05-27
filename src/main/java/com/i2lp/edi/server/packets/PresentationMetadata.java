@@ -1,5 +1,6 @@
 package com.i2lp.edi.server.packets;
 
+import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -14,6 +15,7 @@ public class PresentationMetadata {
     private int current_slide_number;
     private String xml_url;
     private boolean live;
+    private String subjectName; //TODO: Get from database
 
     //Temporary
     private String documentID;
@@ -24,6 +26,7 @@ public class PresentationMetadata {
         this.current_slide_number = current_slide_number;
         this.xml_url = xml_url;
         this.live = live;
+        this.subjectName = "Subject " + module_id;
     }
 
 
@@ -50,4 +53,8 @@ public class PresentationMetadata {
     public String getXml_url() {
         return xml_url;
     }
+
+    public String getSubjectName() { return subjectName; }
+
+    public boolean getLive() { return live; }
 }

@@ -16,22 +16,22 @@ import java.util.ArrayList;
 public class SubjectPanel extends PreviewPanel {
 
     private static double SPACING = 5;
-    private final String subject;
-    private HBox subjectPanels;
+    private final Subject subject;
+    private HBox classroomPanels;
 
-    public SubjectPanel(String subject, Pane parentPane) {
+    public SubjectPanel(Subject subject, Pane parentPane) {
         super(parentPane, false);
         this.subject = subject;
-        subjectPanels = new HBox(SPACING);
-        BorderPane.setMargin(subjectPanels, new Insets(5));
+        classroomPanels = new HBox(SPACING);
+        BorderPane.setMargin(classroomPanels, new Insets(5));
         getStyleClass().add("panel-primary");
 
-        Text title = new Text(subject);
+        Text title = new Text(subject.getSubjectName());
         title.getStyleClass().setAll("h4");
         BorderPane.setMargin(title, new Insets(5));
 
-        subjectPanels.getChildren().addListener((ListChangeListener<? super Node>) observable -> {
-            if(subjectPanels.getChildren().size() == 0) {
+        classroomPanels.getChildren().addListener((ListChangeListener<? super Node>) observable -> {
+            if(classroomPanels.getChildren().size() == 0) {
                 this.setHidden(true);
             } else {
                 this.setHidden(false);
@@ -39,17 +39,17 @@ public class SubjectPanel extends PreviewPanel {
         });
 
         setTop(title);
-        setCenter(subjectPanels);
+        setCenter(classroomPanels);
     }
 
-    public String getSubject() { return subject; }
+    public Subject getSubject() { return subject; }
 
-    public HBox getSubjectPanelsHBox() { return subjectPanels; }
+    public HBox getClassroomPanelsHBox() { return classroomPanels; }
 
     @Override
     public ArrayList<String> getSearchableTerms() {
         ArrayList<String> searchableTerms = new ArrayList<>();
-        searchableTerms.add(getSubject());
+        searchableTerms.add(getSubject().getSubjectName());
 
         return searchableTerms;
     }

@@ -7,46 +7,59 @@ import java.util.List;
 /**
  * Created by Kacper on 2017-05-24.
  */
+@SuppressWarnings("Duplicates")
 public enum PresSortKey {
-    NAME_AZ,
-    NAME_ZA,
+    TITLE_AZ,
+    TITLE_ZA,
     SUBJECT_AZ,
-    SUBJECT_ZA;
+    SUBJECT_ZA,
+    AUTHOR_AZ,
+    AUTHOR_ZA;
 
     @Override
     public String toString() {
         switch(this.name()) {
-            case "NAME_AZ":
-                return "Name A-Z";
-            case "NAME_ZA":
-                return "Name Z-A";
+            case "TITLE_AZ":
+                return "Title A-Z";
+            case "TITLE_ZA":
+                return "Title Z-A";
             case "SUBJECT_AZ":
                 return "Subject A-Z";
             case "SUBJECT_ZA":
                 return "Subject Z-A";
+            case "AUTHOR_AZ":
+                return "Author A-Z";
+            case "AUTHOR_ZA":
+                return "Author Z-A";
             default:
                 return "Unknown";
         }
     }
 
     public static void copyAllToList(List<PresSortKey> list) {
-        list.add(NAME_AZ);
-        list.add(NAME_ZA);
+        list.add(TITLE_AZ);
+        list.add(TITLE_ZA);
         list.add(SUBJECT_AZ);
         list.add(SUBJECT_ZA);
+        list.add(AUTHOR_AZ);
+        list.add(AUTHOR_ZA);
     }
 
     public int compare(Presentation pres1, Presentation pres2) {
         try {
             switch (this) {
-                case NAME_AZ:
+                case TITLE_AZ:
                     return pres1.getDocumentID().compareToIgnoreCase(pres2.getDocumentID());
-                case NAME_ZA:
+                case TITLE_ZA:
                     return -pres1.getDocumentID().compareToIgnoreCase(pres2.getDocumentID());
                 case SUBJECT_AZ:
-                    return pres1.getSubject().compareToIgnoreCase(pres2.getSubject());
+                    return pres1.getSubject().getSubjectName().compareToIgnoreCase(pres2.getSubject().getSubjectName());
                 case SUBJECT_ZA:
-                    return -pres1.getSubject().compareToIgnoreCase(pres2.getSubject());
+                    return -pres1.getSubject().getSubjectName().compareToIgnoreCase(pres2.getSubject().getSubjectName());
+                case AUTHOR_AZ:
+                    return pres1.getAuthor().compareToIgnoreCase(pres2.getAuthor());
+                case AUTHOR_ZA:
+                    return -pres1.getAuthor().compareToIgnoreCase(pres2.getAuthor());
                 default:
                     return 0;
             }

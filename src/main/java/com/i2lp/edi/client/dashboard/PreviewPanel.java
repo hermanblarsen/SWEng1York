@@ -58,7 +58,7 @@ public abstract class PreviewPanel extends Panel {
         }
     }
 
-    private void updateVisibility() {
+    public void updateVisibility() {
         try {
             if(isHidden() && parentPane.getChildren().contains(this)) {
                 parentPane.getChildren().remove(this);
@@ -66,7 +66,7 @@ public abstract class PreviewPanel extends Panel {
                 parentPane.getChildren().add(this);
             }
         } catch(NullPointerException e) {
-            logger.debug("Couldn't show/hide previewPanel");
+            logger.info("Couldn't show/hide previewPanel");
             //Do nothing
         }
     }
