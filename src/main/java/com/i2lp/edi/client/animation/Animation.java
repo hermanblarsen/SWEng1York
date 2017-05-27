@@ -3,7 +3,6 @@ package com.i2lp.edi.client.animation;
 
 import javafx.scene.Node;
 import javafx.util.Duration;
-import sun.plugin.dom.exception.InvalidStateException;
 
 /**
  * Created by amriksadhra on 02/03/2017.
