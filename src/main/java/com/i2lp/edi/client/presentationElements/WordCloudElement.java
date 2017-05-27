@@ -40,7 +40,7 @@ import static com.i2lp.edi.client.Constants.PRESENTATIONS_PATH;
  * Created by Koen on 06/04/2017.
  */
 public class WordCloudElement extends InteractiveElement {
-    protected String task;
+    protected String question;
     protected Panel wordCloudPanel;
     protected List<String> wordList;
     protected Label remainingTime;
@@ -49,13 +49,13 @@ public class WordCloudElement extends InteractiveElement {
     protected Tile countdownTile;
     protected boolean  writingComplete = false;
     protected String cloudShapePath = null;
-    protected float xPosition =0.5f;
-    protected float yPosition =0.5f;
-    protected float xSize =0.5f;
-    protected float ySize=0.5f;
+    protected float xPosition =0.1f;
+    protected float yPosition =0.1f;
+    protected float xSize =0.8f;
+    protected float ySize=0.8f;
     protected float wordCloudHeight=0.25f;
     protected float wordCloudWidth=0.25f;
-    protected boolean buttonAcitve = false;
+    protected boolean buttonActive = false;
 
     @Override
     public void sendDataToServer() {
@@ -81,7 +81,7 @@ public class WordCloudElement extends InteractiveElement {
         wordCloudPanel.setTranslateY(slideHeight * yPosition);
 
         getCoreNode().addEventHandler(MouseEvent.MOUSE_CLICKED,evt->{
-            if(!buttonAcitve){
+            if(!buttonActive){
                 performOnClickAction();
             }
         });
@@ -95,7 +95,7 @@ public class WordCloudElement extends InteractiveElement {
     @Override
     public void setupElement() {
         wordList = new ArrayList<String>();
-        wordCloudPanel = new Panel(task);
+        wordCloudPanel = new Panel(question);
         wordCloudPanel.getStyleClass().add("panel-primary");
         if(teacher){
             Button start_Task = new Button("Start");
@@ -108,10 +108,10 @@ public class WordCloudElement extends InteractiveElement {
                 timeline.play();
             });
             start_Task.addEventHandler(MouseEvent.MOUSE_ENTERED,evt->{
-                buttonAcitve = true;
+                buttonActive = true;
             });
             start_Task.addEventHandler(MouseEvent.MOUSE_EXITED,evt->{
-                buttonAcitve = false;
+                buttonActive = false;
             });
             wordCloudPanel.setBody(start_Task);
         }
@@ -150,7 +150,6 @@ public class WordCloudElement extends InteractiveElement {
             wc.setColorPalette(new ColorPalette(Color.ORANGE,Color.GREEN,Color.cyan));
             wc.setFontScalar(new SqrtFontScalar(10,40));
             wc.build(wordFrequencies);
-//            wc.writeToFile(BASE_PATH + "Wordclouds/wordcloud" + + ".png");
 
             String pathName = presentationID+Integer.toString(slideID);
             File wordcloudPath = new File(PRESENTATIONS_PATH + "/Wordclouds/"+pathName+".png");
@@ -158,7 +157,7 @@ public class WordCloudElement extends InteractiveElement {
                 wordcloudPath.getParentFile().mkdirs(); //Create directory structure if not present yet
             }
             wc.writeToFile(PRESENTATIONS_PATH + "/Wordclouds/"+pathName+".png");
-            //TODO filename can include presentationID and slideID, especially if we want them stored and recalled later. -Herman
+            //TODO @Koen filename can include presentationID and slideID, especially if we want them stored and recalled later. -Herman
 
             Image wordCloud = new Image("file:" + PRESENTATIONS_PATH + "/Wordclouds/"+pathName+".png",xSize,ySize,true,true);
 
@@ -182,12 +181,12 @@ public class WordCloudElement extends InteractiveElement {
 
     }
 
-    public String getTask() {
-        return task;
+    public String getQuestion() {
+        return question;
     }
 
-    public void setTask(String task) {
-        this.task = task;
+    public void setQuestion(String question) {
+        this.question = question;
     }
 
     public VBox wordCloudElements(){
@@ -202,10 +201,10 @@ public class WordCloudElement extends InteractiveElement {
            words.clear();
         });
         sendWord.addEventHandler(MouseEvent.MOUSE_ENTERED,evt->{
-            buttonAcitve = true;
+            buttonActive = true;
         });
         sendWord.addEventHandler(MouseEvent.MOUSE_EXITED,evt->{
-            buttonAcitve = false;
+            buttonActive = false;
         });
         container.getChildren().addAll(words,sendWord);
         return container;

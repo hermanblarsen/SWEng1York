@@ -1,5 +1,6 @@
 package com.i2lp.edi.client.utilities;
 
+import com.i2lp.edi.client.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -129,7 +130,7 @@ public class Utilities {
      * @return true valid hex, false invalid hex
      * @author Amrik Sadhra
      */
-    public static String checkValidColour(String colour, Theme presentationDefaults) {
+    public static String checkValidColour(String colour, Theme presentationDefaults, String context) {
         String HEX_PATTERN = "^#([A-Fa-f0-9]{8})$";
         Pattern pattern = Pattern.compile(HEX_PATTERN);
         Matcher matcher = pattern.matcher(colour);
@@ -139,9 +140,28 @@ public class Utilities {
 
         //If we're checking presentation default, and its invalid
         if (presentationDefaults == null) {
-            logger.warn("Invalid default RGBA Colour specified in XML: " + colour + ", defaulting to: " + FALLBACK_COLOUR);
-            return FALLBACK_COLOUR;
-        } else {
+            String defaultFont = Constants.FALLBACK_COLOUR_TEXT_GRAPHICS;
+            switch (context) {
+                case "font":
+                case "graphics":
+                    logger.warn("Invalid Font or Graphics RGBA Colour specified in XML: " + colour
+                            + ", defaulting to: " + Constants.FALLBACK_COLOUR_TEXT_GRAPHICS);
+                    defaultFont =  Constants.FALLBACK_COLOUR_TEXT_GRAPHICS;
+                    break;
+                case "slidebackground":
+                    logger.warn("Invalid Slide Bacground RGBA Colour specified in XML: " + colour
+                            + ", defaulting to: " + Constants.FALLBACK_COLOUR_SLIDE_BACKGROUND);
+                    defaultFont =  Constants.FALLBACK_COLOUR_SLIDE_BACKGROUND;
+                    break;
+                case "elementbackground":
+                    logger.warn("Invalid SlideElement Background/Fill RGBA Colour specified in XML: " + colour
+                            + ", defaulting to: " + Constants.FALLBACK_COLOUR_ELEMENT_BACKGROUND);
+                    defaultFont =  Constants.FALLBACK_COLOUR_ELEMENT_BACKGROUND;
+                    break;
+            }
+            return defaultFont;
+        }
+        else {
             logger.warn("Invalid RGBA Colour specified in XML: " + colour + ", defaulting to XML Default");
             return presentationDefaults.getFontColour();
         }
