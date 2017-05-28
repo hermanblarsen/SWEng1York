@@ -224,7 +224,7 @@ public abstract class PresentationManager {
         //If we are live, start up a PresentationSession in which to track connectivity data
         if (presentationElement.getServerSideDetails().getLive()) {
             if (this instanceof PresentationManagerTeacher) {
-                presentationSession = new PresentationSession();
+                presentationSession = new PresentationSession(ediManager);
             } else if (this instanceof PresentationManagerStudent) {
                 ediManager.getSocketClient().setUserActivePresentation(ediManager.getPresentationManager().getPresentationElement().getServerSideDetails().getPresentationID(), ediManager.getUserData().getUserID());
             }

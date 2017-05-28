@@ -37,10 +37,6 @@ public class SocketClient {
 
     private Logger logger = LoggerFactory.getLogger(SocketClient.class);
 
-    //TODO: These will be filled by actual values, for now they are temp and meaningless
-    private int current_presentation_id = 1;
-    private int current_question_id = 1;
-
     //Network connections
     private PGDataSource dataSource;
     private Socket socket;
@@ -153,6 +149,7 @@ public class SocketClient {
                 if (ediManager.getUserData().getUserType().equals("teacher")) {//If we're a teacher
                     if (ediManager.getPresentationManager() != null) {//And in a presentation
                         if (ediManager.getPresentationManager().getPresentationElement().getServerSideDetails().getLive()) {//And that presentation is live
+                            logger.info("Updating active user list for live presentation.");
                             ediManager.getPresentationManager().getPresentationSession().setActiveUsers(getPresentationActiveUsers(ediManager.getPresentationManager().getPresentationElement().getServerSideDetails().getPresentationID()));//Update list of active users in that presentation
                         }
                     }
@@ -192,6 +189,7 @@ public class SocketClient {
             case "questions":
                 if (ediManager.getUserData().getUserType().equals("teacher")) {//If we're a teacher
                     if (ediManager.getPresentationManager().getPresentationElement().getServerSideDetails().getLive()) {//In a live presentation
+                        logger.info("Updating QuestionQueue for current presentation");
                         ediManager.getPresentationManager().getPresentationSession().setQuestionQueue(ediManager.getSocketClient().getQuestionsForPresentation(ediManager.getPresentationManager().getPresentationElement().getServerSideDetails().getPresentationID())); //Update the question queue in the session
                     }
                 }
@@ -668,8 +666,45 @@ public class SocketClient {
                 status = rs.getString(1);
             }
 
-            if (status.equals("success")) statementSuccess = true;
+            if (status.equals("success")){
+                statementSuccess = true;
+                logger.info("Successfully added question to question queue.");
+            }
             else logger.error("Unable to add question: " + status);
+
+            statement.close();
+        } catch (Exception e) {
+            logger.error("Unable to connect to PostgreSQL on port 5432. PJDBC dump:", e);
+        }
+
+        return statementSuccess;
+    }
+
+    public boolean answerQuestionInQuestionQueue(int questionID) {
+        boolean statementSuccess = false;
+
+        //Attempt to add a user using stored procedure
+        try (PGConnection connection = (PGConnection) dataSource.getConnection()) {
+
+            PreparedStatement statement = connection.prepareStatement("SELECT * FROM  public.sp_answer_question_in_questionqueue(?);");
+
+            //Fill prepared statements to avoid SQL injection
+            statement.setInt(1, questionID);
+
+            //Call stored procedure on database
+            ResultSet rs = statement.executeQuery();
+
+            String status = "failure";
+
+            while (rs.next()) {
+                status = rs.getString(1);
+            }
+
+            if (status.equals("success")){
+                statementSuccess = true;
+                logger.info("Successfully answered question: " + questionID);
+            }
+            else logger.error("Unable to answer question: " + status);
 
             statement.close();
         } catch (Exception e) {
@@ -694,7 +729,7 @@ public class SocketClient {
             int size = 0;
 
             while (rs.next()) {
-                activeQuestions.add(new Question(rs.getInt("question_id"), rs.getInt("user_id"), rs.getInt("presentation_id"), rs.getTimestamp("time_created"), rs.getTime("time_answered"), rs.getString("question_data"), rs.getInt("slide_number")));
+                activeQuestions.add(new Question(rs.getInt("question_id"), rs.getInt("user_id"), rs.getInt("presentation_id"), rs.getTimestamp("time_created"), rs.getTimestamp("time_answered"), rs.getString("question_data"), rs.getInt("slide_number")));
                 size++;
             }
 

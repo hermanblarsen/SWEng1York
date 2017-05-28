@@ -1,6 +1,5 @@
 package com.i2lp.edi.server.packets;
 
-import java.sql.Time;
 import java.sql.Timestamp;
 
 /**
@@ -11,12 +10,12 @@ public class Question {
     private int user_id;
     private int presentation_id;
     private Timestamp time_created;
-    private Time time_answered;
+    private Timestamp time_answered;
     private String question_data;
     private int slide_number;
 
 
-    public Question(int question_id, int user_id, int presentation_id, Timestamp time_created, Time time_answered, String question_data, int slide_number) {
+    public Question(int question_id, int user_id, int presentation_id, Timestamp time_created, Timestamp time_answered, String question_data, int slide_number) {
         this.question_id = question_id;
         this.user_id = user_id;
         this.presentation_id = presentation_id;
@@ -29,5 +28,9 @@ public class Question {
 
     public String getQuestion_data() {
         return question_data;
+    }
+
+    public int getQuestion_id() {
+        return question_id;
     }
 }

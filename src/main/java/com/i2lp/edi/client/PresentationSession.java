@@ -1,5 +1,6 @@
 package com.i2lp.edi.client;
 
+import com.i2lp.edi.client.managers.EdiManager;
 import com.i2lp.edi.server.packets.Question;
 import com.i2lp.edi.server.packets.User;
 import org.slf4j.Logger;
@@ -12,16 +13,20 @@ import java.util.Date;
  * Created by amriksadhra on 27/05/2017.
  */
 public class PresentationSession {
-    Logger logger = LoggerFactory.getLogger(PresentationSession.class);
+    private Logger logger = LoggerFactory.getLogger(PresentationSession.class);
+    private EdiManager ediManager;
 
-    ArrayList<Question> questionQueue;
-    ArrayList<User> activeUsers;
+
+    private ArrayList<Question> questionQueue;
+    private ArrayList<User> activeUsers;
 
     //Use better Date datastructure to store time per slide
-    Date startDate;
-    Date endDate;
+    private Date startDate;
+    private Date endDate;
 
-    public PresentationSession(){
+    public PresentationSession(EdiManager ediManager){
+        this.ediManager = ediManager;
+
         startDate = new Date();
         logger.info("Live Presentation Session beginning at " + startDate.toString());
     }
@@ -41,6 +46,10 @@ public class PresentationSession {
         }
     }
 
+    public ArrayList<Question> getQuestionQueue() {
+        return questionQueue;
+    }
+
     public void setQuestionQueue(ArrayList<Question> activeQuestions){
         this.questionQueue = activeQuestions;
 
@@ -48,5 +57,10 @@ public class PresentationSession {
         for(Question question : questionQueue){
             logger.info("Question: " + question.getQuestion_data());
         }
+
+        //TODO: Tie to QuestionQueue UI for question answering
+       /* if(ediManager.getSocketClient().answerQuestionInQuestionQueue(questionQueue.get(0).getQuestion_id())){
+            logger.info("Answered question successfully");
+        }*/
     }
 }
