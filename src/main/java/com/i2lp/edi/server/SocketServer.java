@@ -255,9 +255,9 @@ public class SocketServer {
                 statement.close();
                 connection.addNotificationListener(listener);
                 logger.info("Successful connection to PostgreSQL database instance");
-                /*while (keepAlive) {
+                while (keepAlive) {
                     //Keep connection active in order to maintain listen/notify events
-                }*/
+                }
             } catch (Exception e) {
                 logger.error("Unable to connect to PostgreSQL on port 5432. PJDBC dump:", e);
             }
