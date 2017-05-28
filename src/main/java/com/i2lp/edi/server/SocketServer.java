@@ -181,7 +181,6 @@ public class SocketServer {
                 if(commitToLibrary.exists()){
                     logger.info("Presentation already exists. Deleting current Zip and placing new file in library.");
                     commitToLibrary.delete();
-                    //TODO: Drop presentation from SQL db?
                 }
 
                 //Move Zip directly to /var/www/html/Edi/

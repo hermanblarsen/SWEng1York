@@ -84,6 +84,7 @@ public class TextElement extends SlideElement {
             //Set Background of WebView to transparent (using reflection) as CSS wont do the job on Node level
             try {
                 Pattern c = Pattern.compile("rgba?\\((\\d{1,3})[,\\)](\\d{1,3})[,\\)](\\d{1,3})[,\\)](\\d+\\.\\d+)\\)?");
+                if(bgColour == null) bgColour = "rgba(0,0,0,0.0)"; //If no background colour set, transparent background
                 Matcher m = c.matcher (bgColour);
 
                 if (m.matches())
@@ -286,6 +287,7 @@ public class TextElement extends SlideElement {
 
     public void setBorderSize(int borderSize) {
         this.borderSize = borderSize;
+        setHasBorder(true);
     }
 
     public boolean isRendered() {

@@ -221,12 +221,17 @@ public abstract class PresentationManager {
             controlPresentation(Slide.SLIDE_FORWARD); //Move to start sequence 1 so slides can begin with content.
         }
 
-        //If we are live, start up a PresentationSession in which to track connectivity data
-        if (presentationElement.getServerSideDetails().getLive()) {
-            if (this instanceof PresentationManagerTeacher) {
-                presentationSession = new PresentationSession(ediManager);
-            } else if (this instanceof PresentationManagerStudent) {
-                ediManager.getSocketClient().setUserActivePresentation(ediManager.getPresentationManager().getPresentationElement().getServerSideDetails().getPresentationID(), ediManager.getUserData().getUserID());
+        beginLiveSession();
+    }
+
+    private void beginLiveSession(){
+        if(presentationElement.getServerSideDetails() != null) {//If not local presentation
+            if (presentationElement.getServerSideDetails().getLive()) {//If we are live, start up a PresentationSession in which to track connectivity data
+                if (this instanceof PresentationManagerTeacher) {
+                    presentationSession = new PresentationSession(ediManager);
+                } else if (this instanceof PresentationManagerStudent) {
+                    ediManager.getSocketClient().setUserActivePresentation(ediManager.getPresentationManager().getPresentationElement().getServerSideDetails().getPresentationID(), ediManager.getUserData().getUserID());
+                }
             }
         }
     }
@@ -391,6 +396,12 @@ public abstract class PresentationManager {
 
     @SuppressWarnings("ConstantConditions")
     private void controlPresentation(int direction) {
+        if ((direction == Slide.SLIDE_BACKWARD) && isEndPresentation) {
+            isEndPresentation = false;
+            displayCurrentSlide();
+            return;
+        }
+
         int presentationStatus = slideAdvance(presentationElement, direction);
 
         //If Presentation handler told us that slide is changing, update the Slide present on Main screen
@@ -398,10 +409,12 @@ public abstract class PresentationManager {
         if (presentationStatus == Presentation.SLIDE_CHANGE || presentationStatus == Presentation.PRESENTATION_FINISH || presentationStatus == Presentation.PRESENTATION_START || presentationStatus == Presentation.SLIDE_LAST_ELEMENT) {
             if (presentationStatus == Presentation.SLIDE_CHANGE) {
                 logger.info("Changing Slides");
-                //If we are live, send updated current slide to database
-                if (presentationElement.getServerSideDetails().getLive()) {
-                    if (this instanceof PresentationManagerTeacher) {
-                        ediManager.getSocketClient().setCurrentSlideForPresentation(presentationElement.getServerSideDetails().getPresentationID(), currentSlideNumber + 1);
+                if(presentationElement.getServerSideDetails() != null) {//If not local presentation
+                    //If we are live, send updated current slide to database
+                    if (presentationElement.getServerSideDetails().getLive()) {
+                        if (this instanceof PresentationManagerTeacher) {
+                            ediManager.getSocketClient().setCurrentSlideForPresentation(presentationElement.getServerSideDetails().getPresentationID(), currentSlideNumber + 1);
+                        }
                     }
                 }
             } else if (presentationStatus == Presentation.PRESENTATION_START) {
@@ -683,12 +696,6 @@ public abstract class PresentationManager {
     }
 
     public int slideAdvance(Presentation presentationToAdvance, int direction) {
-        if ((direction == Slide.SLIDE_BACKWARD) && isEndPresentation) {
-            isEndPresentation = false;
-            displayCurrentSlide();
-            return Slide.SLIDE_NO_MOVE;
-        }
-
         //Initialise this with something more appropriate
         int presentationStatus = Presentation.SAME_SLIDE;
         int changeStatus;
@@ -858,22 +865,24 @@ public abstract class PresentationManager {
      */
     @SuppressWarnings("FinalizeCalledExplicitly")
     public void close() {
-        if (ediManager != null) {
-            if (presentationElement.getServerSideDetails().getLive()) {
-                if (this instanceof PresentationManagerTeacher) {
-                    //Update Presentation record to offline
-                    ediManager.getSocketClient().setPresentationLive(presentationElement.getServerSideDetails().getPresentationID(), false);
-                    //TODO: End Presentation Properly
-                    presentationSession.endSession();
-                } else if (this instanceof PresentationManagerStudent) {
-                    //TODO: Do other session termination stuff
-                    //Set active presentation for user to 0 (no active presentation)
-                    ediManager.getSocketClient().setUserActivePresentation(0 , ediManager.getUserData().getUserID());
+        if (ediManager != null) {//If we have an edimanager instance
+            if (presentationElement.getServerSideDetails() != null) {//If the presentation is not locally loaded
+                if (presentationElement.getServerSideDetails().getLive()) {
+                    if (this instanceof PresentationManagerTeacher) {
+                        //Update Presentation record to offline
+                        ediManager.getSocketClient().setPresentationLive(presentationElement.getServerSideDetails().getPresentationID(), false);
+                        //TODO: End Presentation Properly
+                        presentationSession.endSession();
+                    } else if (this instanceof PresentationManagerStudent) {
+                        //TODO: Do other session termination stuff
+                        //Set active presentation for user to 0 (no active presentation)
+                        ediManager.getSocketClient().setUserActivePresentation(0, ediManager.getUserData().getUserID());
+                    }
                 }
-            }
 
-            //Reset EdiManager presentation manager reference to null
-            ediManager.setPresentationManager(null);
+                //Reset EdiManager presentation manager reference to null
+                ediManager.setPresentationManager(null);
+            }
         }
         presentationStage.close();
     }
