@@ -2,6 +2,7 @@
  * Created by habl on 26/02/2017.
  */
 package com.i2lp.edi.client.utilities;
+import com.i2lp.edi.client.animation.*;
 import com.i2lp.edi.client.presentationElements.*;
 import org.junit.After;
 import org.junit.Before;
@@ -161,11 +162,39 @@ public class ParserXMLTest {
             assertEquals(y[i], polygonGraphic.getPolyYPositions()[i], ERROR_MARGIN);
         }
         assertEquals(Boolean.TRUE, polygonGraphic.isClosed());
+        //Check the Start Animation (Simple fade 0-1 1000ms)
+        Animation startAnimation = polygonGraphic.getStartAnimation();
+        assert(startAnimation instanceof OpacityAnimation);
+        assertEquals(0, ((OpacityAnimation) startAnimation).getStartOpacity(), ERROR_MARGIN);
+        assertEquals(1, ((OpacityAnimation) startAnimation).getEndOpacity(), ERROR_MARGIN);
+        assertEquals(1000, startAnimation.getDuration().toMillis(), ERROR_MARGIN);
+
+        //Check the End Animation (Simple scale 1-0 1000ms)
+        Animation endAnimation = polygonGraphic.getEndAnimation();
+        assert(endAnimation instanceof ScaleAnimation);
+        assertEquals(1, ((ScaleAnimation) endAnimation).getStartScale(), ERROR_MARGIN);
+        assertEquals(0, ((ScaleAnimation) endAnimation).getEndScale(), ERROR_MARGIN);
+        assertEquals(1000, endAnimation.getDuration().toMillis(), ERROR_MARGIN);
+
 
         GraphicElement ovalGraphic = (GraphicElement) slideElementArray2.get(1);
         assertEquals(0.05, ovalGraphic.getrHorizontal(), ERROR_MARGIN);
         assertEquals(0.1, ovalGraphic.getrVertical(), ERROR_MARGIN);
         assertEquals(45f, ovalGraphic.getRotation(), ERROR_MARGIN);
+        //Check the Start Animation (Simple scale 0-1 1000ms)
+        Animation ovalStartAnimation = ovalGraphic.getStartAnimation();
+        assert(ovalStartAnimation instanceof PathAnimation);
+        assertEquals("M0 0 l0 100 l100 0 z", ((PathAnimation) ovalStartAnimation).getPath().getContent());
+        assertEquals(1000, ovalStartAnimation.getDuration().toMillis(), ERROR_MARGIN);
+        //Check the End Animation (Simple Translate 100,100->-200-200 1000ms)
+        Animation ovalEndAnimation = ovalGraphic.getEndAnimation();
+        assert(ovalEndAnimation instanceof TranslationAnimation);
+        assertEquals(100, ((TranslationAnimation) ovalEndAnimation).getStartX(), ERROR_MARGIN);
+        assertEquals(100, ((TranslationAnimation) ovalEndAnimation).getStartY(), ERROR_MARGIN);
+        assertEquals(-200, ((TranslationAnimation) ovalEndAnimation).getEndX(), ERROR_MARGIN);
+        assertEquals(-200, ((TranslationAnimation) ovalEndAnimation).getEndY(), ERROR_MARGIN);
+        assertEquals(1000, ovalEndAnimation.getDuration().toMillis(), ERROR_MARGIN);
+
 
         AudioElement audioElement = (AudioElement) slideElementArray2.get(2);
         assertEquals("projectResources/sampleFiles/example.mp3", audioElement.getPath());

@@ -53,4 +53,20 @@ public class TranslationAnimation extends Animation{
     public void setEndY(double endY) {
         this.endY = endY;
     }
+
+    public double getStartX() {
+        return startX;
+    }
+
+    public double getStartY() {
+        return startY;
+    }
+
+    public double getEndX() {
+        return endX;
+    }
+
+    public double getEndY() {
+        return endY;
+    }
 }

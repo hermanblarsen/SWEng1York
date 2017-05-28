@@ -37,4 +37,12 @@ public class OpacityAnimation extends Animation{
     public void setEndOpacity(double endOpacity) {
         this.endOpacity = endOpacity;
     }
+
+    public double getStartOpacity() {
+        return startOpacity;
+    }
+
+    public double getEndOpacity() {
+        return endOpacity;
+    }
 }

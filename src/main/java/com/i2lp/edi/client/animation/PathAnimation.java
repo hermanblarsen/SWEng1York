@@ -37,4 +37,8 @@ public class PathAnimation extends Animation{
         this.path.setStroke(Color.RED);
         this.path.setStrokeWidth(5);
     }
+
+    public SVGPath getPath() {
+        return path;
+    }
 }

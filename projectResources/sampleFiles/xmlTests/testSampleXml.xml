@@ -67,6 +67,12 @@
 					<ypositions>0.3, 0.1, 0.04</ypositions>
 					<isclosed>true</isclosed>					
 				</polygon>
+				<animation type="in">
+					<simplefade start="0" end="1" duration="1000"/>
+				</animation>
+				<animation type="out">
+					<simplescale start="1" end="0" duration="1000"/>
+				</animation>
 			</graphic>
 			<graphic elementid ="2" layer="2" visibility="true" startsequence="3" duration="8">
 				<onclickaction>gotoslide</onclickaction>
@@ -82,6 +88,12 @@
 					<rvertical>0.1</rvertical>
 					<rotation>45</rotation>
 				</oval>
+				<animation type="out">
+					<simpletranslate startx="100" starty="100" endx="-200" endy="-200" duration="1000"/>
+				</animation>
+				<animation type="in">
+					<pathtransition duration="1000" path="M0 0 l0 100 l100 0 z"/>
+				</animation>
 			</graphic>
 			<audio elementid ="3" startsequence="2" endsequence="4" duration="12.0">
 				<path>projectResources/sampleFiles/example.mp3</path>

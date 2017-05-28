@@ -40,4 +40,12 @@ public class ScaleAnimation extends Animation{
     public void setEndScale(double endScale) {
         this.endScale = endScale;
     }
+
+    public double getStartScale() {
+        return startScale;
+    }
+
+    public double getEndScale() {
+        return endScale;
+    }
 }

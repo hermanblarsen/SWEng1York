@@ -406,4 +406,12 @@ public abstract class SlideElement {
     public void setEndAnimation(Animation endAnimation){
         this.endAnimation = endAnimation;
     }
+
+    public Animation getStartAnimation() {
+        return startAnimation;
+    }
+
+    public Animation getEndAnimation() {
+        return endAnimation;
+    }
 }
