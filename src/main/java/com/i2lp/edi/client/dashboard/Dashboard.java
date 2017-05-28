@@ -96,10 +96,7 @@ public abstract class Dashboard extends Application {
         border = new BorderPane();
         rootBox = new VBox(addMenuBar(), border);
         scene = new Scene(rootBox, 1000, 600);
-        presentationPanelsFlowPane = new FlowPane(Orientation.HORIZONTAL);
-        subjectPanelsVBox = new VBox(5);  //TODO: move setup of global nodes to separate method
-        subjectPanelsVBox.setAlignment(Pos.TOP_CENTER);
-        noMatchesSubject = new Text("No matches found");
+        noMatchesSubject = new Text("No matches found"); //TODO: move setup of global nodes to separate method
         noMatchesSubject.setFill(Color.GRAY);
         noMatchesSubject.getStyleClass().add("italic");
         noMatchesPres = new Text("No matches found");
@@ -569,7 +566,6 @@ public abstract class Dashboard extends Application {
         ArrayList<String> modules = new ArrayList<>();
         ArrayList<String> subjects = new ArrayList<>();
 
-
         for (int i = 0; i < ediManager.getPresentationLibraryManager().getLocalPresentationList().size(); i++) {
             PresentationMetadata serverSideDetails = ediManager.getPresentationLibraryManager().getLocalPresentationList().get(i);
             ParserXML parser = new ParserXML(PRESENTATIONS_PATH + serverSideDetails.getDocumentID() + File.separator + serverSideDetails.getDocumentID() + ".xml");
@@ -616,6 +612,13 @@ public abstract class Dashboard extends Application {
         else
             subjectPanels.clear();
 
+        if (subjectPanelsVBox == null) {
+            subjectPanelsVBox = new VBox(5);
+            subjectPanelsVBox.setAlignment(Pos.TOP_CENTER);
+        } else {
+            subjectPanelsVBox.getChildren().clear();
+        }
+
         for (Subject subject : availableSubjects) {
             SubjectPanel subjectPanel = new SubjectPanel(subject, subjectPanelsVBox);
             subjectPanels.add(subjectPanel);
@@ -661,6 +664,12 @@ public abstract class Dashboard extends Application {
             presentationPanels = new ArrayList<>();
         else
             presentationPanels.clear();
+
+        if (presentationPanelsFlowPane == null) {
+            presentationPanelsFlowPane = new FlowPane(Orientation.HORIZONTAL);
+        } else {
+            presentationPanelsFlowPane.getChildren().clear();
+        }
 
         for (Presentation presentation : availablePresentations) {
             PresentationPanel presentationPanel = new PresentationPanel(presentation, presentationPanelsFlowPane);
@@ -910,21 +919,21 @@ public abstract class Dashboard extends Application {
                 Subject subject = (Subject) filter;
 
                 for (PresentationPanel panel : presentationPanels) {
-                    if (subject.equals(panel.getPresentation().getSubject()))
+                    if (subject.getSubjectName().equals(panel.getPresentation().getSubject().getSubjectName()))
                         panel.setFiltered(false);
                     else
                         panel.setFiltered(true);
                 }
 
                 for (ModulePanel panel : modulePanels) {
-                    if (subject.equals(panel.getModule().getSubject()))
+                    if (subject.getSubjectName().equals(panel.getModule().getSubject().getSubjectName()))
                         panel.setFiltered(false);
                     else
                         panel.setFiltered(true);
                 }
 
                 for (SubjectPanel panel : subjectPanels) {
-                    if (subject.equals(panel.getSubject()))
+                    if (subject.getSubjectName().equals(panel.getSubject().getSubjectName()))
                         panel.setFiltered(false);
                     else
                         panel.setFiltered(true);
@@ -933,14 +942,14 @@ public abstract class Dashboard extends Application {
                 Module module = (Module) filter;
 
                 for (PresentationPanel panel : presentationPanels) {
-                    if (module.equals(panel.getPresentation().getModule()))
+                    if (module.getModuleName().equals(panel.getPresentation().getModule().getModuleName()))
                         panel.setFiltered(false);
                     else
                         panel.setFiltered(true);
                 }
 
                 for (ModulePanel panel : modulePanels) {
-                    if (module.equals(panel.getModule()))
+                    if (module.getModuleName().equals(panel.getModule().getModuleName()))
                         panel.setFiltered(false);
                     else
                         panel.setFiltered(true);

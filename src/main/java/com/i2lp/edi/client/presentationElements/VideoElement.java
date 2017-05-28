@@ -121,8 +121,6 @@ public class VideoElement extends SlideElement{
             mediaPlayer.setCycleCount(MediaPlayer.INDEFINITE);
         }
 
-
-
         mediaView.setPreserveRatio(aspectRatioLock);
 
         mediaPane.getChildren().add(mediaView);

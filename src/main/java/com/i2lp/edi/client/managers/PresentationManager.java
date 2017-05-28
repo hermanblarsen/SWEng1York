@@ -78,7 +78,7 @@ public abstract class PresentationManager {
     protected Boolean isCommentPanelVisible = false;
     protected Boolean isEmbeddedBrowserOpen = false;
     private boolean isShowBlack = false;
-    private boolean mouseMoved = true;
+    private boolean mouseActivityRegistered = true;
     private boolean mouseDown = false;
     private EventHandler<MouseEvent> disabledCursorFilter;
     private BorderPane controlsPane;
@@ -328,10 +328,10 @@ public abstract class PresentationManager {
         cursorHideTimer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
-                if (!mouseDown && !mouseMoved && currentCursorState.equals(CursorState.DEFAULT) && isMouseOverSlide && !isMouseOverControls)
+                if (!mouseDown && !mouseActivityRegistered && currentCursorState.equals(CursorState.DEFAULT) && isMouseOverSlide && !isMouseOverControls)
                     setCursorState(CursorState.HIDDEN);
 
-                mouseMoved = false;
+                mouseActivityRegistered = false;
             }
         }, 0, 2000);
 
@@ -340,11 +340,11 @@ public abstract class PresentationManager {
                 isMouseOverSlide = true;
             } else if (event.getEventType().equals(MouseEvent.MOUSE_EXITED)) {
                 isMouseOverSlide = false;
-            } else if (event.getEventType().equals(MouseEvent.MOUSE_MOVED)) {
-                mouseMoved = true;
-                if (currentCursorState.equals(CursorState.HIDDEN)) {
-                    setCursorState(CursorState.DEFAULT);
-                }
+            }
+
+            mouseActivityRegistered = true;
+            if (currentCursorState.equals(CursorState.HIDDEN)) {
+                setCursorState(CursorState.DEFAULT);
             }
         });
 
