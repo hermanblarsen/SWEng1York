@@ -60,13 +60,13 @@ public abstract class Dashboard extends Application {
     private PresentationPanel selectedPresPanel;
     private ModulePanel selectedModulePanel;
     protected ArrayList<PresentationPanel> presentationPanels;
-    private ArrayList<ModulePanel> modulePanels;
-    private ArrayList<SubjectPanel> subjectPanels;
+    protected ArrayList<ModulePanel> modulePanels;
+    protected ArrayList<SubjectPanel> subjectPanels;
     private FlowPane presentationPanelsFlowPane;
     private VBox subjectPanelsVBox;
-    private ComboBox<PresSortKey> presSortCombo;
-    private ComboBox<ModuleSortKey> moduleSortCombo;
-    private ComboBox<SubjectSortKey> subjectSortCombo;
+    protected ComboBox<PresSortKey> presSortCombo;
+    protected ComboBox<ModuleSortKey> moduleSortCombo;
+    protected ComboBox<SubjectSortKey> subjectSortCombo;
     private Stage addToServerStage;
     private ArrayList<Presentation> availablePresentations;
     private ArrayList<Module> availableModules;
@@ -83,6 +83,9 @@ public abstract class Dashboard extends Application {
     protected TextField searchField;
     protected Button showAllButton;
     protected ArrayList<Button> subjectButtons;
+    protected Button loadPresButton;
+    protected FileChooser fileChooser;
+    protected MenuBar menuBar;
 
     @Override
     public void start(Stage dashboardStage) {
@@ -791,7 +794,7 @@ public abstract class Dashboard extends Application {
     }
 
     private MenuBar addMenuBar() {
-        MenuBar menuBar = new MenuBar();
+        menuBar = new MenuBar();
         //Due to travis fails, this couldn't be done in the constructor:
 
         Menu fileMenu = new Menu("File");

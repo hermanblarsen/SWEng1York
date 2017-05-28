@@ -57,6 +57,9 @@ public class WordCloudElement extends InteractiveElement {
     protected float wordCloudWidth=0.25f;
     protected boolean buttonActive = false;
 
+    protected Button sendWord;
+    protected TextField words;
+
     @Override
     public void sendDataToServer() {
 
@@ -195,11 +198,11 @@ public class WordCloudElement extends InteractiveElement {
 
     public VBox wordCloudElements(){
         VBox container = new VBox();
-        TextField words = new TextField();
+        words = new TextField();
         words.setPromptText("Enter a word!");
         words.setPrefColumnCount(20);
 
-        Button sendWord = new Button("Send Word");
+        sendWord = new Button("Send Word");
         sendWord.addEventHandler(MouseEvent.MOUSE_CLICKED,evt->{
            wordList.add(words.getText());
            words.clear();

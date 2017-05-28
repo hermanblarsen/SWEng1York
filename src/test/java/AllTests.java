@@ -21,7 +21,10 @@ import org.junit.runners.Suite.SuiteClasses;
         com.i2lp.edi.client.presentationElements.GraphicElementIntegrationTest.class,
         com.i2lp.edi.client.presentationElements.ImageElementTestbench.class,
         com.i2lp.edi.client.presentationElements.ImageElementIntegrationTestbench.class,
+        com.i2lp.edi.client.presentationElements.PollElementTest.class,
+        com.i2lp.edi.client.presentationElements.TextElementTest.class,
         com.i2lp.edi.client.presentationElements.VideoElementTest.class,
+        com.i2lp.edi.client.presentationElements.WordCloudElementTest.class,
 
         //PresentationViewerElements
         com.i2lp.edi.client.presentationViewerElements.CommentPanelTest.class,

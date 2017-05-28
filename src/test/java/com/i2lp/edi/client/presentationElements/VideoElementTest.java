@@ -72,6 +72,7 @@ public class VideoElementTest extends ApplicationTest {
         assertEquals(Duration.millis(300),myVideoElement.getMediaPlayer().getStopTime());
     }
 
+    @Ignore
     @Test
     public void verifyMediaPlayerStatus(){
         sleep(200);

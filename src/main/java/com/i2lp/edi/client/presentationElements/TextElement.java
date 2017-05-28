@@ -306,4 +306,8 @@ public class TextElement extends SlideElement {
     public void setHasBorder(boolean hasBorder) {
         this.hasBorder = hasBorder;
     }
+
+    public Boolean getHasBorder() {
+        return hasBorder;
+    }
 }
