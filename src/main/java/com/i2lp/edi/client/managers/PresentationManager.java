@@ -393,9 +393,6 @@ public abstract class PresentationManager {
     private void controlPresentation(int direction) {
         int presentationStatus = slideAdvance(presentationElement, direction);
 
-        if ((direction == Slide.SLIDE_BACKWARD) && isEndPresentation) {
-            isEndPresentation = false;
-        }
         //If Presentation handler told us that slide is changing, update the Slide present on Main screen
         //Can do specific things when presentation reached end, or start.
         if (presentationStatus == Presentation.SLIDE_CHANGE || presentationStatus == Presentation.PRESENTATION_FINISH || presentationStatus == Presentation.PRESENTATION_START || presentationStatus == Presentation.SLIDE_LAST_ELEMENT) {
@@ -686,6 +683,12 @@ public abstract class PresentationManager {
     }
 
     public int slideAdvance(Presentation presentationToAdvance, int direction) {
+        if ((direction == Slide.SLIDE_BACKWARD) && isEndPresentation) {
+            isEndPresentation = false;
+            displayCurrentSlide();
+            return Slide.SLIDE_NO_MOVE;
+        }
+
         //Initialise this with something more appropriate
         int presentationStatus = Presentation.SAME_SLIDE;
         int changeStatus;
@@ -790,7 +793,6 @@ public abstract class PresentationManager {
         logger.info("Current Sequence is " + slideToAdvance.getCurrentSequenceNumber());
         //Fire animations
         for (SlideElement elementToAnimate : slideToAdvance.getVisibleSlideElementList()) {
-//            if(direction == Slide.SLIDE_FORWARD) {
             if (elementToAnimate.getStartSequence() == slideToAdvance.getCurrentSequenceNumber()) {
                 elementToAnimate.renderElement(Animation.ENTRY_ANIMATION); //Entry Sequence
             } else if (elementToAnimate.getEndSequence() == slideToAdvance.getCurrentSequenceNumber()) {
