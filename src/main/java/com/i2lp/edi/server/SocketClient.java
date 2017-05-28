@@ -142,7 +142,6 @@ public class SocketClient {
             case "interactions":
                 logger.info("New responses to act upon registered on edi server!");
                 ArrayList<Interaction> Interactions = getInteractionsForInteractiveElement(1);
-                //updateResponses(current_presentation_id, current_question_id);
                 break;
 
             case "interactive_elements":
@@ -151,11 +150,10 @@ public class SocketClient {
                 break;
 
             case "users":
-                logger.info("Users database changed!");
-                if (ediManager.getUserData().getUserType().equals("teacher")) {
-                    if (ediManager.getPresentationManager() != null) {
-                        if (ediManager.getPresentationManager().getPresentationElement().getServerSideDetails().getLive()) {
-                            ediManager.getPresentationManager().getPresentationSession().setActiveUsers(getPresentationActiveUsers(ediManager.getPresentationManager().getPresentationElement().getServerSideDetails().getPresentationID()));
+                if (ediManager.getUserData().getUserType().equals("teacher")) {//If we're a teacher
+                    if (ediManager.getPresentationManager() != null) {//And in a presentation
+                        if (ediManager.getPresentationManager().getPresentationElement().getServerSideDetails().getLive()) {//And that presentation is live
+                            ediManager.getPresentationManager().getPresentationSession().setActiveUsers(getPresentationActiveUsers(ediManager.getPresentationManager().getPresentationElement().getServerSideDetails().getPresentationID()));//Update list of active users in that presentation
                         }
                     }
                 }
@@ -166,9 +164,8 @@ public class SocketClient {
                 if (ediManager.getPresentationManager() == null) {
                     ediManager.getPresentationLibraryManager().updatePresentations(); //Update presentation information
                 } else {
-                    if (ediManager.getUserData().getUserType().equals("student")) {
-                        if (ediManager.getPresentationManager().getPresentationElement().getServerSideDetails().getLive()) {
-                            //TODO: Only do this If current slide number has changed
+                    if (ediManager.getUserData().getUserType().equals("student")) {//If we're a student
+                        if (ediManager.getPresentationManager().getPresentationElement().getServerSideDetails().getLive()) {//In a live presentation
                             int current_slide_number = getCurrentSlideForPresentation(ediManager.getPresentationManager().getPresentationElement().getServerSideDetails().getPresentationID());
                             //TODO: Enable undocking (unsync?) of Teacher/Student slide movement using UI toggle
                             if (ediManager.getPresentationManager().getCurrentSlideNumber() != current_slide_number) {
@@ -193,29 +190,12 @@ public class SocketClient {
                 break;
 
             case "questions":
-                logger.info("New questions registered on edi server!");
-                updateResponses(current_presentation_id, current_question_id);
+                if (ediManager.getUserData().getUserType().equals("teacher")) {//If we're a teacher
+                    if (ediManager.getPresentationManager().getPresentationElement().getServerSideDetails().getLive()) {//In a live presentation
+                        ediManager.getPresentationManager().getPresentationSession().setQuestionQueue(ediManager.getSocketClient().getQuestionsForPresentation(ediManager.getPresentationManager().getPresentationElement().getServerSideDetails().getPresentationID())); //Update the question queue in the session
+                    }
+                }
                 break;
-        }
-    }
-
-    private void updateResponses(int presentation_id, int question_id) {
-        try (PGConnection connection = (PGConnection) dataSource.getConnection()) {
-            Statement statement = connection.createStatement();
-            StringBuilder sb = new StringBuilder();
-
-            //TODO: Create Stored Procedure on PostgreSQL
-            sb.append("SELECT * from public.responses where presentation_id = ").append(presentation_id).append(" and question_id = ").append(question_id).append(";");
-            logger.info("Adding response to database using SQL: " + sb.toString());
-            ResultSet rs = statement.executeQuery(sb.toString());
-
-            while (rs.next()) {
-                logger.info(rs.getString("data"));
-            }
-
-            statement.close();
-        } catch (Exception e) {
-            logger.error("Unable to execute update response procedure, PDJBC dump: ", e);
         }
     }
 
@@ -639,8 +619,9 @@ public class SocketClient {
             PreparedStatement statement = connection.prepareStatement("UPDATE users SET active_presentation_id = ? WHERE user_id = ?;");
 
             //If set to no presentation
-            if(presentationID == 0){
-               statement.setNull(1, 0);
+            if (presentationID == 0) {
+                statement.setNull(1, 0);
+                statement.setInt(2, userID);
             } else {
                 //Fill prepared statements to avoid SQL injection
                 statement.setInt(1, presentationID);
@@ -662,5 +643,36 @@ public class SocketClient {
         }
 
         return statementSuccess;
+    }
+
+    public ArrayList<Question> getQuestionsForPresentation(int presentationID) {
+        ArrayList<Question> activeQuestions = new ArrayList<>();
+
+        try (PGConnection connection = (PGConnection) dataSource.getConnection()) {
+            PreparedStatement statement = connection.prepareStatement("SELECT * FROM QUESTIONS WHERE presentation_id = ? AND time_answered IS NULL;");
+
+            //Fill prepared statements to avoid SQL injection
+            statement.setInt(1, presentationID);
+
+            //Call stored procedure on database
+            ResultSet rs = statement.executeQuery();
+
+            int size = 0;
+
+            while (rs.next()) {
+                activeQuestions.add(new Question(rs.getInt("question_id"), rs.getInt("user_id"), rs.getInt("presentation_id"), rs.getTimestamp("time_created"), rs.getTime("time_answered"), rs.getString("question_data"), rs.getInt("slide_number")));
+                size++;
+            }
+
+            if (size == 0) {
+                logger.warn("No questions for presentationID: " + presentationID);
+            }
+
+            statement.close();
+        } catch (Exception e) {
+            logger.error("Unable to connect to PostgreSQL on port 5432. PJDBC dump:", e);
+        }
+
+        return activeQuestions;
     }
 }

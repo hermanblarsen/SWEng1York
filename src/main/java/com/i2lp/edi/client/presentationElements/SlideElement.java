@@ -34,14 +34,14 @@ import org.slf4j.LoggerFactory;
 public abstract class SlideElement {
     Logger logger = LoggerFactory.getLogger(getClass());
 
-    protected float duration=-1;
+    protected float duration = -1;
     protected int slideID; //Needed for CSS generation, CSS filename needs this to identify what to apply
 
     protected String presentationID; //Needed for CSS generation
     protected int elementID;
-    protected int layer=1;
+    protected int layer = 1;
     protected boolean visibility = true;
-    protected int startSequence  = 0 ;
+    protected int startSequence = 0;
     protected int endSequence = -1;
     protected String onClickAction;
     protected String onClickInfo;
@@ -57,9 +57,9 @@ public abstract class SlideElement {
 
     public abstract void doClassSpecificRender();
 
-    public void removeElement(){
+    public void removeElement() {
         destroyElement();
-        if(onCanvas){
+        if (onCanvas) {
             slideCanvas.getChildren().remove(getCoreNode());
             onCanvas = false;
         }
@@ -74,7 +74,7 @@ public abstract class SlideElement {
             logger.error("Tried to set slide internalCanvas before Element constructor was called!");
         } else {
             //Ensure we only add an element to the Canvas once.
-            if(!onCanvas) {
+            if (!onCanvas) {
                 onCanvas = true;
                 slideCanvas.getChildren().add(getCoreNode());
             }
@@ -109,7 +109,7 @@ public abstract class SlideElement {
                     break;
             }
         }
-        if(animationType == Animation.EXIT_ANIMATION) {
+        if (animationType == Animation.EXIT_ANIMATION) {
             destroyElement();
         }
     }
@@ -231,23 +231,23 @@ public abstract class SlideElement {
         this.presentationManager = presentationManager;
     }
 
-    protected void scaleDimensions(float xPosition, float yPosition){
+    protected void scaleDimensions(float xPosition, float yPosition) {
         //Convert position percentages to multipliers against canvas size and update location
         getCoreNode().setTranslateX(xPosition * slideWidth);
         getCoreNode().setTranslateY(yPosition * slideHeight);
     }
 
-    protected void performOnClickAction(){
+    protected void performOnClickAction() {
         SlideElement slideElement = presentationManager.getElement(Integer.parseInt(onClickInfo));
         if (onClickAction != null) {
-            logger.info("Performing onClickAction: \"" + onClickAction + "\" with onClickInfo: \"" + onClickInfo +"\"");
+            logger.info("Performing onClickAction: \"" + onClickAction + "\" with onClickInfo: \"" + onClickInfo + "\"");
             switch (onClickAction) {
                 case "openwebsite":
-                    if(!(slideElement instanceof InteractiveElement)) {
+                    if (!(slideElement instanceof InteractiveElement)) {
                         logger.info("Opening Website: " + onClickInfo);
                         openEmbeddedBrowser();
-                    }else{
-                        if(!(((InteractiveElement) slideElement).elementActive)){
+                    } else {
+                        if (!(((InteractiveElement) slideElement).elementActive)) {
                             logger.info("Opening Website: " + onClickInfo);
                             openEmbeddedBrowser();
                         }
@@ -255,10 +255,10 @@ public abstract class SlideElement {
 
                     break;
                 case "gotoslide":
-                    if(!(slideElement instanceof InteractiveElement)) {
+                    if (!(slideElement instanceof InteractiveElement)) {
                         presentationManager.goToSlide(Integer.parseInt(onClickInfo));
-                    }else{
-                        if(!(((InteractiveElement) slideElement).elementActive)){
+                    } else {
+                        if (!(((InteractiveElement) slideElement).elementActive)) {
                             presentationManager.goToSlide(Integer.parseInt(onClickInfo));
                         }
                     }
@@ -288,13 +288,12 @@ public abstract class SlideElement {
                     logger.info("OnClickAction: " + onClickAction + " with onClick info: " + onClickInfo + " for ElementID: " + getElementID() + " not recognised.");
                     break;
             }
-        }
-        else logger.info("Element with ElementID: " + getElementID() + " has no OnClickAction");
+        } else logger.info("Element with ElementID: " + getElementID() + " has no OnClickAction");
     }
 
     BorderPane embeddedBrowserPane;
     WebEngine engine;
-    final SimpleChangeListener sequenceChangeListener = new SimpleChangeListener(){
+    final SimpleChangeListener sequenceChangeListener = new SimpleChangeListener() {
         //Changing Sequence so close the browser
         @Override
         public void changed() {
@@ -302,7 +301,7 @@ public abstract class SlideElement {
         }
     };
 
-    public void openEmbeddedBrowser(){
+    public void openEmbeddedBrowser() {
         HBox browserToolbar = new HBox();
         WebView webView = new WebView();
 
@@ -330,26 +329,26 @@ public abstract class SlideElement {
         browserToolbar.setHgrow(browserLocation, Priority.ALWAYS);
         browserToolbar.setAlignment(Pos.CENTER_LEFT);
         browserToolbar.setSpacing(10);
-        browserToolbar.setPadding(new Insets(5,12,5,12));
+        browserToolbar.setPadding(new Insets(5, 12, 5, 12));
         browserToolbar.setStyle("-fx-background-color:#34495e");
 
         //Toolbar listeners
         engine.locationProperty().addListener((obs, oldVal, newVal) -> browserLocation.setText(newVal));
         backButton.setOnMouseClicked(event -> {
             WebHistory history = engine.getHistory();
-            if(history.getCurrentIndex() > 0) {
+            if (history.getCurrentIndex() > 0) {
                 history.go(-1);
             }
         });
 
         forwardButton.setOnMouseClicked(event -> {
             WebHistory history = engine.getHistory();
-            if(history.getCurrentIndex() != history.getEntries().size()-1) {
+            if (history.getCurrentIndex() != history.getEntries().size() - 1) {
                 history.go(1);
             }
         });
 
-        reloadButton.setOnMouseClicked(event->{
+        reloadButton.setOnMouseClicked(event -> {
             engine.reload();
         });
 
@@ -358,8 +357,8 @@ public abstract class SlideElement {
         rot.setFromAngle(0);
         rot.setToAngle(360);
         rot.setInterpolator(Interpolator.LINEAR);
-        engine.getLoadWorker().stateProperty().addListener((observable, oldValue, newValue) ->{
-            if(newValue == Worker.State.RUNNING){
+        engine.getLoadWorker().stateProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue == Worker.State.RUNNING) {
                 rot.play();
             } else {
                 rot.pause();
@@ -380,7 +379,7 @@ public abstract class SlideElement {
 
         presentationManager.setIsEmbeddedBrowserOpen(true); //To disable the presentation control hotkeys
         slideCanvas.setOnKeyPressed(keyEvent -> {
-            if (keyEvent.getCode().equals(KeyCode.ESCAPE)){
+            if (keyEvent.getCode().equals(KeyCode.ESCAPE)) {
                 keyEvent.consume();
                 closeEmbeddedBrowser();
                 slideCanvas.setOnKeyPressed(null);
@@ -390,15 +389,14 @@ public abstract class SlideElement {
         embeddedBrowserPane.toFront();
 
         //Listeners to resize and close the browser.
-        slideCanvas.widthProperty().addListener(e->webView.setPrefWidth(getSlideWidth()));
-        slideCanvas.heightProperty().addListener(e->webView.setPrefHeight(getSlideHeight()));
+        slideCanvas.widthProperty().addListener(e -> webView.setPrefWidth(getSlideWidth()));
+        slideCanvas.heightProperty().addListener(e -> webView.setPrefHeight(getSlideHeight()));
         presentationManager.addSequenceChangeListener(sequenceChangeListener);
 
         engine.load(onClickInfo);
-
     }
 
-    public void closeEmbeddedBrowser(){
+    public void closeEmbeddedBrowser() {
         engine.load(null);
         slideCanvas.getChildren().remove(embeddedBrowserPane);
         presentationManager.setIsEmbeddedBrowserOpen(false);
@@ -413,11 +411,11 @@ public abstract class SlideElement {
         isThumbnailGen = thumbnailGen;
     }
 
-    public void setStartAnimation(Animation startAnimation){
+    public void setStartAnimation(Animation startAnimation) {
         this.startAnimation = startAnimation;
     }
 
-    public void setEndAnimation(Animation endAnimation){
+    public void setEndAnimation(Animation endAnimation) {
         this.endAnimation = endAnimation;
     }
 
