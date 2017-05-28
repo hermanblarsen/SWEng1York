@@ -59,7 +59,7 @@ public abstract class PresentationManager {
 
     Logger logger = LoggerFactory.getLogger(PresentationManager.class);
 
-    private EdiManager ediManager;
+    protected EdiManager ediManager;
     private PresentationSession presentationSession;
 
     protected Scene scene;
@@ -391,8 +391,6 @@ public abstract class PresentationManager {
 
     @SuppressWarnings("ConstantConditions")
     private void controlPresentation(int direction) {
-
-
         int presentationStatus = slideAdvance(presentationElement, direction);
 
         if ((direction == Slide.SLIDE_BACKWARD) && isEndPresentation) {

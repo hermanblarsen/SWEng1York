@@ -645,6 +645,40 @@ public class SocketClient {
         return statementSuccess;
     }
 
+    public boolean addQuestionToQuestionQueue(int userID, int presentationID, String questionData, int slideNumber) {
+        boolean statementSuccess = false;
+
+        //Attempt to add a user using stored procedure
+        try (PGConnection connection = (PGConnection) dataSource.getConnection()) {
+
+            PreparedStatement statement = connection.prepareStatement("SELECT * FROM public.sp_addquestion_to_questionqueue(?, ?, ?, ?);");
+
+            //Fill prepared statements to avoid SQL injection
+            statement.setInt(1, userID);
+            statement.setInt(2, presentationID);
+            statement.setString(3, questionData);
+            statement.setInt(4, slideNumber);
+
+            //Call stored procedure on database
+            ResultSet rs = statement.executeQuery();
+
+            String status = "failure";
+
+            while (rs.next()) {
+                status = rs.getString(1);
+            }
+
+            if (status.equals("success")) statementSuccess = true;
+            else logger.error("Unable to add question: " + status);
+
+            statement.close();
+        } catch (Exception e) {
+            logger.error("Unable to connect to PostgreSQL on port 5432. PJDBC dump:", e);
+        }
+
+        return statementSuccess;
+    }
+
     public ArrayList<Question> getQuestionsForPresentation(int presentationID) {
         ArrayList<Question> activeQuestions = new ArrayList<>();
 
