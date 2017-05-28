@@ -239,16 +239,30 @@ public abstract class SlideElement {
 
     protected void performOnClickAction(){
         SlideElement slideElement = presentationManager.getElement(Integer.parseInt(onClickInfo));
-        if (onClickAction != null && !(slideElement instanceof InteractiveElement)) {
+        if (onClickAction != null) {
             logger.info("Performing onClickAction: \"" + onClickAction + "\" with onClickInfo: \"" + onClickInfo +"\"");
             switch (onClickAction) {
                 case "openwebsite":
-                    logger.info("Opening Website: " + onClickInfo);
-                    openEmbeddedBrowser();
+                    if(!(slideElement instanceof InteractiveElement)) {
+                        logger.info("Opening Website: " + onClickInfo);
+                        openEmbeddedBrowser();
+                    }else{
+                        if(!(((InteractiveElement) slideElement).elementActive)){
+                            logger.info("Opening Website: " + onClickInfo);
+                            openEmbeddedBrowser();
+                        }
+                    }
 
                     break;
                 case "gotoslide":
-                    presentationManager.goToSlide(Integer.parseInt(onClickInfo));
+                    if(!(slideElement instanceof InteractiveElement)) {
+                        presentationManager.goToSlide(Integer.parseInt(onClickInfo));
+                    }else{
+                        if(!(((InteractiveElement) slideElement).elementActive)){
+                            presentationManager.goToSlide(Integer.parseInt(onClickInfo));
+                        }
+                    }
+
                     break;
 
                 case "dynamicmediatoggle":

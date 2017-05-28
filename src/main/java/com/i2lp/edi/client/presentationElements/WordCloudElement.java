@@ -101,6 +101,7 @@ public class WordCloudElement extends InteractiveElement {
             Button start_Task = new Button("Start");
             //wordCloudPanel.getChildren().add(start_Task);
             start_Task.addEventHandler(MouseEvent.MOUSE_CLICKED,evt->{
+                elementActive = true;
                 wordCloudPanel.getChildren().remove(start_Task);
                 HBox test = new HBox();
                 test.getChildren().addAll(wordCloudElements(),countdownTile);
@@ -131,6 +132,7 @@ public class WordCloudElement extends InteractiveElement {
 
         timeline.setCycleCount(timeLimit);
         timeline.setOnFinished(event -> {
+            elementActive = false;
             wordCloudPanel.getChildren().removeAll();
             FrequencyAnalyzer fa = new FrequencyAnalyzer();
             List<WordFrequency> wordFrequencies = fa.load(wordList);
@@ -174,6 +176,8 @@ public class WordCloudElement extends InteractiveElement {
                 .descriptionAlignment(Pos.BASELINE_RIGHT)
                 .build();
         wordCloudPanel.setVisible(visibility);
+
+        getCoreNode().addEventFilter(MouseEvent.MOUSE_CLICKED, event -> performOnClickAction());
     }
 
     @Override

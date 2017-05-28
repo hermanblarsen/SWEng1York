@@ -6,4 +6,5 @@ package com.i2lp.edi.client.presentationElements;
 public abstract class InteractiveElement extends SlideElement {
     public abstract void sendDataToServer();
     public abstract void receiveDataFromServer();
+    protected boolean elementActive = false;
 }

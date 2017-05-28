@@ -294,6 +294,12 @@ public class VideoElement extends SlideElement{
                 mediaPlayer.pause();
             }
         });
+        playPauseButton.addEventHandler(MouseEvent.MOUSE_ENTERED,evt->{
+            controlActive = true;
+        });
+        playPauseButton.addEventHandler(MouseEvent.MOUSE_EXITED,evt->{
+            controlActive = false;
+        });
         // mediaBar.getChildren().add(playPauseButton);
 
         //Stop Button
@@ -303,6 +309,12 @@ public class VideoElement extends SlideElement{
             mediaPlayer.stop();
             playPauseButton.setImage(play);
         });
+        stopButton.addEventHandler(MouseEvent.MOUSE_ENTERED,evt->{
+            controlActive = true;
+        });
+        stopButton.addEventHandler(MouseEvent.MOUSE_EXITED,evt->{
+            controlActive = false;
+        });
         // mediaBar.getChildren().add(stopButton);
 
         // Seek Control
@@ -311,6 +323,12 @@ public class VideoElement extends SlideElement{
             if (newValue == MediaPlayer.Status.READY) {
                 videoTime.setMax(mediaPlayer.getCycleDuration().toMillis() + startTime.toMillis());
             }
+        });
+        videoTime.addEventHandler(MouseEvent.MOUSE_ENTERED,evt->{
+            controlActive = true;
+        });
+        videoTime.addEventHandler(MouseEvent.MOUSE_EXITED,evt->{
+            controlActive = false;
         });
         //Update the time bar to match the current playback time.
         final VideoElement.Holder<Boolean> isProgrammaticChange = new VideoElement.Holder<>(false);
@@ -338,14 +356,32 @@ public class VideoElement extends SlideElement{
                     Math.floor(totalDuration / 60),
                     Math.floor(totalDuration % 60)));
         });
+        playTime.addEventHandler(MouseEvent.MOUSE_ENTERED,evt->{
+            controlActive = true;
+        });
+        playTime.addEventHandler(MouseEvent.MOUSE_EXITED,evt->{
+            controlActive = false;
+        });
         //mediaBar.getChildren().add(playTime);
 
         //Volume Label
         final Label volume = new Label("  Volume: ");
         volume.setTextFill(Color.web("#ffffff"));
+        volume.addEventHandler(MouseEvent.MOUSE_ENTERED,evt->{
+            controlActive = true;
+        });
+        volume.addEventHandler(MouseEvent.MOUSE_EXITED,evt->{
+            controlActive = false;
+        });
         //mediaBar.getChildren().add(volume);
         //Volume Slider
         final Slider volumeSlider = new Slider(0, 1, 0.5);
+        volumeSlider.addEventHandler(MouseEvent.MOUSE_ENTERED,evt->{
+            controlActive = true;
+        });
+        volumeSlider.addEventHandler(MouseEvent.MOUSE_EXITED,evt->{
+            controlActive = false;
+        });
         volumeSlider.valueProperty().addListener((observable) -> mediaPlayer.setVolume(volumeSlider.getValue()));
         //mediaBar.getChildren().add(volumeSlider);
 
@@ -353,6 +389,12 @@ public class VideoElement extends SlideElement{
         //final ToggleButton fullscreenButton = new ToggleButton("Fullscreen");
         Image fullscreenIcon = new Image("file:projectResources/icons/Fullscreen_NEW.png",20,20,true,true);
         ImageView fullscreenButton = new ImageView(fullscreenIcon);
+        fullscreenButton.addEventHandler(MouseEvent.MOUSE_ENTERED,evt->{
+            controlActive = true;
+        });
+        fullscreenButton.addEventHandler(MouseEvent.MOUSE_EXITED,evt->{
+            controlActive = false;
+        });
         //final Rectangle2D initialBounds = new Rectangle2D(mediaView.getFitWidth(), mediaView.getFitWidth(), mediaView.getFitHeight(), mediaView.getFitWidth());
         fullscreenButton.addEventHandler(MouseEvent.MOUSE_CLICKED,(event) -> {
             // TODO: Implement this properly
@@ -377,6 +419,7 @@ public class VideoElement extends SlideElement{
 //                if(aspectRatioLock) {
 //                    mediaView.setTranslateY((screenSize.getHeight()/8));
 //                }
+
                 StackPane.setAlignment(mediaView,Pos.CENTER);
                 mediaplayerPane.getChildren().add(mediaControl());
                 videoFullscreenStage.show();
@@ -408,7 +451,6 @@ public class VideoElement extends SlideElement{
         //mediaBar.getChildren().add(fullscreenButton);
         mediaBar.getChildren().addAll(playPauseButton,stopButton,videoTime,playTime,volume,volumeSlider,fullscreenButton);
         mediaBar.addEventHandler(MouseEvent.MOUSE_ENTERED, evt->{
-            controlActive = true;
             FadeTransition ft = new FadeTransition(javafx.util.Duration.millis(500),mediaBar);
             ft.setFromValue(mediaBar.getOpacity());
             ft.setToValue(1.0);
@@ -416,7 +458,6 @@ public class VideoElement extends SlideElement{
         });
 
         mediaBar.addEventHandler(MouseEvent.MOUSE_EXITED, evt->{
-            controlActive = false;
             FadeTransition ft = new FadeTransition(javafx.util.Duration.millis(500),mediaBar);
             ft.setFromValue(mediaBar.getOpacity());
             ft.setToValue(0.0);

@@ -268,6 +268,7 @@ public class ImageElement extends SlideElement {
         }
 
         coreNode.setRotate(rotation);
+        getCoreNode().addEventFilter(MouseEvent.MOUSE_CLICKED, event -> performOnClickAction());
     }
 
     //Getters and Setters

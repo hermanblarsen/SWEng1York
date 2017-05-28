@@ -128,6 +128,7 @@ public class PollElement extends InteractiveElement {
         timeline.setCycleCount(timeLimit);
         timeline.setOnFinished(event -> {
             //pollPane.getChildren().remove(pollOptions);
+            elementActive = true;
             displayDone();
         });
 
@@ -148,6 +149,7 @@ public class PollElement extends InteractiveElement {
             Button startTimer = new Button("START");
             startTimer.getStyleClass().setAll("btn", "btn-default");
             startTimer.addEventHandler(MouseEvent.MOUSE_CLICKED, evt->{
+                elementActive = true;
                 timerStart = true;
                 //responseIndicator = new ResponseIndicator();
                 //responseIndicator.setNumberOfStudents(20); //TODO: Get this from server
@@ -170,6 +172,7 @@ public class PollElement extends InteractiveElement {
             questionPane.setBody(startTimer);
         }
         questionPane.setVisible(visibility);
+        getCoreNode().addEventFilter(MouseEvent.MOUSE_CLICKED, event -> performOnClickAction());
     }
 
     @Override

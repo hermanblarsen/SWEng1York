@@ -70,6 +70,7 @@ public class GraphicElement extends SlideElement {
             wrapperPane.getChildren().clear();
             wrapperPane.getChildren().add(graphicShape);
             getCoreNode().setPickOnBounds(false);
+
     }
 
     @Override
@@ -81,6 +82,7 @@ public class GraphicElement extends SlideElement {
     public void setupElement() {
         wrapperPane = new Pane();
         wrapperPane.setVisible(visibility);
+        getCoreNode().addEventFilter(MouseEvent.MOUSE_CLICKED, event -> performOnClickAction());
 
     }
 
