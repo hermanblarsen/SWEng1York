@@ -782,7 +782,7 @@ public abstract class Dashboard extends Application {
         Presentation presentationToDelete = previewPanel.getPresentation();
 
         //Try to remove the presentation from the server
-        boolean successful_removal = ediManager.getPresentationLibraryManager().removePresentation(25, 1); //TODO we needs to store this somehow in our java @Amrik
+        boolean successful_removal = ediManager.getPresentationLibraryManager().removePresentation(presentationToDelete.getServerSideDetails().getPresentationID(), presentationToDelete.getServerSideDetails().getModule_id()); 
 
         if (successful_removal) {
             updateAvailablePresentations();

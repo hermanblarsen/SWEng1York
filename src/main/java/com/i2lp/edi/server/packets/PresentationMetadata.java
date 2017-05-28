@@ -10,6 +10,8 @@ import static com.i2lp.edi.client.Constants.MISSING_DOCUMENT_ID;
  */
 public class PresentationMetadata {
     private int presentation_id;
+
+
     private int module_id;
     private int current_slide_number;
     private String xml_url;
@@ -66,5 +68,10 @@ public class PresentationMetadata {
 
     public void setLive(boolean live) {
         this.live = live;
+    }
+
+
+    public int getModule_id() {
+        return module_id;
     }
 }

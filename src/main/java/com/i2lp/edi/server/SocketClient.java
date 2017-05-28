@@ -468,9 +468,11 @@ public class SocketClient {
             statementRemovePresentation.setString(2, xml_path);
 
             //Call stored procedure on database
-            statementRemovePresentation.executeQuery();
+            ResultSet removalStatus = statementRemovePresentation.executeQuery();
 
-            return_status_removal = statementRemovePresentation.getResultSet().toString(); //TODO is this right Amrik?
+            while(removalStatus.next()){
+                return_status_removal = removalStatus.getString(1); //TODO is this right Amrik?
+            }
 
             statementRemovePresentation.close();
         } catch (Exception e) {
