@@ -238,8 +238,8 @@ public abstract class SlideElement {
     }
 
     protected void performOnClickAction(){
-
-        if (onClickAction != null) {
+        SlideElement slideElement = presentationManager.getElement(Integer.parseInt(onClickInfo));
+        if (onClickAction != null && !(slideElement instanceof InteractiveElement)) {
             logger.info("Performing onClickAction: \"" + onClickAction + "\" with onClickInfo: \"" + onClickInfo +"\"");
             switch (onClickAction) {
                 case "openwebsite":
@@ -252,6 +252,7 @@ public abstract class SlideElement {
                     break;
 
                 case "dynamicmediatoggle":
+
                     SlideElement se = presentationManager.getElement(Integer.parseInt(onClickInfo));
                     if (se instanceof VideoElement) {
                         if (((VideoElement) se).getMediaPlayer().getStatus() == MediaPlayer.Status.PLAYING) {

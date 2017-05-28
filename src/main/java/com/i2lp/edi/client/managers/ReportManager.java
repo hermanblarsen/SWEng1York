@@ -95,9 +95,6 @@ public class ReportManager {
             }
         }
         reportPane.setContent(flow);
-
-
-
     }
     private Tile generatePollTile(String task, int numberOfQuestions){
         PollQuestions pQ = new PollQuestions(task,numberOfQuestions);

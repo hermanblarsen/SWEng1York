@@ -83,6 +83,7 @@ public class VideoElement extends SlideElement{
         if(isThumbnailGen){
             mediaPlayer.stop();
         }
+        getCoreNode().setPickOnBounds(false);
 
     }
 
