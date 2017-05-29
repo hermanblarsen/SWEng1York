@@ -38,10 +38,10 @@ public class PollElement extends InteractiveElement {
     protected Timeline timeline;
     protected Panel questionPane;
     //protected ResponseIndicator responseIndicator;
-    private Label remainingTime;
+    protected Label remainingTime;
     private Tile countdownTile;
-    private Tile answerOutputTile;
-    private ToggleButton[] answerButton;
+    protected Tile answerOutputTile;
+    protected ToggleButton[] answerButton;
     private ChartData[] chartDataArray;
     private Color assignedColour;
     protected float xSize= 0.8f;
@@ -49,6 +49,7 @@ public class PollElement extends InteractiveElement {
     protected float xPosition=0.1f;
     protected float yPosition=0.1f;
     protected boolean buttonActive = false;
+    protected Button startTimer;
 
     public PollElement() {
 
@@ -146,7 +147,7 @@ public class PollElement extends InteractiveElement {
                                       .title("Responses")
                                       .build();
         if(teacher && !timerStart) {
-            Button startTimer = new Button("START");
+            startTimer = new Button("START");
             startTimer.getStyleClass().setAll("btn", "btn-default");
             startTimer.addEventHandler(MouseEvent.MOUSE_CLICKED, evt->{
                 elementActive = true;
