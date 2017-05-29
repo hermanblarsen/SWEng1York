@@ -224,8 +224,8 @@ public abstract class PresentationManager {
         beginLiveSession();
     }
 
-    private void beginLiveSession(){
-        if(presentationElement.getServerSideDetails() != null) {//If not local presentation
+    private void beginLiveSession() {
+        if (presentationElement.getServerSideDetails() != null) {//If not local presentation
             if (presentationElement.getServerSideDetails().getLive()) {//If we are live, start up a PresentationSession in which to track connectivity data
                 if (this instanceof PresentationManagerTeacher) {
                     presentationSession = new PresentationSession(ediManager);
@@ -406,14 +406,14 @@ public abstract class PresentationManager {
 
         //If Presentation handler told us that slide is changing, update the Slide present on Main screen
         //Can do specific things when presentation reached end, or start.
-        if (presentationStatus == Presentation.SLIDE_CHANGE || presentationStatus == Presentation.PRESENTATION_FINISH || presentationStatus == Presentation.PRESENTATION_START || presentationStatus == Presentation.SLIDE_LAST_ELEMENT) {
-            if (presentationStatus == Presentation.SLIDE_CHANGE) {
-                logger.info("Changing Slides");
-                if(presentationElement.getServerSideDetails() != null) {//If not local presentation
+        if (presentationStatus == Presentation.SLIDE_CHANGE || presentationStatus == Presentation.PRESENTATION_FINISH || presentationStatus == Presentation.PRESENTATION_START || presentationStatus == Presentation.SLIDE_LAST_ELEMENT || presentationStatus == Presentation.SAME_SLIDE) {
+            if ((presentationStatus == Presentation.SLIDE_CHANGE) || (presentationStatus == Presentation.SAME_SLIDE)) {
+                if(presentationStatus == Presentation.SLIDE_CHANGE) logger.info("Changing Slides");
+                if (presentationElement.getServerSideDetails() != null) {//If not local presentation
                     //If we are live, send updated current slide to database
                     if (presentationElement.getServerSideDetails().getLive()) {
                         if (this instanceof PresentationManagerTeacher) {
-                            ediManager.getSocketClient().setCurrentSlideForPresentation(presentationElement.getServerSideDetails().getPresentationID(), currentSlideNumber + 1);
+                            ediManager.getSocketClient().setCurrentSlideAndSequenceForPresentation(presentationElement.getServerSideDetails().getPresentationID(), currentSlideNumber + 1, presentationElement.getSlide(currentSlideNumber).getCurrentSequenceNumber());
                         }
                     }
                 }
@@ -869,13 +869,14 @@ public abstract class PresentationManager {
             if (presentationElement.getServerSideDetails() != null) {//If the presentation is not locally loaded
                 if (presentationElement.getServerSideDetails().getLive()) {
                     if (this instanceof PresentationManagerTeacher) {
+                        //TODO: End Presentation Properly
                         //Update Presentation record to offline
                         ediManager.getSocketClient().setPresentationLive(presentationElement.getServerSideDetails().getPresentationID(), false);
-                        //TODO: End Presentation Properly
+                        ediManager.getSocketClient().setCurrentSlideAndSequenceForPresentation(presentationElement.getServerSideDetails().getPresentationID(), 0, 0);
                         presentationSession.endSession();
                     } else if (this instanceof PresentationManagerStudent) {
                         //TODO: Do other session termination stuff
-                        //Set active presentation for user to 0 (no active presentation)
+                        //Set active presentation for user to null (no active presentation)
                         ediManager.getSocketClient().setUserActivePresentation(0, ediManager.getUserData().getUserID());
                     }
                 }

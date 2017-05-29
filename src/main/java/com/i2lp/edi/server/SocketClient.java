@@ -7,7 +7,6 @@ import com.impossibl.postgres.api.jdbc.PGConnection;
 import com.impossibl.postgres.jdbc.PGDataSource;
 import io.socket.client.IO;
 import io.socket.client.Socket;
-import javafx.application.Platform;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -113,6 +112,8 @@ public class SocketClient {
 
         socket.on(Socket.EVENT_CONNECT, args -> logger.info("Client successfully connected to Edi Server"));
 
+
+
         socket.on("DB_Update", args -> {
             logger.info("Client knows DB has updated:  " + args[0]);
             //Pull fresh table
@@ -157,22 +158,22 @@ public class SocketClient {
                 break;
 
             case "presentations":
-                //Update presentation list whilst no presentation is live
-                if (ediManager.getPresentationManager() == null) {
+                //Update presentation list if there is a library manager
+                if (ediManager.getPresentationLibraryManager() != null) {
                     ediManager.getPresentationLibraryManager().updatePresentations(); //Update presentation information
-                } else {
-                    if (ediManager.getUserData().getUserType().equals("student")) {//If we're a student
-                        if (ediManager.getPresentationManager().getPresentationElement().getServerSideDetails().getLive()) {//In a live presentation
-                            int current_slide_number = getCurrentSlideForPresentation(ediManager.getPresentationManager().getPresentationElement().getServerSideDetails().getPresentationID());
-                            //TODO: Enable undocking (unsync?) of Teacher/Student slide movement using UI toggle
-                            if (ediManager.getPresentationManager().getCurrentSlideNumber() != current_slide_number) {
-                                //If the current slide number has changed, move to it
-                                logger.info("Slide change request from teacher received. Changing to target slide.");
-                                Platform.runLater(() -> ediManager.getPresentationManager().goToSlide(current_slide_number));
-                            }
-                        }
+                }
+                if (ediManager.getUserData().getUserType().equals("student")) {//If we're a student
+                    if (ediManager.getPresentationManager().getPresentationElement().getServerSideDetails().getLive()) {//In a live presentation
+                        int current_slide_number = getCurrentSlideForPresentation(ediManager.getPresentationManager().getPresentationElement().getServerSideDetails().getPresentationID());
+                        //TODO: Enable undocking (unsync?) of Teacher/Student slide movement using UI toggle
+                       /* if ((ediManager.getPresentationManager().getCurrentSlideNumber() != current_slide_number)||(ediManager.getPresentationManager().getPresentationElement().getSlide(current_slide_number).getCurrentSequenceNumber())) {
+                            //If the current slide number has changed, move to it
+                            logger.info("Slide change request from teacher received. Changing to target slide.");
+                            Platform.runLater(() -> ediManager.getPresentationManager().goToSlide(current_slide_number));
+                        }*/
                     }
                 }
+
                 break;
 
             case "jnct_users_modules":
@@ -470,7 +471,7 @@ public class SocketClient {
             //Call stored procedure on database
             ResultSet removalStatus = statementRemovePresentation.executeQuery();
 
-            while(removalStatus.next()){
+            while (removalStatus.next()) {
                 return_status_removal = removalStatus.getString(1); //TODO is this right Amrik?
             }
 
@@ -563,30 +564,40 @@ public class SocketClient {
         return activeUsers;
     }
 
-    public boolean setCurrentSlideForPresentation(int presentationID, int currentSlide) {
-        boolean statementSuccess = false;
-        try (PGConnection connection = (PGConnection) dataSource.getConnection()) {
-            PreparedStatement statement = connection.prepareStatement("UPDATE presentations SET current_slide_number = ? WHERE presentation_id = ?;");
+    public void setCurrentSlideAndSequenceForPresentation(int presentationID, int currentSlide, int currentSequence) {
+        Thread statementThread = new Thread(() -> {
+            boolean statementSuccess = false;
+            try (PGConnection connection = (PGConnection) dataSource.getConnection()) {
+                PreparedStatement statement = connection.prepareStatement("UPDATE presentations SET current_slide_number = ?, current_sequence_number = ? WHERE presentation_id = ?;");
 
-            //Fill prepared statements to avoid SQL injection
-            statement.setInt(1, currentSlide);
-            statement.setInt(2, presentationID);
 
-            //Call stored procedure on database
-            statementSuccess = statement.execute();
+                if ((currentSlide == 0) && (currentSequence == 0)) {
+                    statement.setNull(1, 0);
+                    statement.setNull(2, 0);
+                } else {
+                    //Fill prepared statements to avoid SQL injection
+                    statement.setInt(1, currentSlide);
+                    statement.setInt(2, currentSequence);
+                }
+                statement.setInt(3, presentationID);
 
-            if (statementSuccess) {
-                logger.error("Unable to set current slide number.");
-            } else {
-                logger.info("Successfully changed current slide number.");
+                //Call stored procedure on database
+                statementSuccess = statement.execute();
+
+                if (statementSuccess) {
+                    logger.error("Unable to set current slide number.");
+                } else {
+                    logger.info("Successfully changed current slide number.");
+                }
+
+                statement.close();
+            } catch (Exception e) {
+                logger.error("Unable to connect to PostgreSQL on port 5432. PJDBC dump:", e);
             }
 
-            statement.close();
-        } catch (Exception e) {
-            logger.error("Unable to connect to PostgreSQL on port 5432. PJDBC dump:", e);
-        }
-
-        return statementSuccess;
+            //TODO: Statement success isn't returned. Don't wanna create a future callable and wait on result. Ignore success for now.
+        });
+        statementThread.start();
     }
 
     public int getCurrentSlideForPresentation(int presentationID) {
@@ -668,11 +679,10 @@ public class SocketClient {
                 status = rs.getString(1);
             }
 
-            if (status.equals("success")){
+            if (status.equals("success")) {
                 statementSuccess = true;
                 logger.info("Successfully added question to question queue.");
-            }
-            else logger.error("Unable to add question: " + status);
+            } else logger.error("Unable to add question: " + status);
 
             statement.close();
         } catch (Exception e) {
@@ -702,11 +712,10 @@ public class SocketClient {
                 status = rs.getString(1);
             }
 
-            if (status.equals("success")){
+            if (status.equals("success")) {
                 statementSuccess = true;
                 logger.info("Successfully answered question: " + questionID);
-            }
-            else logger.error("Unable to answer question: " + status);
+            } else logger.error("Unable to answer question: " + status);
 
             statement.close();
         } catch (Exception e) {
