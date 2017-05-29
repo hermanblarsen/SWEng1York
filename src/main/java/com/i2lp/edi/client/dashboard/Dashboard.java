@@ -29,11 +29,18 @@ import javafx.stage.FileChooser;
 import javafx.stage.Popup;
 import javafx.stage.Stage;
 import javafx.stage.Window;
+import org.apache.commons.validator.UrlValidator;
 import org.kordamp.bootstrapfx.scene.layout.Panel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xml.sax.InputSource;
 
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -185,7 +192,10 @@ public abstract class Dashboard extends Application {
                 });
 
                 MenuItem online = new MenuItem("Remotely (from HTTP)");
-                online.setOnAction(event1 -> logger.info("Not yet implemented")); //TODO: open presentation from web
+                online.setOnAction(event1 -> {
+                    //For testing you can use :https://raw.githubusercontent.com/hermanblarsen/SWEng1York/master/projectResources/sampleFiles/xml/i2lpSampleXml.xml?token=AYLAhZswVfz-zJFrEDKoquw1Eg0XybCKks5ZNcqAwA%3D%3D
+                    openOnlineXMLSelectorWindow("");
+                });
 
                 menu.getItems().addAll(local, online);
                 menu.show(openPresButton, Side.BOTTOM, 0, 0);
@@ -1147,6 +1157,64 @@ public abstract class Dashboard extends Application {
     private void showReport(String presentationID) {
         ReportManager rm = new ReportManager();
         rm.openReportPanel(presentationID);
+    }
+
+    private void openOnlineXMLSelectorWindow(String defaultURLField) {
+        TextField urlInput = new TextField(defaultURLField);
+        urlInput.setPrefWidth(250);
+
+        Button okButton = new Button("OK");
+
+        HBox root = new HBox();
+        root.setAlignment(Pos.CENTER);
+        root.setSpacing(5);
+        root.setPadding(new Insets(5, 12, 5, 12));
+        root.setHgrow(urlInput, Priority.ALWAYS);
+
+        root.getChildren().add(urlInput);
+        root.getChildren().add(okButton);
+
+        Scene scene = new Scene(root, 400, 100);
+
+        final Stage onlineChooser = new Stage();
+        onlineChooser.setScene(scene);
+        onlineChooser.setTitle("Open Remote Presentation");
+        onlineChooser.getIcons().add(new Image("file:projectResources/logos/ediLogo32x32.png"));
+
+        okButton.setOnMouseClicked((e) -> {
+            UrlValidator urlValidator = new UrlValidator(new String[]{"http", "https"});
+            if(urlValidator.isValid(urlInput.getText())) {
+                //Valid URL
+                String presentationURL = urlInput.getText();
+                onlineChooser.close();
+
+                try {
+                    URL url = new URL(presentationURL);//Example source: https://raw.githubusercontent.com/hermanblarsen/SWEng1York/master/projectResources/sampleFiles/xml/i2lpSampleXml.xml?token=AYLAhZslFnsvKaAljeMwbdPuGpYn7Rnbks5ZNciAwA%3D%3D
+                    URLConnection connection = url.openConnection();
+                    InputSource presentationInputSource = new InputSource(new BufferedInputStream(connection.getInputStream()));
+
+                    ParserXML parser = new ParserXML(presentationInputSource, presentationURL);
+                    Presentation presentation = parser.parsePresentation();
+                    launchPresentation(presentation);
+
+                } catch (MalformedURLException murle){
+                    logger.error("Malformed URL given for remote presentation.");
+                } catch (IOException ioe){
+                    logger.warn("IOException when trying to get remote http presentation.");
+                    new Alert(Alert.AlertType.ERROR, "Couldn't get presentation from this URL.");
+                    openOnlineXMLSelectorWindow(presentationURL);//Reopen the url entry window so that the user can try again.
+                    return;
+                }
+
+            } else {
+                //Not Valid URL.
+                logger.info("Invalid url given for remote presentation.");
+                new Alert(Alert.AlertType.ERROR, "Invalid URL.").showAndWait();
+            }
+
+        });
+
+        onlineChooser.show();
     }
 
     public void setEdiManager(EdiManager ediManager) {

@@ -11,6 +11,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import java.io.FileNotFoundException;
@@ -47,6 +48,22 @@ public class ParserXML {
         xmlParser = new DOMParser(); //Equivalent to DocumentBuilder when not writing to XML
         try {
             xmlParser.parse(this.presentationXmlPath);
+        } catch (SAXException e) {
+            e.printStackTrace();
+            logger.warn("SAXExeption when accessing XML");
+        } catch (IOException e) {
+            e.printStackTrace();
+            logger.warn("IOExeption when accessing XML");
+        }
+        xmlDocument = xmlParser.getDocument();
+    }
+
+    public ParserXML(InputSource input, String sourcePath){
+        //Parses an XML from any InputSource.
+        xmlParser = new DOMParser();
+        presentationXmlPath = sourcePath;
+        try {
+            xmlParser.parse(input);
         } catch (SAXException e) {
             e.printStackTrace();
             logger.warn("SAXExeption when accessing XML");
