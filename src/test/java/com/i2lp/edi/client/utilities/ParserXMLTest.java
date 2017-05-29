@@ -184,7 +184,7 @@ public class ParserXMLTest {
         //Check the Start Animation (Simple scale 0-1 1000ms)
         Animation ovalStartAnimation = ovalGraphic.getStartAnimation();
         assert(ovalStartAnimation instanceof PathAnimation);
-        assertEquals("M0 0 l0 100 l100 0 z", ((PathAnimation) ovalStartAnimation).getPath().getContent());
+        assertEquals("M0 0 l0 100 l100 0 z", ((PathAnimation) ovalStartAnimation).getPathUnscaled().getContent());
         assertEquals(1000, ovalStartAnimation.getDuration().toMillis(), ERROR_MARGIN);
         //Check the End Animation (Simple Translate 100,100->-200-200 1000ms)
         Animation ovalEndAnimation = ovalGraphic.getEndAnimation();

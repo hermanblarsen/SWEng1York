@@ -10,7 +10,10 @@ import javafx.scene.control.Button;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.shape.SVGPath;
+import javafx.scene.transform.Scale;
 import javafx.stage.Stage;
 
 /**
@@ -32,7 +35,7 @@ public class AnimationTestbench extends Application {
 //        PresentationManagerTeacher presentationManager = new PresentationManagerTeacher();
 //        presentationManager.openPresentation("file:projectResources/sampleFiles/xml/sampleXmlSimpleAnimation.xml");
 //        SVGPath testPath = new SVGPath();
-//        testPath.setContent("M10 10 L100 100");
+//        testPath.setContent("M-0.1 -0.1 L0.1 0.1 L0.1 0.9 L0.9 0.9 L0.2 0.2");
 //        testPath.setStroke(Color.BLUE);
 //        presentationManager.border.getChildren().add(testPath);
 //        testPath.setVisible(true);
@@ -84,12 +87,24 @@ public class AnimationTestbench extends Application {
         buttonsBox.getChildren().add(opacityButton);
         buttonsBox.getChildren().add(pathButton);
 
+//        SVGPath testPath = new SVGPath();
+//        testPath.setContent("M0 0 L0.1 0.1 L0.1 0.9 L0.9 0.9 L0.2 0.2");
+//        //Scale scale = new Scale(1000, 500, 0,0);
+//        //testPath.getTransforms().add(scale);
+//        testPath.setScaleX(1);
+//        testPath.setStroke(Color.BLUE);
+//        testPath.setStrokeWidth(0.01);
+//        testPath.setFill(Color.TRANSPARENT);
+
         //Setup the root border pane, controls on the left.
         BorderPane root = new BorderPane();
         root.setLeft(buttonsBox);
         root.getChildren().add(testRect);
+//        root.getChildren().add(testPath);
 
         Scene scene = new Scene(root, 1000, 1000);
+        pathAnimation.setScaleFactor(1000,10000);
+        translationAnimation.setScaleFactor(1000,1000);
 
         primaryStage.setTitle("Simple Animations Test");
         primaryStage.setScene(scene);

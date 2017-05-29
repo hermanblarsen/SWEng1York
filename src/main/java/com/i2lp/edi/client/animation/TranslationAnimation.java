@@ -11,6 +11,9 @@ public class TranslationAnimation extends Animation{
     private double startY;
     private double endX;
     private double endY;
+    private double width;
+    private double height;
+    private boolean scaleSet = false;
 
     public TranslationAnimation(double startX, double startY, double endX, double endY, double durationMillis){
         this.startX = startX;
@@ -24,15 +27,22 @@ public class TranslationAnimation extends Animation{
 
     }
 
-
+    public void setScaleFactor(double width, double height){
+        this.width = width;
+        this.height = height;
+        scaleSet = true;
+    }
 
     @Override
     public void play() {
+        if(!scaleSet){
+            logger.error("Animation played before scale was set before calling play");
+        }
         TranslateTransition transition = new TranslateTransition(duration, getCoreNodeToAnimate());
-        transition.setFromX(startX);
-        transition.setFromY(startY);
-        transition.setToX(endX);
-        transition.setToY(endY);
+        transition.setFromX(startX*width);
+        transition.setFromY(startY*height);
+        transition.setToX(endX*width);
+        transition.setToY(endY*height);
 
         transition.setCycleCount(1);
         transition.play();
