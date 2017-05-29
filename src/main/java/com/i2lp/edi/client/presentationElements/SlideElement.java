@@ -1,6 +1,8 @@
 package com.i2lp.edi.client.presentationElements;
 
 import com.i2lp.edi.client.animation.Animation;
+import com.i2lp.edi.client.animation.PathAnimation;
+import com.i2lp.edi.client.animation.TranslationAnimation;
 import com.i2lp.edi.client.managers.PresentationManager;
 import com.i2lp.edi.client.utilities.SimpleChangeListener;
 import de.jensd.fx.glyphs.GlyphsDude;
@@ -90,7 +92,15 @@ public abstract class SlideElement {
                 case Animation.ENTRY_ANIMATION: //Entry animation (playback)
                     if (startAnimation != null) {//animation Exists as StartSequence Present
                         startAnimation.setCoreNodeToAnimate(getCoreNode());
+
+                        if(startAnimation instanceof TranslationAnimation ){
+                            ((TranslationAnimation) startAnimation).setScaleFactor(getSlideWidth(), getSlideHeight());
+                        } else if(startAnimation instanceof PathAnimation){
+                            ((PathAnimation) startAnimation).setScaleFactor(getSlideWidth(), getSlideHeight());
+                        }
+
                         startAnimation.play();
+
                         logger.info("Entry animation playing");
                     } else {
                         // If there's no animation to show the element then just make it visible

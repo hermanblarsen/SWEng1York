@@ -39,10 +39,10 @@
 				<xsize>0.8</xsize>
 				<ysize>0.4</ysize>
 				<animation type="in">
-					<simpletranslate startx="-200" starty="-200" endx="200" endy="200" duration="1000"/>
+					<simpletranslate startx="-0.2" starty="-0.2" endx="0.2" endy="0.5" duration="1000"/>
 				</animation>
 				<animation type="out">
-					<simpletranslate startx="100" starty="100" endx="-200" endy="-200" duration="1000"/>
+					<simpletranslate startx="0.2" starty="0.5" endx="-0.2" endy="-0.2" duration="1000"/>
 				</animation>
             </text>
 

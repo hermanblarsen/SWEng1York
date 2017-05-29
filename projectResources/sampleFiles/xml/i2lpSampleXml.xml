@@ -43,10 +43,10 @@
 				<xsize>0.8</xsize>
 				<ysize>0.4</ysize>
 				<animation type="in">
-					<simpletranslate startx="-200" starty="-200" endx="200" endy="200" duration="1000"/>
+					<simpletranslate startx="-0.2" starty="-0.2" endx="0.2" endy="0.5" duration="1000"/>
 				</animation>
 				<animation type="out">
-					<simpletranslate startx="100" starty="100" endx="-200" endy="-200" duration="1000"/>
+					<simpletranslate startx="0.2" starty="0.5" endx="-0.2" endy="-0.2" duration="1000"/>
 				</animation>
             </text>
 
@@ -132,7 +132,7 @@
 				<onclickaction>dynamicmediatoggle</onclickaction>
 				<onclickinfo>3</onclickinfo>
 				<animation type="in">
-					<pathtransition duration="1000" path="m74.5,163c73,-96 151,-167 291,-116c140,51 193,230 81,261c-112,31 -341,96 -318,-34c23,-130 110,-178 149,-147c39,31 92,124 38,134c-54,10 -121,-57 -105,-74"/>
+					<pathtransition duration="1000" path="M-0.1 -0.1 L0.1 0.1 L0.1 0.9 L0.9 0.9 L0.2 0.2"/>
 				</animation>
 			</graphic>
 

@@ -3,6 +3,8 @@ package com.i2lp.edi.client.animation;
 
 import javafx.scene.Node;
 import javafx.util.Duration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Created by amriksadhra on 02/03/2017.
@@ -16,10 +18,13 @@ public abstract class Animation {
     public final static int ENTRY_ANIMATION = 1;
     public final static int EXIT_ANIMATION = 2;
 
+    protected Logger logger = LoggerFactory.getLogger(getClass());
+
     Node coreNodeToAnimate;
     protected Duration duration; //The duration of any transition
 
-    public  Animation(){}
+    public  Animation(){
+    }
     /*
      * Play animation
      */
