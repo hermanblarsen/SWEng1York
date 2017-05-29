@@ -57,7 +57,6 @@ public class PresentationSession {
         for(Question question : questionQueue){
             logger.info("Question: " + question.getQuestion_data());
         }
-
         //TODO: Tie to QuestionQueue UI for question answering
        /* if(ediManager.getSocketClient().answerQuestionInQuestionQueue(questionQueue.get(0).getQuestion_id())){
             logger.info("Answered question successfully");

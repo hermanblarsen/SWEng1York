@@ -1,6 +1,8 @@
 package com.i2lp.edi.client.managers;
 
+import com.i2lp.edi.client.PresentationSession;
 import com.i2lp.edi.client.presentationViewerElements.CommentPanel;
+import com.i2lp.edi.server.packets.Question;
 import javafx.animation.Animation;
 import javafx.animation.Interpolator;
 import javafx.animation.Transition;
@@ -20,6 +22,7 @@ import javafx.stage.WindowEvent;
 import javafx.util.Duration;
 import org.kordamp.bootstrapfx.scene.layout.Panel;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -37,9 +40,20 @@ public class PresentationManagerTeacher extends PresentationManager {
     protected Stage teacherToolKit;
     private int numberOfTestQuestions = 10;
     private int numberOnline = 0;
+    private ArrayList<Question> newQuestionList;
 
     public PresentationManagerTeacher(EdiManager ediManager) {
         super(ediManager);
+    }
+
+    private void setListOfQuestions(){
+        newQuestionList = getPresentationSession().getQuestionQueue();
+        if(newQuestionList == null){
+            newQuestionList = new ArrayList<>();
+        }
+        for(Question question : newQuestionList){
+            logger.info("Question: " + question.getQuestion_data());
+        }
     }
 
     @Override
@@ -55,8 +69,10 @@ public class PresentationManagerTeacher extends PresentationManager {
             scene.getStylesheets().add("bootstrapfx.css");
             Tab questions = new Tab();
             questions.setText("Question Queue");
-            questionList = generateQuestions();
-            questions.setContent(questionQueueFunction(questionList));
+            questionList = new ArrayList<String>();
+            setListOfQuestions();
+            //questionList = generateQuestions();
+            questions.setContent(questionQueueFunction(newQuestionList));
             tp.getTabs().add(questions);
 
             Tab studentStats = new Tab();
@@ -73,21 +89,6 @@ public class PresentationManagerTeacher extends PresentationManager {
             teacherToolKit.addEventHandler(WindowEvent.WINDOW_CLOSE_REQUEST, evt -> toolkitOpen = false);
         }
 
-    }
-
-
-    //TODO: @Koen Modify this class so questions can be hotloaded into UI
-    protected List<String> generateQuestions() { //TODO remove
-        ArrayList<String> questions = new ArrayList<>();
-
-        //Ensure this runs whenever questions are fed in
-       /* ArrayList<Question> queueQuestions = ediManager.getPresentationManager().getPresentationSession().getQuestionQueue();
-
-        for (Question question : queueQuestions) {
-            questions.add(question.getQuestion_data());
-        }*/
-
-        return questions;
     }
 
     protected List<Student> generateTestStudents() { //TODO remove
@@ -108,7 +109,7 @@ public class PresentationManagerTeacher extends PresentationManager {
         return studentList;
     }
 
-    protected BorderPane questionQueueFunction(List<String> questions) {
+    protected BorderPane questionQueueFunction(List<Question> questions) {
         BorderPane bp = new BorderPane();
         bp.setStyle("-fx-background-color: #34495e");
         bp.setPadding(new Insets(0, 10, 10, 10));
@@ -129,7 +130,7 @@ public class PresentationManagerTeacher extends PresentationManager {
         StackPane slidePane = new StackPane();
 
         for (int i = 0; i < questions.size(); i++) {
-            slides[i] = new Panel(questions.get(i));
+            slides[i] = new Panel(questions.get(i).getQuestion_data());
             //slides[i].getStyleClass().add("panel-primary");
             slides[i].setMinWidth(400);
             fp.getChildren().add(slides[i]);

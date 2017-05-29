@@ -942,7 +942,6 @@ public abstract class PresentationManager {
         }
         boolean targetToggle = false;
         //If we need to go backwards, go backwards
-        System.out.println("T: "+targetSlideNumber+" C: "+currentSlideNumber);
         if (currentSlideNumber+2 == targetSlideNumber||currentSlideNumber == targetSlideNumber){
 
             if(targetSlideNumber < currentSlideNumber){
