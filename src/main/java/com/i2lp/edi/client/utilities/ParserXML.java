@@ -7,12 +7,14 @@ import javafx.scene.media.MediaException;
 import javafx.util.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.*;
+import org.w3c.dom.Document;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.FloatBuffer;
 import java.nio.file.InvalidPathException;
 import java.util.ArrayList;
 
@@ -376,10 +378,10 @@ public class ParserXML {
 
                 switch (elementName){
                     case "textcontent":
-                        textElement.setTextContent(elementContent, presentationXmlPath);
+                        textElement.setTextContent(elementContent);
                         break;
                     case "textfilepath":
-                        textElement.setTextFilepath(elementContent);
+                        textElement.setTextFilepath(elementContent, presentationXmlPath);
                         break;
                     case "textcontentreference":
                         textElement.setTextContentReference(elementContent);

@@ -31,9 +31,9 @@
             </text>
 
             <text elementid ="1" layer="1" startsequence="2">
-                <textcontent>
-                    EXTERN[i2lpExternalText.txt]
-                </textcontent>
+                <textfilepath>
+                    i2lpExternalText.txt
+                </textfilepath>
 				<xposition>0.1</xposition>
 				<yposition>0.3</yposition>
 				<xsize>0.8</xsize>

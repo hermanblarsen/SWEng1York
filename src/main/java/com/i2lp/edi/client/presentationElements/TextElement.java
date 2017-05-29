@@ -146,32 +146,27 @@ public class TextElement extends SlideElement {
         return textContent;
     }
 
-    public void setTextContent(String textContent, String xmlPath) {
-        if (textContent.contains("EXTERN[")) {
-            String filePathString = textContent.substring(textContent.indexOf("[") + 1, textContent.indexOf("]"));
-            if(!filePathString.contains("/")){//If path is relative to XML path
-                filePathString = xmlPath.substring(0, xmlPath.lastIndexOf("/")) + File.separator + filePathString;
-                logger.info("Loading external text content from " + filePathString);
-            }
-            try {
-                this.textContent = readFile(filePathString, Charset.defaultCharset());
-            } catch (IOException e) {
-                logger.error("Externally referenced text source: " + filePathString + " does not exist. Using default content.");
-                this.textContent = FALLBACK_MISSING_EXTERNAL_TEXTCONTENT;
-            }
-        } else {
-            this.textContent = textContent;
-        }
+    public void setTextContent(String textContent) {
+        this.textContent = textContent;
     }
-
-
 
     public String getTextFilepath() {
         return textFilepath;
     }
 
-    public void setTextFilepath(String textFilepath) {
-        this.textFilepath = textFilepath;
+    public void setTextFilepath(String textFilepath, String xmlPath) {
+        this.textFilepath = textFilepath.trim();
+
+        if (!this.textFilepath.contains("/")) {//If path is relative to XML path
+            this.textFilepath = xmlPath.substring(0, xmlPath.lastIndexOf("/")) + File.separator + this.textFilepath;
+            logger.info("Loading external text content from " + this.textFilepath);
+        }
+        try {
+            this.textContent = readFile(this.textFilepath, Charset.defaultCharset());
+        } catch (IOException e) {
+            logger.error("Externally referenced text source: " + this.textFilepath + " does not exist. Using default content.");
+            this.textContent = FALLBACK_MISSING_EXTERNAL_TEXTCONTENT;
+        }
     }
 
     public String getTextContentReference() {
