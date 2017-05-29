@@ -1,5 +1,6 @@
 package com.i2lp.edi.client.managers;
 
+import com.i2lp.edi.client.PresentationSession;
 import com.i2lp.edi.client.presentationViewerElements.CommentPanel;
 import com.i2lp.edi.server.packets.Question;
 import javafx.animation.Animation;
@@ -11,6 +12,8 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
@@ -19,9 +22,13 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.stage.WindowEvent;
 import javafx.util.Duration;
+import org.apache.commons.net.ntp.TimeStamp;
 import org.kordamp.bootstrapfx.scene.layout.Panel;
 
+import java.lang.reflect.Array;
+import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -39,6 +46,8 @@ public class PresentationManagerTeacher extends PresentationManager {
     private int numberOfTestQuestions = 10;
     private int numberOnline = 0;
     private ArrayList<Question> newQuestionList;
+    boolean buttonActive = false;
+    //private Timestamp openTime;
 
     public PresentationManagerTeacher(EdiManager ediManager) {
         super(ediManager);
@@ -49,6 +58,7 @@ public class PresentationManagerTeacher extends PresentationManager {
             newQuestionList = getPresentationSession().getQuestionQueue();
         }
         if(newQuestionList == null){
+            System.out.println("NULL QUESTION");
             newQuestionList = new ArrayList<>();
         }
         for(Question question : newQuestionList){
@@ -110,11 +120,13 @@ public class PresentationManagerTeacher extends PresentationManager {
     }
 
     protected BorderPane questionQueueFunction(List<Question> questions) {
+
         BorderPane bp = new BorderPane();
         bp.setStyle("-fx-background-color: #34495e");
         bp.setPadding(new Insets(0, 10, 10, 10));
 
         ScrollPane sp = new ScrollPane();
+        sp.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         sp.setMaxWidth(Double.MAX_VALUE);
         FlowPane fp = new FlowPane();
         fp.setPrefWrapLength(100);
@@ -131,6 +143,24 @@ public class PresentationManagerTeacher extends PresentationManager {
 
         for (int i = 0; i < questions.size(); i++) {
             slides[i] = new Panel(questions.get(i).getQuestion_data());
+            Image answered = new Image("file:projectResources/icons/Tick.png",30,30,true,true);
+            ImageView answeredView = new ImageView(answered);
+            final int j= i;
+            answeredView.addEventHandler(MouseEvent.MOUSE_CLICKED, evt->{
+                buttonActive = true;
+                ediManager.getSocketClient().answerQuestionInQuestionQueue(questions.get(0).getQuestion_id());
+                Label questionComplete = new Label("Question Answered!");
+                logger.info("Question: "+j+" Answered");
+                slides[j].setBody(questionComplete);
+                buttonActive = false;
+            });
+            answeredView.addEventHandler(MouseEvent.MOUSE_ENTERED,evt->{
+                buttonActive = true;
+            });
+            answeredView.addEventHandler(MouseEvent.MOUSE_EXITED,evt->{
+                buttonActive = false;
+            });
+            slides[i].setBody(answeredView);
             //slides[i].getStyleClass().add("panel-primary");
             slides[i].setMinWidth(400);
             fp.getChildren().add(slides[i]);
@@ -138,57 +168,94 @@ public class PresentationManagerTeacher extends PresentationManager {
             Region backgroundRegion = new Region();
             backgroundRegion.setBackground(new Background(new BackgroundFill(Color.web("#34495e"), null, null)));
             setText = new String();
-            slides[i].addEventHandler(MouseEvent.MOUSE_CLICKED, evt -> {
-                if (!questionClicked) {
-                    displayPane.getChildren().remove(slidePane);
-                    slidePane.getChildren().removeAll(backgroundRegion, lab);
-                    lab.setFont(new Font("Helvetica", 50));
-                    lab.setTextFill(Color.WHITE);
-                    lab.setWrapText(true);
-                    setText = lab.getText();
-                    slidePane.setPrefSize(slideWidth, slideHeight);
-                    slidePane.getChildren().addAll(backgroundRegion, lab);
-                    displayPane.getChildren().addAll(slidePane);
-                    questionClicked = true;
-                } else {
-                    if (Objects.equals(lab.getText(), setText)) {
-                        displayPane.getChildren().remove(slidePane);
-                        slidePane.getChildren().removeAll(backgroundRegion, lab);
-                        questionClicked = false;
-                    } else {
-                        displayPane.getChildren().remove(slidePane);
-                        slidePane.getChildren().removeAll(backgroundRegion, lab);
-                        lab.setFont(new Font("Helvetica", 50));
-                        lab.setTextFill(Color.WHITE);
-                        lab.setWrapText(true);
-                        setText = lab.getText();
-                        slidePane.getChildren().addAll(backgroundRegion, lab);
-                        displayPane.getChildren().addAll(slidePane);
-                        questionClicked = true;
+
+                slides[i].addEventHandler(MouseEvent.MOUSE_CLICKED, evt -> {
+                    if(!buttonActive) {
+                        if (!questionClicked) {
+                            displayPane.getChildren().remove(slidePane);
+                            slidePane.getChildren().removeAll(backgroundRegion, lab);
+                            lab.setFont(new Font("Helvetica", 50));
+                            lab.setTextFill(Color.WHITE);
+                            lab.setWrapText(true);
+                            setText = lab.getText();
+                            slidePane.setPrefSize(slideWidth, slideHeight);
+                            slidePane.getChildren().addAll(backgroundRegion, lab);
+                            displayPane.getChildren().addAll(slidePane);
+                            questionClicked = true;
+                        } else {
+                            if (Objects.equals(lab.getText(), setText)) {
+                                displayPane.getChildren().remove(slidePane);
+                                slidePane.getChildren().removeAll(backgroundRegion, lab);
+                                questionClicked = false;
+                            } else {
+                                displayPane.getChildren().remove(slidePane);
+                                slidePane.getChildren().removeAll(backgroundRegion, lab);
+                                lab.setFont(new Font("Helvetica", 50));
+                                lab.setTextFill(Color.WHITE);
+                                lab.setWrapText(true);
+                                setText = lab.getText();
+                                slidePane.getChildren().addAll(backgroundRegion, lab);
+                                displayPane.getChildren().addAll(slidePane);
+                                questionClicked = true;
+                            }
+                        }
                     }
-                }
-            });
+                });
 
             teacherToolKit.addEventHandler(WindowEvent.WINDOW_CLOSE_REQUEST, evt -> {
                 displayPane.getChildren().remove(slidePane);
                 slidePane.getChildren().removeAll(backgroundRegion, lab);
                 questionClicked = false;
+
             });
 
-            int finalI = i;
-            Animation animation = new Transition() {
-                {
-                    setCycleDuration(Duration.minutes(5));
-                    setInterpolator(Interpolator.EASE_OUT);
-                }
+            Date date = new Date();
+            long time = date.getTime();
+            Timestamp ts = new Timestamp(time);
 
-                @Override
-                protected void interpolate(double frac) {
-                    Color vColor = new Color(1, 0, 0, 0 + frac);
-                    slides[finalI].setBackground(new Background(new BackgroundFill(vColor, CornerRadii.EMPTY, Insets.EMPTY)));
-                }
-            };
-            animation.play();
+            long timeTaken = ts.getTime() - newQuestionList.get(i).getTime_created().getTime();
+            long oneMin = 60000;
+            logger.info("TIME TAKEN: "+timeTaken);
+            if(timeTaken <= oneMin){
+                System.out.println(">ONE MIN");
+              //  slides[i].setBackground(new Background(new BackgroundFill(Color.GREEN, CornerRadii.EMPTY, Insets.EMPTY)));
+                slides[i].setStyle("-fx-background-color: green");
+            }else if(timeTaken> oneMin && timeTaken< oneMin*2){
+                System.out.println("ONE MIN");
+              //  slides[i].setBackground(new Background(new BackgroundFill(Color.GREENYELLOW, CornerRadii.EMPTY, Insets.EMPTY)));
+                slides[i].setStyle("-fx-background-color: greenyellow");
+            }else if(timeTaken>= oneMin*2 && timeTaken< oneMin*3){
+                System.out.println("TWO MIN");
+               // slides[i].setBackground(new Background(new BackgroundFill(Color.YELLOWGREEN, CornerRadii.EMPTY, Insets.EMPTY)));
+                slides[i].setStyle("-fx-background-color: yellowgreen");
+            }else if(timeTaken>= oneMin*3 && timeTaken< oneMin*3){
+                System.out.println("THREE MIN");
+               // slides[i].setBackground(new Background(new BackgroundFill(Color.ORANGE, CornerRadii.EMPTY, Insets.EMPTY)));
+                slides[i].setStyle("-fx-background-color: orange");
+            }else if(timeTaken>= oneMin*4 && timeTaken< oneMin*5){
+                System.out.println("FOUR MIN");
+               // slides[i].setBackground(new Background(new BackgroundFill(Color.DARKORANGE, CornerRadii.EMPTY, Insets.EMPTY)));
+                slides[i].setStyle("-fx-background-color: orangered");
+            }else{
+                System.out.println("FIVE MIN");
+                //slides[i].setBackground(new Background(new BackgroundFill(Color.RED, CornerRadii.EMPTY, Insets.EMPTY)));
+                slides[i].setStyle("-fx-background-color: red");
+            }
+//            int finalI = i;
+//            Animation animation = new Transition() {
+//                {
+//                    setCycleDuration(Duration.minutes(5));
+//                    setInterpolator(Interpolator.EASE_OUT);
+//                }
+//
+//
+//                @Override
+//                protected void interpolate(double frac) {
+//                    Color vColor = new Color(1, 0, 0, 0 + frac);
+//                    slides[finalI].setBackground(new Background(new BackgroundFill(vColor, CornerRadii.EMPTY, Insets.EMPTY)));
+//                }
+//            };
+//            animation.play();
 
         }
         sp.setContent(fp);

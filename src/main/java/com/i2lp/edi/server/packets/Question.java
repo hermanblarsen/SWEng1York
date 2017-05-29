@@ -33,4 +33,9 @@ public class Question {
     public int getQuestion_id() {
         return question_id;
     }
+
+    public Timestamp getTime_created() {
+        return time_created;
+    }
+
 }
