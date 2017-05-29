@@ -1,6 +1,5 @@
 package com.i2lp.edi.client.managers;
 
-import com.i2lp.edi.client.PresentationSession;
 import com.i2lp.edi.client.presentationViewerElements.CommentPanel;
 import com.i2lp.edi.server.packets.Question;
 import javafx.animation.Animation;
@@ -22,7 +21,6 @@ import javafx.stage.WindowEvent;
 import javafx.util.Duration;
 import org.kordamp.bootstrapfx.scene.layout.Panel;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -47,7 +45,9 @@ public class PresentationManagerTeacher extends PresentationManager {
     }
 
     private void setListOfQuestions(){
-        newQuestionList = getPresentationSession().getQuestionQueue();
+        if(getPresentationSession() != null) {
+            newQuestionList = getPresentationSession().getQuestionQueue();
+        }
         if(newQuestionList == null){
             newQuestionList = new ArrayList<>();
         }

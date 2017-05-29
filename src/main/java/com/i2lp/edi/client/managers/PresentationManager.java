@@ -231,6 +231,9 @@ public abstract class PresentationManager {
                     presentationSession = new PresentationSession(ediManager);
                 } else if (this instanceof PresentationManagerStudent) {
                     ediManager.getSocketClient().setUserActivePresentation(ediManager.getPresentationManager().getPresentationElement().getServerSideDetails().getPresentationID(), ediManager.getUserData().getUserID());
+                    //Go to current slide of teacher
+                    int[] current_slide_states = ediManager.getSocketClient().getCurrentSlideForPresentation(ediManager.getPresentationManager().getPresentationElement().getServerSideDetails().getPresentationID());
+                    ediManager.getPresentationManager().goToSlideElement(current_slide_states[0], current_slide_states[1]);
                 }
             }
         }
@@ -407,8 +410,8 @@ public abstract class PresentationManager {
         //If Presentation handler told us that slide is changing, update the Slide present on Main screen
         //Can do specific things when presentation reached end, or start.
         if (presentationStatus == Presentation.SLIDE_CHANGE || presentationStatus == Presentation.PRESENTATION_FINISH || presentationStatus == Presentation.PRESENTATION_START || presentationStatus == Presentation.SLIDE_LAST_ELEMENT || presentationStatus == Presentation.SAME_SLIDE) {
-            if ((presentationStatus == Presentation.SLIDE_CHANGE) || (presentationStatus == Presentation.SAME_SLIDE)) {
-                if(presentationStatus == Presentation.SLIDE_CHANGE) logger.info("Changing Slides");
+            if ((presentationStatus == Presentation.SLIDE_CHANGE) || (presentationStatus == Presentation.SAME_SLIDE) || (presentationStatus == Presentation.SLIDE_LAST_ELEMENT)) {
+                if (presentationStatus == Presentation.SLIDE_CHANGE) logger.info("Changing Slides");
                 if (presentationElement.getServerSideDetails() != null) {//If not local presentation
                     //If we are live, send updated current slide to database
                     if (presentationElement.getServerSideDetails().getLive()) {
@@ -929,6 +932,28 @@ public abstract class PresentationManager {
         resize();
     }
 
+    public void goToSlideElement(int targetSlideNumber, int targetElementNumber) {
+        logger.info("Requested move to Slide: " + targetSlideNumber + " Element: " + targetElementNumber);
+        goToSlide(targetSlideNumber);
+        goToElement(targetElementNumber);
+    }
+
+    public void goToElement(int targetElementNumber) {
+        int direction = Slide.SLIDE_NO_MOVE;
+        int currentSequenceNumber = presentationElement.getSlide(currentSlideNumber).getCurrentSequenceNumber();
+
+        //Check TargetElement number exists
+        if (currentSequenceNumber == targetElementNumber) return;
+        else if (currentSequenceNumber > targetElementNumber) direction = Slide.SLIDE_BACKWARD;
+        else if (currentSequenceNumber < targetElementNumber) direction = Slide.SLIDE_FORWARD;
+
+        do {
+            elementAdvance(presentationElement.getSlide(currentSlideNumber), direction);
+        }
+        while (presentationElement.getSlide(currentSlideNumber).getCurrentSequenceNumber() != targetElementNumber);
+
+    }
+
     /**
      * Go to a specific slide number
      *
@@ -943,12 +968,12 @@ public abstract class PresentationManager {
         }
         boolean targetToggle = false;
         //If we need to go backwards, go backwards
-        if (currentSlideNumber+2 == targetSlideNumber||currentSlideNumber == targetSlideNumber){
+        if (currentSlideNumber + 2 == targetSlideNumber || currentSlideNumber == targetSlideNumber) {
 
-            if(targetSlideNumber < currentSlideNumber){
+            if (targetSlideNumber < currentSlideNumber) {
                 System.out.println("BACK");
                 slideAdvance(presentationElement, Slide.SLIDE_BACKWARD);
-            }else{
+            } else {
                 slideAdvance(presentationElement, Slide.SLIDE_FORWARD);
             }
             targetToggle = true;

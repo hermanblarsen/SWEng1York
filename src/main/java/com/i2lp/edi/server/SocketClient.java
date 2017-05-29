@@ -7,6 +7,7 @@ import com.impossibl.postgres.api.jdbc.PGConnection;
 import com.impossibl.postgres.jdbc.PGDataSource;
 import io.socket.client.IO;
 import io.socket.client.Socket;
+import javafx.application.Platform;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -113,7 +114,6 @@ public class SocketClient {
         socket.on(Socket.EVENT_CONNECT, args -> logger.info("Client successfully connected to Edi Server"));
 
 
-
         socket.on("DB_Update", args -> {
             logger.info("Client knows DB has updated:  " + args[0]);
             //Pull fresh table
@@ -134,67 +134,78 @@ public class SocketClient {
      * @author Amrik Sadhra
      */
     public void updateLocalTables(Object tableToUpdate) {
-        //SocketIO will pass a generic object. But we know its a string because that's what DB_notify returns from com.i2lp.edi.server side
-        switch ((String) tableToUpdate) {
-            case "interactions":
-                logger.info("New responses to act upon registered on edi server!");
-                ArrayList<Interaction> Interactions = getInteractionsForInteractiveElement(1);
-                break;
+        //If the user has logged in
+        if(ediManager.getUserData() != null) {
+            //SocketIO will pass a generic object. But we know its a string because that's what DB_notify returns from com.i2lp.edi.server side
+            switch ((String) tableToUpdate) {
+                case "interactions":
+                    logger.info("New responses to act upon registered on edi server!");
+                    ArrayList<Interaction> Interactions = getInteractionsForInteractiveElement(1);
+                    break;
 
-            case "interactive_elements":
-                logger.info("New interactive elements present on edi server!");
-                //updateResponses(current_presentation_id, current_question_id);
-                break;
+                case "interactive_elements":
+                    logger.info("New interactive elements present on edi server!");
+                    //updateResponses(current_presentation_id, current_question_id);
+                    break;
 
-            case "users":
-                if (ediManager.getUserData().getUserType().equals("teacher")) {//If we're a teacher
-                    if (ediManager.getPresentationManager() != null) {//And in a presentation
-                        if (ediManager.getPresentationManager().getPresentationElement().getServerSideDetails().getLive()) {//And that presentation is live
-                            logger.info("Updating active user list for live presentation.");
-                            ediManager.getPresentationManager().getPresentationSession().setActiveUsers(getPresentationActiveUsers(ediManager.getPresentationManager().getPresentationElement().getServerSideDetails().getPresentationID()));//Update list of active users in that presentation
+                case "users":
+                    if (ediManager.getUserData().getUserType().equals("teacher")) {//If we're a teacher
+                        if (ediManager.getPresentationManager() != null) {//And in a presentation
+                            if (ediManager.getPresentationManager().getPresentationElement().getServerSideDetails().getLive()) {//And that presentation is live
+                                logger.info("Updating active user list for live presentation.");
+                                ediManager.getPresentationManager().getPresentationSession().setActiveUsers(getPresentationActiveUsers(ediManager.getPresentationManager().getPresentationElement().getServerSideDetails().getPresentationID()));//Update list of active users in that presentation
+                            }
                         }
                     }
-                }
-                break;
+                    break;
 
-            case "presentations":
-                //Update presentation list if there is a library manager
-                if (ediManager.getPresentationLibraryManager() != null) {
+                case "presentations":
+                    //Update presentation list if no presentation manager is open
+                    if (ediManager.getPresentationManager() == null) {
+                        ediManager.getPresentationLibraryManager().updatePresentations(); //Update presentation information
+                    }
+                    if (ediManager.getPresentationManager() != null) {//If there is a presentation
+                        if (ediManager.getUserData().getUserType().equals("student")) {//If we're a student
+                            if (ediManager.getPresentationManager().getPresentationElement().getServerSideDetails().getLive()) {//In a live presentation
+                                //current_slide_states[0] = current slide number, [1] = current sequence number
+                                int[] current_slide_states = getCurrentSlideForPresentation(ediManager.getPresentationManager().getPresentationElement().getServerSideDetails().getPresentationID());
+                                //TODO: Enable undocking (unsync?) of Teacher/Student slide movement using UI toggle
+                                if ((ediManager.getPresentationManager().getCurrentSlideNumber() != current_slide_states[0]) || (ediManager.getPresentationManager().getPresentationElement().getSlide(current_slide_states[0]).getCurrentSequenceNumber() != current_slide_states[1])) {
+                                    if ((current_slide_states[0] == 0) && (current_slide_states[1] == 0)) {
+                                        //TODO: Do something more useful here
+                                        logger.info("Server ended session. We should probs do the same.");
+                                    }
+                                    //If the current slide number or sequence number has changed, move to it
+                                    Platform.runLater(() -> {
+                                        //TODO: Get this to run when a student initially connects
+                                        ediManager.getPresentationManager().goToSlideElement(current_slide_states[0], current_slide_states[1]);
+                                    });
+
+                                }
+                            }
+                        }
+                    }
+                    break;
+
+                case "jnct_users_modules":
+                    logger.info("Modules user is registered for may have changed!");
                     ediManager.getPresentationLibraryManager().updatePresentations(); //Update presentation information
-                }
-                if (ediManager.getUserData().getUserType().equals("student")) {//If we're a student
-                    if (ediManager.getPresentationManager().getPresentationElement().getServerSideDetails().getLive()) {//In a live presentation
-                        int current_slide_number = getCurrentSlideForPresentation(ediManager.getPresentationManager().getPresentationElement().getServerSideDetails().getPresentationID());
-                        //TODO: Enable undocking (unsync?) of Teacher/Student slide movement using UI toggle
-                       /* if ((ediManager.getPresentationManager().getCurrentSlideNumber() != current_slide_number)||(ediManager.getPresentationManager().getPresentationElement().getSlide(current_slide_number).getCurrentSequenceNumber())) {
-                            //If the current slide number has changed, move to it
-                            logger.info("Slide change request from teacher received. Changing to target slide.");
-                            Platform.runLater(() -> ediManager.getPresentationManager().goToSlide(current_slide_number));
-                        }*/
+                    break;
+
+
+                case "modules":
+                    logger.info("Modules database changed!");
+                    break;
+
+                case "questions":
+                    if (ediManager.getUserData().getUserType().equals("teacher")) {//If we're a teacher
+                        if (ediManager.getPresentationManager().getPresentationElement().getServerSideDetails().getLive()) {//In a live presentation
+                            logger.info("Updating QuestionQueue for current presentation");
+                            ediManager.getPresentationManager().getPresentationSession().setQuestionQueue(ediManager.getSocketClient().getQuestionsForPresentation(ediManager.getPresentationManager().getPresentationElement().getServerSideDetails().getPresentationID())); //Update the question queue in the session
+                        }
                     }
-                }
-
-                break;
-
-            case "jnct_users_modules":
-                logger.info("Modules user is registered for may have changed!");
-                ediManager.getPresentationLibraryManager().updatePresentations(); //Update presentation information
-                break;
-
-
-            case "modules":
-                logger.info("Modules database changed!");
-                //TODO: Update class list
-                break;
-
-            case "questions":
-                if (ediManager.getUserData().getUserType().equals("teacher")) {//If we're a teacher
-                    if (ediManager.getPresentationManager().getPresentationElement().getServerSideDetails().getLive()) {//In a live presentation
-                        logger.info("Updating QuestionQueue for current presentation");
-                        ediManager.getPresentationManager().getPresentationSession().setQuestionQueue(ediManager.getSocketClient().getQuestionsForPresentation(ediManager.getPresentationManager().getPresentationElement().getServerSideDetails().getPresentationID())); //Update the question queue in the session
-                    }
-                }
-                break;
+                    break;
+            }
         }
     }
 
@@ -600,11 +611,14 @@ public class SocketClient {
         statementThread.start();
     }
 
-    public int getCurrentSlideForPresentation(int presentationID) {
+    public int[] getCurrentSlideForPresentation(int presentationID) {
+        int[] toReturn = new int[2];
+
         int currentSlide = 0;
+        int currentSequenceNumber = 0;
 
         try (PGConnection connection = (PGConnection) dataSource.getConnection()) {
-            PreparedStatement statement = connection.prepareStatement("SELECT current_slide_number FROM presentations WHERE presentation_id = ?;");
+            PreparedStatement statement = connection.prepareStatement("SELECT current_slide_number, current_sequence_number FROM presentations WHERE presentation_id = ?;");
 
             //Fill prepared statements to avoid SQL injection
             statement.setInt(1, presentationID);
@@ -614,6 +628,7 @@ public class SocketClient {
 
             while (rs.next()) {
                 currentSlide = rs.getInt("current_slide_number");
+                currentSequenceNumber = rs.getInt("current_sequence_number");
             }
 
             statement.close();
@@ -621,7 +636,10 @@ public class SocketClient {
             logger.error("Unable to connect to PostgreSQL on port 5432. PJDBC dump:", e);
         }
 
-        return currentSlide;
+        toReturn[0] = currentSlide;
+        toReturn[1] = currentSequenceNumber;
+
+        return toReturn;
     }
 
     public boolean setUserActivePresentation(int presentationID, int userID) {
