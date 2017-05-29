@@ -6,12 +6,12 @@ import javafx.collections.ObservableMap;
 import javafx.concurrent.Task;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaMarkerEvent;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaView;
 import javafx.util.Duration;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 
@@ -817,7 +817,7 @@ public class AudioElement extends SlideElement{
 
     @Override
     public void destroyElement(){
-        mediaPlayer.stop();
+        if(mediaPlayer != null) mediaPlayer.stop();
     }
 
     private void initMediaPlayer(){

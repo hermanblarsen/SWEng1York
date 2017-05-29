@@ -998,7 +998,7 @@ public abstract class PresentationManager {
     }
 
     public SlideElement getElement(int elementID) {
-        SlideElement slideElement = presentationElement.getSlide(currentSlideNumber).getSlideElementList().get(elementID - 1);
+        SlideElement slideElement = presentationElement.getSlide(currentSlideNumber).getSlideElementList().get(elementID);
         return slideElement;
     }
 
