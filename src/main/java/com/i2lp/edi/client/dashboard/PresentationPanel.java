@@ -22,7 +22,7 @@ public class PresentationPanel extends PreviewPanel {
     private final Presentation presentation;
     private boolean isLive;
 
-    public PresentationPanel(Presentation presentation, Pane parentPane) { //TODO: Swap the order of input arguments
+    public PresentationPanel(Presentation presentation, Pane parentPane) {
         super(parentPane);
         this.presentation = presentation;
         this.setText("Title: " + this.presentation.getDocumentTitle());
@@ -42,13 +42,13 @@ public class PresentationPanel extends PreviewPanel {
 
         Tooltip tooltip = new Tooltip("Title: " + getPresentation().getDocumentTitle() + "\n" +
                                         "Author: " + getPresentation().getAuthor() + "\n" +
-                                        "Subject: " + getPresentation().getSubject() + "\n" +
+                                        "Subject: " + getPresentation().getSubject().getSubjectName() + "\n" +
                                         "Description: " + getPresentation().getDescription() + "\n" +
                                         "Tags: " + getPresentation().getTags());
         Tooltip.install(this, tooltip);
     }
 
-    public Presentation  getPresentation() { return presentation; }
+    public Presentation getPresentation() { return presentation; }
 
     @Override
     public ArrayList<String> getSearchableTerms() {

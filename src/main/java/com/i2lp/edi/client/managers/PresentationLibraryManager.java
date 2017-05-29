@@ -56,7 +56,7 @@ public class PresentationLibraryManager {
     public ArrayList<Module> getUserModuleList() {
         logger.info("--- User Registered Modules ---");
         for(Module module : userModuleList){
-            logger.info("ID: " + module.getModule_id() + " Subject: " + module.getSubject());
+            logger.info("ID: " + module.getModule_id() + " Subject: " + module.getSubjectName());
         }
         return userModuleList;
     }

@@ -10,11 +10,12 @@ import java.util.ArrayList;
  */
 public class ModulePanel extends PreviewPanel {
 
-    private final Module module;
+    private final DashModule module;
 
-    public ModulePanel(Module module, Pane parentPane) {
-        super(parentPane);
+    public ModulePanel(DashModule module, SubjectPanel parentPanel) {
+        super(parentPanel.getModulePanelsHBox());
         this.module = module;
+        parentPanel.addModulePanel(this);
 
         setText(module.getModuleName());
         setFooter(new Label(module.getPresentations().size() + " presentations"));
@@ -22,7 +23,7 @@ public class ModulePanel extends PreviewPanel {
 
     public String getModuleName() { return module.getModuleName(); }
 
-    public Module getModule() { return module; }
+    public DashModule getModule() { return module; }
 
     @Override
     public ArrayList<String> getSearchableTerms() {

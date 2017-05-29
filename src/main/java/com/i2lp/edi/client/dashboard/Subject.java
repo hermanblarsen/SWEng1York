@@ -8,15 +8,14 @@ import java.util.ArrayList;
 public class Subject {
 
     private final String subjectName;
-    private ArrayList<Module> modules;
+    private ArrayList<DashModule> modules;
 
-    public Subject(String subjectName, ArrayList<Subject> availableSubjects) {
+    public Subject(String subjectName) {
         this.subjectName = subjectName;
         modules = new ArrayList<>();
-        availableSubjects.add(this);
     }
 
-    public void addModule(Module module) {
+    public void addModule(DashModule module) {
         modules.add(module);
     }
 
@@ -25,12 +24,22 @@ public class Subject {
     public int getNumberOfPresentations() {
         int numOfPres = 0;
 
-        for(Module module : modules) {
+        for(DashModule module : modules) {
             numOfPres += module.getPresentations().size();
         }
 
         return numOfPres;
     }
 
-    public ArrayList<Module> getModules() { return modules; }
+    public ArrayList<DashModule> getModules() { return modules; }
+
+    public static Subject findInArray(String subjectName, ArrayList<Subject> arrayList) {
+        for (Subject subject : arrayList) {
+            if (subject.getSubjectName().equals(subjectName)) {
+                return subject;
+            }
+        }
+
+        return null;
+    }
 }

@@ -1,7 +1,7 @@
 package com.i2lp.edi.client.presentationElements;
 
 
-import com.i2lp.edi.client.dashboard.Module;
+import com.i2lp.edi.client.dashboard.DashModule;
 import com.i2lp.edi.client.dashboard.Subject;
 import com.i2lp.edi.client.utilities.Theme;
 import com.i2lp.edi.server.packets.PresentationMetadata;
@@ -50,7 +50,7 @@ public class Presentation extends Pane {
     private Slide currentSlide;
     private boolean autoplayMedia;
 
-    private Module module; //Module to which this presentation belongs
+    private DashModule module; //DashModule to which this presentation belongs
 
     private int groupFormat;
 
@@ -468,9 +468,9 @@ public class Presentation extends Pane {
 
     public void setPath(String path) { this.documentFilePath = path; }
 
-    public Module getModule() { return module; }
+    public DashModule getModule() { return module; }
 
-    public void setModule(Module module) { this.module = module; }
+    public void setModule(DashModule module) { this.module = module; }
 
     public void setPresentationMetadata(PresentationMetadata serverSideDetails) {
         this.serverSideDetails = serverSideDetails;

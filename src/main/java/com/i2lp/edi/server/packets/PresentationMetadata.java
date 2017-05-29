@@ -45,7 +45,7 @@ public class PresentationMetadata {
         else return MISSING_DOCUMENT_ID;
     }
 
-    public String getModuleName() { return "Module" + module_id; }
+    public String getModuleName() { return "DashModule" + module_id; }
 
     public int getPresentationID() {
         return presentation_id;

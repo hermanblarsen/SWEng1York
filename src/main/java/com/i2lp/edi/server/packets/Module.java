@@ -8,12 +8,12 @@ import java.sql.Timestamp;
  * Project: SWEng1York - Package: com.i2lp.edi.server.packets
  */
 public class Module {
-    int module_id;
-    String description;
-    String subject;
-    Time time_last_updated;
-    Timestamp time_created;
-    String module_name;
+    private int module_id;
+    private String description;
+    private String subject;
+    private Time time_last_updated;
+    private Timestamp time_created;
+    private String module_name;
 
     public int getModule_id() {
         return module_id;
@@ -23,7 +23,7 @@ public class Module {
         return description;
     }
 
-    public String getSubject() {
+    public String getSubjectName() {
         return subject;
     }
 

@@ -17,21 +17,23 @@ public class SubjectPanel extends PreviewPanel {
 
     private static double SPACING = 5;
     private final Subject subject;
-    private HBox modulePanels;
+    private ArrayList<ModulePanel> modulePanels;
+    private HBox modulePanelsHBox;
 
     public SubjectPanel(Subject subject, Pane parentPane) {
         super(parentPane, false);
         this.subject = subject;
-        modulePanels = new HBox(SPACING);
-        BorderPane.setMargin(modulePanels, new Insets(5));
+        modulePanelsHBox = new HBox(SPACING);
+        modulePanels = new ArrayList<>();
+        BorderPane.setMargin(modulePanelsHBox, new Insets(5));
         getStyleClass().add("panel-primary");
 
         Text title = new Text(subject.getSubjectName());
         title.getStyleClass().setAll("h4");
         BorderPane.setMargin(title, new Insets(5));
 
-        modulePanels.getChildren().addListener((ListChangeListener<? super Node>) observable -> {
-            if(modulePanels.getChildren().size() == 0) {
+        modulePanelsHBox.getChildren().addListener((ListChangeListener<? super Node>) observable -> {
+            if(modulePanelsHBox.getChildren().size() == 0) {
                 this.setHidden(true);
             } else {
                 this.setHidden(false);
@@ -39,12 +41,12 @@ public class SubjectPanel extends PreviewPanel {
         });
 
         setTop(title);
-        setCenter(modulePanels);
+        setCenter(modulePanelsHBox);
     }
 
     public Subject getSubject() { return subject; }
 
-    public HBox getModulePanelsHBox() { return modulePanels; }
+    public HBox getModulePanelsHBox() { return modulePanelsHBox; }
 
     @Override
     public ArrayList<String> getSearchableTerms() {
@@ -53,4 +55,20 @@ public class SubjectPanel extends PreviewPanel {
 
         return searchableTerms;
     }
+
+    public static SubjectPanel findInArray(String subjectName, ArrayList<SubjectPanel> arrayList) {
+        for (SubjectPanel panel : arrayList) {
+            if (panel.getSubject().getSubjectName().equals(subjectName)) {
+                return panel;
+            }
+        }
+
+        return null;
+    }
+
+    public void addModulePanel(ModulePanel panel) {
+        modulePanels.add(panel);
+    }
+
+    public ArrayList<ModulePanel> getModulePanels() { return modulePanels; }
 }

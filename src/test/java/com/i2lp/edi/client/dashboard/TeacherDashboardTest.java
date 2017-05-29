@@ -1,7 +1,7 @@
 package com.i2lp.edi.client.dashboard;
 
 import com.i2lp.edi.client.managers.EdiManager;
-import com.i2lp.edi.client.utilities.ModuleSortKey;
+import com.i2lp.edi.client.utilities.DashModuleSortKey;
 import com.i2lp.edi.client.utilities.PresSortKey;
 import com.i2lp.edi.client.utilities.SubjectSortKey;
 import com.i2lp.edi.server.packets.User;
@@ -36,7 +36,7 @@ public class TeacherDashboardTest extends ApplicationTest {
     private Button loadPresButton;
     private FileChooser fileChooser;
     private MenuBar menuBar;
-    private ComboBox<ModuleSortKey> moduleSortCombo;
+    private ComboBox<DashModuleSortKey> moduleSortCombo;
     private ComboBox<SubjectSortKey> subjectSortCombo;
     private ComboBox<PresSortKey> presSortCombo;
     private ArrayList<PresentationPanel> presentationPanels;
@@ -63,7 +63,7 @@ public class TeacherDashboardTest extends ApplicationTest {
         Assume.assumeTrue(!IS_CIRCLE_BUILD);
 
         searchField = myDashboard.searchField;
-        showAllButton = myDashboard.showAllButton;
+        showAllButton = myDashboard.selectAllButton;
         subjectButtons = myDashboard.subjectButtons;
         loadPresButton = myDashboard.loadPresButton;
         fileChooser = myDashboard.fileChooser;
@@ -74,7 +74,6 @@ public class TeacherDashboardTest extends ApplicationTest {
         presSortCombo = myDashboard.presSortCombo;
 
         subjectPanels = myDashboard.subjectPanels;
-        modulePanels = myDashboard.modulePanels;
         presentationPanels = myDashboard.presentationPanels;
     }
 
@@ -122,7 +121,7 @@ public class TeacherDashboardTest extends ApplicationTest {
         }
 
         assertFalse("Presentation search for " + searchText + " failed", presSearchFailed);
-        assertFalse("Module search for " + searchText + " failed", moduleSearchFailed);
+        assertFalse("DashModule search for " + searchText + " failed", moduleSearchFailed);
     }
 
     @Test
