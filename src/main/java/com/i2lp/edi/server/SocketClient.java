@@ -178,7 +178,6 @@ public class SocketClient {
                                     }
                                     //If the current slide number or sequence number has changed, move to it
                                     Platform.runLater(() -> {
-                                        //TODO: Get this to run when a student initially connects
                                         ediManager.getPresentationManager().goToSlideElement(current_slide_states[0], current_slide_states[1]);
                                     });
 

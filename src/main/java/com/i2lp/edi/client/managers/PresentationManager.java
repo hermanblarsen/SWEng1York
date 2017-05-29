@@ -217,8 +217,6 @@ public abstract class PresentationManager {
 
         if (presentationElement.isAutoplayPresentation()) {
             autoPlay();
-        } else {
-            controlPresentation(Slide.SLIDE_FORWARD); //Move to start sequence 1 so slides can begin with content.
         }
 
         beginLiveSession();
@@ -771,7 +769,7 @@ public abstract class PresentationManager {
             }
             currentSequenceNumber++;
             notifySequenceChangeListeners();//Notify any sequence number listeners that there has been a change
-        } else if ((slideToAdvance.getCurrentSequenceNumber() > 0) && (direction == Slide.SLIDE_BACKWARD)) {  //If we're going backwards and still elements left
+        } else if ((slideToAdvance.getCurrentSequenceNumber() > 1) && (direction == Slide.SLIDE_BACKWARD)) {  //If we're going backwards and still elements left
             try {
                 checkInVisibleSet = Slide.searchForSequenceElement(slideToAdvance.getSlideElementList(), slideToAdvance.getCurrentSequenceNumber());
 

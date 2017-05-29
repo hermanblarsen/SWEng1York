@@ -62,6 +62,20 @@ public class PresentationLibraryManager {
     }
 
     /**
+     * Get list of modules that has been retrieved by server strings
+     * @return List of modules
+     */
+    public ArrayList<String> getUserModuleListString() {
+        ArrayList<String> userModuleListString = new ArrayList<>();
+
+        for(Module module : userModuleList){
+            userModuleListString.add(module.getModule_name());
+        }
+
+        return userModuleListString;
+    }
+
+    /**
      * Update local presentation list with all available on server. Called whenever a presentation is added or goes live.
      */
     @SuppressWarnings("unchecked")

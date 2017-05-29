@@ -214,7 +214,8 @@ public abstract class Dashboard extends Application {
             GridPane.setConstraints(saveInModule, 0, 1, 1, 1, HPos.CENTER, VPos.CENTER);
 
             ComboBox<String> modulesCombo = new ComboBox<>();
-            modulesCombo.getItems().addAll("Module 1", "Module 2", "Module 3");
+
+            modulesCombo.getItems().addAll(ediManager.getPresentationLibraryManager().getUserModuleListString());
             addToServerGridPane.add(modulesCombo, 0, 2);
             GridPane.setConstraints(modulesCombo, 0, 2, 1, 1, HPos.CENTER, VPos.CENTER);
 
