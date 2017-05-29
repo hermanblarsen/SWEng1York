@@ -3,6 +3,7 @@ package com.i2lp.edi.client.managers;
 import com.i2lp.edi.client.utilities.ParserXML;
 import com.i2lp.edi.client.utilities.ZipUtils;
 import com.i2lp.edi.server.SocketClient;
+import com.i2lp.edi.server.packets.Module;
 import com.i2lp.edi.server.packets.PresentationMetadata;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
@@ -34,6 +35,7 @@ public class PresentationLibraryManager {
 
     private ArrayList<String> localPresentationListString; //Stores locally available DocumentIDs
     private ArrayList<String> remotePresentationListString; //Stores server DocumentIDs
+    private ArrayList<Module> userModuleList;
     private ArrayList<PresentationMetadata> localPresentationList; //Stores PresentationMetadata locally for current user
     private ArrayList<PresentationMetadata> remotePresentationList; //Stores PresentationMetadata on server for current user
 
@@ -44,8 +46,19 @@ public class PresentationLibraryManager {
         this.socketClient = ediManager.getSocketClient();
 
         updatePresentations();
+    }
 
 
+    /**
+     * Get list of modules that has been retrieved by server
+     * @return List of modules
+     */
+    public ArrayList<Module> getUserModuleList() {
+        logger.info("--- User Registered Modules ---");
+        for(Module module : userModuleList){
+            logger.info("ID: " + module.getModule_id() + " Subject: " + module.getSubject());
+        }
+        return userModuleList;
     }
 
     /**
@@ -53,6 +66,8 @@ public class PresentationLibraryManager {
      */
     @SuppressWarnings("unchecked")
     public void updatePresentations(){
+        //Update list of modules for User for UI
+        userModuleList = ediManager.getSocketClient().getModulesForUser(ediManager.getUserData().getUserID());
         //Work out what we presentations are available locally, what are available remotely.
         localPresentationListString = getLocalPresentationListString();
         remotePresentationList = getRemotePresentationList();

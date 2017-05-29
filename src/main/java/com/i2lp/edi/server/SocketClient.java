@@ -388,7 +388,7 @@ public class SocketClient {
             ResultSet rs = statement.executeQuery();
 
             while (rs.next()) {
-                presentationsForUser.add(new PresentationMetadata(rs.getInt("presentation_id"), rs.getInt("module_id"), rs.getInt("current_slide_number"), rs.getString("xml_url"), rs.getBoolean(("live"))));
+                presentationsForUser.add(new PresentationMetadata(rs.getInt("presentation_id"), rs.getInt("module_id"), rs.getInt("current_slide_number"), rs.getString("xml_url"), rs.getBoolean("live"), rs.getTimestamp("go_live_timestamp")));
             }
 
             statement.close();

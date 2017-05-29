@@ -49,13 +49,14 @@ import static javafx.scene.layout.BorderPane.setAlignment;
  */
 @SuppressWarnings({"WeakerAccess", "unused", "Duplicates"})
 public abstract class Dashboard extends Application {
+    protected static Logger logger = LoggerFactory.getLogger(Dashboard.class);
+    private EdiManager ediManager;
+    protected PresentationManager presentationManager;
+
     private static final double LEFT_PANEL_SIZE = 200;
     protected Scene scene;
     protected BorderPane border;
     private VBox rootBox;
-    protected static Logger logger = LoggerFactory.getLogger(Dashboard.class);
-    private EdiManager ediManager;
-    protected PresentationManager presentationManager;
     protected Stage dashboardStage;
     private PresentationPanel selectedPresPanel;
     private ModulePanel selectedModulePanel;
@@ -109,6 +110,8 @@ public abstract class Dashboard extends Application {
         dashboardStage.setScene(scene);
 
         updateAvailablePresentations();
+
+        ediManager.getPresentationLibraryManager().getUserModuleList();
 
         goToState(DashboardState.TOP_LEVEL);
 

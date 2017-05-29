@@ -1,5 +1,6 @@
 package com.i2lp.edi.server.packets;
 
+import java.sql.Timestamp;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -10,27 +11,24 @@ import static com.i2lp.edi.client.Constants.MISSING_DOCUMENT_ID;
  */
 public class PresentationMetadata {
     private int presentation_id;
-
-
     private int module_id;
     private int current_slide_number;
     private String xml_url;
-
-
-
     private boolean live;
     private String subjectName; //TODO: Get from database
+    private Timestamp go_live_timestamp;
 
     //Temporary
     private String documentID;
 
-    public PresentationMetadata(int presentation_id, int module_id, int current_slide_number, String xml_url, boolean live) {
+    public PresentationMetadata(int presentation_id, int module_id, int current_slide_number, String xml_url, boolean live, Timestamp go_live_timestamp) {
         this.presentation_id = presentation_id;
         this.module_id = module_id;
         this.current_slide_number = current_slide_number;
         this.xml_url = xml_url;
         this.live = live;
         this.subjectName = "Subject " + module_id;
+        this.go_live_timestamp = go_live_timestamp;
     }
 
 
