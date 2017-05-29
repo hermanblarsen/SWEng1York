@@ -172,8 +172,9 @@ public class SocketClient {
                                 //TODO: Enable undocking (unsync?) of Teacher/Student slide movement using UI toggle
                                 if ((ediManager.getPresentationManager().getCurrentSlideNumber() != current_slide_states[0]) || (ediManager.getPresentationManager().getPresentationElement().getSlide(current_slide_states[0]).getCurrentSequenceNumber() != current_slide_states[1])) {
                                     if ((current_slide_states[0] == 0) && (current_slide_states[1] == 0)) {
-                                        //TODO: Do something more useful here
+                                        //TODO: SESSION END Do something more useful here
                                         logger.info("Server ended session. We should probs do the same.");
+                                        return;
                                     }
                                     //If the current slide number or sequence number has changed, move to it
                                     Platform.runLater(() -> {
