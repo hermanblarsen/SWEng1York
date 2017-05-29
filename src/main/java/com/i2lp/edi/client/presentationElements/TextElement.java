@@ -11,11 +11,16 @@ import javafx.scene.web.WebView;
 import javafx.stage.Screen;
 
 import java.awt.*;
+import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Field;
+import java.nio.charset.Charset;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static com.i2lp.edi.client.Constants.FALLBACK_MISSING_EXTERNAL_TEXTCONTENT;
 import static com.i2lp.edi.client.Constants.TEXT_ELEMENT_ZOOM_FACTOR;
+import static com.i2lp.edi.client.utilities.Utilities.readFile;
 
 /**
  * Created by habl on 26/02/2017.
@@ -84,20 +89,20 @@ public class TextElement extends SlideElement {
             //Set Background of WebView to transparent (using reflection) as CSS wont do the job on Node level
             try {
                 Pattern c = Pattern.compile("rgba?\\((\\d{1,3})[,\\)](\\d{1,3})[,\\)](\\d{1,3})[,\\)](\\d+\\.\\d+)\\)?");
-                if(bgColour == null) bgColour = "rgba(0,0,0,0.0)"; //If no background colour set, transparent background
-                Matcher m = c.matcher (bgColour);
+                if (bgColour == null)
+                    bgColour = "rgba(0,0,0,0.0)"; //If no background colour set, transparent background
+                Matcher m = c.matcher(bgColour);
 
-                if (m.matches())
-                {
+                if (m.matches()) {
                     // Use reflection to retrieve the WebEngine's private 'page' field.
                     Field f = webEngine.getClass().getDeclaredField("page");
                     f.setAccessible(true);
                     WebPage page = (WebPage) f.get(webEngine);
-                    Color backgroundColor = new java.awt.Color(Integer.valueOf(m.group(1)), Integer.valueOf(m.group(2)), Integer.valueOf(m.group(3)),  (int) (Float.valueOf(m.group(4))*255));
+                    Color backgroundColor = new java.awt.Color(Integer.valueOf(m.group(1)), Integer.valueOf(m.group(2)), Integer.valueOf(m.group(3)), (int) (Float.valueOf(m.group(4)) * 255));
                     page.setBackgroundColor(backgroundColor.getRGB());
                 }
             } catch (Exception e) {
-                logger.error("Unable to set TextElement background colour to: " + bgColour , e);
+                logger.error("Unable to set TextElement background colour to: " + bgColour, e);
             }
         });
         browser.setVisible(visibility);
@@ -125,7 +130,7 @@ public class TextElement extends SlideElement {
             //Rescale positioning of elements
             scaleDimensions(xPosition, yPosition);
             //Alter Zoom of webview to maintain proportions
-            browser.setZoom((slideWidth/ Screen.getPrimary().getVisualBounds().getWidth()) * TEXT_ELEMENT_ZOOM_FACTOR);
+            browser.setZoom((slideWidth / Screen.getPrimary().getVisualBounds().getWidth()) * TEXT_ELEMENT_ZOOM_FACTOR);
         }
 
         //Stage 2 DoClassSpecificRender: Refresh content inside Core Node
@@ -141,9 +146,25 @@ public class TextElement extends SlideElement {
         return textContent;
     }
 
-    public void setTextContent(String textContent) {
-        this.textContent = textContent;
+    public void setTextContent(String textContent, String xmlPath) {
+        if (textContent.contains("EXTERN[")) {
+            String filePathString = textContent.substring(textContent.indexOf("[") + 1, textContent.indexOf("]"));
+            if(!filePathString.contains("/")){//If path is relative to XML path
+                filePathString = xmlPath.substring(0, xmlPath.lastIndexOf("/")) + File.separator + filePathString;
+                logger.info("Loading external text content from " + filePathString);
+            }
+            try {
+                this.textContent = readFile(filePathString, Charset.defaultCharset());
+            } catch (IOException e) {
+                logger.error("Externally referenced text source: " + filePathString + " does not exist. Using default content.");
+                this.textContent = FALLBACK_MISSING_EXTERNAL_TEXTCONTENT;
+            }
+        } else {
+            this.textContent = textContent;
+        }
     }
+
+
 
     public String getTextFilepath() {
         return textFilepath;

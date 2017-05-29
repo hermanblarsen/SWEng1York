@@ -1,0 +1,241 @@
+<document documentid="i2lpSampleXml">
+	<documentdetails>
+		<title>I2LP Sample Presentation</title>
+		<author>Herman Larsen</author>
+		<version>1.0</version>
+		<documentaspectratio>1</documentaspectratio>
+		<description>I2LP Sample XML input</description>
+		<tags>sample,xml,input,I2LP</tags>
+		<groupformat>2</groupformat>
+	</documentdetails>
+	<slideshow>
+		<defaults>
+			<bgcolour>#FFFFFFFF</bgcolour>
+			<font>"Times New Roman", Times, serif</font>
+			<fontsize>12</fontsize>
+			<fontcolour>#000000FF</fontcolour>
+			<graphicscolour>#2ecc71FF</graphicscolour>
+			<autoplaymedia>true</autoplaymedia>
+		</defaults>
+		<slide slideid="1">
+            <!--Title-->
+            <text elementid ="0" layer="10" startsequence="1">
+                <textcontent>
+                    &lt;h1&gt;Text Slide&lt;/h1&gt;</textcontent>
+                <bordercolour>#ABCDEFFF</bordercolour>
+                <bordersize>5</bordersize>
+                <xposition>0.3</xposition>
+                <yposition>0.05</yposition>
+                <xsize>0.5</xsize>
+                <ysize>0.1</ysize>
+            </text>
+
+            <text elementid ="1" layer="1" startsequence="2">
+                <textcontent>
+                    EXTERN[i2lpExternalText.txt]
+                </textcontent>
+				<xposition>0.1</xposition>
+				<yposition>0.3</yposition>
+				<xsize>0.8</xsize>
+				<ysize>0.4</ysize>
+				<animation type="in">
+					<simpletranslate startx="-200" starty="-200" endx="200" endy="200" duration="1000"/>
+				</animation>
+				<animation type="out">
+					<simpletranslate startx="100" starty="100" endx="-200" endy="-200" duration="1000"/>
+				</animation>
+            </text>
+
+            <text elementid ="2" layer="2" startsequence="3">
+                <textcontent>
+                    &lt;p&gt;Example HTML Number 2! Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.&lt;/p&gt;
+                </textcontent>
+                <xposition>0.1</xposition>
+                <yposition>0.6</yposition>
+				<bordercolour>#ABCDEF22</bordercolour>
+				<bordersize>15</bordersize>
+                <xsize>0.8</xsize>
+                <ysize>0.4</ysize>
+            </text>
+
+            <text elementid ="3" layer="1" startsequence="4">
+                <textcontent>
+                    &lt;h1&gt;Some text on top of everything, with semi transparent background!. Bigger is better!&lt;/h1&gt;
+                    &lt;p&gt;Click me to go to Google!&lt;/p&gt;
+                </textcontent>
+                <xposition>0.1</xposition>
+                <yposition>0.4</yposition>
+                <xsize>0.6</xsize>
+                <ysize>0.4</ysize>
+                <fontsize>12</fontsize>
+                <fontcolour>#0000FFFF</fontcolour>
+                <bgcolour>#11226611</bgcolour>
+                <onclickaction>openwebsite</onclickaction>
+                <onclickinfo>https://www.google.no/</onclickinfo>
+            </text>
+
+            <text elementid ="4" layer="4" startsequence="5">
+                <textcontent>
+                    &lt;h4&gt;Some fully transparent text on top of everything squared!&lt;/h4&gt;
+                    &lt;p&gt;Clicks on me will do nothing, but I should have a border!&lt;/p&gt;
+                </textcontent>
+                <xposition>0.4</xposition>
+                <yposition>0.5</yposition>
+                <xsize>0.6</xsize>
+                <ysize>0.2</ysize>
+                <fontsize>20</fontsize>
+                <fontcolour>#FF0000FF</fontcolour>
+                <bgcolour>#00000000</bgcolour>
+                <bordercolour>#ABCDEFFF</bordercolour>
+                <bordersize>5</bordersize>
+            </text>
+		</slide>
+
+
+		<slide slideid="2">
+            <graphic elementid ="0" layer="1" visibility="true" startsequence="1" endsequence="3">
+                <onclickaction>dynamicmediatoggle</onclickaction>
+                <onclickinfo>3</onclickinfo>
+                <aspectratiolock>true</aspectratiolock>
+                <elementaspectratio>1.0</elementaspectratio>
+                <linecolour>#aaffaaFF</linecolour>
+                <fillcolour>#FF00008F</fillcolour>
+                <polygon>
+                    <xpositions>0.5, 0.6, 0.9, 0.65, 0.7, 0.5, 0.3, 0.35, 0.1, 0.4, 0.5</xpositions>
+                    <ypositions>0.2, 0.4, 0.4, 0.5, 0.9, 0.7, 0.9, 0.5, 0.4, 0.4, 0.2</ypositions>
+                    <isclosed>true</isclosed>
+                </polygon>
+				<animation type="in">
+					<simplescale start="0" end="1" duration="500"/>
+				</animation>
+
+            </graphic>
+
+			<graphic elementid ="1" layer="2" visibility="true" startsequence="2">
+				<aspectratiolock>false</aspectratiolock>
+				<elementaspectratio>1.5</elementaspectratio>
+				<linecolour>#FF000066</linecolour>
+				<fillcolour>#000000FF</fillcolour>
+				<oval>
+					<xposition>0.6</xposition>
+					<yposition>0.2</yposition>
+					<rhorizontal>0.5</rhorizontal>
+					<rvertical>0.3</rvertical>
+					<rotation>45</rotation>
+				</oval>
+				<onclickaction>dynamicmediatoggle</onclickaction>
+				<onclickinfo>3</onclickinfo>
+				<animation type="in">
+					<pathtransition duration="1000" path="m74.5,163c73,-96 151,-167 291,-116c140,51 193,230 81,261c-112,31 -341,96 -318,-34c23,-130 110,-178 149,-147c39,31 92,124 38,134c-54,10 -121,-57 -105,-74"/>
+				</animation>
+			</graphic>
+
+			<audio elementid ="3" startsequence="3">
+				<path>projectResources/sampleFiles/NeverGonnaGiveYouUp.mp3</path>
+				<loop>true</loop>
+				<autoplay>true</autoplay>
+				<starttime>0</starttime>
+				<endtime>15</endtime>
+			</audio>
+
+
+			<text elementid ="4" layer="3" startsequence="3">
+				<textcontent>
+					&lt;h1&gt;Click me to Toggle the Video playing!&lt;/h1&gt;</textcontent>
+				<bordercolour>#ABCDEFFF</bordercolour>
+				<bordersize>5</bordersize>
+				<xposition>0.3</xposition>
+				<yposition>0.6</yposition>
+				<xsize>0.5</xsize>
+				<ysize>0.2</ysize>
+				<onclickaction>dynamicmediatoggle</onclickaction>
+				<onclickinfo>3</onclickinfo>
+			</text>
+		</slide>
+
+
+
+
+		<slide slideid="3">
+			<image elementid ="0" layer="2" visibility="true" startsequence="1" >
+				<xposition>0.1</xposition>
+				<yposition>0.1</yposition>
+				<xsize>0.8</xsize>
+				<ysize>0.8</ysize>
+				<path>projectResources/logos/ediLogo1000x1000.png</path>
+				<onclickaction>gotoslide</onclickaction>
+				<onclickinfo>1</onclickinfo>
+				<opacity>0.3</opacity>
+				<aspectratiolock>true</aspectratiolock>
+				<elementaspectratio>1.0</elementaspectratio>
+
+			</image>
+			<image elementid ="1" layer="1" visibility="true" startsequence="2">
+				<xposition>0.2</xposition>
+				<yposition>0.2</yposition>
+				<xsize>0.8</xsize>
+				<ysize>0.8</ysize>
+				<path>projectResources/logos/ediLogo1000x1000.png</path>
+				<onclickaction>gotoslide</onclickaction>
+				<onclickinfo>3</onclickinfo>
+				<opacity>1</opacity>
+				<aspectratiolock>true</aspectratiolock>
+				<elementaspectratio>1.5</elementaspectratio>
+				<animation type="in">
+					<simplefade start="0" end="1" duration="1000"/>
+				</animation>
+			</image>
+		</slide>
+
+
+
+
+		<slide slideid="4">
+			<video elementid ="0" layer="1" visibility="true" startsequence="1">
+				<xposition>0</xposition>
+				<yposition>0</yposition>
+				<xsize>1</xsize>
+				<ysize>1</ysize>
+				<path>projectResources/sampleFiles/prometheus.mp4</path>
+				<loop>true</loop>
+				<aspectratiolock>true</aspectratiolock>
+				<elementaspectratio>2</elementaspectratio>
+				<autoplay>true</autoplay>
+				<starttime>0</starttime>
+				<endtime>15000</endtime>
+				<onclickaction>openwebsite</onclickaction>
+				<onclickinfo>https://www.google.no/</onclickinfo>
+			</video>
+
+			<text elementid ="1" layer="2" startsequence="1">
+				<textcontent>
+					&lt;h1&gt;Click me to Toggle the Video playing!&lt;/h1&gt;</textcontent>
+				<bordercolour>#ABCDEFFF</bordercolour>
+				<bordersize>5</bordersize>
+				<xposition>0.3</xposition>
+				<yposition>0.6</yposition>
+				<xsize>0.5</xsize>
+				<ysize>0.2</ysize>
+				<onclickaction>dynamicmediatoggle</onclickaction>
+				<onclickinfo>0</onclickinfo>
+			</text>
+		</slide>
+
+        <slide slideid="4">
+            <wordcloud elementid ="0" layer="1" visibility="true" startsequence="1">
+                <question>Insert Words About Edi Here</question>
+                <timelimit>20</timelimit>
+            </wordcloud>
+        </slide>
+
+
+
+        <slide slideid="4">
+            <poll elementid ="0" layer="1" visibility="true" startsequence="1" endsequence="2">
+                <timelimit>20</timelimit>
+                <question>Insert Longer Question Here</question>
+                <answers>answer1,answer2,answer3,answer4</answers>
+            </poll>
+        </slide>
+	</slideshow>
+</document>

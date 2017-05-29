@@ -376,7 +376,7 @@ public class ParserXML {
 
                 switch (elementName){
                     case "textcontent":
-                        textElement.setTextContent(elementContent);
+                        textElement.setTextContent(elementContent, presentationXmlPath);
                         break;
                     case "textfilepath":
                         textElement.setTextFilepath(elementContent);

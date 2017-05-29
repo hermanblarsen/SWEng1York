@@ -212,7 +212,7 @@ public class Presentation extends Pane {
         //myTextElement.setBgColour("#000000");
         myTextElement.setBorderSize(2);
         myTextElement.setBorderColour("#000000");
-        myTextElement.setTextContent("<b>IILP HTML Support Test</b>");
+        myTextElement.setTextContent("<b>IILP HTML Support Test</b>", "");
         myTextElement.setSlideCanvas(slide1);
         slideElementsSlide1.add(myTextElement);
 
@@ -229,7 +229,7 @@ public class Presentation extends Pane {
         myTextElement1.setBgColour("#000000");
         myTextElement1.setBorderSize(2);
         myTextElement1.setBorderColour("#000000");
-        myTextElement1.setTextContent("<b>Same starting sequence</b>");
+        myTextElement1.setTextContent("<b>Same starting sequence</b>", "");
         myTextElement1.setSlideCanvas(slide1);
         slideElementsSlide1.add(myTextElement1);
 
@@ -289,7 +289,7 @@ public class Presentation extends Pane {
         myTextElement11.setFontSize(24);
         myTextElement11.setFontColour("#AA4567");
         myTextElement11.setBgColour("#000000");
-        myTextElement11.setTextContent("<b>This is some sample text for Adar to be impressed by</b>");
+        myTextElement11.setTextContent("<b>This is some sample text for Adar to be impressed by</b>","");
         myTextElement11.setSlideCanvas(slide1);
         slideElementsSlide1.add(myTextElement11);
 
@@ -341,7 +341,7 @@ public class Presentation extends Pane {
         myTextElementNewSlide.setEndSequence(4);
         myTextElementNewSlide.setDuration(1);
         myTextElementNewSlide.setElementID(69);
-        myTextElementNewSlide.setTextContent("<b>Slide2</b>");
+        myTextElementNewSlide.setTextContent("<b>Slide2</b>", "");
         myTextElementNewSlide.setSlideCanvas(slide2);
         slideElementsSlide2.add(myTextElementNewSlide);
 
@@ -382,7 +382,7 @@ public class Presentation extends Pane {
         myTextElementNewSlide2.setEndSequence(2);
         myTextElementNewSlide2.setDuration(1);
         myTextElementNewSlide2.setElementID(124214);
-        myTextElementNewSlide2.setTextContent("<b>Slide3</b>");
+        myTextElementNewSlide2.setTextContent("<b>Slide3</b>", "");
         myTextElementNewSlide2.setSlideCanvas(slide3);
         slideElementsSlide3.add(myTextElementNewSlide2);
 
