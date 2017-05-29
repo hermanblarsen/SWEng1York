@@ -62,10 +62,10 @@
                 <ysize>0.4</ysize>
             </text>
 
-            <text elementid ="3" layer="1" startsequence="4">
+            <text elementid ="3" layer="3" startsequence="4">
                 <textcontent>
-                    &lt;h1&gt;Some text on top of everything, with semi transparent background!. Bigger is better!&lt;/h1&gt;
-                    &lt;p&gt;Click me to go to Google!&lt;/p&gt;
+                    &lt;h1&gt;Some text on top of everything, with semi transparent background!. Bigger is better!
+                    Click me to go to Google!&lt;/h1&gt;
                 </textcontent>
                 <xposition>0.1</xposition>
                 <yposition>0.4</yposition>
@@ -73,9 +73,9 @@
                 <ysize>0.4</ysize>
                 <fontsize>12</fontsize>
                 <fontcolour>#0000FFFF</fontcolour>
-                <bgcolour>#11226611</bgcolour>
+                <bgcolour>#11881155</bgcolour>
                 <onclickaction>openwebsite</onclickaction>
-                <onclickinfo>https://www.google.no/</onclickinfo>
+                <onclickinfo>https://www.google.com/</onclickinfo>
             </text>
 
             <text elementid ="4" layer="4" startsequence="5">
@@ -168,7 +168,7 @@
 				<ysize>0.8</ysize>
 				<path>projectResources/logos/ediLogo1000x1000.png</path>
 				<onclickaction>gotoslide</onclickaction>
-				<onclickinfo>1</onclickinfo>
+				<onclickinfo>2</onclickinfo>
 				<opacity>0.3</opacity>
 				<aspectratiolock>true</aspectratiolock>
 				<elementaspectratio>1.0</elementaspectratio>
@@ -181,7 +181,7 @@
 				<ysize>0.8</ysize>
 				<path>projectResources/logos/ediLogo1000x1000.png</path>
 				<onclickaction>gotoslide</onclickaction>
-				<onclickinfo>3</onclickinfo>
+				<onclickinfo>4</onclickinfo>
 				<opacity>1</opacity>
 				<aspectratiolock>true</aspectratiolock>
 				<elementaspectratio>1.5</elementaspectratio>
