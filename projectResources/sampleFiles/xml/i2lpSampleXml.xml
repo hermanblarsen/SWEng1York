@@ -92,6 +92,8 @@
                 <bgcolour>#00000000</bgcolour>
                 <bordercolour>#ABCDEFFF</bordercolour>
                 <bordersize>5</bordersize>
+				<onclickaction>gotoslide</onclickaction>
+				<onclickinfo>3</onclickinfo>
             </text>
 		</slide>
 
@@ -195,7 +197,7 @@
 
 
 		<slide slideid="4">
-			<video elementid ="0" layer="1" visibility="true" startsequence="1">
+			<video elementid ="1" layer="1" visibility="true" startsequence="1">
 				<xposition>0</xposition>
 				<yposition>0</yposition>
 				<xsize>1</xsize>
@@ -211,7 +213,7 @@
 				<onclickinfo>https://www.google.no/</onclickinfo>
 			</video>
 
-			<text elementid ="1" layer="2" startsequence="1">
+			<text elementid ="2" layer="2" startsequence="1">
 				<textcontent>
 					&lt;h1&gt;Click me to Toggle the Video playing!&lt;/h1&gt;</textcontent>
 				<bordercolour>#ABCDEFFF</bordercolour>
@@ -221,7 +223,7 @@
 				<xsize>0.5</xsize>
 				<ysize>0.2</ysize>
 				<onclickaction>dynamicmediatoggle</onclickaction>
-				<onclickinfo>0</onclickinfo>
+				<onclickinfo>1</onclickinfo>
 			</text>
 		</slide>
 
@@ -236,7 +238,7 @@
 
         <slide slideid="4">
             <poll elementid ="0" layer="1" visibility="true" startsequence="1" endsequence="2">
-                <timelimit>20</timelimit>
+                <timelimit>5</timelimit>
                 <question>Insert Longer Question Here</question>
                 <answers>answer1,answer2,answer3,answer4</answers>
             </poll>

@@ -940,9 +940,20 @@ public abstract class PresentationManager {
             logger.warn("Target slide number lies outside that which is available in this presentation. Modify XML to account for this.");
             return;
         }
-
+        boolean targetToggle = false;
         //If we need to go backwards, go backwards
-        if (targetSlideNumber < currentSlideNumber) {
+        System.out.println("T: "+targetSlideNumber+" C: "+currentSlideNumber);
+        if (currentSlideNumber+2 == targetSlideNumber||currentSlideNumber == targetSlideNumber){
+
+            if(targetSlideNumber < currentSlideNumber){
+                System.out.println("BACK");
+                slideAdvance(presentationElement, Slide.SLIDE_BACKWARD);
+            }else{
+                slideAdvance(presentationElement, Slide.SLIDE_FORWARD);
+            }
+            targetToggle = true;
+        }
+        if (targetSlideNumber < currentSlideNumber) { // && targetToggle == false
             while (currentSlideNumber != targetSlideNumber - 1) {
                 slideAdvance(presentationElement, Slide.SLIDE_BACKWARD);
             }

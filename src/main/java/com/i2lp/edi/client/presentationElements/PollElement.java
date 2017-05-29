@@ -34,7 +34,7 @@ public class PollElement extends InteractiveElement {
     protected boolean answered = false;
     protected boolean timerStart = false;
     protected int timeLimit = 30; //TODO get from server
-    protected HBox pollOptions;
+    protected VBox pollOptions;
     protected Timeline timeline;
     protected Panel questionPane;
     //protected ResponseIndicator responseIndicator;
@@ -49,6 +49,7 @@ public class PollElement extends InteractiveElement {
     protected float xPosition=0.1f;
     protected float yPosition=0.1f;
     protected boolean buttonActive = false;
+    protected int setValue;
     protected Button startTimer;
 
     public PollElement() {
@@ -128,14 +129,13 @@ public class PollElement extends InteractiveElement {
 
         timeline.setCycleCount(timeLimit);
         timeline.setOnFinished(event -> {
-            //pollPane.getChildren().remove(pollOptions);
-            elementActive = true;
+            elementActive = false;
             displayDone();
         });
 
         countdownTile = TileBuilder.create()
                                    .skinType(Tile.SkinType.NUMBER)
-                                   .prefSize((xSize*slideWidth)/3,(ySize*slideHeight)/3)
+                                   .prefSize((xSize*slideWidth)/5,(ySize*slideHeight)/2)
                                    .title("Time Limit")
                                    .value(timeLimit)
                                    .description("Seconds")
@@ -143,7 +143,7 @@ public class PollElement extends InteractiveElement {
                                    .build();
         answerOutputTile = TileBuilder.create()
                                       .skinType(Tile.SkinType.RADIAL_CHART)
-                                      .prefSize((xSize*slideWidth)/3,(ySize*slideHeight)/3)
+                                      .prefSize((xSize*slideWidth),(ySize*slideHeight))
                                       .title("Responses")
                                       .build();
         if(teacher && !timerStart) {
@@ -154,9 +154,9 @@ public class PollElement extends InteractiveElement {
                 timerStart = true;
                 //responseIndicator = new ResponseIndicator();
                 //responseIndicator.setNumberOfStudents(20); //TODO: Get this from server
-                pollOptions = new HBox();
-                pollOptions.getChildren().setAll(answerOutputTile, setUpQuestions(), countdownTile);
-                pollOptions.setAlignment(Pos.TOP_CENTER);
+                pollOptions = new VBox();
+                pollOptions.getChildren().setAll(countdownTile,setUpQuestions());
+                pollOptions.setAlignment(Pos.CENTER);
                 pollOptions.setSpacing(20);
                 //pollPane.setCenter(pollOptions);
                 questionPane.setBody(pollOptions);
@@ -181,27 +181,27 @@ public class PollElement extends InteractiveElement {
 
     }
 
-    private VBox setUpQuestions(){
+    private HBox setUpQuestions(){
         setUpQuestionList(answers);
         answerButton = new ToggleButton[possibleAnswers.size()];
         chartDataArray = new ChartData[possibleAnswers.size()];
         final ToggleGroup group = new ToggleGroup();
-        VBox answerSelection = new VBox();
+        HBox answerSelection = new HBox();
         //answerSelection.setMaxWidth(slideCanvas.getMaxWidth());
         //answerSelection.setMaxHeight(slideCanvas.getMaxHeight());
         for (int i = 0; i < possibleAnswers.size(); i++) {
             final int number = i;
-            chartDataArray[i] = new ChartData(possibleAnswers.get(i),0);
+
             //chartDataArray[i].setName(possibleAnswers.get(i));
-            chartDataArray[i].setColor(assignBarColour(i));
+
             answerButton[i] = new ToggleButton(possibleAnswers.get(i));
             //answerButton[i].setMinWidth(slideCanvas.getWidth());
             answerButton[i].getStyleClass().setAll("btn","btn-default");
             answerButton[i].addEventHandler(MouseEvent.MOUSE_CLICKED, evt -> {
                 //responseIndicator.incrementResponses();
-
                 //checkIfDone();
-                chartDataArray[number].setValue(chartDataArray[number].getValue()+1);
+                setValue = number;
+
             });
             answerButton[i].addEventHandler(MouseEvent.MOUSE_ENTERED, evt->{
                 buttonActive = true;
@@ -212,28 +212,21 @@ public class PollElement extends InteractiveElement {
             answerSelection.getChildren().add(answerButton[i]);
             answerButton[i].setToggleGroup(group);
 
+
         }
-        answerOutputTile.setRadialChartData(chartDataArray);
+        answerSelection.setAlignment(Pos.CENTER);
         return answerSelection;
     }
 
-//    private void checkIfDone() {
-//        if(responseIndicator.isDone()) {
-//            timeline.stop();
-//            displayDone();
-//        }
-//    }
-
     private void displayDone() {
-//        questionPane.getChildren().remove(pollOptions);
-//        Label done = new Label("DONE");
-//        //pollPane.setCenter(done);
-//        questionPane.setBody(done);
-        pollOptions.getChildren().remove(remainingTime);
-        //responseIndicator.setDone();
-        for(int i=0; i < answerButton.length; i++) {
-            answerButton[i].setDisable(true);
+        questionPane.getChildren().remove(questionPane.getBody());
+        for(int i = 0; i<possibleAnswers.size();i++){
+            chartDataArray[i] = new ChartData(possibleAnswers.get(i),0);
+            chartDataArray[i].setColor(assignBarColour(i));
         }
+        chartDataArray[setValue].setValue(chartDataArray[setValue].getValue()+1);
+        answerOutputTile.setRadialChartData(chartDataArray);
+        questionPane.setBody(answerOutputTile);
     }
 
     public String getQuestion() {
@@ -281,7 +274,6 @@ public class PollElement extends InteractiveElement {
         i = i%possibleAnswers.size();
         //assignedColour = new Color();
         //for(int j = i; j<possibleAnswers.size(); j++){
-            System.out.println("in i = "+ i);
             switch (i){
                 case 1:
                     assignedColour = Tile.BLUE;

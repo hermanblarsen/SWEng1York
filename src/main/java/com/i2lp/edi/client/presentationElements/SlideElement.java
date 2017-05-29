@@ -237,17 +237,17 @@ public abstract class SlideElement {
         getCoreNode().setTranslateY(yPosition * slideHeight);
     }
 
-    protected void performOnClickAction() {
-        SlideElement slideElement = presentationManager.getElement(Integer.parseInt(onClickInfo));
+    protected void performOnClickAction(){
+        SlideElement slideElement = this;
         if (onClickAction != null) {
-            logger.info("Performing onClickAction: \"" + onClickAction + "\" with onClickInfo: \"" + onClickInfo + "\"");
+            logger.info("Performing onClickAction: \"" + onClickAction + "\" with onClickInfo: \"" + onClickInfo +"\"");
             switch (onClickAction) {
                 case "openwebsite":
-                    if (!(slideElement instanceof InteractiveElement)) {
+                    if(!(slideElement instanceof InteractiveElement)) {
                         logger.info("Opening Website: " + onClickInfo);
                         openEmbeddedBrowser();
-                    } else {
-                        if (!(((InteractiveElement) slideElement).elementActive)) {
+                    }else{
+                        if(!(((InteractiveElement) slideElement).elementActive)){
                             logger.info("Opening Website: " + onClickInfo);
                             openEmbeddedBrowser();
                         }
@@ -255,10 +255,10 @@ public abstract class SlideElement {
 
                     break;
                 case "gotoslide":
-                    if (!(slideElement instanceof InteractiveElement)) {
+                    if(!(slideElement instanceof InteractiveElement)) {
                         presentationManager.goToSlide(Integer.parseInt(onClickInfo));
-                    } else {
-                        if (!(((InteractiveElement) slideElement).elementActive)) {
+                    }else{
+                        if(!(((InteractiveElement) slideElement).elementActive)){
                             presentationManager.goToSlide(Integer.parseInt(onClickInfo));
                         }
                     }
@@ -288,7 +288,8 @@ public abstract class SlideElement {
                     logger.info("OnClickAction: " + onClickAction + " with onClick info: " + onClickInfo + " for ElementID: " + getElementID() + " not recognised.");
                     break;
             }
-        } else logger.info("Element with ElementID: " + getElementID() + " has no OnClickAction");
+        }
+        else logger.info("Element with ElementID: " + getElementID() + " has no OnClickAction");
     }
 
     BorderPane embeddedBrowserPane;
