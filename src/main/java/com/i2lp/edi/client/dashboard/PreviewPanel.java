@@ -3,6 +3,7 @@ package com.i2lp.edi.client.dashboard;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
 import org.apache.commons.lang3.StringUtils;
 import org.kordamp.bootstrapfx.scene.layout.Panel;
 import org.slf4j.Logger;
@@ -13,18 +14,20 @@ import java.util.ArrayList;
 /**
  * Created by Kacper on 2017-05-25.
  */
-public abstract class PreviewPanel extends Panel {
+public abstract class PreviewPanel extends StackPane {
 
     protected static Logger logger = LoggerFactory.getLogger(PreviewPanel.class);
     private final Pane parentPane;
     private boolean isSelected;
     private boolean isHidden = false;
     private boolean isFiltered = false, isSearchResult = true;
+    private Panel displayPanel;
 
     public PreviewPanel(Pane parentPane, boolean dropshadow) {
         this.parentPane = parentPane;
+        this.displayPanel = new Panel();
+        this.getChildren().add(displayPanel);
         this.setSelected(false);
-        this.getStyleClass().add("panel-primary");
         this.updateVisibility();
 
         if(dropshadow) {
@@ -44,17 +47,17 @@ public abstract class PreviewPanel extends Panel {
         isSelected = selected;
 
         if(isSelected) {
-            this.getStyleClass().removeIf(s -> {
+            displayPanel.getStyleClass().removeIf(s -> {
                 if(s.equals("panel-primary")) return true;
                 else return false;
             });
-            this.getStyleClass().add("panel-success");
+            displayPanel.getStyleClass().add("panel-success");
         } else {
-            this.getStyleClass().removeIf(s -> {
+            displayPanel.getStyleClass().removeIf(s -> {
                 if(s.equals("panel-success")) return true;
                 else return false;
             });
-            this.getStyleClass().add("panel-primary");
+            displayPanel.getStyleClass().add("panel-primary");
         }
     }
 
@@ -110,4 +113,6 @@ public abstract class PreviewPanel extends Panel {
             this.setSearchResult(false);
         }
     }
+
+    public Panel getDisplayPanel() { return displayPanel; }
 }

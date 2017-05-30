@@ -1,10 +1,16 @@
 package com.i2lp.edi.client.dashboard;
 
 import com.i2lp.edi.client.presentationElements.Presentation;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,7 +31,7 @@ public class PresentationPanel extends PreviewPanel {
     public PresentationPanel(Presentation presentation, Pane parentPane) {
         super(parentPane);
         this.presentation = presentation;
-        this.setText("Title: " + this.presentation.getDocumentTitle());
+        getDisplayPanel().setText("Title: " + this.presentation.getDocumentTitle());
         this.setPrefWidth(MAX_PRES_PREVIEW_WIDTH + 10);
 
         isLive = presentation.getPresentationMetadata().getLive();
@@ -37,8 +43,8 @@ public class PresentationPanel extends PreviewPanel {
 
         ImageView preview = getPresentation().getSlidePreview(0, previewWidth);
         StackPane bodyPane = new StackPane(preview);
-        this.setBody(bodyPane);
-        this.setFooter(new Label("Subject: " + presentation.getSubject().getSubjectName()));
+        getDisplayPanel().setBody(bodyPane);
+        getDisplayPanel().setFooter(new Label("Subject: " + presentation.getSubject().getSubjectName()));
 
         Tooltip tooltip = new Tooltip("Title: " + getPresentation().getDocumentTitle() + "\n" +
                                         "Author: " + getPresentation().getAuthor() + "\n" +
@@ -75,11 +81,16 @@ public class PresentationPanel extends PreviewPanel {
 
         try {
             if(isLive) {
-                setText("Title: " + this.presentation.getDocumentTitle() + " (live)");
-
+                //Terrible hack to circumvent padding set by the bootstrap
+                ImageView liveIcon = new ImageView(new Image("file:projectResources/icons/live_icon.png"));
+                this.getChildren().add(liveIcon);
+                StackPane.setAlignment(liveIcon, Pos.TOP_LEFT);
+                StackPane.setMargin(liveIcon, new Insets(2, 0, 2, 4));
+                getDisplayPanel().setText("       Title: " + presentation.getDocumentTitle());
             } else {
-                setText("Title: " + this.presentation.getDocumentTitle());
+                getDisplayPanel().setText("Title: " + presentation.getDocumentTitle());
             }
+
         } catch (NullPointerException e) {
             //Do nothing
         }
@@ -94,4 +105,5 @@ public class PresentationPanel extends PreviewPanel {
 
         return null;
     }
+
 }

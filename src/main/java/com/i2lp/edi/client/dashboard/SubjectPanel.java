@@ -40,8 +40,8 @@ public class SubjectPanel extends PreviewPanel {
             }
         });
 
-        setTop(title);
-        setCenter(modulePanelsHBox);
+        getDisplayPanel().setTop(title);
+        getDisplayPanel().setCenter(modulePanelsHBox);
     }
 
     public Subject getSubject() { return subject; }

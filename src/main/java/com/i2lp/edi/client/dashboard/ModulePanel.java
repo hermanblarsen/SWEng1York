@@ -18,8 +18,8 @@ public class ModulePanel extends PreviewPanel {
         this.module = module;
         parentPanel.addModulePanel(this);
 
-        setText(module.getModuleName());
-        setFooter(new Label(module.getPresentations().size() + " presentations"));
+        getDisplayPanel().setText(module.getModuleName());
+        getDisplayPanel().setFooter(new Label(module.getPresentations().size() + " presentations"));
     }
 
     public String getModuleName() { return module.getModuleName(); }
