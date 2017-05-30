@@ -99,6 +99,7 @@ public abstract class SlideElement {
                             ((PathAnimation) startAnimation).setScaleFactor(getSlideWidth(), getSlideHeight());
                         }
 
+                        getCoreNode().setVisible(isVisibility());
                         startAnimation.play();
 
                         logger.info("Entry animation playing");
@@ -110,6 +111,13 @@ public abstract class SlideElement {
                 case Animation.EXIT_ANIMATION: //Exit animation (playback)
                     if (endAnimation != null) {//animation Exists as EndSequence Present
                         endAnimation.setCoreNodeToAnimate(getCoreNode());
+
+                        if(endAnimation instanceof TranslationAnimation ){
+                            ((TranslationAnimation) endAnimation).setScaleFactor(getSlideWidth(), getSlideHeight());
+                        } else if(endAnimation instanceof PathAnimation){
+                            ((PathAnimation) endAnimation).setScaleFactor(getSlideWidth(), getSlideHeight());
+                        }
+
                         endAnimation.play();
 
                         logger.info("Exit animation playing");

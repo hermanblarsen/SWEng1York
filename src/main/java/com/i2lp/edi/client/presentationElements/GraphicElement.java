@@ -1,8 +1,9 @@
 package com.i2lp.edi.client.presentationElements;
 
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Ellipse;
 import javafx.scene.shape.Polyline;
@@ -41,7 +42,7 @@ public class GraphicElement extends SlideElement {
 
     protected float rotation;
 
-    private Pane wrapperPane;//Wrap the graphics within its own pane so that absolute positioning works properly.
+    private StackPane wrapperPane;//Wrap the graphics within its own pane so that absolute positioning works properly.
 
     public GraphicElement() {
 
@@ -80,8 +81,9 @@ public class GraphicElement extends SlideElement {
 
     @Override
     public void setupElement() {
-        wrapperPane = new Pane();
+        wrapperPane = new StackPane();
         wrapperPane.setVisible(visibility);
+        wrapperPane.setAlignment(Pos.CENTER);
         getCoreNode().addEventFilter(MouseEvent.MOUSE_CLICKED, event -> performOnClickAction());
 
     }

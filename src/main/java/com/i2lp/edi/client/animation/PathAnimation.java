@@ -39,11 +39,15 @@ public class PathAnimation extends Animation{
             logger.error("Animation played before scale was set before calling play");
         }
         Scale denormalisation= new Scale(width, height, 0,0);
-        path.getTransforms().add(denormalisation);
-        PathTransition transition = new PathTransition(duration, path, getCoreNodeToAnimate());
-        transition.setCycleCount(1);
-        transition.setInterpolator(Interpolator.EASE_BOTH);
-        transition.play();
+        if(path.getTransforms().size() == 0) {
+        	path.getTransforms().add(denormalisation);
+        } else{
+            path.getTransforms().set(0, denormalisation);
+        }
+        animation = new PathTransition(duration, path, getCoreNodeToAnimate());
+        animation.setCycleCount(1);
+        animation.setInterpolator(Interpolator.EASE_BOTH);
+        animation.play();
     }
 
     public void setPath(String pathString) {
