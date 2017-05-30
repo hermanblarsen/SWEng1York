@@ -7,9 +7,9 @@ import com.i2lp.edi.server.packets.User;
 import com.i2lp.edi.server.packets.UserAuth;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
+import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.geometry.Side;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -17,14 +17,13 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.ArrayList;
 
 import static com.i2lp.edi.client.Constants.BASE_PATH;
 import static com.i2lp.edi.client.Constants.remoteServerAddress;
@@ -41,6 +40,9 @@ public class Login extends Application {
     protected PasswordField passwordField;
     protected Button loginButton;
     protected Button forgotPasswordButton;
+    private Label messageLabel;
+    private ImageView loadingImage;
+    private HBox rootBox;
 
     protected boolean loginSuccessful = false;
     protected boolean offline = false;
@@ -52,27 +54,9 @@ public class Login extends Application {
         Image ediLogoSmall = new Image("file:projectResources/logos/ediLogo32x32.png");
         loginStage.getIcons().add(ediLogoSmall);
 
-        gridPane = new GridPane();
-        gridPane.setAlignment(Pos.CENTER_RIGHT);
-        gridPane.setHgap(10);
-        gridPane.setVgap(10);
-        gridPane.setPadding(new Insets(25, 25, 25, 25));
-
-        ArrayList<BackgroundImage> backgroundImageList = new ArrayList<>();
-        Image ediLogo = new Image("file:projectResources/logos/ediLogo400x400.png");
-
-        backgroundImageList.add(new BackgroundImage(ediLogo,
-                BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT,
-                new BackgroundPosition(Side.LEFT, -0.05, true,
-                        Side.TOP, 0.5, true),
-                new BackgroundSize(BackgroundSize.AUTO, BackgroundSize.AUTO,
-                        false, false,
-                        true, false)));
-        ArrayList<BackgroundFill> backgroundFillList = new ArrayList<>();
-        backgroundFillList.add(new BackgroundFill(Color.GHOSTWHITE, CornerRadii.EMPTY, Insets.EMPTY));
-        gridPane.setBackground(new Background(backgroundFillList, backgroundImageList));
-
-        Scene scene = new Scene(gridPane, 550, 275);
+        rootBox = new HBox(5);
+        rootBox.setAlignment(Pos.CENTER);
+        Scene scene = new Scene(rootBox, 550, 275);
 
         //sets the stylesheet to https://github.com/aalmiray/bootstrapfx, giving us access to various premade CSS styles.
         //More available on https://docs.oracle.com/javase/8/javafx/api/javafx/scene/doc-files/cssref.html
@@ -86,18 +70,30 @@ public class Login extends Application {
         logger.info("EDI Client " + Constants.BUILD_STRING);
         logger.info("Scratch Directory: " + BASE_PATH);
 
-        populateGUI();
+        populateGuiPreConnection();
         loginStage.show();
 
         //TODO: Mode switching code depending on online/offline functionality
         if (!offline) {
             serverConnect();
+            changeGuiPostConnection();
         } else {
             //TODO do something while offline!
         }
     }
 
-    private void populateGUI() {
+    private void populateGuiPreConnection() {
+        Image ediLogo = new Image("file:projectResources/logos/ediLogo400x400.png", 275, 275, true, true);
+        ImageView logoImageView = new ImageView(ediLogo);
+        rootBox.getChildren().add(logoImageView);
+
+        gridPane = new GridPane();
+        gridPane.setAlignment(Pos.CENTER);
+        gridPane.setHgap(10);
+        gridPane.setVgap(10);
+        gridPane.setPadding(new Insets(25, 25, 25, 25));
+        rootBox.getChildren().add(gridPane);
+
         DropShadow titleDropShadow = new DropShadow();
         titleDropShadow.setRadius(5.0);
         titleDropShadow.setOffsetX(3.0);
@@ -107,44 +103,75 @@ public class Login extends Application {
         Text sceneTitle = new Text("Login");
         sceneTitle.getStyleClass().setAll("h1", "text-primary");
         sceneTitle.setEffect(titleDropShadow);
-        gridPane.add(sceneTitle, 2, 0, 3, 1);
+        gridPane.add(sceneTitle, 0, 0, 2, 1);
+        GridPane.setHalignment(sceneTitle, HPos.CENTER);
 
         Background labelBackground = new Background(new BackgroundFill(Color.LIGHTGRAY,
-               new CornerRadii(3, false), new Insets(-6,-5,-6,-115)));
+               new CornerRadii(3, false), new Insets(0,0,0,0)));
 
         usernameField = new TextField();
         usernameField.setText("Teacher");
-        usernameField.setBackground(labelBackground);
-        gridPane.add(usernameField, 2, 2, 3, 1);
+        gridPane.add(usernameField, 1, 2);
+        GridPane.setHalignment(usernameField, HPos.RIGHT);
 
         passwordField = new PasswordField();
         passwordField.setText("password");
-        passwordField.setBackground(labelBackground);
-        gridPane.add(passwordField, 2, 3, 3, 1);
+        gridPane.add(passwordField, 1, 3);
+        GridPane.setHalignment(passwordField, HPos.RIGHT);
 
         Label username = new Label("User Name:");
         username.getStyleClass().setAll("h4");
-//        username.setBackground(labelBackground);
-        gridPane.add(username, 0, 2, 2, 1);
+        username.setMinSize(Label.USE_PREF_SIZE, Label.USE_PREF_SIZE);
+        gridPane.add(username, 0, 2);
+        GridPane.setHalignment(username, HPos.RIGHT);
 
         Label password = new Label("Password:");
         password.getStyleClass().setAll("h4");
-//        password.setBackground(labelBackground);
-        gridPane.add(password, 0, 3, 2, 1);
+        password.setMinSize(Label.USE_PREF_SIZE, Label.USE_PREF_SIZE);
+        gridPane.add(password, 0, 3);
+        GridPane.setHalignment(password, HPos.RIGHT);
 
         forgotPasswordButton = new Button("Forgot password?");
         forgotPasswordButton.getStyleClass().setAll("btn");
-        gridPane.add(forgotPasswordButton, 1, 4, 2, 1);
+        gridPane.add(forgotPasswordButton, 0, 4, 2, 1);
+        GridPane.setHalignment(forgotPasswordButton, HPos.CENTER);
 
-        loginButton = new Button("Login");
+        loginButton = new Button("Open in offline mode");
+        loginButton.setAlignment(Pos.CENTER);
         loginButton.getStyleClass().setAll("btn", "btn-primary");
         loginButton.setDefaultButton(true); //ties enter button to Login button
-
         loginButton.setOnAction((ActionEvent event) -> {
+            changeGuiLoggingIn();
             if (!offline) login();
             else ;//TODO decide what to do if offline
         });
-        gridPane.add(loginButton, 2, 5, 2, 1);
+        gridPane.add(loginButton, 0, 5, 2, 1);
+        GridPane.setHalignment(loginButton, HPos.CENTER);
+
+        loadingImage = new ImageView(new Image("file:projectResources/preloaders/loader.gif"));
+        gridPane.add(loadingImage, 0, 6, 2, 1);
+        GridPane.setHalignment(loadingImage, HPos.CENTER);
+
+        messageLabel = new Label("Connecting to server...");
+        gridPane.add(messageLabel, 0, 7, 2, 1);
+        GridPane.setHalignment(messageLabel, HPos.CENTER);
+    }
+
+    private void changeGuiPostConnection() {
+        loginButton.setText("Login");
+        gridPane.getChildren().remove(loadingImage);
+
+        messageLabel.setText("");
+    }
+
+    private void changeGuiLoggingIn() {
+        gridPane.add(loadingImage, 0, 6, 2, 1);
+        messageLabel.setText("Logging in...");
+    }
+
+    private void changeGuiLoginFailed() {
+        gridPane.getChildren().remove(loadingImage);
+        messageLabel.setText("Login unsuccessful");
     }
 
     private void login() {
@@ -198,6 +225,7 @@ public class Login extends Application {
                 ediManager.loginSucceeded(isTeacher, userData); //Do this after shutting down the login window.
             }
         } else {
+            changeGuiLoginFailed();
             logger.info("Login unsuccessful");
             //TODO add colour events and stuff here to notify user of unsuccessful login.
         }

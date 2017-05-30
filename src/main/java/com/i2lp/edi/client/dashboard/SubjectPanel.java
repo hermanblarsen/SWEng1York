@@ -26,7 +26,6 @@ public class SubjectPanel extends PreviewPanel {
         modulePanelsHBox = new HBox(SPACING);
         modulePanels = new ArrayList<>();
         BorderPane.setMargin(modulePanelsHBox, new Insets(5));
-        getStyleClass().add("panel-primary");
 
         Text title = new Text(subject.getSubjectName());
         title.getStyleClass().setAll("h4");

@@ -1,6 +1,7 @@
 package com.i2lp.edi.client.dashboard;
 
 import javafx.scene.control.Label;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.Pane;
 import org.apache.xpath.operations.Mod;
 
@@ -20,6 +21,12 @@ public class ModulePanel extends PreviewPanel {
 
         getDisplayPanel().setText(module.getModuleName());
         getDisplayPanel().setFooter(new Label(module.getPresentations().size() + " presentations"));
+
+        Tooltip tooltip = new Tooltip("Name: " + getModuleName() + "\n" +
+                                        "Subject: " + getModule().getSubject().getSubjectName() + "\n" +
+                                        "Description: " + getModule().getModuleDescription() + "\n" +
+                                        "Last updated: " + getModule().getTimeLastUpdated());
+        Tooltip.install(this, tooltip);
     }
 
     public String getModuleName() { return module.getModuleName(); }

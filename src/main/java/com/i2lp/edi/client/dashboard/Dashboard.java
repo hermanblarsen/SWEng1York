@@ -10,6 +10,7 @@ import com.i2lp.edi.client.utilities.PresSortKey;
 import com.i2lp.edi.client.utilities.SubjectSortKey;
 import com.i2lp.edi.server.packets.Module;
 import com.i2lp.edi.server.packets.PresentationMetadata;
+import com.sun.javafx.scene.control.skin.DatePickerSkin;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.geometry.*;
@@ -29,6 +30,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Popup;
 import javafx.stage.Stage;
 import javafx.stage.Window;
+import javafx.util.Callback;
 import org.apache.commons.validator.UrlValidator;
 import org.kordamp.bootstrapfx.scene.layout.Panel;
 import org.slf4j.Logger;
@@ -42,12 +44,12 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static com.i2lp.edi.client.Constants.PRESENTATIONS_PATH;
-import static com.i2lp.edi.client.Constants.SLIDE_PREVIEW_WIDTH;
 import static com.i2lp.edi.client.utilities.Utilities.removeFileExtension;
 import static javafx.scene.layout.BorderPane.setAlignment;
 
@@ -57,11 +59,11 @@ import static javafx.scene.layout.BorderPane.setAlignment;
  */
 @SuppressWarnings({"WeakerAccess", "unused", "Duplicates"})
 public abstract class Dashboard extends Application {
+    private static final double RIGHT_PANEL_WIDTH = 200;
+    private static final double LEFT_PANEL_WIDTH = 200;
     protected static Logger logger = LoggerFactory.getLogger(Dashboard.class);
     private EdiManager ediManager;
     protected PresentationManager presentationManager;
-
-    private static final double LEFT_PANEL_SIZE = 200;
     protected Scene scene;
     protected BorderPane border;
     private VBox rootBox;
@@ -84,9 +86,14 @@ public abstract class Dashboard extends Application {
     private Text noMatchesSubject, noMatchesPres;
     private Button addToServerButton;
     private VBox constantControlsVBox, removableControlsVBox, controlsContainerVBox;
-    private ScrollPane controlsScroll;
+    private ScrollPane leftPanelScroll;
     private Panel searchPanel, subjectFilterPanel, presSortPanel, moduleSortPanel, subjectSortPanel;
     private DashModule selectedModule;
+    private DatePicker calendar;
+    private Node calendarNode;
+    private VBox rightPanelVBox;
+    private ScrollPane rightPanelScroll;
+    private Panel schedulePanel;
 
     protected TextField searchField;
     protected Button selectAllButton;
@@ -117,6 +124,31 @@ public abstract class Dashboard extends Application {
         noMatchesPres = new Text("No matches found");
         noMatchesPres.setFill(Color.GRAY);
         noMatchesPres.getStyleClass().add("italic");
+        DatePicker calendar = new DatePicker(LocalDate.now());
+        final Callback<DatePicker, DateCell> dayCellFactory =
+                new Callback<DatePicker, DateCell>() {
+                    @Override
+                    public DateCell call(final DatePicker datePicker) {
+                        return new DateCell() {
+                            @Override
+                            public void updateItem(LocalDate item, boolean empty) {
+                                super.updateItem(item, empty);
+
+                                if (item.getDayOfMonth() % 2 == 1) {
+                                    setStyle("-fx-background-color: #80e980;");
+                                }
+                            }
+                        };
+                    }
+                };
+        calendar.setDayCellFactory(dayCellFactory);
+        DatePickerSkin datePickerSkin = new DatePickerSkin(calendar);
+        calendarNode = datePickerSkin.getPopupContent();
+        calendarNode.setStyle("-fx-font-size: 8.9px;");
+        calendarNode.setEffect(null);
+        schedulePanel = new Panel("Schedule");
+        schedulePanel.getStyleClass().add("panel-primary");
+
         scene.getStylesheets().add("bootstrapfx.css");
         dashboardStage.setScene(scene);
 
@@ -277,6 +309,23 @@ public abstract class Dashboard extends Application {
         VBox vbox = new VBox(5);
         vbox.setPadding(new Insets(10));
         vbox.setAlignment(Pos.TOP_CENTER);
+        vbox.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
+            switch (currentState) {
+                case TOP_LEVEL:
+                    setSelectedPreviewPanel(selectedModulePanel, false);
+                    break;
+                case MODULE:
+                case SEARCH_IN_MODULE:
+                    setSelectedPreviewPanel(selectedPresPanel, false);
+                    break;
+                case SEARCH_ALL:
+                    setSelectedPreviewPanel(selectedPresPanel, false);
+                    setSelectedPreviewPanel(selectedModulePanel, false);
+                    break;
+                default:
+                    //do nothing
+            }
+        });
 
         ScrollPane modulesScrollPane = new ScrollPane();
         modulesScrollPane.setContent(subjectPanelsVBox);
@@ -409,15 +458,15 @@ public abstract class Dashboard extends Application {
             controlsContainerVBox.getChildren().add(removableControlsVBox);
         }
 
-        if (controlsScroll == null) {
-            controlsScroll = new ScrollPane();
-            controlsScroll.setHbarPolicy(ScrollBarPolicy.NEVER);
-            controlsScroll.setVbarPolicy(ScrollBarPolicy.NEVER);
-            controlsScroll.getStyleClass().add("edge-to-edge");
-            controlsScroll.setContent(controlsContainerVBox);
-            controlsScroll.setFitToWidth(true);
-            controlsScroll.setMaxWidth(LEFT_PANEL_SIZE);
-            border.setLeft(controlsScroll);
+        if (leftPanelScroll == null) {
+            leftPanelScroll = new ScrollPane();
+            leftPanelScroll.setHbarPolicy(ScrollBarPolicy.NEVER);
+            leftPanelScroll.setVbarPolicy(ScrollBarPolicy.NEVER);
+            leftPanelScroll.getStyleClass().add("edge-to-edge");
+            leftPanelScroll.setContent(controlsContainerVBox);
+            leftPanelScroll.setFitToWidth(true);
+            leftPanelScroll.setMaxWidth(LEFT_PANEL_WIDTH);
+            border.setLeft(leftPanelScroll);
         }
 
         Insets panelInsets = new Insets(5);
@@ -588,39 +637,49 @@ public abstract class Dashboard extends Application {
     }
 
     private void displayBorderRight(DashboardState state) {
+
+        if (rightPanelVBox == null) {
+            rightPanelVBox = new VBox(2);
+            rightPanelVBox.setAlignment(Pos.TOP_CENTER);
+        }
+
+        if (rightPanelScroll == null) {
+            rightPanelScroll = new ScrollPane();
+            rightPanelScroll.setHbarPolicy(ScrollBarPolicy.NEVER);
+            rightPanelScroll.setVbarPolicy(ScrollBarPolicy.NEVER);
+            rightPanelScroll.getStyleClass().add("edge-to-edge");
+            rightPanelScroll.setContent(rightPanelVBox);
+            border.setRight(rightPanelScroll);
+        }
+
         switch (state) {
             case TOP_LEVEL:
             case SEARCH_ALL:
-                border.setRight(null);
+                rightPanelVBox.setPadding(new Insets(10));
+                rightPanelVBox.getChildren().clear();
+                rightPanelVBox.getChildren().addAll(schedulePanel, calendarNode);
                 break;
 
             case MODULE:
             case SEARCH_IN_MODULE:
                 if (selectedPresPanel != null) {
-                    VBox parentBox = new VBox(2);
-                    parentBox.setPadding(new Insets(5));
-
+                    rightPanelVBox.setPadding(new Insets(10, 9, 10, 10));
+                    rightPanelVBox.getChildren().clear();
                     for (int i = 0; i < selectedPresPanel.getPresentation().getMaxSlideNumber(); i++) {
                         VBox vbox = new VBox(3);
                         vbox.setBorder(new Border(new BorderStroke(Color.GRAY, BorderStrokeStyle.SOLID, new CornerRadii(5), BorderStroke.DEFAULT_WIDTHS)));
                         vbox.setAlignment(Pos.CENTER);
                         vbox.setPadding(new Insets(5));
 
-                        vbox.getChildren().add(selectedPresPanel.getPresentation().getSlidePreview(i, SLIDE_PREVIEW_WIDTH));
+                        vbox.getChildren().add(selectedPresPanel.getPresentation().getSlidePreview(i, RIGHT_PANEL_WIDTH));
                         vbox.getChildren().add(new Label(Integer.toString(i + 1)));
                         vbox.setStyle("-fx-background-color: #ffffff");
-                        parentBox.getChildren().add(vbox);
+                        rightPanelVBox.getChildren().add(vbox);
                     }
-
-                    ScrollPane scroll = new ScrollPane();
-                    scroll.setHbarPolicy(ScrollBarPolicy.NEVER);
-                    scroll.setVbarPolicy(ScrollBarPolicy.NEVER);
-                    scroll.getStyleClass().add("edge-to-edge");
-                    scroll.setContent(parentBox);
-
-                    border.setRight(scroll);
                 } else {
-                    border.setRight(null);
+                    rightPanelVBox.setPadding(new Insets(10));
+                    rightPanelVBox.getChildren().clear();
+                    rightPanelVBox.getChildren().addAll(schedulePanel, calendarNode);
                 }
                 break;
 
@@ -732,6 +791,7 @@ public abstract class Dashboard extends Application {
                     } else {
                         setSelectedPreviewPanel(modulePanel, true);
                     }
+                    event.consume();
                 });
             } catch (NullPointerException e) {
                 logger.info("Couldn't find subject panel for module" + module.getModuleName());
@@ -803,6 +863,7 @@ public abstract class Dashboard extends Application {
                     }
                     cMenu.show(dashboardStage, event.getScreenX(), event.getScreenY());
                 }
+                event.consume();
             });
             presentationPanels.add(presentationPanel);
         }

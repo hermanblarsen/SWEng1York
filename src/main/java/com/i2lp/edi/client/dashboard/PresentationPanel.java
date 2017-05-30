@@ -6,12 +6,14 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
+import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Color;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,15 +26,21 @@ import java.util.ArrayList;
 public class PresentationPanel extends PreviewPanel {
     private static final double MAX_PRES_PREVIEW_WIDTH = 200;
     private static final double MAX_PRES_PREVIEW_HEIGHT = 100;
+    private static final double MARGIN_FOR_LIVE_ICON = 50;
+    private static final double MARGIN_AROUND_PRES_PREVIEW = 10;
     protected static Logger logger = LoggerFactory.getLogger(PresentationPanel.class);
     private final Presentation presentation;
     private boolean isLive;
+    private ImageView liveIcon;
 
     public PresentationPanel(Presentation presentation, Pane parentPane) {
         super(parentPane);
         this.presentation = presentation;
         getDisplayPanel().setText("Title: " + this.presentation.getDocumentTitle());
-        this.setPrefWidth(MAX_PRES_PREVIEW_WIDTH + 10);
+        Label titleLabel = new Label("Title: " + this.getPresentation().getDocumentTitle());
+        getDisplayPanel().widthProperty().addListener(observable -> titleLabel.setPrefWidth(getDisplayPanel().getWidth() - MARGIN_FOR_LIVE_ICON));
+        getDisplayPanel().setHeading(titleLabel);
+        this.setPrefWidth(MAX_PRES_PREVIEW_WIDTH + MARGIN_AROUND_PRES_PREVIEW);
 
         isLive = presentation.getPresentationMetadata().getLive();
 
@@ -45,6 +53,10 @@ public class PresentationPanel extends PreviewPanel {
         StackPane bodyPane = new StackPane(preview);
         getDisplayPanel().setBody(bodyPane);
         getDisplayPanel().setFooter(new Label("Subject: " + presentation.getSubject().getSubjectName()));
+
+        liveIcon = new ImageView(new Image("file:projectResources/icons/live_icon.png"));
+        StackPane.setAlignment(liveIcon, Pos.TOP_RIGHT);
+        StackPane.setMargin(liveIcon, new Insets(2, 4, 2, 4));
 
         Tooltip tooltip = new Tooltip("Title: " + getPresentation().getDocumentTitle() + "\n" +
                                         "Author: " + getPresentation().getAuthor() + "\n" +
@@ -81,17 +93,11 @@ public class PresentationPanel extends PreviewPanel {
 
         try {
             if(isLive) {
-                //Terrible hack to circumvent padding set by the bootstrap
-                ImageView liveIcon = new ImageView(new Image("file:projectResources/icons/live_icon.png"));
                 this.getChildren().add(liveIcon);
-                StackPane.setAlignment(liveIcon, Pos.TOP_LEFT);
-                StackPane.setMargin(liveIcon, new Insets(2, 0, 2, 4));
-                getDisplayPanel().setText("       Title: " + presentation.getDocumentTitle());
             } else {
-                getDisplayPanel().setText("Title: " + presentation.getDocumentTitle());
+                this.getChildren().remove(liveIcon);
             }
-
-        } catch (NullPointerException e) {
+        } catch (NullPointerException | IllegalArgumentException e) {
             //Do nothing
         }
     }

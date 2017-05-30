@@ -14,6 +14,7 @@ public class DashModule {
 
     private final String moduleName;
     private final int moduleID;
+
     private final String moduleDescription;
     private final Subject subject;
     private final Time timeLastUpdated;
@@ -64,4 +65,10 @@ public class DashModule {
 
     @Override
     public String toString() { return moduleName; }
+
+    public String getModuleDescription() { return moduleDescription; }
+
+    public Time getTimeLastUpdated() { return timeLastUpdated; }
+
+    public Timestamp getTimeCreated() { return timeCreated; }
 }
