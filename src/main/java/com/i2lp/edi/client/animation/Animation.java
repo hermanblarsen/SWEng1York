@@ -1,10 +1,14 @@
 package com.i2lp.edi.client.animation;
 
 
+import javafx.animation.Transition;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.util.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 
 /**
  * Created by amriksadhra on 02/03/2017.
@@ -22,6 +26,8 @@ public abstract class Animation {
 
     Node coreNodeToAnimate;
     protected Duration duration; //The duration of any transition
+    protected Transition animation;
+
 
     public  Animation(){
     }
@@ -45,5 +51,9 @@ public abstract class Animation {
 
     public Duration getDuration() {
         return duration;
+    }
+
+    public void setOnFinish(EventHandler<ActionEvent> handler){
+        animation.setOnFinished(handler);
     }
 }

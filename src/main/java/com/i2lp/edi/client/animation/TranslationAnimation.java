@@ -38,14 +38,14 @@ public class TranslationAnimation extends Animation{
         if(!scaleSet){
             logger.error("Animation played before scale was set before calling play");
         }
-        TranslateTransition transition = new TranslateTransition(duration, getCoreNodeToAnimate());
-        transition.setFromX(startX*width);
-        transition.setFromY(startY*height);
-        transition.setToX(endX*width);
-        transition.setToY(endY*height);
+        animation = new TranslateTransition(duration, getCoreNodeToAnimate());
+        ((TranslateTransition)animation).setFromX(startX*width);
+        ((TranslateTransition)animation).setFromY(startY*height);
+        ((TranslateTransition)animation).setToX(endX*width);
+        ((TranslateTransition)animation).setToY(endY*height);
 
-        transition.setCycleCount(1);
-        transition.play();
+        animation.setCycleCount(1);
+        animation.play();
     }
 
     public void setStartX(double startX) {

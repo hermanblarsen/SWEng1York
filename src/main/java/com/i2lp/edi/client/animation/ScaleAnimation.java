@@ -22,15 +22,15 @@ public class ScaleAnimation extends Animation{
 
     @Override
     public void play() {
-        ScaleTransition transition = new ScaleTransition(duration, getCoreNodeToAnimate());
-        transition.setFromX(startScale);
-        transition.setFromY(startScale);
+        animation = new ScaleTransition(duration, getCoreNodeToAnimate());
+        ((ScaleTransition)animation).setFromX(startScale);
+        ((ScaleTransition)animation).setFromY(startScale);
 
-        transition.setToX(endScale);
-        transition.setToY(endScale);
+        ((ScaleTransition)animation).setToX(endScale);
+        ((ScaleTransition)animation).setToY(endScale);
 
-        transition.setCycleCount(1);
-        transition.play();
+        animation.setCycleCount(1);
+        animation.play();
     }
 
     public void setStartScale(double startScale) {

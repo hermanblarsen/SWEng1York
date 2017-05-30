@@ -22,12 +22,12 @@ public class OpacityAnimation extends Animation{
 
     @Override
     public void play() {
-        FadeTransition transition = new FadeTransition(duration, getCoreNodeToAnimate());
-        transition.setFromValue(startOpacity);
-        transition.setToValue(endOpacity);
+        animation = new FadeTransition(duration, getCoreNodeToAnimate());
+        ((FadeTransition)animation).setFromValue(startOpacity);
+        ((FadeTransition)animation).setToValue(endOpacity);
 
-        transition.setCycleCount(1);
-        transition.play();
+        animation.setCycleCount(1);
+        animation.play();
     }
 
     public void setStartOpacity(double startOpacity) {
