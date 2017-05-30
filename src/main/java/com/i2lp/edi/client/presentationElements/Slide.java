@@ -33,7 +33,7 @@ public class Slide extends Pane {
 
     protected int slideID;
 
-    int currentSequenceNumber = 1;
+    int currentSequenceNumber = 0;
     int maxSequenceNumber = 0;
 
 

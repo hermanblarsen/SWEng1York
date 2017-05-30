@@ -167,20 +167,17 @@ public class SocketClient {
                     if (ediManager.getPresentationManager() != null) {//If there is a presentation
                         if (ediManager.getUserData().getUserType().equals("student")) {//If we're a student
                             if (ediManager.getPresentationManager().getPresentationElement().getPresentationMetadata().getLive()) {//In a live presentation
-                                //current_slide_states[0] = current slide number, [1] = current sequence number
-                                int[] current_slide_states = getCurrentSlideForPresentation(ediManager.getPresentationManager().getPresentationElement().getPresentationMetadata().getPresentationID());
+                                Integer[] current_slide_states = getCurrentSlideForPresentation(ediManager.getPresentationManager().getPresentationElement().getPresentationMetadata().getPresentationID());
+                                if((current_slide_states[0] == -1)&&(current_slide_states[1] == -1)){
+                                    logger.info("Teacher has left the sesh. We should probably do something with this information");
+                                    return;
+                                }
                                 //TODO: Enable undocking (unsync?) of Teacher/Student slide movement using UI toggle
                                 if ((ediManager.getPresentationManager().getCurrentSlideNumber() != current_slide_states[0]) || (ediManager.getPresentationManager().getPresentationElement().getSlide(current_slide_states[0]).getCurrentSequenceNumber() != current_slide_states[1])) {
-                                    if ((current_slide_states[0] == 0) && (current_slide_states[1] == 0)) {
-                                        //TODO: SESSION END Do something more useful here
-                                        logger.info("Server ended session. We should probs do the same.");
-                                        return;
-                                    }
                                     //If the current slide number or sequence number has changed, move to it
                                     Platform.runLater(() -> {
-                                        ediManager.getPresentationManager().goToSlideElement(current_slide_states[0], current_slide_states[1]);
+                                        ediManager.getPresentationManager().goToSlideElement(current_slide_states);
                                     });
-
                                 }
                             }
                         }
@@ -611,11 +608,11 @@ public class SocketClient {
         statementThread.start();
     }
 
-    public int[] getCurrentSlideForPresentation(int presentationID) {
-        int[] toReturn = new int[2];
+    public Integer[] getCurrentSlideForPresentation(int presentationID) {
+        Integer[] toReturn = new Integer[2];
 
-        int currentSlide = 0;
-        int currentSequenceNumber = 0;
+        Integer currentSlide = 0;
+        Integer currentSequenceNumber = 0;
 
         try (PGConnection connection = (PGConnection) dataSource.getConnection()) {
             PreparedStatement statement = connection.prepareStatement("SELECT current_slide_number, current_sequence_number FROM presentations WHERE presentation_id = ?;");
@@ -627,8 +624,11 @@ public class SocketClient {
             ResultSet rs = statement.executeQuery();
 
             while (rs.next()) {
+
                 currentSlide = rs.getInt("current_slide_number");
+                if(rs.wasNull()) currentSlide = -1;
                 currentSequenceNumber = rs.getInt("current_sequence_number");
+                if(rs.wasNull()) currentSequenceNumber = -1;
             }
 
             statement.close();

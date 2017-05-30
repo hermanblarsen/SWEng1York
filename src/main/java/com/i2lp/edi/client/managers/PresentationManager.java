@@ -229,6 +229,9 @@ public abstract class PresentationManager {
 
         if (presentationElement.isAutoplayPresentation()) {
             autoPlay();
+        } else {
+            //Move to StartSequence 1
+            slideAdvance(presentationElement, Slide.SLIDE_FORWARD);
         }
 
         beginLiveSession();
@@ -242,8 +245,8 @@ public abstract class PresentationManager {
                 } else if (this instanceof PresentationManagerStudent) {
                     ediManager.getSocketClient().setUserActivePresentation(ediManager.getPresentationManager().getPresentationElement().getPresentationMetadata().getPresentationID(), ediManager.getUserData().getUserID());
                     //Go to current slide of teacher
-                    int[] current_slide_states = ediManager.getSocketClient().getCurrentSlideForPresentation(ediManager.getPresentationManager().getPresentationElement().getPresentationMetadata().getPresentationID());
-                    ediManager.getPresentationManager().goToSlideElement(current_slide_states[0], current_slide_states[1]);
+                    Integer[] current_slide_states = ediManager.getSocketClient().getCurrentSlideForPresentation(ediManager.getPresentationManager().getPresentationElement().getPresentationMetadata().getPresentationID());
+                    ediManager.getPresentationManager().goToSlideElement(current_slide_states);
                 }
             }
         }
@@ -424,7 +427,7 @@ public abstract class PresentationManager {
                     //If we are live, send updated current slide to database
                     if (presentationElement.getPresentationMetadata().getLive()) {
                         if (this instanceof PresentationManagerTeacher) {
-                            ediManager.getSocketClient().setCurrentSlideAndSequenceForPresentation(presentationElement.getPresentationMetadata().getPresentationID(), currentSlideNumber + 1, presentationElement.getSlide(currentSlideNumber).getCurrentSequenceNumber());
+                            ediManager.getSocketClient().setCurrentSlideAndSequenceForPresentation(presentationElement.getPresentationMetadata().getPresentationID(), currentSlideNumber, presentationElement.getCurrentSlide().getCurrentSequenceNumber());
                         }
                     }
                 }
@@ -707,7 +710,6 @@ public abstract class PresentationManager {
     }
 
     public int slideAdvance(Presentation presentationToAdvance, int direction) {
-        //Initialise this with something more appropriate
         int presentationStatus = Presentation.SAME_SLIDE;
         int changeStatus;
         if (direction == Slide.SLIDE_FORWARD) {
@@ -726,14 +728,13 @@ public abstract class PresentationManager {
                         displayCurrentSlide();
                     }
                 } else if (changeStatus == Slide.SLIDE_PRE_CHANGE) {
-                    //Userful state for Thumbnail generation
+                    //Useful state for Thumbnail generation
                     presentationStatus = Presentation.SLIDE_LAST_ELEMENT;
                 }
             } else {//If on last slide, as == maxSlideNumber
                 logger.info("Reached final slide: " + presentationToAdvance.getMaxSlideNumber());
                 presentationStatus = Presentation.PRESENTATION_FINISH;
             }
-
         } else if (direction == Slide.SLIDE_BACKWARD) {
             //If we're not at start of presentation
             if (currentSlideNumber >= 0) {
@@ -756,6 +757,10 @@ public abstract class PresentationManager {
             }
         }
         presentationToAdvance.setCurrentSlide(presentationToAdvance.getSlideList().get(currentSlideNumber));
+
+        if ((presentationToAdvance.getCurrentSlide().getCurrentSequenceNumber() == 0) && (currentSlideNumber != 0))
+            slideAdvance(presentationToAdvance, direction);
+
         if (commentPanel != null) commentPanel.setSlide(this.presentationElement.getCurrentSlide());
         return presentationStatus;
     }
@@ -880,10 +885,6 @@ public abstract class PresentationManager {
             if (presentationElement.getPresentationMetadata() != null) {//If the presentation is not locally loaded
                 if (presentationElement.getPresentationMetadata().getLive()) {
                     if (this instanceof PresentationManagerTeacher) {
-                        //TODO: End Presentation Properly
-                        //Update Presentation record to offline
-                        ediManager.getSocketClient().setPresentationLive(presentationElement.getPresentationMetadata().getPresentationID(), false);
-                        ediManager.getSocketClient().setCurrentSlideAndSequenceForPresentation(presentationElement.getPresentationMetadata().getPresentationID(), 0, 0);
                         presentationSession.endSession();
                     } else if (this instanceof PresentationManagerStudent) {
                         //TODO: Do other session termination stuff
@@ -940,26 +941,41 @@ public abstract class PresentationManager {
         resize();
     }
 
-    public void goToSlideElement(int targetSlideNumber, int targetElementNumber) {
-        logger.info("Requested move to Slide: " + targetSlideNumber + " Element: " + targetElementNumber);
-        goToSlide(targetSlideNumber);
-        goToElement(targetElementNumber);
+    //targetPresentationState[0] = current slide number, [1] = current sequence number
+    public boolean goToSlideElement(Integer[] targetPresentationState) {
+        boolean successState = false;
+
+        logger.info("Requested move to Slide: " + targetPresentationState[0] + " Element: " + targetPresentationState[1]);
+        //If moving to target slide succeeds, move to target Element
+        if (goToSlide(targetPresentationState[0])) {
+            successState = goToElement(targetPresentationState[1]);
+        } else {
+            successState = false;
+        }
+
+        return successState;
     }
 
-    public void goToElement(int targetElementNumber) {
+    public boolean goToElement(int targetElementNumber) {
         int direction = Slide.SLIDE_NO_MOVE;
         int currentSequenceNumber = presentationElement.getSlide(currentSlideNumber).getCurrentSequenceNumber();
 
         //Check TargetElement number exists
-        if (currentSequenceNumber == targetElementNumber) return;
+        if (currentSequenceNumber == targetElementNumber) return true;
         else if (currentSequenceNumber > targetElementNumber) direction = Slide.SLIDE_BACKWARD;
         else if (currentSequenceNumber < targetElementNumber) direction = Slide.SLIDE_FORWARD;
 
+        //Attempt to stop infinite loops (defense against faulty controlpresentation logic)
+        int numElements = presentationElement.getSlide(currentSlideNumber).getMaxSequenceNumber();
+        int i = 0;
+
         do {
             elementAdvance(presentationElement.getSlide(currentSlideNumber), direction);
+           if(i++ == numElements) return false;
         }
         while (presentationElement.getSlide(currentSlideNumber).getCurrentSequenceNumber() != targetElementNumber);
 
+        return true;
     }
 
     /**
@@ -968,36 +984,28 @@ public abstract class PresentationManager {
      * @param targetSlideNumber Slide to traverse to.
      * @author Amrik Sadhra
      */
-    public void goToSlide(int targetSlideNumber) {
+    public boolean goToSlide(int targetSlideNumber) {
         //If target slide invalid, do nothing and log warning
         if ((targetSlideNumber < 0) || (targetSlideNumber > presentationElement.getMaxSlideNumber())) {
             logger.warn("Target slide number lies outside that which is available in this presentation. Modify XML to account for this.");
-            return;
+            return false;
         }
-        boolean targetToggle = false;
-        //If we need to go backwards, go backwards
-        if (currentSlideNumber + 2 == targetSlideNumber || currentSlideNumber == targetSlideNumber) {
 
-            if (targetSlideNumber < currentSlideNumber) {
-                System.out.println("BACK");
-                slideAdvance(presentationElement, Slide.SLIDE_BACKWARD);
-            } else {
-                slideAdvance(presentationElement, Slide.SLIDE_FORWARD);
-            }
-            targetToggle = true;
-        }
-        if (targetSlideNumber < currentSlideNumber) { // && targetToggle == false
-            while (currentSlideNumber != targetSlideNumber - 1) {
+
+        if (targetSlideNumber < currentSlideNumber) {
+            while (currentSlideNumber != targetSlideNumber) {
                 slideAdvance(presentationElement, Slide.SLIDE_BACKWARD);
             }
         } else if (targetSlideNumber > currentSlideNumber) { //If we need to go forwards, go forwards
-            while (currentSlideNumber != targetSlideNumber - 1) {
+            while (currentSlideNumber != targetSlideNumber) {
                 slideAdvance(presentationElement, Slide.SLIDE_FORWARD);
             }
         }
 
         //Update progress bar
         slideProgress(presentationElement);
+
+        return true;
     }
 
     private void setFullscreen(boolean fullscreen) {
