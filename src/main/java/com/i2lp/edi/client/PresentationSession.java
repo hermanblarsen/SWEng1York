@@ -28,7 +28,7 @@ public class PresentationSession {
         this.ediManager = ediManager;
 
         //Update Question Queue
-        setQuestionQueue(ediManager.getSocketClient().getQuestionsForPresentation(ediManager.getPresentationManager().getPresentationElement().getServerSideDetails().getPresentationID()));
+        setQuestionQueue(ediManager.getSocketClient().getQuestionsForPresentation(ediManager.getPresentationManager().getPresentationElement().getPresentationMetadata().getPresentationID()));
 
         startDate = new Date();
         logger.info("Live Presentation Session beginning at " + startDate.toString());

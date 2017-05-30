@@ -151,9 +151,9 @@ public class SocketClient {
                 case "users":
                     if (ediManager.getUserData().getUserType().equals("teacher")) {//If we're a teacher
                         if (ediManager.getPresentationManager() != null) {//And in a presentation
-                            if (ediManager.getPresentationManager().getPresentationElement().getServerSideDetails().getLive()) {//And that presentation is live
+                            if (ediManager.getPresentationManager().getPresentationElement().getPresentationMetadata().getLive()) {//And that presentation is live
                                 logger.info("Updating active user list for live presentation.");
-                                ediManager.getPresentationManager().getPresentationSession().setActiveUsers(getPresentationActiveUsers(ediManager.getPresentationManager().getPresentationElement().getServerSideDetails().getPresentationID()));//Update list of active users in that presentation
+                                ediManager.getPresentationManager().getPresentationSession().setActiveUsers(getPresentationActiveUsers(ediManager.getPresentationManager().getPresentationElement().getPresentationMetadata().getPresentationID()));//Update list of active users in that presentation
                             }
                         }
                     }
@@ -166,9 +166,9 @@ public class SocketClient {
                     }
                     if (ediManager.getPresentationManager() != null) {//If there is a presentation
                         if (ediManager.getUserData().getUserType().equals("student")) {//If we're a student
-                            if (ediManager.getPresentationManager().getPresentationElement().getServerSideDetails().getLive()) {//In a live presentation
+                            if (ediManager.getPresentationManager().getPresentationElement().getPresentationMetadata().getLive()) {//In a live presentation
                                 //current_slide_states[0] = current slide number, [1] = current sequence number
-                                int[] current_slide_states = getCurrentSlideForPresentation(ediManager.getPresentationManager().getPresentationElement().getServerSideDetails().getPresentationID());
+                                int[] current_slide_states = getCurrentSlideForPresentation(ediManager.getPresentationManager().getPresentationElement().getPresentationMetadata().getPresentationID());
                                 //TODO: Enable undocking (unsync?) of Teacher/Student slide movement using UI toggle
                                 if ((ediManager.getPresentationManager().getCurrentSlideNumber() != current_slide_states[0]) || (ediManager.getPresentationManager().getPresentationElement().getSlide(current_slide_states[0]).getCurrentSequenceNumber() != current_slide_states[1])) {
                                     if ((current_slide_states[0] == 0) && (current_slide_states[1] == 0)) {
@@ -199,9 +199,9 @@ public class SocketClient {
 
                 case "questions":
                     if (ediManager.getUserData().getUserType().equals("teacher")) {//If we're a teacher
-                        if (ediManager.getPresentationManager().getPresentationElement().getServerSideDetails().getLive()) {//In a live presentation
+                        if (ediManager.getPresentationManager().getPresentationElement().getPresentationMetadata().getLive()) {//In a live presentation
                             logger.info("Updating QuestionQueue for current presentation");
-                            ediManager.getPresentationManager().getPresentationSession().setQuestionQueue(ediManager.getSocketClient().getQuestionsForPresentation(ediManager.getPresentationManager().getPresentationElement().getServerSideDetails().getPresentationID())); //Update the question queue in the session
+                            ediManager.getPresentationManager().getPresentationSession().setQuestionQueue(ediManager.getSocketClient().getQuestionsForPresentation(ediManager.getPresentationManager().getPresentationElement().getPresentationMetadata().getPresentationID())); //Update the question queue in the session
                         }
                     }
                     break;

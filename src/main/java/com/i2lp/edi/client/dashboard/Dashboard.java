@@ -161,46 +161,49 @@ public abstract class Dashboard extends Application {
         platformTitleHBox.setAlignment(Pos.CENTER);
         platformTitleHBox.getChildren().add(platformTitle);
 
-        if (this instanceof TeacherDashboard) {
-            HBox openAddButtonsHBox = new HBox(10);
+        HBox openAddButtonsHBox = new HBox(10);
 
-            final FileChooser fileChooser = new FileChooser();
-            FileChooser.ExtensionFilter xmlExtensionFilter =
-                    new FileChooser.ExtensionFilter("XML Presentations (*.XML)", "*.xml", "*.XML");
-            fileChooser.getExtensionFilters().add(xmlExtensionFilter);
-            fileChooser.setSelectedExtensionFilter(xmlExtensionFilter);
-            fileChooser.setInitialDirectory(new File("projectResources/sampleFiles/xml"));
-            //fileChooser.setInitialDirectory(new File(System.getProperty("user.home"))); //TODO reinstate when tested
-            fileChooser.setTitle("Open Presentation");
+        final FileChooser fileChooser = new FileChooser();
+        FileChooser.ExtensionFilter xmlExtensionFilter =
+                new FileChooser.ExtensionFilter("XML Presentations (*.XML)", "*.xml", "*.XML");
+        fileChooser.getExtensionFilters().add(xmlExtensionFilter);
+        fileChooser.setSelectedExtensionFilter(xmlExtensionFilter);
+        fileChooser.setInitialDirectory(new File("projectResources/sampleFiles/xml"));
+        //fileChooser.setInitialDirectory(new File(System.getProperty("user.home"))); //TODO reinstate when tested
+        fileChooser.setTitle("Open Presentation");
 
-            Button openPresButton = new Button("Open Presentation", new ImageView(new Image("file:projectResources/icons/arrow-down.png", 10, 10, true, true)));
-            openPresButton.getStyleClass().setAll("btn", "btn-default");
-            openPresButton.setOnAction(event -> {
-                ContextMenu menu = new ContextMenu();
+        Button openPresButton = new Button("Open Presentation", new ImageView(new Image("file:projectResources/icons/arrow-down.png", 10, 10, true, true)));
+        openPresButton.getStyleClass().setAll("btn", "btn-default");
+        openPresButton.setOnAction(event -> {
+            ContextMenu menu = new ContextMenu();
 
-                MenuItem local = new MenuItem("From this computer");
-                local.setOnAction(event1 -> {
-                    Node source = (Node) event.getSource();
-                    Window stage = source.getScene().getWindow();
+            MenuItem local = new MenuItem("From this computer");
+            local.setOnAction(event1 -> {
+                Node source = (Node) event.getSource();
+                Window stage = source.getScene().getWindow();
 
 
-                    File file = fileChooser.showOpenDialog(stage);
-                    if (file != null) {
-                        ParserXML parserXML = new ParserXML(file.getPath());
-                        launchPresentation(parserXML.parsePresentation());
-                    } else logger.info("No presentation was selected");
-                });
-
-                MenuItem online = new MenuItem("Remotely (from HTTP)");
-                online.setOnAction(event1 -> {
-                    //For testing you can use :https://raw.githubusercontent.com/hermanblarsen/SWEng1York/master/projectResources/sampleFiles/xml/i2lpSampleXml.xml?token=AYLAhZswVfz-zJFrEDKoquw1Eg0XybCKks5ZNcqAwA%3D%3D
-                    openOnlineXMLSelectorWindow("");
-                });
-
-                menu.getItems().addAll(local, online);
-                menu.show(openPresButton, Side.BOTTOM, 0, 0);
+                File file = fileChooser.showOpenDialog(stage);
+                if (file != null) {
+                    ParserXML parserXML = new ParserXML(file.getPath());
+                    launchPresentation(parserXML.parsePresentation());
+                } else logger.info("No presentation was selected");
             });
 
+            MenuItem online = new MenuItem("Remotely (from HTTP)");
+            online.setOnAction(event1 -> {
+                //For testing you can use :https://raw.githubusercontent.com/hermanblarsen/SWEng1York/master/projectResources/sampleFiles/xml/i2lpSampleXml.xml?token=AYLAhZswVfz-zJFrEDKoquw1Eg0XybCKks5ZNcqAwA%3D%3D
+                openOnlineXMLSelectorWindow("");
+            });
+
+            menu.getItems().addAll(local, online);
+            menu.show(openPresButton, Side.BOTTOM, 0, 0);
+        });
+
+        openAddButtonsHBox.getChildren().add(openPresButton);
+        topPanel.getChildren().add(openAddButtonsHBox);
+
+        if (this instanceof TeacherDashboard) {
             addToServerButton = new Button("Add pres to server");
             addToServerButton.getStyleClass().setAll("btn", "btn-success");
             addToServerButton.setOnAction(event -> {
@@ -251,8 +254,8 @@ public abstract class Dashboard extends Application {
                 addToServerStage.show();
             });
 
-            openAddButtonsHBox.getChildren().addAll(openPresButton, addToServerButton);
-            topPanel.getChildren().addAll(openAddButtonsHBox);
+            openAddButtonsHBox.getChildren().add(addToServerButton);
+
         }
 
         topPanel.getChildren().add(platformTitleHBox);
@@ -334,6 +337,8 @@ public abstract class Dashboard extends Application {
 
                 vbox.getChildren().add(modulesScrollPane);
                 border.setCenter(vbox);
+
+                filterBy(filterSubjects);
                 break;
 
             case SEARCH_ALL:
@@ -354,6 +359,8 @@ public abstract class Dashboard extends Application {
                 searchScrollPane.getStyleClass().add("edge-to-edge");
 
                 border.setCenter(searchScrollPane);
+
+                filterBy(filterSubjects);
                 break;
 
             case MODULE:
@@ -362,7 +369,6 @@ public abstract class Dashboard extends Application {
                 backButton.getStyleClass().setAll("btn", "btn-default");
                 backButton.setOnAction(event -> {
                     goToState(DashboardState.TOP_LEVEL);
-                    filterBy(null);
                 });
                 Text moduleText = new Text(selectedModule.getSubject().getSubjectName() + " -> " + selectedModule.getModuleName());
                 moduleText.getStyleClass().setAll("h4");
@@ -374,10 +380,10 @@ public abstract class Dashboard extends Application {
                 borderPane.setRight(dummy);
                 borderPane.setCenter(moduleText);
 
-                filterBy(selectedModule);
-
                 vbox.getChildren().addAll(borderPane, presentationsScrollPane);
                 border.setCenter(vbox);
+
+                filterBy(selectedModule);
                 break;
 
             default:
@@ -444,27 +450,27 @@ public abstract class Dashboard extends Application {
             selectAllButton.setMaxWidth(Double.MAX_VALUE);
             selectAllButton.setAlignment(Pos.CENTER);
             selectAllButton.setOnAction(event -> {
-                boolean allDeselected = true;
+                boolean allSelected = true;
 
                 for (CheckBox checkBox : subjectCheckboxes) {
-                    if (checkBox.isSelected()) {
-                        allDeselected = false;
+                    if (!checkBox.isSelected()) {
+                        allSelected = false;
                         break;
                     }
                 }
 
-                if (allDeselected) {
-                    for (CheckBox checkBox : subjectCheckboxes) {
-                        checkBox.setSelected(true);
-                    }
-
-                    selectAllButton.setText("Deselect all");
-                } else {
+                if (allSelected) {
                     for (CheckBox checkBox : subjectCheckboxes) {
                         checkBox.setSelected(false);
                     }
 
                     selectAllButton.setText("Select all");
+                } else {
+                    for (CheckBox checkBox : subjectCheckboxes) {
+                        checkBox.setSelected(true);
+                    }
+
+                    selectAllButton.setText("Deselect all");
                 }
 
                 filterBy(null);
@@ -674,6 +680,23 @@ public abstract class Dashboard extends Application {
         setupSubjectPanels();
         setupModulePanels();
         setupPresentationPanels();
+
+        if (currentState != null) {
+            if (currentState == DashboardState.SEARCH_ALL || currentState == DashboardState.TOP_LEVEL) {
+                filterBy(filterSubjects);
+            } else {
+                filterBy(selectedModule);
+            }
+        }
+
+        if (selectedPresPanel != null) {
+            setSelectedPreviewPanel(PresentationPanel.findInArray(selectedPresPanel.getPresentation().getPresentationMetadata().getPresentationID(), presentationPanels), true);
+        }
+        if (selectedModulePanel != null) {
+            for (SubjectPanel panel : subjectPanels) {
+                setSelectedPreviewPanel(ModulePanel.findInArray(selectedModulePanel.getModule().getModuleID(), panel.getModulePanels()), true);
+            }
+        }
     }
 
     private void setupSubjectPanels() {
@@ -695,8 +718,6 @@ public abstract class Dashboard extends Application {
 
         if (subjectSortCombo != null)
             sortSubjects(subjectSortCombo.getValue());
-
-        filterBy(filterSubjects);
     }
 
     private void setupModulePanels() {
@@ -706,12 +727,10 @@ public abstract class Dashboard extends Application {
             try {
                 ModulePanel modulePanel = new ModulePanel(module, subjectPanel);
                 modulePanel.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
-                    if (event.getButton() == MouseButton.PRIMARY) {
-                        if (modulePanel.isSelected()) {
-                            goToState(DashboardState.MODULE);
-                        } else {
-                            setSelectedPreviewPanel(modulePanel, true);
-                        }
+                    if (modulePanel.isSelected()) {
+                        goToState(DashboardState.MODULE);
+                    } else {
+                        setSelectedPreviewPanel(modulePanel, true);
                     }
                 });
             } catch (NullPointerException e) {
@@ -754,9 +773,12 @@ public abstract class Dashboard extends Application {
                     cMenu.getItems().add(open);
 
                     if (this instanceof TeacherDashboard) {
-                        MenuItem goLive = new MenuItem("Toggle Live Mode");
-                        goLive.setOnAction(goLiveEvent -> toggleLive(presentationPanel));
-                        cMenu.getItems().add(goLive);
+                        MenuItem openAndGoLive = new MenuItem("Open & Go Live");
+                        openAndGoLive.setOnAction(goLiveEvent -> {
+                            setLive(presentationPanel, true);
+                            launchPresentation(presentationPanel.getPresentation());
+                        });
+                        cMenu.getItems().add(openAndGoLive);
 
                         MenuItem edit = new MenuItem("Edit");
                         edit.setOnAction(editEvent -> showPresentationEditor(presentationPanel.getPresentation().getPath()));
@@ -788,25 +810,23 @@ public abstract class Dashboard extends Application {
         if (presSortCombo != null)
             sortPresentations(presSortCombo.getValue());
 
-        if (selectedModule != null)
-            filterBy(selectedModule);
     }
 
-    private void toggleLive(PresentationPanel presPanel) {
-        if (presPanel.isLive()) {
+    private void setLive(PresentationPanel presPanel, boolean live) {
+        if (!live && presPanel.isLive()) {
             presPanel.setLive(false);
-            if (ediManager.getSocketClient().setPresentationLive(presPanel.getPresentation().getServerSideDetails().getPresentationID(), false)) {
-                //TODO: Stub for succesful go offline
+            if (ediManager.getSocketClient().setPresentationLive(presPanel.getPresentation().getPresentationMetadata().getPresentationID(), false)) {
+                //TODO: Stub for successful go offline
             } else {
                 //TODO: Stub for unsuccessful go offline
             }
-        } else {
+        } else if (live && !presPanel.isLive()) {
             presPanel.setLive(true);
             //Update server database to indicate presentation is Live
-            if (ediManager.getSocketClient().setPresentationLive(presPanel.getPresentation().getServerSideDetails().getPresentationID(), true)) {
+            if (ediManager.getSocketClient().setPresentationLive(presPanel.getPresentation().getPresentationMetadata().getPresentationID(), true)) {
                 //TODO: Stub for successful go live
             } else {
-                //TODO: Stub for unsuccesfful go live
+                //TODO: Stub for unsuccessful go live
             }
         }
     }
@@ -815,11 +835,13 @@ public abstract class Dashboard extends Application {
         if (previewPanel instanceof PresentationPanel) {
             if (setSelected) {
                 previewPanel.setSelected(true);
-                if (selectedPresPanel != null) {
+                if (selectedPresPanel != null && selectedPresPanel != previewPanel) {
                     selectedPresPanel.setSelected(false);
                 }
                 selectedPresPanel = (PresentationPanel) previewPanel;
-                setSelectedPreviewPanel(selectedModulePanel, false);
+                if (currentState == DashboardState.SEARCH_ALL) {
+                    setSelectedPreviewPanel(selectedModulePanel, false);
+                }
             } else {
                 previewPanel.setSelected(false);
                 selectedPresPanel = null;
@@ -829,12 +851,14 @@ public abstract class Dashboard extends Application {
         } else if (previewPanel instanceof ModulePanel) {
             if (setSelected) {
                 previewPanel.setSelected(true);
-                if (selectedModulePanel != null) {
+                if (selectedModulePanel != null && selectedModulePanel != previewPanel) {
                     selectedModulePanel.setSelected(false);
                 }
                 selectedModulePanel = (ModulePanel) previewPanel;
                 selectedModule = selectedModulePanel.getModule();
-                setSelectedPreviewPanel(selectedPresPanel, false);
+                if (currentState == DashboardState.SEARCH_ALL) {
+                    setSelectedPreviewPanel(selectedPresPanel, false);
+                }
             } else {
                 previewPanel.setSelected(false);
                 selectedModulePanel = null;
@@ -846,7 +870,7 @@ public abstract class Dashboard extends Application {
         Presentation presentationToDelete = previewPanel.getPresentation();
 
         //Try to remove the presentation from the server
-        boolean successful_removal = ediManager.getPresentationLibraryManager().removePresentation(presentationToDelete.getServerSideDetails().getPresentationID(), presentationToDelete.getServerSideDetails().getModule_id());
+        boolean successful_removal = ediManager.getPresentationLibraryManager().removePresentation(presentationToDelete.getPresentationMetadata().getPresentationID(), presentationToDelete.getPresentationMetadata().getModule_id());
 
         if (successful_removal) {
             updateAvailablePresentations();

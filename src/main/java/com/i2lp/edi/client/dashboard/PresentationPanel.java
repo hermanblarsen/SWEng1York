@@ -28,7 +28,7 @@ public class PresentationPanel extends PreviewPanel {
         this.setText("Title: " + this.presentation.getDocumentTitle());
         this.setPrefWidth(MAX_PRES_PREVIEW_WIDTH + 10);
 
-        isLive = presentation.getServerSideDetails().getLive();
+        isLive = presentation.getPresentationMetadata().getLive();
 
         double previewWidth = MAX_PRES_PREVIEW_WIDTH;
 
@@ -64,7 +64,7 @@ public class PresentationPanel extends PreviewPanel {
     public boolean isLive() { return isLive; }
 
     public void setLive(boolean live) {
-        presentation.getServerSideDetails().setLive(live);
+        presentation.getPresentationMetadata().setLive(live);
         isLive = live;
         updateVisibility();
     }
@@ -83,5 +83,15 @@ public class PresentationPanel extends PreviewPanel {
         } catch (NullPointerException e) {
             //Do nothing
         }
+    }
+
+    public static PresentationPanel findInArray(int presentationID, ArrayList<PresentationPanel> arrayList) {
+        for (PresentationPanel panel : arrayList) {
+            if (panel.getPresentation().getPresentationMetadata().getPresentationID() == presentationID) {
+                return panel;
+            }
+        }
+
+        return null;
     }
 }

@@ -58,13 +58,13 @@ public class PresentationManagerStudent extends PresentationManager {
         ta.setWrapText(true);
         border.setCenter(ta);
 
-        //TODO: @Koen Hide this all when in offline mode/presentation not live (check through ediManager.getPresentationManager().getPresentationElement().getServerSideDetails().isLive())
+        //TODO: @Koen Hide this all when in offline mode/presentation not live (check through ediManager.getPresentationManager().getPresentationElement().getPresentationMetadata().isLive())
         Image tick = new Image("file:projectResources/icons/Tick.png", 30, 30, true, true);
         ImageView tickPanel = new ImageView(tick);
         tickPanel.addEventHandler(MouseEvent.MOUSE_CLICKED, evt -> {
             //TODO: Add length limiting to questions
             if(!ta.getText().isEmpty()){
-                if(ediManager.getSocketClient().addQuestionToQuestionQueue(ediManager.getUserData().getUserID(), ediManager.getPresentationManager().getPresentationElement().getServerSideDetails().getPresentationID(), ta.getText(), ediManager.getPresentationManager().getCurrentSlideNumber())){
+                if(ediManager.getSocketClient().addQuestionToQuestionQueue(ediManager.getUserData().getUserID(), ediManager.getPresentationManager().getPresentationElement().getPresentationMetadata().getPresentationID(), ta.getText(), ediManager.getPresentationManager().getCurrentSlideNumber())){
                     logger.info("Question successfully submitted");
                 } else {
                     logger.error("Question did not submit successfully");

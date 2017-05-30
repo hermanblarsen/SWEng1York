@@ -27,7 +27,7 @@ public class Presentation extends Pane {
     protected static Logger logger = LoggerFactory.getLogger(Presentation.class);
 
     //From i2lp:
-    private PresentationMetadata serverSideDetails;
+    private PresentationMetadata presentationMetadata;
     private String documentTitle;
     private int currentSlideNumber;
     private String documentFilePath;
@@ -472,11 +472,11 @@ public class Presentation extends Pane {
 
     public void setModule(DashModule module) { this.module = module; }
 
-    public void setPresentationMetadata(PresentationMetadata serverSideDetails) {
-        this.serverSideDetails = serverSideDetails;
+    public void setPresentationMetadata(PresentationMetadata presentationMetadata) {
+        this.presentationMetadata = presentationMetadata;
     }
 
-    public PresentationMetadata getServerSideDetails() {
-        return serverSideDetails;
+    public PresentationMetadata getPresentationMetadata() {
+        return presentationMetadata;
     }
 }

@@ -59,7 +59,7 @@ public abstract class PresentationManager {
 
     Logger logger = LoggerFactory.getLogger(PresentationManager.class);
 
-    protected EdiManager ediManager;
+    protected final EdiManager ediManager;
     private PresentationSession presentationSession;
 
     protected Scene scene;
@@ -118,6 +118,18 @@ public abstract class PresentationManager {
         presentationStage.setOnCloseRequest(event -> {
             destroyAllElements();
             close();
+
+            try {
+                if (this instanceof PresentationManagerTeacher && getPresentationElement().getPresentationMetadata().getLive()) {
+                    if (ediManager.getSocketClient().setPresentationLive(getPresentationElement().getPresentationMetadata().getPresentationID(), false)) {
+                        //TODO: Stub for successful go offline
+                    } else {
+                        //TODO: Stub for unsuccessful go offline
+                    }
+                }
+            } catch (NullPointerException e) {
+                //Do nothing. NullPointerException will be thrown when closing local presentations as they don't have PresentationMetadata
+            }
         });
 
 
@@ -223,14 +235,14 @@ public abstract class PresentationManager {
     }
 
     private void beginLiveSession() {
-        if (presentationElement.getServerSideDetails() != null) {//If not local presentation
-            if (presentationElement.getServerSideDetails().getLive()) {//If we are live, start up a PresentationSession in which to track connectivity data
+        if (presentationElement.getPresentationMetadata() != null) {//If not local presentation
+            if (presentationElement.getPresentationMetadata().getLive()) {//If we are live, start up a PresentationSession in which to track connectivity data
                 if (this instanceof PresentationManagerTeacher) {
                     presentationSession = new PresentationSession(ediManager);
                 } else if (this instanceof PresentationManagerStudent) {
-                    ediManager.getSocketClient().setUserActivePresentation(ediManager.getPresentationManager().getPresentationElement().getServerSideDetails().getPresentationID(), ediManager.getUserData().getUserID());
+                    ediManager.getSocketClient().setUserActivePresentation(ediManager.getPresentationManager().getPresentationElement().getPresentationMetadata().getPresentationID(), ediManager.getUserData().getUserID());
                     //Go to current slide of teacher
-                    int[] current_slide_states = ediManager.getSocketClient().getCurrentSlideForPresentation(ediManager.getPresentationManager().getPresentationElement().getServerSideDetails().getPresentationID());
+                    int[] current_slide_states = ediManager.getSocketClient().getCurrentSlideForPresentation(ediManager.getPresentationManager().getPresentationElement().getPresentationMetadata().getPresentationID());
                     ediManager.getPresentationManager().goToSlideElement(current_slide_states[0], current_slide_states[1]);
                 }
             }
@@ -270,8 +282,6 @@ public abstract class PresentationManager {
                     while (slideAdvance(presentationElement, Slide.SLIDE_BACKWARD) != Presentation.PRESENTATION_START) ;
                 } else if (keyEvent.getCode().equals(KeyCode.END)) {
                     while (slideAdvance(presentationElement, Slide.SLIDE_FORWARD) != Presentation.PRESENTATION_FINISH) ;
-                } else if (keyEvent.getCode().equals(KeyCode.ESCAPE)) {
-                    presentationStage.close();
                 }
 
                 keyEvent.consume();
@@ -410,11 +420,11 @@ public abstract class PresentationManager {
         if (presentationStatus == Presentation.SLIDE_CHANGE || presentationStatus == Presentation.PRESENTATION_FINISH || presentationStatus == Presentation.PRESENTATION_START || presentationStatus == Presentation.SLIDE_LAST_ELEMENT || presentationStatus == Presentation.SAME_SLIDE) {
             if ((presentationStatus == Presentation.SLIDE_CHANGE) || (presentationStatus == Presentation.SAME_SLIDE) || (presentationStatus == Presentation.SLIDE_LAST_ELEMENT)) {
                 if (presentationStatus == Presentation.SLIDE_CHANGE) logger.info("Changing Slides");
-                if (presentationElement.getServerSideDetails() != null) {//If not local presentation
+                if (presentationElement.getPresentationMetadata() != null) {//If not local presentation
                     //If we are live, send updated current slide to database
-                    if (presentationElement.getServerSideDetails().getLive()) {
+                    if (presentationElement.getPresentationMetadata().getLive()) {
                         if (this instanceof PresentationManagerTeacher) {
-                            ediManager.getSocketClient().setCurrentSlideAndSequenceForPresentation(presentationElement.getServerSideDetails().getPresentationID(), currentSlideNumber + 1, presentationElement.getSlide(currentSlideNumber).getCurrentSequenceNumber());
+                            ediManager.getSocketClient().setCurrentSlideAndSequenceForPresentation(presentationElement.getPresentationMetadata().getPresentationID(), currentSlideNumber + 1, presentationElement.getSlide(currentSlideNumber).getCurrentSequenceNumber());
                         }
                     }
                 }
@@ -867,13 +877,13 @@ public abstract class PresentationManager {
     @SuppressWarnings("FinalizeCalledExplicitly")
     public void close() {
         if (ediManager != null) {//If we have an edimanager instance
-            if (presentationElement.getServerSideDetails() != null) {//If the presentation is not locally loaded
-                if (presentationElement.getServerSideDetails().getLive()) {
+            if (presentationElement.getPresentationMetadata() != null) {//If the presentation is not locally loaded
+                if (presentationElement.getPresentationMetadata().getLive()) {
                     if (this instanceof PresentationManagerTeacher) {
                         //TODO: End Presentation Properly
                         //Update Presentation record to offline
-                        ediManager.getSocketClient().setPresentationLive(presentationElement.getServerSideDetails().getPresentationID(), false);
-                        ediManager.getSocketClient().setCurrentSlideAndSequenceForPresentation(presentationElement.getServerSideDetails().getPresentationID(), 0, 0);
+                        ediManager.getSocketClient().setPresentationLive(presentationElement.getPresentationMetadata().getPresentationID(), false);
+                        ediManager.getSocketClient().setCurrentSlideAndSequenceForPresentation(presentationElement.getPresentationMetadata().getPresentationID(), 0, 0);
                         presentationSession.endSession();
                     } else if (this instanceof PresentationManagerStudent) {
                         //TODO: Do other session termination stuff
@@ -896,7 +906,7 @@ public abstract class PresentationManager {
             slide.setBackground(new Background(new BackgroundFill(Color.valueOf(presentationElement.getTheme().getBackgroundColour()), null, null)));
             displayPane.getChildren().add(slide);
         } else {
-            Label lab = new Label("End of Presentation. Press ESC to exit.");
+            Label lab = new Label("End of Presentation");
             Region bgRegion = new Region();
             bgRegion.setBackground(new Background(new BackgroundFill(Color.web("#34495e"), null, null)));
             slidePane = new StackPane();

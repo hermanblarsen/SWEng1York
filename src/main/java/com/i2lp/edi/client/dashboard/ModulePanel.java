@@ -2,6 +2,7 @@ package com.i2lp.edi.client.dashboard;
 
 import javafx.scene.control.Label;
 import javafx.scene.layout.Pane;
+import org.apache.xpath.operations.Mod;
 
 import java.util.ArrayList;
 
@@ -32,5 +33,15 @@ public class ModulePanel extends PreviewPanel {
         searchableTerms.add(module.getSubject().getSubjectName());
 
         return searchableTerms;
+    }
+
+    public static ModulePanel findInArray(int moduleId, ArrayList<ModulePanel> arrayList) {
+        for (ModulePanel panel : arrayList) {
+            if (panel.getModule().getModuleID() == moduleId) {
+                return panel;
+            }
+        }
+
+        return null;
     }
 }
