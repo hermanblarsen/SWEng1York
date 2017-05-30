@@ -21,13 +21,14 @@ public class PresentationSession {
     private EdiManager ediManager;
     private Presentation activePresentation;
 
+    private PresentationStatistics presentationStatistics;
     private ArrayList<InteractiveElement> interactiveElements;
     private ArrayList<Question> questionQueue;
     private ArrayList<User> activeUsers;
 
     //Configuration Variables for session
 
-    //Use better Date datastructure to store time per slide
+
     private Date startDate;
     private Date endDate;
 
@@ -75,12 +76,23 @@ public class PresentationSession {
     }
 
     public void endSession() {
+        gatherUserStatistics();
+
         endDate = new Date();
         logger.info("Live Presentation session ending. Presentation lasted " + (int) ((endDate.getTime() - startDate.getTime()) / 1000) + " seconds.");
 
         //Update Presentation record to offline
         ediManager.getSocketClient().setPresentationLive(activePresentation.getPresentationMetadata().getPresentationID(), false);
         ediManager.getSocketClient().setCurrentSlideAndSequenceForPresentation(activePresentation.getPresentationMetadata().getPresentationID(), 0, 0);
+    }
+
+    private void gatherUserStatistics(){
+        //Perform a master query over the Interactions table for a specific users interactions
+        //Count Number of responses
+        //Generate ArrayList of UserStatistics
+
+        //For Presentation
+
     }
 
     public ArrayList<User> getActiveUsers() {

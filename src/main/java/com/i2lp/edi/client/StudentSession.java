@@ -61,13 +61,11 @@ public class StudentSession {
         if (setLink) {
             isLinked = false;
             Image unlockIcon = new Image("file:projectResources/icons/unlock.png", 30, 30, true, true);
-            ediManager.getSocketClient().setTeacherStudentSlideSync(false);
             ediManager.getPresentationManager().linkButton.setImage(unlockIcon);
 
         } else {
             isLinked = true;
             Image lockIcon = new Image("file:projectResources/icons/lock.png", 30, 30, true, true);
-            ediManager.getSocketClient().setTeacherStudentSlideSync(true);
             ediManager.getPresentationManager().linkButton.setImage(lockIcon);
             synchroniseWithTeacher();
         }
