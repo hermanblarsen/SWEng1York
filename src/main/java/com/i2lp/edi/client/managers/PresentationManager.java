@@ -87,6 +87,7 @@ public abstract class PresentationManager {
     private Region blackRegion;
     private DrawPane drawPane;
     private ImageView visibilityButton;
+    private ImageView linkButton;
     private Popup colourPopup;
     private CursorState currentCursorState = CursorState.DEFAULT;
     private Pane eraseCursorPane;
@@ -106,6 +107,8 @@ public abstract class PresentationManager {
     private boolean isThumbnailGen = false;
     private boolean isEndPresentation = false;
     private StackPane slidePane;
+    private boolean isLinked = false;
+    private boolean wordCloudActive = false;
 
     public PresentationManager(EdiManager ediManager) {
         this.ediManager = ediManager;
@@ -500,6 +503,20 @@ public abstract class PresentationManager {
         }
     }
 
+    private void setPresentationLink(boolean setLink){
+        if(setLink){
+            isLinked = false;
+            Image unlockIcon = new Image("file:projectResources/icons/unlock.png",30,30,true,true);
+            ediManager.getSocketClient().setTeacherStudentSlideSync(false);
+            linkButton.setImage(unlockIcon);
+        }else{
+            isLinked = true;
+            Image lockIcon = new Image("file:projectResources/icons/lock.png",30,30,true,true);
+            ediManager.getSocketClient().setTeacherStudentSlideSync(true);
+            linkButton.setImage(lockIcon);
+        }
+    }
+
     public HBox addPresentationControls() {
         HBox presControls = new HBox();
         presControls.setStyle("-fx-background-color:transparent");//#34495e
@@ -529,6 +546,23 @@ public abstract class PresentationManager {
             }
         });
 
+
+            String linkIconURL;
+            if(isLinked)
+                linkIconURL = "file:projectResources/icons/lock.png";
+            else
+                linkIconURL = "file:projectResources/icons/unlock.png";
+
+            linkButton = makeCustomButton(linkIconURL,evt->{
+                if(isLinked) {
+                    setPresentationLink(true);
+                }
+                else{
+                    setPresentationLink(false);
+                }
+            });
+
+
         ImageView commentButton = makeCustomButton("file:projectResources/icons/SB_filled.png", event -> toggleCommentsWindow());
 
         ImageView drawButton = makeCustomButton("file:projectResources/icons/draw.png", event -> toggleDrawingMode());
@@ -550,9 +584,12 @@ public abstract class PresentationManager {
         StackPane progressBar = new StackPane();
         this.progressBar.setMinSize(200, 10);
         progressBar.getChildren().addAll(this.progressBar, slideNumber);
+        if(this instanceof PresentationManagerStudent) {
+            presControls.getChildren().addAll(backButton, nextButton, fullScreenButton, linkButton, specificFeats, commentButton, drawButton, visibilityButton, progressBar);
+        }else{
+            presControls.getChildren().addAll(backButton, nextButton, fullScreenButton ,specificFeats, commentButton, drawButton, visibilityButton, progressBar);
 
-        presControls.getChildren().addAll(backButton, nextButton, fullScreenButton, specificFeats, commentButton, drawButton, visibilityButton, progressBar);
-
+        }
         addMouseHandlersToControls(presControls);
 
         presControls.setMaxHeight(PRES_CONTROLS_HEIGHT);
@@ -1120,5 +1157,9 @@ public abstract class PresentationManager {
 
     public int getCurrentSlideNumber() {
         return currentSlideNumber;
+    }
+
+    public void setWordCloudActive(boolean wordCloudActive) {
+        this.wordCloudActive = wordCloudActive;
     }
 }

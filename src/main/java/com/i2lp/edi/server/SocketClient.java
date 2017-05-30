@@ -42,6 +42,7 @@ public class SocketClient {
     private Socket socket;
     //EdiManager
     private EdiManager ediManager;
+    private boolean teacherStudentSlideSync = false;
 
     public static void main(String[] args) {
         //new SocketClient(remoteServerAddress, 8080);
@@ -126,6 +127,10 @@ public class SocketClient {
         socket.connect();
     }
 
+    public void setTeacherStudentSlideSync(boolean teacherStudentSlideSync) {
+        this.teacherStudentSlideSync = teacherStudentSlideSync;
+    }
+
     /**
      * The main controller for remote database updates. We can act appropriately based upon what has updated remotely.
      * e.g. Live responses to the current presentation can be used to update current graph object on slide.
@@ -167,17 +172,19 @@ public class SocketClient {
                     if (ediManager.getPresentationManager() != null) {//If there is a presentation
                         if (ediManager.getUserData().getUserType().equals("student")) {//If we're a student
                             if (ediManager.getPresentationManager().getPresentationElement().getPresentationMetadata().getLive()) {//In a live presentation
-                                Integer[] current_slide_states = getCurrentSlideForPresentation(ediManager.getPresentationManager().getPresentationElement().getPresentationMetadata().getPresentationID());
-                                if((current_slide_states[0] == -1)&&(current_slide_states[1] == -1)){
-                                    logger.info("Teacher has left the sesh. We should probably do something with this information");
-                                    return;
-                                }
-                                //TODO: Enable undocking (unsync?) of Teacher/Student slide movement using UI toggle
-                                if ((ediManager.getPresentationManager().getCurrentSlideNumber() != current_slide_states[0]) || (ediManager.getPresentationManager().getPresentationElement().getSlide(current_slide_states[0]).getCurrentSequenceNumber() != current_slide_states[1])) {
-                                    //If the current slide number or sequence number has changed, move to it
-                                    Platform.runLater(() -> {
-                                        ediManager.getPresentationManager().goToSlideElement(current_slide_states);
-                                    });
+                                if(teacherStudentSlideSync) {
+                                    Integer[] current_slide_states = getCurrentSlideForPresentation(ediManager.getPresentationManager().getPresentationElement().getPresentationMetadata().getPresentationID());
+                                    if ((current_slide_states[0] == -1) && (current_slide_states[1] == -1)) {
+                                        logger.info("Teacher has left the sesh. We should probably do something with this information");
+                                        return;
+                                    }
+                                    //TODO: Enable undocking (unsync?) of Teacher/Student slide movement using UI toggle
+                                    if ((ediManager.getPresentationManager().getCurrentSlideNumber() != current_slide_states[0]) || (ediManager.getPresentationManager().getPresentationElement().getSlide(current_slide_states[0]).getCurrentSequenceNumber() != current_slide_states[1])) {
+                                        //If the current slide number or sequence number has changed, move to it
+                                        Platform.runLater(() -> {
+                                            ediManager.getPresentationManager().goToSlideElement(current_slide_states);
+                                        });
+                                    }
                                 }
                             }
                         }

@@ -2,6 +2,7 @@ package com.i2lp.edi.client.managers;
 
 import com.i2lp.edi.client.PresentationSession;
 import com.i2lp.edi.client.presentationViewerElements.CommentPanel;
+import com.i2lp.edi.server.packets.PresentationMetadata;
 import com.i2lp.edi.server.packets.Question;
 import javafx.animation.Animation;
 import javafx.animation.Interpolator;
@@ -87,7 +88,7 @@ public class PresentationManagerTeacher extends PresentationManager {
 
             Tab studentStats = new Tab();
             studentStats.setText("Students");
-            studentList = generateTestStudents();
+            studentList = generateStudentList();
             studentStats.setContent(studentStats(studentList));
             tp.getTabs().add(studentStats);
 
@@ -101,22 +102,20 @@ public class PresentationManagerTeacher extends PresentationManager {
 
     }
 
-    protected List<Student> generateTestStudents() { //TODO remove
-        ArrayList<Student> studentList = new ArrayList<Student>();
-
-        Student stu1 = new Student("Koen Arroo", 4, true);
-        studentList.add(stu1);
-        Student stu2 = new Student("Herman Larsen", 10, true);
-        studentList.add(stu2);
-        Student stu3 = new Student("Amrik Sadhra", 2, true);
-        studentList.add(stu3);
-        Student stu4 = new Student("Kacper Sagnowski", 7, true);
-        studentList.add(stu4);
-        Student stu5 = new Student("Zain Rajput", 8, false);
-        studentList.add(stu5);
-
-
-        return studentList;
+    protected ArrayList<Student> generateStudentList(){
+        int numberOfStudents = 0;
+        if(presentationElement.getPresentationMetadata().getLive()) {
+            if(getPresentationSession().getActiveUsers() != null) {
+                numberOfStudents = getPresentationSession().getActiveUsers().size();
+            }
+        }
+        ArrayList<Student> studentList = new ArrayList<>();
+        for(int i = 0;i<numberOfStudents;i++){
+            String studentName = getPresentationSession().getActiveUsers().get(i).getFirstName()+" "+getPresentationSession().getActiveUsers().get(i).getSecondName();
+            Student newStudent = new Student(studentName,10,true);//Todo add interaction stuff once it is ready
+            studentList.add(newStudent);
+        }
+        return  studentList;
     }
 
     protected BorderPane questionQueueFunction(List<Question> questions) {

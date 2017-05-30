@@ -14,6 +14,7 @@ import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
+import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
@@ -21,6 +22,8 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.image.*;
 import javafx.scene.image.Image;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -100,14 +103,16 @@ public class WordCloudElement extends InteractiveElement {
         wordList = new ArrayList<String>();
         wordCloudPanel = new Panel(question);
         wordCloudPanel.getStyleClass().add("panel-primary");
+        wordCloudPanel.setStyle("-fx-background-color: #2a2a2a");
         if(teacher){
             Button start_Task = new Button("Start");
+            start_Task.setAlignment(Pos.CENTER);
             //wordCloudPanel.getChildren().add(start_Task);
             start_Task.addEventHandler(MouseEvent.MOUSE_CLICKED,evt->{
                 elementActive = true;
                 wordCloudPanel.getChildren().remove(start_Task);
-                HBox test = new HBox();
-                test.getChildren().addAll(wordCloudElements(),countdownTile);
+                VBox test = new VBox();
+                test.getChildren().addAll(countdownTile,wordCloudElements());
                 wordCloudPanel.setBody(test);
                 timeline.play();
             });
@@ -140,7 +145,7 @@ public class WordCloudElement extends InteractiveElement {
             FrequencyAnalyzer fa = new FrequencyAnalyzer();
             List<WordFrequency> wordFrequencies = fa.load(wordList);
 
-            Dimension dimension = new Dimension((int)Math.round(slideWidth*wordCloudWidth),(int)Math.round(slideWidth*wordCloudHeight));
+            Dimension dimension = new Dimension((int)(xSize*slideWidth),(int)(ySize*slideHeight));
             WordCloud wc = new WordCloud(dimension, CollisionMode.PIXEL_PERFECT);
             wc.setPadding(2);
             if(cloudShapePath != null){
@@ -150,7 +155,8 @@ public class WordCloudElement extends InteractiveElement {
                     e.printStackTrace();
                 }
             }else {
-                wc.setBackground(new CircleBackground(Math.round(xSize/2)));
+                float rad = (xSize*(float)slideWidth)/2;
+                wc.setBackground(new CircleBackground(Math.round(rad)));
              }
             wc.setColorPalette(new ColorPalette(Color.ORANGE,Color.GREEN,Color.cyan));
             wc.setFontScalar(new SqrtFontScalar(10,40));
@@ -161,10 +167,9 @@ public class WordCloudElement extends InteractiveElement {
             if (!wordcloudPath.exists()) {
                 wordcloudPath.getParentFile().mkdirs(); //Create directory structure if not present yet
             }
-            wc.writeToFile(PRESENTATIONS_PATH + "/Wordclouds/"+pathName+".png");
-            //TODO @Koen filename can include presentationID and slideID, especially if we want them stored and recalled later. -Herman
+            wc.writeToFile(PRESENTATIONS_PATH + "/Wordclouds/"+presentationID+"/"+pathName+".png");
 
-            Image wordCloud = new Image("file:" + PRESENTATIONS_PATH + "/Wordclouds/"+pathName+".png",xSize,ySize,true,true);
+            Image wordCloud = new Image("file:" + PRESENTATIONS_PATH + "/Wordclouds/"+presentationID+"/"+pathName+".png",xSize,ySize,true,true);
 
             ImageView iv = new ImageView(wordCloud);
             wordCloudPanel.setBody(iv);
@@ -196,13 +201,14 @@ public class WordCloudElement extends InteractiveElement {
         this.question = question;
     }
 
-    public VBox wordCloudElements(){
-        VBox container = new VBox();
+    public HBox wordCloudElements(){
+        HBox container = new HBox();
         words = new TextField();
         words.setPromptText("Enter a word!");
         words.setPrefColumnCount(20);
-
+        words.setAlignment(Pos.TOP_CENTER);
         sendWord = new Button("Send Word");
+        sendWord.setAlignment(Pos.CENTER);
         sendWord.addEventHandler(MouseEvent.MOUSE_CLICKED,evt->{
            wordList.add(words.getText());
            words.clear();

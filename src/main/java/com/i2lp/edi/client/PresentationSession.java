@@ -47,6 +47,10 @@ public class PresentationSession {
         ediManager.getSocketClient().setCurrentSlideAndSequenceForPresentation(activePresentation.getPresentationMetadata().getPresentationID(), 0, 0);
     }
 
+    public ArrayList<User> getActiveUsers() {
+        return activeUsers;
+    }
+
     public void setActiveUsers(ArrayList<User> activeUsers) {
         this.activeUsers = activeUsers;
 
