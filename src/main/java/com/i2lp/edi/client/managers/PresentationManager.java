@@ -261,7 +261,7 @@ public abstract class PresentationManager {
 
     private void addKeyboardListeners() {
         scene.addEventFilter(KeyEvent.KEY_PRESSED, keyEvent -> {
-            if (!isCommentPanelVisible && !isEmbeddedBrowserOpen) {
+            if (!isCommentPanelVisible && !isEmbeddedBrowserOpen && !wordCloudActive) {
                 if (keyEvent.getCode().equals(KeyCode.ENTER) ||
                         keyEvent.getCode().equals(KeyCode.SPACE) ||
                         keyEvent.getCode().equals(KeyCode.PAGE_UP) ||

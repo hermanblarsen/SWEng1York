@@ -106,7 +106,7 @@ public class WordCloudElement extends InteractiveElement {
         wordCloudPanel.setStyle("-fx-background-color: #2a2a2a");
         if(teacher){
             Button start_Task = new Button("Start");
-            start_Task.setAlignment(Pos.CENTER);
+            start_Task.setAlignment(Pos.TOP_CENTER);
             //wordCloudPanel.getChildren().add(start_Task);
             start_Task.addEventHandler(MouseEvent.MOUSE_CLICKED,evt->{
                 elementActive = true;
@@ -140,6 +140,7 @@ public class WordCloudElement extends InteractiveElement {
 
         timeline.setCycleCount(timeLimit);
         timeline.setOnFinished(event -> {
+            presentationManager.setWordCloudActive(false);
             elementActive = false;
             wordCloudPanel.getChildren().removeAll();
             FrequencyAnalyzer fa = new FrequencyAnalyzer();
@@ -202,6 +203,7 @@ public class WordCloudElement extends InteractiveElement {
     }
 
     public HBox wordCloudElements(){
+        presentationManager.setWordCloudActive(true);
         HBox container = new HBox();
         words = new TextField();
         words.setPromptText("Enter a word!");
@@ -218,6 +220,12 @@ public class WordCloudElement extends InteractiveElement {
         });
         sendWord.addEventHandler(MouseEvent.MOUSE_EXITED,evt->{
             buttonActive = false;
+        });
+        words.addEventHandler(KeyEvent.KEY_PRESSED,keyEvent->{
+            if(keyEvent.getCode().equals(KeyCode.ENTER)){
+                wordList.add(words.getText());
+                words.clear();
+            }
         });
         container.getChildren().addAll(words,sendWord);
         return container;
