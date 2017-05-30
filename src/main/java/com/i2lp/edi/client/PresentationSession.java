@@ -2,6 +2,7 @@ package com.i2lp.edi.client;
 
 import com.i2lp.edi.client.managers.EdiManager;
 import com.i2lp.edi.client.presentationElements.Presentation;
+import com.i2lp.edi.server.packets.InteractiveElement;
 import com.i2lp.edi.server.packets.Question;
 import com.i2lp.edi.server.packets.User;
 import org.slf4j.Logger;
@@ -9,6 +10,8 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * Created by amriksadhra on 27/05/2017.
@@ -18,29 +21,62 @@ public class PresentationSession {
     private EdiManager ediManager;
     private Presentation activePresentation;
 
+    private ArrayList<InteractiveElement> interactiveElements;
     private ArrayList<Question> questionQueue;
     private ArrayList<User> activeUsers;
+
+    //Configuration Variables for session
 
     //Use better Date datastructure to store time per slide
     private Date startDate;
     private Date endDate;
 
-    public PresentationSession(EdiManager ediManager){
+    public PresentationSession(EdiManager ediManager) {
         this.ediManager = ediManager;
         this.activePresentation = ediManager.getPresentationManager().getPresentationElement();
 
-        //Update Question Queue
-        setQuestionQueue(ediManager.getSocketClient().getQuestionsForPresentation(activePresentation.getPresentationMetadata().getPresentationID()));
         //Update database with slide number and start sequence of 0
         ediManager.getSocketClient().setCurrentSlideAndSequenceForPresentation(activePresentation.getPresentationMetadata().getPresentationID(), 0, 0);
+        //Get Interactive Elements
+        interactiveElements = ediManager.getSocketClient().getInteractiveElementsForPresentation(activePresentation.getPresentationMetadata().getPresentationID());
+        //Update Question Queue
+        questionQueue = ediManager.getSocketClient().getQuestionsForPresentation(activePresentation.getPresentationMetadata().getPresentationID());
 
-        startDate = new Date();
-        logger.info("Live Presentation Session beginning at " + startDate.toString());
+        logger.info("Live Presentation Session beginning at " + (startDate = new Date()).toString());
     }
 
-    public void endSession(){
+    public void beginInteraction(int interactiveElementID, boolean isLive) {
+        InteractiveElement liveElement = null;
+
+        //Find interactive element with correct ID
+        for (InteractiveElement interactiveElement : interactiveElements) {
+            if (interactiveElement.getInteractive_element_id() == interactiveElementID) {
+                liveElement = interactiveElement;
+                break;
+            }
+        }
+
+        logger.info("Response time is: " + liveElement.getResponse_interval().getTime());
+        ediManager.getSocketClient().setInteractiveElementLive(liveElement.getInteractive_element_id(), isLive);
+        //Start timer of response interval, in which to set Interactive element non live
+        Timer responseWindow = new Timer();
+        InteractiveElement finalLiveElement = liveElement;
+        responseWindow.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                ediManager.getSocketClient().setInteractiveElementLive(finalLiveElement.getInteractive_element_id(), false);
+                logger.info("Interactive element response window closed");
+            }
+        }, finalLiveElement.getResponse_interval().getTime());
+    }
+
+    public void synchroniseSlides() {
+        ediManager.getSocketClient().setCurrentSlideAndSequenceForPresentation(activePresentation.getPresentationMetadata().getPresentationID(), ediManager.getPresentationManager().getCurrentSlideNumber(), activePresentation.getCurrentSlide().getCurrentSequenceNumber());
+    }
+
+    public void endSession() {
         endDate = new Date();
-        logger.info("Live Presentation session ending. Presentation lasted " + (int)((endDate.getTime() - startDate.getTime()) / 1000) + " seconds.");
+        logger.info("Live Presentation session ending. Presentation lasted " + (int) ((endDate.getTime() - startDate.getTime()) / 1000) + " seconds.");
 
         //Update Presentation record to offline
         ediManager.getSocketClient().setPresentationLive(activePresentation.getPresentationMetadata().getPresentationID(), false);
@@ -56,7 +92,7 @@ public class PresentationSession {
 
         logger.info(activeUsers.size() + " Currently Active Users: ");
 
-        for(User activeUser : activeUsers){
+        for (User activeUser : activeUsers) {
             logger.info(activeUser.getFirstName());
         }
     }
@@ -65,16 +101,7 @@ public class PresentationSession {
         return questionQueue;
     }
 
-    public void setQuestionQueue(ArrayList<Question> activeQuestions){
+    public void setQuestionQueue(ArrayList<Question> activeQuestions) {
         this.questionQueue = activeQuestions;
-
-        logger.info("Received " + activeQuestions.size() + " questions");
-        for(Question question : questionQueue){
-            logger.info("Question: " + question.getQuestion_data());
-        }
-        //TODO: Tie to QuestionQueue UI for question answering
-       /* if(ediManager.getSocketClient().answerQuestionInQuestionQueue(questionQueue.get(0).getQuestion_id())){
-            logger.info("Answered question successfully");
-        }*/
     }
 }

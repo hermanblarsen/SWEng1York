@@ -64,11 +64,7 @@ public class PresentationManagerStudent extends PresentationManager {
         tickPanel.addEventHandler(MouseEvent.MOUSE_CLICKED, evt -> {
             //TODO: Add length limiting to questions
             if(!ta.getText().isEmpty()){
-                if(ediManager.getSocketClient().addQuestionToQuestionQueue(ediManager.getUserData().getUserID(), ediManager.getPresentationManager().getPresentationElement().getPresentationMetadata().getPresentationID(), ta.getText(), ediManager.getPresentationManager().getCurrentSlideNumber())){
-                    logger.info("Question successfully submitted");
-                } else {
-                    logger.error("Question did not submit successfully");
-                }
+               getStudentSession().addQuestionToQueue(ta.getText());
             }
             questionQueueStage.close();
         });

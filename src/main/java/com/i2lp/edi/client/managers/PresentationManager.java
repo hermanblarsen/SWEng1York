@@ -1,6 +1,7 @@
 package com.i2lp.edi.client.managers;
 
 import com.i2lp.edi.client.PresentationSession;
+import com.i2lp.edi.client.StudentSession;
 import com.i2lp.edi.client.animation.Animation;
 import com.i2lp.edi.client.exceptions.SequenceNotFoundException;
 import com.i2lp.edi.client.presentationElements.Presentation;
@@ -61,6 +62,7 @@ public abstract class PresentationManager {
 
     protected final EdiManager ediManager;
     private PresentationSession presentationSession;
+    private StudentSession studentSession;
 
     protected Scene scene;
     protected StackPane displayPane;
@@ -87,7 +89,7 @@ public abstract class PresentationManager {
     private Region blackRegion;
     private DrawPane drawPane;
     private ImageView visibilityButton;
-    private ImageView linkButton;
+    public ImageView linkButton;
     private Popup colourPopup;
     private CursorState currentCursorState = CursorState.DEFAULT;
     private Pane eraseCursorPane;
@@ -107,7 +109,7 @@ public abstract class PresentationManager {
     private boolean isThumbnailGen = false;
     private boolean isEndPresentation = false;
     private StackPane slidePane;
-    private boolean isLinked = false;
+
     private boolean wordCloudActive = false;
 
     public PresentationManager(EdiManager ediManager) {
@@ -121,20 +123,7 @@ public abstract class PresentationManager {
         presentationStage.setOnCloseRequest(event -> {
             destroyAllElements();
             close();
-
-            try {
-                if (this instanceof PresentationManagerTeacher && getPresentationElement().getPresentationMetadata().getLive()) {
-                    if (ediManager.getSocketClient().setPresentationLive(getPresentationElement().getPresentationMetadata().getPresentationID(), false)) {
-                        //TODO: Stub for successful go offline
-                    } else {
-                        //TODO: Stub for unsuccessful go offline
-                    }
-                }
-            } catch (NullPointerException e) {
-                //Do nothing. NullPointerException will be thrown when closing local presentations as they don't have PresentationMetadata
-            }
         });
-
 
         sceneBox = new VBox();
         sceneBox.addEventHandler(MouseEvent.MOUSE_PRESSED, event -> {
@@ -246,13 +235,14 @@ public abstract class PresentationManager {
                 if (this instanceof PresentationManagerTeacher) {
                     presentationSession = new PresentationSession(ediManager);
                 } else if (this instanceof PresentationManagerStudent) {
-                    ediManager.getSocketClient().setUserActivePresentation(ediManager.getPresentationManager().getPresentationElement().getPresentationMetadata().getPresentationID(), ediManager.getUserData().getUserID());
-                    //Go to current slide of teacher
-                    Integer[] current_slide_states = ediManager.getSocketClient().getCurrentSlideForPresentation(ediManager.getPresentationManager().getPresentationElement().getPresentationMetadata().getPresentationID());
-                    ediManager.getPresentationManager().goToSlideElement(current_slide_states);
+                    studentSession = new StudentSession(ediManager);
                 }
             }
         }
+    }
+
+    public StudentSession getStudentSession() {
+        return studentSession;
     }
 
     public PresentationSession getPresentationSession() {
@@ -426,13 +416,8 @@ public abstract class PresentationManager {
         if (presentationStatus == Presentation.SLIDE_CHANGE || presentationStatus == Presentation.PRESENTATION_FINISH || presentationStatus == Presentation.PRESENTATION_START || presentationStatus == Presentation.SLIDE_LAST_ELEMENT || presentationStatus == Presentation.SAME_SLIDE) {
             if ((presentationStatus == Presentation.SLIDE_CHANGE) || (presentationStatus == Presentation.SAME_SLIDE) || (presentationStatus == Presentation.SLIDE_LAST_ELEMENT)) {
                 if (presentationStatus == Presentation.SLIDE_CHANGE) logger.info("Changing Slides");
-                if (presentationElement.getPresentationMetadata() != null) {//If not local presentation
-                    //If we are live, send updated current slide to database
-                    if (presentationElement.getPresentationMetadata().getLive()) {
-                        if (this instanceof PresentationManagerTeacher) {
-                            ediManager.getSocketClient().setCurrentSlideAndSequenceForPresentation(presentationElement.getPresentationMetadata().getPresentationID(), currentSlideNumber, presentationElement.getCurrentSlide().getCurrentSequenceNumber());
-                        }
-                    }
+                if (getPresentationSession() != null) {//If in live hosting session
+                    getPresentationSession().synchroniseSlides();
                 }
             } else if (presentationStatus == Presentation.PRESENTATION_START) {
                 logger.info("At Presentation start");
@@ -503,19 +488,6 @@ public abstract class PresentationManager {
         }
     }
 
-    private void setPresentationLink(boolean setLink){
-        if(setLink){
-            isLinked = false;
-            Image unlockIcon = new Image("file:projectResources/icons/unlock.png",30,30,true,true);
-            ediManager.getSocketClient().setTeacherStudentSlideSync(false);
-            linkButton.setImage(unlockIcon);
-        }else{
-            isLinked = true;
-            Image lockIcon = new Image("file:projectResources/icons/lock.png",30,30,true,true);
-            ediManager.getSocketClient().setTeacherStudentSlideSync(true);
-            linkButton.setImage(lockIcon);
-        }
-    }
 
     public HBox addPresentationControls() {
         HBox presControls = new HBox();
@@ -547,20 +519,17 @@ public abstract class PresentationManager {
         });
 
 
-            String linkIconURL;
-            if(isLinked)
-                linkIconURL = "file:projectResources/icons/lock.png";
-            else
-                linkIconURL = "file:projectResources/icons/unlock.png";
+        String linkIconURL = "file:projectResources/icons/lock.png";
 
-            linkButton = makeCustomButton(linkIconURL,evt->{
-                if(isLinked) {
-                    setPresentationLink(true);
+        linkButton = makeCustomButton(linkIconURL, evt -> {
+            if (studentSession != null) {
+                if (studentSession.isLinked()) {
+                    studentSession.setPresentationLink(true);
+                } else {
+                    studentSession.setPresentationLink(false);
                 }
-                else{
-                    setPresentationLink(false);
-                }
-            });
+            }
+        });
 
 
         ImageView commentButton = makeCustomButton("file:projectResources/icons/SB_filled.png", event -> toggleCommentsWindow());
@@ -584,10 +553,10 @@ public abstract class PresentationManager {
         StackPane progressBar = new StackPane();
         this.progressBar.setMinSize(200, 10);
         progressBar.getChildren().addAll(this.progressBar, slideNumber);
-        if(this instanceof PresentationManagerStudent) {
+        if (this instanceof PresentationManagerStudent) {
             presControls.getChildren().addAll(backButton, nextButton, fullScreenButton, linkButton, specificFeats, commentButton, drawButton, visibilityButton, progressBar);
-        }else{
-            presControls.getChildren().addAll(backButton, nextButton, fullScreenButton ,specificFeats, commentButton, drawButton, visibilityButton, progressBar);
+        } else {
+            presControls.getChildren().addAll(backButton, nextButton, fullScreenButton, specificFeats, commentButton, drawButton, visibilityButton, progressBar);
 
         }
         addMouseHandlersToControls(presControls);
@@ -918,22 +887,18 @@ public abstract class PresentationManager {
      */
     @SuppressWarnings("FinalizeCalledExplicitly")
     public void close() {
-        if (ediManager != null) {//If we have an edimanager instance
-            if (presentationElement.getPresentationMetadata() != null) {//If the presentation is not locally loaded
-                if (presentationElement.getPresentationMetadata().getLive()) {
-                    if (this instanceof PresentationManagerTeacher) {
-                        presentationSession.endSession();
-                    } else if (this instanceof PresentationManagerStudent) {
-                        //TODO: Do other session termination stuff
-                        //Set active presentation for user to null (no active presentation)
-                        ediManager.getSocketClient().setUserActivePresentation(0, ediManager.getUserData().getUserID());
-                    }
-                }
-
-                //Reset EdiManager presentation manager reference to null
-                ediManager.setPresentationManager(null);
+        if (this instanceof PresentationManagerTeacher) {
+            if (presentationSession != null) {
+                presentationSession.endSession();
+            }
+        } else if (this instanceof PresentationManagerStudent) {
+            if (studentSession != null) {
+                studentSession.endSession();
             }
         }
+
+        //Reset EdiManager presentation manager reference to null
+        ediManager.setPresentationManager(null);
         presentationStage.close();
     }
 
@@ -1008,7 +973,7 @@ public abstract class PresentationManager {
 
         do {
             elementAdvance(presentationElement.getSlide(currentSlideNumber), direction);
-           if(i++ == numElements) return false;
+            if (i++ == numElements) return false;
         }
         while (presentationElement.getSlide(currentSlideNumber).getCurrentSequenceNumber() != targetElementNumber);
 

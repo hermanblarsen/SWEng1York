@@ -42,7 +42,7 @@ public class SocketClient {
     private Socket socket;
     //EdiManager
     private EdiManager ediManager;
-    private boolean teacherStudentSlideSync = false;
+    private boolean teacherStudentSlideSync = true;
 
     public static void main(String[] args) {
         //new SocketClient(remoteServerAddress, 8080);
@@ -140,7 +140,7 @@ public class SocketClient {
      */
     public void updateLocalTables(Object tableToUpdate) {
         //If the user has logged in
-        if(ediManager.getUserData() != null) {
+        if (ediManager.getUserData() != null) {
             //SocketIO will pass a generic object. But we know its a string because that's what DB_notify returns from com.i2lp.edi.server side
             switch ((String) tableToUpdate) {
                 case "interactions":
@@ -149,8 +149,11 @@ public class SocketClient {
                     break;
 
                 case "interactive_elements":
-                    logger.info("New interactive elements present on edi server!");
-                    //updateResponses(current_presentation_id, current_question_id);
+                    if (ediManager.getPresentationManager() != null) { //If in a presentation
+                        if (ediManager.getPresentationManager().getStudentSession() != null){
+                            ediManager.getPresentationManager().getStudentSession().setInteractiveElementsToRespond(ediManager.getSocketClient().getInteractiveElementsForPresentation(ediManager.getPresentationManager().getPresentationElement().getPresentationMetadata().getPresentationID()));
+                        }
+                    }
                     break;
 
                 case "users":
@@ -172,7 +175,7 @@ public class SocketClient {
                     if (ediManager.getPresentationManager() != null) {//If there is a presentation
                         if (ediManager.getUserData().getUserType().equals("student")) {//If we're a student
                             if (ediManager.getPresentationManager().getPresentationElement().getPresentationMetadata().getLive()) {//In a live presentation
-                                if(teacherStudentSlideSync) {
+                                if (teacherStudentSlideSync) {
                                     Integer[] current_slide_states = getCurrentSlideForPresentation(ediManager.getPresentationManager().getPresentationElement().getPresentationMetadata().getPresentationID());
                                     if ((current_slide_states[0] == -1) && (current_slide_states[1] == -1)) {
                                         logger.info("Teacher has left the sesh. We should probably do something with this information");
@@ -633,9 +636,9 @@ public class SocketClient {
             while (rs.next()) {
 
                 currentSlide = rs.getInt("current_slide_number");
-                if(rs.wasNull()) currentSlide = -1;
+                if (rs.wasNull()) currentSlide = -1;
                 currentSequenceNumber = rs.getInt("current_sequence_number");
-                if(rs.wasNull()) currentSequenceNumber = -1;
+                if (rs.wasNull()) currentSequenceNumber = -1;
             }
 
             statement.close();
@@ -779,5 +782,100 @@ public class SocketClient {
         }
 
         return activeQuestions;
+    }
+
+    public boolean setInteractiveElementLive(int interactiveElementID, boolean isLive) {
+        boolean statementSuccess = false;
+
+        try (PGConnection connection = (PGConnection) dataSource.getConnection()) {
+            PreparedStatement statement = connection.prepareStatement("UPDATE interactive_elements SET live = ? WHERE interactive_element_id = ?;");
+
+            //Fill prepared statements to avoid SQL injection
+            statement.setBoolean(1, isLive);
+            statement.setInt(2, interactiveElementID);
+
+            //Call stored procedure on database
+            statementSuccess = statement.execute();
+
+            if (statementSuccess) {
+                logger.error("Unable to set interactive element: " + interactiveElementID + " live status to: " + isLive);
+            } else {
+                logger.error("Interactive Element: " + interactiveElementID + " live status change to: " + isLive);
+            }
+
+            statement.close();
+        } catch (Exception e) {
+            logger.error("Unable to connect to PostgreSQL on port 5432. PJDBC dump:", e);
+        }
+
+        return statementSuccess;
+    }
+
+    public ArrayList<InteractiveElement> getInteractiveElementsForPresentation(int presentationID) {
+        ArrayList<InteractiveElement> interactiveElements = new ArrayList<>();
+
+        try (PGConnection connection = (PGConnection) dataSource.getConnection()) {
+            PreparedStatement statement = connection.prepareStatement("SELECT * FROM edi.public.sp_getinteractiveelementsforpresentation(?);");
+
+            //Fill prepared statements to avoid SQL injection
+            statement.setInt(1, presentationID);
+
+            //Call stored procedure on database
+            ResultSet rs = statement.executeQuery();
+
+            int size = 0;
+
+            while (rs.next()) {
+                interactiveElements.add(new InteractiveElement(rs.getInt("interactive_element_id"), rs.getInt("presentation_id"), rs.getString("interactive_element_data"), rs.getString("type"), rs.getBoolean("live"), rs.getTime("response_interval"), rs.getInt("slide_number")));
+                size++;
+            }
+
+            if (size == 0) {
+                logger.warn("No interactive elements for presentationID: " + presentationID);
+            }
+
+            statement.close();
+        } catch (Exception e) {
+            logger.error("Unable to connect to PostgreSQL on port 5432. PJDBC dump:", e);
+        }
+
+        return interactiveElements;
+    }
+
+    public boolean addInteractionToInteractiveElement(int userID, int interactiveElementID, String interactionData){
+        //public.sp_addinteraction_to_interactiveelemnt
+        boolean statementSuccess = false;
+
+        //TODO: IMPORTANT - Modify stored procedure to check live status of target interactive element. Fail if non live.
+        //Attempt to add a user using stored procedure
+        try (PGConnection connection = (PGConnection) dataSource.getConnection()) {
+
+            PreparedStatement statement = connection.prepareStatement("SELECT * FROM public.sp_addinteraction_to_interactiveelemnt(?,?,?);");
+
+            //Fill prepared statements to avoid SQL injection
+            statement.setInt(1, userID);
+            statement.setInt(2, interactiveElementID);
+            statement.setString(3, interactionData);
+
+            //Call stored procedure on database
+            ResultSet rs = statement.executeQuery();
+
+            String status = "failure";
+
+            while (rs.next()) {
+                status = rs.getString(1);
+            }
+
+            if (status.equals("success")) {
+                statementSuccess = true;
+                logger.info("Successfully added interaction to interactive element.");
+            } else logger.error("Unable to add interaction: " + status);
+
+            statement.close();
+        } catch (Exception e) {
+            logger.error("Unable to connect to PostgreSQL on port 5432. PJDBC dump:", e);
+        }
+
+        return statementSuccess;
     }
 }
