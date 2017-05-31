@@ -56,7 +56,7 @@ public class Constants {
 
     public static final String FALLBACK_MISSING_EXTERNAL_TEXTCONTENT = "Missing file!";
 
-    /* Server Interaction Constants */
+    /* Server InteractionRecord Constants */
     public static final String MISSING_DOCUMENT_ID = "NoID"; //Used by getDocumentID function when the XML_URL doesnt contain a valid DocumentID
 
     /* ELEMENT RENDERING CONSTANTS */

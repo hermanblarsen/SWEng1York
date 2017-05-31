@@ -5,7 +5,7 @@ import java.sql.Time;
 /**
  * Created by amriksadhra on 30/05/2017.
  */
-public class InteractiveElement {
+public class InteractiveElementRecord {
     int interactive_element_id;
     int presentation_id;
     String interactive_element_data;
@@ -19,7 +19,7 @@ public class InteractiveElement {
     Time response_interval;
     int slide_number;
 
-    public InteractiveElement(int interactive_element_id, int presentation_id, String interactive_element_data, String type, boolean isLive, Time response_interval, int slide_number) {
+    public InteractiveElementRecord(int interactive_element_id, int presentation_id, String interactive_element_data, String type, boolean isLive, Time response_interval, int slide_number) {
         this.interactive_element_id = interactive_element_id;
         this.presentation_id = presentation_id;
         this.interactive_element_data = interactive_element_data;

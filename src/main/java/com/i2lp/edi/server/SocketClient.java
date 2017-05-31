@@ -7,7 +7,6 @@ import com.impossibl.postgres.api.jdbc.PGConnection;
 import com.impossibl.postgres.jdbc.PGDataSource;
 import io.socket.client.IO;
 import io.socket.client.Socket;
-import javafx.application.Platform;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -139,25 +138,28 @@ public class SocketClient {
             //SocketIO will pass a generic object. But we know its a string because that's what DB_notify returns from com.i2lp.edi.server side
             switch ((String) tableToUpdate) {
                 case "interactions":
-                    logger.info("New responses to act upon registered on edi server!");
-                    ArrayList<Interaction> Interactions = getInteractionsForInteractiveElement(1);
+                    if (ediManager.getPresentationManager() != null) {//If in a presentation
+                        if (ediManager.getPresentationManager().getPresentationSession() != null) {//That a teacher is holding that is live
+                            logger.info("New responses to act upon registered on edi server!");
+                            //ediManager.getPresentationManager().getPresentationSession().
+                            //ArrayList<InteractionRecord> interactionRecords = getInteractionsForInteractiveElement(1);
+                        }
+                    }
                     break;
 
                 case "interactive_elements":
                     if (ediManager.getPresentationManager() != null) { //If in a presentation
-                        if (ediManager.getPresentationManager().getStudentSession() != null){
-                            ediManager.getPresentationManager().getStudentSession().setInteractiveElementsToRespond(ediManager.getSocketClient().getInteractiveElementsForPresentation(ediManager.getPresentationManager().getPresentationElement().getPresentationMetadata().getPresentationID()));
+                        if (ediManager.getPresentationManager().getStudentSession() != null) {
+                            ediManager.getPresentationManager().getStudentSession().setInteractiveElementsToRespondRecord(ediManager.getSocketClient().getInteractiveElementsForPresentation(ediManager.getPresentationManager().getPresentationElement().getPresentationMetadata().getPresentationID()));
                         }
                     }
                     break;
 
                 case "users":
-                    if (ediManager.getUserData().getUserType().equals("teacher")) {//If we're a teacher
-                        if (ediManager.getPresentationManager() != null) {//And in a presentation
-                            if (ediManager.getPresentationManager().getPresentationElement().getPresentationMetadata().getLive()) {//And that presentation is live
-                                logger.info("Updating active user list for live presentation.");
-                                ediManager.getPresentationManager().getPresentationSession().setActiveUsers(getPresentationActiveUsers(ediManager.getPresentationManager().getPresentationElement().getPresentationMetadata().getPresentationID()));//Update list of active users in that presentation
-                            }
+                    if (ediManager.getPresentationManager() != null) {
+                        if (ediManager.getPresentationManager().getPresentationSession() != null) {//If in a live session as a teacher
+                            logger.info("Updating active user list for live presentation.");
+                            ediManager.getPresentationManager().getPresentationSession().setActiveUsers(getPresentationActiveUsers(ediManager.getPresentationManager().getPresentationElement().getPresentationMetadata().getPresentationID()));//Update list of active users in that presentation
                         }
                     }
                     break;
@@ -168,23 +170,8 @@ public class SocketClient {
                         ediManager.getPresentationLibraryManager().updatePresentations(); //Update presentation information
                     }
                     if (ediManager.getPresentationManager() != null) {//If there is a presentation
-                        if (ediManager.getUserData().getUserType().equals("student")) {//If we're a student
-                            if (ediManager.getPresentationManager().getPresentationElement().getPresentationMetadata().getLive()) {//In a live presentation
-                                if (ediManager.getPresentationManager().getStudentSession().isLinked()) {
-                                    Integer[] current_slide_states = getCurrentSlideForPresentation(ediManager.getPresentationManager().getPresentationElement().getPresentationMetadata().getPresentationID());
-                                    if ((current_slide_states[0] == -1) && (current_slide_states[1] == -1)) {
-                                        logger.info("Teacher has left the sesh. We should probably do something with this information");
-                                        return;
-                                    }
-                                    //TODO: Enable undocking (unsync?) of Teacher/Student slide movement using UI toggle
-                                    if ((ediManager.getPresentationManager().getCurrentSlideNumber() != current_slide_states[0]) || (ediManager.getPresentationManager().getPresentationElement().getSlide(current_slide_states[0]).getCurrentSequenceNumber() != current_slide_states[1])) {
-                                        //If the current slide number or sequence number has changed, move to it
-                                        Platform.runLater(() -> {
-                                            ediManager.getPresentationManager().goToSlideElement(current_slide_states);
-                                        });
-                                    }
-                                }
-                            }
+                        if (ediManager.getPresentationManager().getStudentSession() != null) {//that is live and am a student
+                            ediManager.getPresentationManager().getStudentSession().synchroniseWithTeacher();
                         }
                     }
                     break;
@@ -200,8 +187,8 @@ public class SocketClient {
                     break;
 
                 case "questions":
-                    if (ediManager.getUserData().getUserType().equals("teacher")) {//If we're a teacher
-                        if (ediManager.getPresentationManager().getPresentationElement().getPresentationMetadata().getLive()) {//In a live presentation
+                    if (ediManager.getPresentationManager() != null) {//If in a presentation
+                        if (ediManager.getPresentationManager().getPresentationSession() != null) { //a teacher in a live presentation
                             logger.info("Updating QuestionQueue for current presentation");
                             ediManager.getPresentationManager().getPresentationSession().setQuestionQueue(ediManager.getSocketClient().getQuestionsForPresentation(ediManager.getPresentationManager().getPresentationElement().getPresentationMetadata().getPresentationID())); //Update the question queue in the session
                         }
@@ -218,6 +205,7 @@ public class SocketClient {
      * @return User containing user_type of authenticated user.
      * @author Amrik Sadhra
      */
+
     public User userAuth(UserAuth toAuth) {
         ExecutorService executor = Executors.newSingleThreadExecutor();
         Future<User> future = executor.submit(new UserAuthTask(toAuth));
@@ -495,8 +483,8 @@ public class SocketClient {
         return return_status_removal;
     }
 
-    public ArrayList<Interaction> getInteractionsForInteractiveElement(int interactiveElementID) {
-        ArrayList<Interaction> interactionsForElement = new ArrayList<>();
+    public ArrayList<InteractionRecord> getInteractionsForInteractiveElement(int interactiveElementID) {
+        ArrayList<InteractionRecord> interactionsForElement = new ArrayList<>();
 
         //Attempt to add a user using stored procedure
         try (PGConnection connection = (PGConnection) dataSource.getConnection()) {
@@ -509,7 +497,7 @@ public class SocketClient {
             ResultSet rs = statement.executeQuery();
 
             while (rs.next()) {
-                interactionsForElement.add(new Interaction(rs.getInt("interaction_id"), rs.getInt("user_id"), rs.getInt("interactive_element_id"), rs.getString("interaction_data"), rs.getTimestamp("time_created")));
+                interactionsForElement.add(new InteractionRecord(rs.getInt("interaction_id"), rs.getInt("user_id"), rs.getInt("interactive_element_id"), rs.getString("interaction_data"), rs.getTimestamp("time_created")));
             }
 
             statement.close();
@@ -779,15 +767,16 @@ public class SocketClient {
         return activeQuestions;
     }
 
-    public boolean setInteractiveElementLive(int interactiveElementID, boolean isLive) {
+    public boolean setInteractiveElementLive(int presentationID, int interactiveElementID, boolean isLive) {
         boolean statementSuccess = false;
 
         try (PGConnection connection = (PGConnection) dataSource.getConnection()) {
-            PreparedStatement statement = connection.prepareStatement("UPDATE interactive_elements SET live = ? WHERE interactive_element_id = ?;");
+            PreparedStatement statement = connection.prepareStatement("UPDATE interactive_elements SET live = ? WHERE interactive_element_id = ? AND presentation_id = ?;");
 
             //Fill prepared statements to avoid SQL injection
             statement.setBoolean(1, isLive);
             statement.setInt(2, interactiveElementID);
+            statement.setInt(3, presentationID);
 
             //Call stored procedure on database
             statementSuccess = statement.execute();
@@ -806,8 +795,8 @@ public class SocketClient {
         return statementSuccess;
     }
 
-    public ArrayList<InteractiveElement> getInteractiveElementsForPresentation(int presentationID) {
-        ArrayList<InteractiveElement> interactiveElements = new ArrayList<>();
+    public ArrayList<InteractiveElementRecord> getInteractiveElementsForPresentation(int presentationID) {
+        ArrayList<InteractiveElementRecord> interactiveElementRecords = new ArrayList<>();
 
         try (PGConnection connection = (PGConnection) dataSource.getConnection()) {
             PreparedStatement statement = connection.prepareStatement("SELECT * FROM edi.public.sp_getinteractiveelementsforpresentation(?);");
@@ -821,7 +810,7 @@ public class SocketClient {
             int size = 0;
 
             while (rs.next()) {
-                interactiveElements.add(new InteractiveElement(rs.getInt("interactive_element_id"), rs.getInt("presentation_id"), rs.getString("interactive_element_data"), rs.getString("type"), rs.getBoolean("live"), rs.getTime("response_interval"), rs.getInt("slide_number")));
+                interactiveElementRecords.add(new InteractiveElementRecord(rs.getInt("interactive_element_id"), rs.getInt("presentation_id"), rs.getString("interactive_element_data"), rs.getString("type"), rs.getBoolean("live"), rs.getTime("response_interval"), rs.getInt("slide_number")));
                 size++;
             }
 
@@ -834,10 +823,10 @@ public class SocketClient {
             logger.error("Unable to connect to PostgreSQL on port 5432. PJDBC dump:", e);
         }
 
-        return interactiveElements;
+        return interactiveElementRecords;
     }
 
-    public boolean addInteractionToInteractiveElement(int userID, int interactiveElementID, String interactionData){
+    public boolean addInteractionToInteractiveElement(int userID, int interactiveElementID, String interactionData) {
         //public.sp_addinteraction_to_interactiveelemnt
         boolean statementSuccess = false;
 
@@ -874,8 +863,8 @@ public class SocketClient {
         return statementSuccess;
     }
 
-    public ArrayList<Interaction> getInteractionsForPresentation(int presentationID){
-        ArrayList<Interaction> interactionsForPresentation = new ArrayList<>();
+    public ArrayList<InteractionRecord> getInteractionsForPresentation(int presentationID) {
+        ArrayList<InteractionRecord> interactionsForPresentation = new ArrayList<>();
 
         //Attempt to add a user using stored procedure
         try (PGConnection connection = (PGConnection) dataSource.getConnection()) {
@@ -888,7 +877,7 @@ public class SocketClient {
             ResultSet rs = statement.executeQuery();
 
             while (rs.next()) {
-                interactionsForPresentation.add(new Interaction(rs.getInt("interaction_id"), rs.getInt("user_id"), rs.getInt("interactive_element_id"), rs.getString("interaction_data"), rs.getTimestamp("time_created")));
+                interactionsForPresentation.add(new InteractionRecord(rs.getInt("interaction_id"), rs.getInt("user_id"), rs.getInt("interactive_element_id"), rs.getString("interaction_data"), rs.getTimestamp("time_created")));
             }
 
             statement.close();

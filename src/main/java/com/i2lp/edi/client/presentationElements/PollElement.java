@@ -162,6 +162,9 @@ public class PollElement extends InteractiveElement {
                 questionPane.setBody(pollOptions);
                 //delay.play();
                 timeline.play();
+                if(ediManager.getPresentationManager().getPresentationSession() != null) {
+                    ediManager.getPresentationManager().getPresentationSession().beginInteraction(elementID, true);
+                }
             });
             startTimer.addEventHandler(MouseEvent.MOUSE_ENTERED,evt->{
                 buttonActive = true;

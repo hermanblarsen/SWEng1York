@@ -1,6 +1,6 @@
 package com.i2lp.edi.client;
 
-import com.i2lp.edi.server.packets.Interaction;
+import com.i2lp.edi.server.packets.InteractionRecord;
 import com.i2lp.edi.server.packets.User;
 
 import java.sql.Time;
@@ -12,7 +12,7 @@ import java.util.ArrayList;
 public class UserStatistics {
     private User userData;
     private int numberOfResponses;
-    private ArrayList<Interaction> userInteractions;
+    private ArrayList<InteractionRecord> userInteractionRecords;
     private Time averageTimeToReply;
     private ArrayList<Time> timePerSlide;
 
@@ -21,8 +21,8 @@ public class UserStatistics {
         //WordCloud: Number of words submitted
         //Poll: Number
 
-        for(Interaction userInteraction : userInteractions){
-            //userInteraction
+        for(InteractionRecord userInteractionRecord : userInteractionRecords){
+            //userInteractionRecord
         }
     }
 }

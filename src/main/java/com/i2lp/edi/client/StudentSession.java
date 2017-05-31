@@ -2,7 +2,8 @@ package com.i2lp.edi.client;
 
 import com.i2lp.edi.client.managers.EdiManager;
 import com.i2lp.edi.client.presentationElements.Presentation;
-import com.i2lp.edi.server.packets.InteractiveElement;
+import com.i2lp.edi.server.packets.InteractiveElementRecord;
+import javafx.application.Platform;
 import javafx.scene.image.Image;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,10 +22,10 @@ public class StudentSession {
     //Configuration variables for live session
     private boolean isLinked = false;
 
-    private ArrayList<InteractiveElement> interactiveElementsToRespond;
+    private ArrayList<InteractiveElementRecord> interactiveElementsToRespondRecord;
     private Date startDate, endDate;
 
-    public StudentSession(EdiManager ediManager){
+    public StudentSession(EdiManager ediManager) {
         this.ediManager = ediManager;
         this.activePresentation = ediManager.getPresentationManager().getPresentationElement();
 
@@ -33,23 +34,32 @@ public class StudentSession {
         //Go active in the current presentation
         goActiveInPresentation();
         //Go to current slide of teacher
-        synchroniseWithTeacher();
+        setPresentationLink(true);
     }
 
     //Go active in the current presentation
-    private void goActiveInPresentation(){
+    private void goActiveInPresentation() {
         ediManager.getSocketClient().setUserActivePresentation(ediManager.getPresentationManager().getPresentationElement().getPresentationMetadata().getPresentationID(), ediManager.getUserData().getUserID());
     }
 
 
     //Go to current slide of teacher
-    private void synchroniseWithTeacher(){
-        Integer[] current_slide_states = ediManager.getSocketClient().getCurrentSlideForPresentation(ediManager.getPresentationManager().getPresentationElement().getPresentationMetadata().getPresentationID());
-        ediManager.getPresentationManager().goToSlideElement(current_slide_states);
+    public void synchroniseWithTeacher() {
+        if (isLinked) {
+            Integer[] current_slide_states = ediManager.getSocketClient().getCurrentSlideForPresentation(ediManager.getPresentationManager().getPresentationElement().getPresentationMetadata().getPresentationID());
+            if ((current_slide_states[0] == -1) && (current_slide_states[1] == -1)) {
+                ediManager.getPresentationManager().getStudentSession().teacherLeft();
+            } else if ((ediManager.getPresentationManager().getCurrentSlideNumber() != current_slide_states[0]) || (ediManager.getPresentationManager().getPresentationElement().getSlide(current_slide_states[0]).getCurrentSequenceNumber() != current_slide_states[1])) {
+                Platform.runLater(() ->{
+                    //If the current slide number or sequence number has changed, move to it
+                    ediManager.getPresentationManager().goToSlideElement(current_slide_states);
+                });
+            }
+        }
     }
 
     //TODO: Do other session termination stuff
-    public void endSession(){
+    public void endSession() {
         //Set active presentation for user to null (no active presentation)
         ediManager.getSocketClient().setUserActivePresentation(0, ediManager.getUserData().getUserID());
 
@@ -62,7 +72,7 @@ public class StudentSession {
             isLinked = false;
             Image unlockIcon = new Image("file:projectResources/icons/unlock.png", 30, 30, true, true);
             ediManager.getPresentationManager().linkButton.setImage(unlockIcon);
-
+            synchroniseWithTeacher();
         } else {
             isLinked = true;
             Image lockIcon = new Image("file:projectResources/icons/lock.png", 30, 30, true, true);
@@ -71,22 +81,28 @@ public class StudentSession {
         }
     }
 
-    public void addQuestionToQueue(String question){
-        if(ediManager.getSocketClient().addQuestionToQuestionQueue(ediManager.getUserData().getUserID(), activePresentation.getPresentationMetadata().getPresentationID(), question, ediManager.getPresentationManager().getCurrentSlideNumber())){
+    public void addQuestionToQueue(String question) {
+        if (ediManager.getSocketClient().addQuestionToQuestionQueue(ediManager.getUserData().getUserID(), activePresentation.getPresentationMetadata().getPresentationID(), question, ediManager.getPresentationManager().getCurrentSlideNumber())) {
             logger.info("Question successfully submitted");
         } else {
             logger.error("Question did not submit successfully");
         }
     }
 
-    public void setInteractiveElementsToRespond(ArrayList<InteractiveElement> interactiveElementsToRespond) {
-        this.interactiveElementsToRespond = interactiveElementsToRespond;
-        for(InteractiveElement interactiveElement : interactiveElementsToRespond){
-            if(interactiveElement.isLive()) logger.info("Interactive Element: " + interactiveElement.getInteractive_element_id() + " of type: " + interactiveElement.getType() + " is now live." + "You have " + interactiveElement.getResponse_interval() + " to respond.");
+    public void setInteractiveElementsToRespondRecord(ArrayList<InteractiveElementRecord> interactiveElementsToRespondRecord) {
+        this.interactiveElementsToRespondRecord = interactiveElementsToRespondRecord;
+        for (InteractiveElementRecord interactiveElementRecord : interactiveElementsToRespondRecord) {
+            if (interactiveElementRecord.isLive())
+                logger.info("Interactive Element: " + interactiveElementRecord.getInteractive_element_id() + " of type: " + interactiveElementRecord.getType() + " is now live." + "You have " + interactiveElementRecord.getResponse_interval() + " to respond.");
         }
     }
 
     public boolean isLinked() {
         return isLinked;
     }
+
+    public void teacherLeft() {
+        logger.info("Teacher has left the session.");
+    }
 }
+

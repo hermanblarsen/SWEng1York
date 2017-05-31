@@ -14,14 +14,13 @@ import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
-import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.image.*;
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
@@ -30,7 +29,6 @@ import javafx.scene.layout.VBox;
 import javafx.util.Duration;
 import org.kordamp.bootstrapfx.scene.layout.Panel;
 
-//import java.awt.*;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
@@ -38,6 +36,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.i2lp.edi.client.Constants.PRESENTATIONS_PATH;
+
+//import java.awt.*;
 
 /**
  * Created by Koen on 06/04/2017.
@@ -140,7 +140,7 @@ public class WordCloudElement extends InteractiveElement {
 
         timeline.setCycleCount(timeLimit);
         timeline.setOnFinished(event -> {
-            presentationManager.setWordCloudActive(false);
+            ediManager.getPresentationManager().setWordCloudActive(false);
             elementActive = false;
             wordCloudPanel.getChildren().removeAll();
             FrequencyAnalyzer fa = new FrequencyAnalyzer();
@@ -203,7 +203,7 @@ public class WordCloudElement extends InteractiveElement {
     }
 
     public HBox wordCloudElements(){
-        presentationManager.setWordCloudActive(true);
+        ediManager.getPresentationManager().setWordCloudActive(true);
         HBox container = new HBox();
         words = new TextField();
         words.setPromptText("Enter a word!");

@@ -1,8 +1,9 @@
 package com.i2lp.edi.client;
 
 import com.i2lp.edi.client.managers.EdiManager;
+import com.i2lp.edi.client.presentationElements.InteractiveElement;
 import com.i2lp.edi.client.presentationElements.Presentation;
-import com.i2lp.edi.server.packets.InteractiveElement;
+import com.i2lp.edi.server.packets.InteractiveElementRecord;
 import com.i2lp.edi.server.packets.Question;
 import com.i2lp.edi.server.packets.User;
 import org.slf4j.Logger;
@@ -22,7 +23,10 @@ public class PresentationSession {
     private Presentation activePresentation;
 
     private PresentationStatistics presentationStatistics;
-    private ArrayList<InteractiveElement> interactiveElements;
+
+    private ArrayList<InteractiveElementRecord> interactiveElementRecords;
+    private ArrayList<InteractiveElement> interactiveElementsInPresentation; //Needed to link records to InteractiveElements in presentation
+
     private ArrayList<Question> questionQueue;
     private ArrayList<User> activeUsers;
 
@@ -35,11 +39,12 @@ public class PresentationSession {
     public PresentationSession(EdiManager ediManager) {
         this.ediManager = ediManager;
         this.activePresentation = ediManager.getPresentationManager().getPresentationElement();
+        this.interactiveElementsInPresentation = ediManager.getPresentationManager().getInteractiveElementList();
 
         //Update database with slide number and start sequence of 0
         ediManager.getSocketClient().setCurrentSlideAndSequenceForPresentation(activePresentation.getPresentationMetadata().getPresentationID(), 0, 0);
         //Get Interactive Elements
-        interactiveElements = ediManager.getSocketClient().getInteractiveElementsForPresentation(activePresentation.getPresentationMetadata().getPresentationID());
+        interactiveElementRecords = ediManager.getSocketClient().getInteractiveElementsForPresentation(activePresentation.getPresentationMetadata().getPresentationID());
         //Update Question Queue
         questionQueue = ediManager.getSocketClient().getQuestionsForPresentation(activePresentation.getPresentationMetadata().getPresentationID());
 
@@ -47,25 +52,25 @@ public class PresentationSession {
     }
 
     public void beginInteraction(int interactiveElementID, boolean isLive) {
-        InteractiveElement liveElement = null;
+        InteractiveElementRecord liveElement = null;
 
         //Find interactive element with correct ID
-        for (InteractiveElement interactiveElement : interactiveElements) {
-            if (interactiveElement.getInteractive_element_id() == interactiveElementID) {
-                liveElement = interactiveElement;
+        for (InteractiveElementRecord interactiveElementRecord : interactiveElementRecords) {
+            if (interactiveElementRecord.getInteractive_element_id() == interactiveElementID) {
+                liveElement = interactiveElementRecord;
                 break;
             }
         }
 
         logger.info("Response time is: " + liveElement.getResponse_interval().getTime());
-        ediManager.getSocketClient().setInteractiveElementLive(liveElement.getInteractive_element_id(), isLive);
+        ediManager.getSocketClient().setInteractiveElementLive(activePresentation.getPresentationMetadata().getPresentationID(), liveElement.getInteractive_element_id(), isLive);
         //Start timer of response interval, in which to set Interactive element non live
         Timer responseWindow = new Timer();
-        InteractiveElement finalLiveElement = liveElement;
+        InteractiveElementRecord finalLiveElement = liveElement;
         responseWindow.schedule(new TimerTask() {
             @Override
             public void run() {
-                ediManager.getSocketClient().setInteractiveElementLive(finalLiveElement.getInteractive_element_id(), false);
+                ediManager.getSocketClient().setInteractiveElementLive(activePresentation.getPresentationMetadata().getPresentationID(), finalLiveElement.getInteractive_element_id(), false);
                 logger.info("Interactive element response window closed");
             }
         }, finalLiveElement.getResponse_interval().getTime());
@@ -115,5 +120,9 @@ public class PresentationSession {
 
     public void setQuestionQueue(ArrayList<Question> activeQuestions) {
         this.questionQueue = activeQuestions;
+    }
+
+    public void setInteractionDataForInteractiveElements(){
+
     }
 }

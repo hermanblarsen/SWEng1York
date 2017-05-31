@@ -21,6 +21,10 @@ public class Slide extends Pane {
     protected List<SlideElement> visibleSlideElementList;
     protected List<TextElement> textElementList = new ArrayList<>();
 
+
+
+    protected List<InteractiveElement> interactiveElementList = new ArrayList<>();
+
     private ArrayList<WritableImage> slideDrawings;
     private int drawingIndex;
     private String userComments;
@@ -101,6 +105,7 @@ public class Slide extends Pane {
 //            if (slideElement instanceof ImageElement) imageElementList.add((ImageElement) slideElement);
 //            if (slideElement instanceof VideoElement) videoElementList.add((VideoElement) slideElement);
 //            if (slideElement instanceof AudioElement) audioElementList.add((AudioElement) slideElement);
+            if(slideElement instanceof InteractiveElement) interactiveElementList.add((InteractiveElement) slideElement);
         }
     }
 
@@ -250,6 +255,10 @@ public class Slide extends Pane {
 
     public void setUserComments(String userComments) {
         this.userComments = userComments;
+    }
+
+    public List<InteractiveElement> getInteractiveElementList() {
+        return interactiveElementList;
     }
 }
 

@@ -4,7 +4,7 @@ package com.i2lp.edi.client.presentationElements;
 import com.i2lp.edi.client.dashboard.DashModule;
 import com.i2lp.edi.client.dashboard.Subject;
 import com.i2lp.edi.client.utilities.Theme;
-import com.i2lp.edi.server.packets.PresentationMetadata;
+import com.i2lp.edi.server.packets.*;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;

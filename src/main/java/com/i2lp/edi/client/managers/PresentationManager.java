@@ -4,6 +4,7 @@ import com.i2lp.edi.client.PresentationSession;
 import com.i2lp.edi.client.StudentSession;
 import com.i2lp.edi.client.animation.Animation;
 import com.i2lp.edi.client.exceptions.SequenceNotFoundException;
+import com.i2lp.edi.client.presentationElements.InteractiveElement;
 import com.i2lp.edi.client.presentationElements.Presentation;
 import com.i2lp.edi.client.presentationElements.Slide;
 import com.i2lp.edi.client.presentationElements.SlideElement;
@@ -60,14 +61,17 @@ public abstract class PresentationManager {
 
     Logger logger = LoggerFactory.getLogger(PresentationManager.class);
 
+    /* -------------- LIVE SESSION OBJECCTS ----------------*/
     protected final EdiManager ediManager;
     private PresentationSession presentationSession;
     private StudentSession studentSession;
+    //Interactive Element list for linking to ServerSide data
+    private ArrayList<InteractiveElement> interactiveElementList = new ArrayList<>();
 
+    /* -------------- UI OBJECTS ----------------*/
     protected Scene scene;
     protected StackPane displayPane;
     private VBox sceneBox;
-
     protected Presentation presentationElement;
     protected ProgressBar progressBar;
     private double slideProgress;
@@ -169,7 +173,7 @@ public abstract class PresentationManager {
     protected void assignAttributes(Presentation myPresentationElement) {
         for (Slide toAssign : myPresentationElement.getSlideList()) {
             for (SlideElement toBeAssigned : toAssign.getSlideElementList()) {
-                toBeAssigned.setPresentationManager(this); //Needed for onClickAction
+                toBeAssigned.setEdiManager(ediManager); //Allows access to PresMan for OnClick, and SocketClient for Interactive Elements
                 toBeAssigned.setSlideID(toAssign.getSlideID());
                 toBeAssigned.setPresentationID(myPresentationElement.getDocumentID());
                 if (this instanceof PresentationManagerTeacher) {
@@ -182,7 +186,14 @@ public abstract class PresentationManager {
                 toBeAssigned.setSlideWidth(slideWidth);
                 toBeAssigned.setSlideHeight(slideHeight);
             }
+            //Retrieve Interactive Element lists
+            interactiveElementList.addAll(toAssign.getInteractiveElementList());
         }
+    }
+
+    public ArrayList<InteractiveElement> getInteractiveElementList(){
+        if(interactiveElementList.isEmpty()) logger.error("Interactive element list not set yet");
+        return interactiveElementList;
     }
 
     protected void assignSizeProperties(Slide slide) {

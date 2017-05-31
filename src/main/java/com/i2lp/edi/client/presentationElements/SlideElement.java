@@ -3,7 +3,7 @@ package com.i2lp.edi.client.presentationElements;
 import com.i2lp.edi.client.animation.Animation;
 import com.i2lp.edi.client.animation.PathAnimation;
 import com.i2lp.edi.client.animation.TranslationAnimation;
-import com.i2lp.edi.client.managers.PresentationManager;
+import com.i2lp.edi.client.managers.EdiManager;
 import com.i2lp.edi.client.utilities.SimpleChangeListener;
 import de.jensd.fx.glyphs.GlyphsDude;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
@@ -36,6 +36,10 @@ import org.slf4j.LoggerFactory;
 public abstract class SlideElement {
     Logger logger = LoggerFactory.getLogger(getClass());
 
+
+
+    protected EdiManager ediManager;
+
     protected float duration = -1;
     protected int slideID; //Needed for CSS generation, CSS filename needs this to identify what to apply
 
@@ -54,7 +58,6 @@ public abstract class SlideElement {
     protected double slideHeight;
     protected boolean teacher;
     protected SlideElement mediaElement;
-    protected PresentationManager presentationManager;
     protected boolean isThumbnailGen;
 
     public abstract void doClassSpecificRender();
@@ -143,6 +146,14 @@ public abstract class SlideElement {
      * If you disagree with this description then let me know -Zain
      */
     public abstract void destroyElement();
+
+    public void setEdiManager(EdiManager ediManager) {
+        this.ediManager = ediManager;
+    }
+
+    public EdiManager getEdiManager() {
+        return ediManager;
+    }
 
     public void setSlideCanvas(Pane slideCanvas) {
         this.slideCanvas = slideCanvas;
@@ -245,10 +256,6 @@ public abstract class SlideElement {
         this.slideHeight = slideHeight;
     }
 
-    public void setPresentationManager(PresentationManager presentationManager) {
-        this.presentationManager = presentationManager;
-    }
-
     protected void scaleDimensions(float xPosition, float yPosition) {
         //Convert position percentages to multipliers against canvas size and update location
         getCoreNode().setTranslateX(xPosition * slideWidth);
@@ -274,10 +281,10 @@ public abstract class SlideElement {
                     break;
                 case "gotoslide":
                     if(!(slideElement instanceof InteractiveElement)) {
-                        presentationManager.goToSlide(Integer.parseInt(onClickInfo));
+                        ediManager.getPresentationManager().goToSlide(Integer.parseInt(onClickInfo));
                     }else{
                         if(!(((InteractiveElement) slideElement).elementActive)){
-                            presentationManager.goToSlide(Integer.parseInt(onClickInfo));
+                            ediManager.getPresentationManager().goToSlide(Integer.parseInt(onClickInfo));
                         }
                     }
 
@@ -285,7 +292,7 @@ public abstract class SlideElement {
 
                 case "dynamicmediatoggle":
 
-                    SlideElement se = presentationManager.getElement(Integer.parseInt(onClickInfo));
+                    SlideElement se = ediManager.getPresentationManager().getElement(Integer.parseInt(onClickInfo));
                     if (se instanceof VideoElement) {
                         if (((VideoElement) se).getMediaPlayer().getStatus() == MediaPlayer.Status.PLAYING) {
                             ((VideoElement) se).getMediaPlayer().pause();
@@ -396,7 +403,7 @@ public abstract class SlideElement {
         embeddedBrowserPane.setTop(browserToolbar);
         embeddedBrowserPane.setCenter(webView);
 
-        presentationManager.setIsEmbeddedBrowserOpen(true); //To disable the presentation control hotkeys
+        ediManager.getPresentationManager().setIsEmbeddedBrowserOpen(true); //To disable the presentation control hotkeys
         slideCanvas.setOnKeyPressed(keyEvent -> {
             if (keyEvent.getCode().equals(KeyCode.ESCAPE)) {
                 keyEvent.consume();
@@ -410,7 +417,7 @@ public abstract class SlideElement {
         //Listeners to resize and close the browser.
         slideCanvas.widthProperty().addListener(e -> webView.setPrefWidth(getSlideWidth()));
         slideCanvas.heightProperty().addListener(e -> webView.setPrefHeight(getSlideHeight()));
-        presentationManager.addSequenceChangeListener(sequenceChangeListener);
+        ediManager.getPresentationManager().addSequenceChangeListener(sequenceChangeListener);
 
         engine.load(onClickInfo);
     }
@@ -418,8 +425,8 @@ public abstract class SlideElement {
     public void closeEmbeddedBrowser() {
         engine.load(null);
         slideCanvas.getChildren().remove(embeddedBrowserPane);
-        presentationManager.setIsEmbeddedBrowserOpen(false);
-        presentationManager.removeSequenceChangeListener(sequenceChangeListener);
+        ediManager.getPresentationManager().setIsEmbeddedBrowserOpen(false);
+        ediManager.getPresentationManager().removeSequenceChangeListener(sequenceChangeListener);
     }
 
     public boolean isThumbnailGen() {

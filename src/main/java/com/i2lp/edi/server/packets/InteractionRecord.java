@@ -5,14 +5,14 @@ import java.sql.Timestamp;
 /**
  * Created by amriksadhra on 27/05/2017.
  */
-public class Interaction {
+public class InteractionRecord {
     private int interaction_id;
     private int user_id;
     private int interactive_element_id;
     private String interaction_data;
     private Timestamp time_created;
 
-    public Interaction(int interaction_id, int user_id, int interactive_element_id, String interaction_data, Timestamp time_created) {
+    public InteractionRecord(int interaction_id, int user_id, int interactive_element_id, String interaction_data, Timestamp time_created) {
         this.interaction_id = interaction_id;
         this.user_id = user_id;
         this.interactive_element_id = interactive_element_id;
