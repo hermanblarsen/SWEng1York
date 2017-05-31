@@ -247,6 +247,12 @@ public class WordCloudElement extends InteractiveElement {
         return container;
     }
 
+
+    public void setWordList(List<String> wordList) {
+        this.wordList = wordList;
+    }
+
+
     public int getTimeLimit() {
         return timeLimit;
     }
