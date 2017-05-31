@@ -139,9 +139,7 @@ public class SocketClient {
                 case "interactions":
                     if (ediManager.getPresentationManager() != null) {//If in a presentation
                         if (ediManager.getPresentationManager().getPresentationSession() != null) {//That a teacher is holding that is live
-                            logger.info("New responses to act upon registered on edi server!");
-                            //ediManager.getPresentationManager().getPresentationSession().
-                            //ArrayList<InteractionRecord> interactionRecords = getInteractionsForInteractiveElement(1);
+                            ediManager.getPresentationManager().getPresentationSession().setInteractionsForPresentation(getInteractionsForPresentation(ediManager.getPresentationManager().getPresentationElement().getPresentationMetadata().getPresentationID()));
                         }
                     }
                     break;
@@ -168,7 +166,9 @@ public class SocketClient {
                 case "presentations":
                     //Update presentation list if no presentation manager is open
                     if (ediManager.getPresentationManager() == null) {
-                        ediManager.getPresentationLibraryManager().updatePresentations(); //Update presentation information
+                        if (ediManager.getPresentationLibraryManager() != null) {
+                            ediManager.getPresentationLibraryManager().updatePresentations(); //Update presentation information
+                        }
                     }
                     if (ediManager.getPresentationManager() != null) {//If there is a presentation
                         if (ediManager.getPresentationManager().getStudentSession() != null) {//that is live and am a student
@@ -432,18 +432,22 @@ public class SocketClient {
      * Send packet to server Socket to alert it that a new presentation is available for
      * integration into the Edi database.
      */
-    public void alertServerToUpload(String presentationName, int moduleID, Presentation presentation ) {
+    public void alertServerToUpload(String presentationName, int moduleID, Presentation presentation) {
         socket.emit("NewUpload", presentationName + " " + moduleID);
         socket.on("NewUploadStatus", objects -> {
-            int presentationId = Integer.parseInt((String)objects[0]);
+            int presentationId = Integer.parseInt((String) objects[0]);
             logger.info("Added " + presentationName + " presentation with the following ID " + objects[0]);
-            if (presentationId != -1) {
-            	logger.info("Adding interactive elements to DB");
-                sendInteractiveElementsToServer(presentation, Integer.parseInt((String)objects[0]));//Update the interactive_elements table for the new presentation
-                presentation.getPresentationMetadata().setDocumentID(Integer.toString(presentationId));
-                ediManager.getPresentationLibraryManager().updatePresentations(); //Go and download the presentation from the server
-            } else {
-                logger.warn("Failed to add presentation to the presentations database");
+            if (Integer.parseInt((String) objects[0]) != -1) {
+                logger.info("Adding interactive elements to DB");
+                sendInteractiveElementsToServer(presentation, Integer.parseInt((String) objects[0]));//Update the interactive_elements table for the new presentation
+                if (presentationId != -1) {
+                    logger.info("Adding interactive elements to DB");
+                    sendInteractiveElementsToServer(presentation, Integer.parseInt((String) objects[0]));//Update the interactive_elements table for the new presentation
+                    presentation.getPresentationMetadata().setDocumentID(Integer.toString(presentationId));
+                    ediManager.getPresentationLibraryManager().updatePresentations(); //Go and download the presentation from the server
+                } else {
+                    logger.warn("Failed to add presentation to the presentations database");
+                }
             }
         });
     }
@@ -475,21 +479,21 @@ public class SocketClient {
     }
 
     private void sendInteractiveElementsToServer(Presentation presentation, int presentationId) {
-    //Presentation successfully uploaded, send the details of the interactive elements to the DB.
-    for( Slide slides : presentation.getSlideList())
-        for (SlideElement element : slides.getSlideElementList()) {
-            if (element instanceof InteractiveElement) {
-                ArrayList<InteractiveElement> interactiveElements = new ArrayList<>();
-                interactiveElements.add((InteractiveElement) element);
-                setInteractiveElementsForPresentation(
-                        interactiveElements,
-                        presentationId,//Pres ID
-                        slides.getSlideID()//Slide Number
-                );
-                logger.info("Adding interactive elements from slide " + slides.getSlideID() + " Presentation: " + presentationId);
+        //Presentation successfully uploaded, send the details of the interactive elements to the DB.
+        for (Slide slides : presentation.getSlideList())
+            for (SlideElement element : slides.getSlideElementList()) {
+                if (element instanceof InteractiveElement) {
+                    ArrayList<InteractiveElement> interactiveElements = new ArrayList<>();
+                    interactiveElements.add((InteractiveElement) element);
+                    setInteractiveElementsForPresentation(
+                            interactiveElements,
+                            presentationId,//Pres ID
+                            slides.getSlideID()//Slide Number
+                    );
+                    logger.info("Adding interactive elements from slide " + slides.getSlideID() + " Presentation: " + presentationId);
+                }
             }
-        }
-    logger.info("Finished uploading interactive elements");
+        logger.info("Finished uploading interactive elements");
     }
 
     /**
@@ -648,8 +652,6 @@ public class SocketClient {
             } catch (Exception e) {
                 logger.error("Unable to connect to PostgreSQL on port 5432. PJDBC dump:", e);
             }
-
-            //TODO: Statement success isn't returned. Don't wanna create a future callable and wait on result. Ignore success for now.
         });
         statementThread.start();
     }
@@ -906,7 +908,7 @@ public class SocketClient {
             int size = 0;
 
             while (rs.next()) {
-                interactiveElementRecords.add(new InteractiveElementRecord(rs.getInt("interactive_element_id"), rs.getInt("presentation_id"), rs.getString("interactive_element_data"), rs.getString("type"), rs.getBoolean("live"), rs.getTime("response_interval"), rs.getInt("slide_number")));
+                interactiveElementRecords.add(new InteractiveElementRecord(rs.getInt("interactive_element_id"), rs.getInt("interactive_pres_id"), rs.getInt("presentation_id"), rs.getString("interactive_element_data"), rs.getString("type"), rs.getBoolean("live"), rs.getTime("response_interval"), rs.getInt("slide_number")));
                 size++;
             }
 
@@ -923,10 +925,8 @@ public class SocketClient {
     }
 
     public boolean addInteractionToInteractiveElement(int userID, int interactiveElementID, String interactionData) {
-        //public.sp_addinteraction_to_interactiveelemnt
         boolean statementSuccess = false;
 
-        //TODO: IMPORTANT - Modify stored procedure to check live status of target interactive element. Fail if non live.
         //Attempt to add a user using stored procedure
         try (PGConnection connection = (PGConnection) dataSource.getConnection()) {
 

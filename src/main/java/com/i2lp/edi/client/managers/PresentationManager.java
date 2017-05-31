@@ -555,6 +555,8 @@ public abstract class PresentationManager {
         else
             visibilityIconURL = "file:projectResources/icons/eyeVisible.png";
 
+
+
         visibilityButton = makeCustomButton(visibilityIconURL, event -> {
             if (isDrawPaneVisible) {
                 setDrawPaneVisible(false);
@@ -914,7 +916,7 @@ public abstract class PresentationManager {
         }
 
         //Reset EdiManager presentation manager reference to null
-        ediManager.setPresentationManager(null);
+        if(ediManager != null) ediManager.setPresentationManager(null);
         presentationStage.close();
     }
 

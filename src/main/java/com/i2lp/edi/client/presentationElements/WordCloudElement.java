@@ -117,6 +117,9 @@ public class WordCloudElement extends InteractiveElement {
                 test.getChildren().addAll(countdownTile,dataBox);
                 wordCloudPanel.setBody(test);
                 timeline.play();
+                if(ediManager.getPresentationManager().getPresentationSession() != null) {
+                    ediManager.getPresentationManager().getPresentationSession().beginInteraction(this, true);
+                }
             });
             start_Task.addEventHandler(MouseEvent.MOUSE_ENTERED,evt->{
                 buttonActive = true;

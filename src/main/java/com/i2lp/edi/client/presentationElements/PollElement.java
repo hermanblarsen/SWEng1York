@@ -33,7 +33,7 @@ public class PollElement extends InteractiveElement {
     protected String answers;
     protected boolean answered = false;
     protected boolean timerStart = false;
-    protected int timeLimit = 30; //TODO get from server
+
     protected VBox pollOptions;
     protected Timeline timeline;
     protected Panel questionPane;
@@ -163,7 +163,7 @@ public class PollElement extends InteractiveElement {
                 //delay.play();
                 timeline.play();
                 if(ediManager.getPresentationManager().getPresentationSession() != null) {
-                    ediManager.getPresentationManager().getPresentationSession().beginInteraction(elementID, true);
+                    ediManager.getPresentationManager().getPresentationSession().beginInteraction(this, true);
                 }
             });
             startTimer.addEventHandler(MouseEvent.MOUSE_ENTERED,evt->{
@@ -266,13 +266,7 @@ public class PollElement extends InteractiveElement {
     }
 
 
-    public int getTimeLimit() {
-        return timeLimit;
-    }
 
-    public void setTimeLimit(int timeLimit) {
-        this.timeLimit = timeLimit;
-    }
 
     private Color assignBarColour(int i){
         i = i%possibleAnswers.size();

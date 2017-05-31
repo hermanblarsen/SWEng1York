@@ -3,6 +3,7 @@ package com.i2lp.edi.client;
 import com.i2lp.edi.client.managers.EdiManager;
 import com.i2lp.edi.client.presentationElements.InteractiveElement;
 import com.i2lp.edi.client.presentationElements.Presentation;
+import com.i2lp.edi.server.packets.InteractionRecord;
 import com.i2lp.edi.server.packets.InteractiveElementRecord;
 import com.i2lp.edi.server.packets.Question;
 import com.i2lp.edi.server.packets.User;
@@ -28,6 +29,7 @@ public class PresentationSession {
 
     private ArrayList<InteractiveElementRecord> interactiveElementRecords;
     private ArrayList<InteractiveElement> interactiveElementsInPresentation; //Needed to link records to InteractiveElements in presentation
+    private ArrayList<InteractionRecord> interactionsFromStudents;
 
     private ArrayList<Question> questionQueue;
     private ArrayList<User> activeUsers;
@@ -49,6 +51,7 @@ public class PresentationSession {
         ediManager.getSocketClient().setCurrentSlideAndSequenceForPresentation(activePresentation.getPresentationMetadata().getPresentationID(), 0, 0);
         //Get Interactive Elements
         interactiveElementRecords = ediManager.getSocketClient().getInteractiveElementsForPresentation(activePresentation.getPresentationMetadata().getPresentationID());
+
         //Update Question Queue
         questionQueue = ediManager.getSocketClient().getQuestionsForPresentation(activePresentation.getPresentationMetadata().getPresentationID());
         //Add the slide timers:
@@ -58,29 +61,39 @@ public class PresentationSession {
         logger.info("Live Presentation Session beginning at " + (startDate = new Date()).toString());
     }
 
-    public void beginInteraction(int interactiveElementID, boolean isLive) {
-        InteractiveElementRecord liveElement = null;
+    public void beginInteraction(InteractiveElement interactiveElement, boolean isLive) {
+        InteractiveElementRecord liveElementRecord = null;
+        ArrayList<String> results = new ArrayList<>();
 
-        //Find interactive element with correct ID
+        //Find interactive elementRecord with correct ID so we can retrieve its interactive_element_id PK:
+        //TODO: Modify stored procedures to only use PresentationID and interactive_pres_id in place of PK so can remove this loop
         for (InteractiveElementRecord interactiveElementRecord : interactiveElementRecords) {
-            if (interactiveElementRecord.getInteractive_element_id() == interactiveElementID) {
-                liveElement = interactiveElementRecord;
+            if (interactiveElementRecord.getInteractive_pres_id() == interactiveElement.getElementID()) {
+                liveElementRecord = interactiveElementRecord;
                 break;
             }
         }
 
-        logger.info("Response time is: " + liveElement.getResponse_interval().getTime());
-        ediManager.getSocketClient().setInteractiveElementLive(activePresentation.getPresentationMetadata().getPresentationID(), liveElement.getInteractive_element_id(), isLive);
+        //Use TimeLimit from local XML
+        logger.info("Response time is: " + interactiveElement.getTimeLimit());
+        ediManager.getSocketClient().setInteractiveElementLive(activePresentation.getPresentationMetadata().getPresentationID(), liveElementRecord.getInteractive_element_id(), isLive);
         //Start timer of response interval, in which to set Interactive element non live
         Timer responseWindow = new Timer();
-        InteractiveElementRecord finalLiveElement = liveElement;
+        InteractiveElementRecord finalLiveElement = liveElementRecord;
         responseWindow.schedule(new TimerTask() {
             @Override
             public void run() {
                 ediManager.getSocketClient().setInteractiveElementLive(activePresentation.getPresentationMetadata().getPresentationID(), finalLiveElement.getInteractive_element_id(), false);
                 logger.info("Interactive element response window closed");
+
+                //Find Interactions that belong to this current interactive element
+                for(InteractionRecord interactionRecord : interactionsFromStudents){
+                    if(interactionRecord.getInteractive_element_id() == finalLiveElement.getInteractive_element_id()){
+                        results.add(interactionRecord.getInteraction_data());
+                    }
+                }
             }
-        }, finalLiveElement.getResponse_interval().getTime());
+        }, interactiveElement.getTimeLimit()*1000);
     }
 
     public void synchroniseSlides() {
@@ -129,12 +142,16 @@ public class PresentationSession {
         this.questionQueue = activeQuestions;
     }
 
-    public void setInteractionDataForInteractiveElements(){
+    public void setInteractionsForPresentation(ArrayList<InteractionRecord> interactionsFromStudents){
+        this.interactionsFromStudents = interactionsFromStudents;
 
+        for(InteractionRecord interactionRecord : interactionsFromStudents){
+            logger.info("Interaction for " + interactionRecord.getInteractive_element_id() + " is " + interactionRecord.getInteraction_data() + " from user " + interactionRecord.getUser_id());
+        }
     }
 
     private void addSlideTimeListener() {
-        //Initialise the array with eough space for all of the slides. and set the time on ach slide to 0
+        //Initialise the array with enough space for all of the slides. and set the time on ach slide to 0
         slideTimes = new ArrayList<>();
         int numberOfSlides = ediManager.getPresentationManager().getPresentationElement().getMaxSlideNumber();
         for(int i=0; i <= numberOfSlides; i++){

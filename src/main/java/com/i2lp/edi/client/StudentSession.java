@@ -1,6 +1,7 @@
 package com.i2lp.edi.client;
 
 import com.i2lp.edi.client.managers.EdiManager;
+import com.i2lp.edi.client.presentationElements.InteractiveElement;
 import com.i2lp.edi.client.presentationElements.Presentation;
 import com.i2lp.edi.server.packets.InteractiveElementRecord;
 import javafx.application.Platform;
@@ -10,6 +11,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Random;
 
 /**
  * Created by amriksadhra on 30/05/2017.
@@ -23,11 +25,13 @@ public class StudentSession {
     private boolean isLinked = false;
 
     private ArrayList<InteractiveElementRecord> interactiveElementsToRespondRecord;
+    private ArrayList<InteractiveElement> interactiveElementsInPresentation; //Needed to link records to InteractiveElements in presentation
     private Date startDate, endDate;
 
     public StudentSession(EdiManager ediManager) {
         this.ediManager = ediManager;
         this.activePresentation = ediManager.getPresentationManager().getPresentationElement();
+        this.interactiveElementsInPresentation = ediManager.getPresentationManager().getInteractiveElementList();
 
         logger.info("Connected to live presentation  at " + (startDate = new Date()).toString());
 
@@ -50,7 +54,7 @@ public class StudentSession {
             if ((current_slide_states[0] == -1) && (current_slide_states[1] == -1)) {
                 teacherLeft();
             } else if ((ediManager.getPresentationManager().getCurrentSlideNumber() != current_slide_states[0]) || (ediManager.getPresentationManager().getPresentationElement().getSlide(current_slide_states[0]).getCurrentSequenceNumber() != current_slide_states[1])) {
-                Platform.runLater(() ->{
+                Platform.runLater(() -> {
                     //If the current slide number or sequence number has changed, move to it
                     ediManager.getPresentationManager().goToSlideElement(current_slide_states);
                 });
@@ -60,6 +64,7 @@ public class StudentSession {
 
     //TODO: Do other session termination stuff
     public void endSession() {
+        sendUserStatistics();
         //Set active presentation for user to null (no active presentation)
         ediManager.getSocketClient().setUserActivePresentation(0, ediManager.getUserData().getUserID());
 
@@ -90,10 +95,28 @@ public class StudentSession {
 
     public void setInteractiveElementsToRespondRecord(ArrayList<InteractiveElementRecord> interactiveElementsToRespondRecord) {
         this.interactiveElementsToRespondRecord = interactiveElementsToRespondRecord;
+
         for (InteractiveElementRecord interactiveElementRecord : interactiveElementsToRespondRecord) {
-            if (interactiveElementRecord.isLive())
-                logger.info("Interactive Element: " + interactiveElementRecord.getInteractive_element_id() + " of type: " + interactiveElementRecord.getType() + " is now live." + "You have " + interactiveElementRecord.getResponse_interval() + " to respond.");
+            if (interactiveElementRecord.isLive()) {
+                for (InteractiveElement interactiveElement : interactiveElementsInPresentation) {
+                    if (interactiveElement.getElementID() == interactiveElementRecord.getInteractive_pres_id()) {
+                        logger.info("Interactive Element: " + interactiveElement.getElementID() + " of type: " + interactiveElementRecord.getType() + " is now live." + "You have " + interactiveElement.getTimeLimit() + " seconds to respond.");
+                        //Send test response
+                        ediManager.getSocketClient().addInteractionToInteractiveElement(ediManager.getUserData().getUserID(), interactiveElementRecord.getInteractive_element_id(), generateString(new Random(), "TestStuffHere", 12));
+                    }
+                }
+            }
         }
+    }
+
+    public static String generateString(Random rng, String characters, int length)
+    {
+        char[] text = new char[length];
+        for (int i = 0; i < length; i++)
+        {
+            text[i] = characters.charAt(rng.nextInt(characters.length()));
+        }
+        return new String(text);
     }
 
     public boolean isLinked() {
@@ -102,6 +125,12 @@ public class StudentSession {
 
     public void teacherLeft() {
         logger.info("Teacher has left the session.");
+    }
+
+
+    //TODO: Go through slide time data and add as interactions to database
+    public void sendUserStatistics() {
+
     }
 }
 
