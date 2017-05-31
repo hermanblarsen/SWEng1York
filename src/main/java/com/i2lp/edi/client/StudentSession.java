@@ -29,7 +29,7 @@ public class StudentSession {
         this.ediManager = ediManager;
         this.activePresentation = ediManager.getPresentationManager().getPresentationElement();
 
-        logger.info("Connected to live presentation at " + (startDate = new Date()).toString());
+        logger.info("Connected to live presentation  at " + (startDate = new Date()).toString());
 
         //Go active in the current presentation
         goActiveInPresentation();
