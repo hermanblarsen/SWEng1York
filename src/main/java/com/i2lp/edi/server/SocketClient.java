@@ -441,7 +441,6 @@ public class SocketClient {
                 if (presentationId != -1) {
                     logger.info("Adding interactive elements to DB");
                     sendInteractiveElementsToServer(presentation, Integer.parseInt((String) objects[0]));//Update the interactive_elements table for the new presentation
-                    presentation.getPresentationMetadata().setDocumentID(Integer.toString(presentationId));
                     ediManager.getPresentationLibraryManager().updatePresentations(); //Go and download the presentation from the server
                 } else {
                     logger.warn("Failed to add presentation to the presentations database");
