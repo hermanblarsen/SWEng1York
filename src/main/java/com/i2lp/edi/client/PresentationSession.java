@@ -9,6 +9,7 @@ import com.i2lp.edi.server.packets.InteractionRecord;
 import com.i2lp.edi.server.packets.InteractiveElementRecord;
 import com.i2lp.edi.server.packets.Question;
 import com.i2lp.edi.server.packets.User;
+import javafx.application.Platform;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -98,10 +99,14 @@ public class PresentationSession {
                         }
                     }
                     //If its a WordCloud, set the wordList
-                    if (interactiveElement instanceof WordCloudElement)
+                    if (interactiveElement instanceof WordCloudElement) {
                         ((WordCloudElement) interactiveElement).setWordList(elementInteractions);
-                } else{
-                    logger.error("No interactions received for Interactive Elemenet: " + interactiveElement.getElementID());
+                        Platform.runLater(() -> {
+                            ((WordCloudElement) interactiveElement).generateWordCloud();
+                        });
+                    }
+                } else {
+                    logger.error("No interactions received for Interactive Element: " + interactiveElement.getElementID());
                 }
             }
         }, interactiveElement.getTimeLimit() * 1000);

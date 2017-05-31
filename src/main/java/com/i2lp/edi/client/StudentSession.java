@@ -4,6 +4,7 @@ import com.i2lp.edi.client.managers.EdiManager;
 import com.i2lp.edi.client.presentationElements.InteractiveElement;
 import com.i2lp.edi.client.presentationElements.Presentation;
 import com.i2lp.edi.client.presentationElements.WordCloudElement;
+import com.i2lp.edi.server.packets.InteractionRecord;
 import com.i2lp.edi.server.packets.InteractiveElementRecord;
 import javafx.application.Platform;
 import javafx.scene.image.Image;
@@ -12,9 +13,7 @@ import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Random;
+import java.util.*;
 
 /**
  * Created by amriksadhra on 30/05/2017.
@@ -108,10 +107,39 @@ public class StudentSession {
                 for (InteractiveElement interactiveElement : interactiveElementsInPresentation) {
                     if (interactiveElement.getElementID() == interactiveElementRecord.getXml_element_id()) {
                         logger.info("Interactive Element: " + interactiveElement.getElementID() + " of type: " + interactiveElementRecord.getType() + " is now live." + "You have " + interactiveElement.getTimeLimit() + " seconds to respond.");
+
+
                         if (interactiveElement instanceof WordCloudElement) {
                             ((WordCloudElement) interactiveElement).setUpWordCloudData();
                         }
 
+                        //Start timer of response interval, in which to set Interactive element non live
+                        Timer responseWindow = new Timer();
+                        responseWindow.schedule(new TimerTask() {
+                            @Override
+                            public void run() {
+                                ArrayList<InteractionRecord> interactionsFromStudents = ediManager.getSocketClient().getInteractionsForPresentation(ediManager.getPresentationManager().getPresentationElement().getPresentationMetadata().getPresentationID());
+                                ArrayList<String> elementInteractions = new ArrayList<>();
+
+                                //Find Interactions that belong to this current interactive element
+                                if (!interactionsFromStudents.isEmpty()) {
+                                    for (InteractionRecord interactionRecord : interactionsFromStudents) {
+                                        if (interactionRecord.getInteractive_element_id() == interactiveElementRecord.getInteractive_element_id()) {
+                                            elementInteractions.add(interactionRecord.getInteraction_data());
+                                        }
+                                    }
+                                    //If its a WordCloud, set the wordList
+                                    if (interactiveElement instanceof WordCloudElement) {
+                                        ((WordCloudElement) interactiveElement).setWordList(elementInteractions);
+                                        Platform.runLater(() -> {
+                                            ((WordCloudElement) interactiveElement).generateWordCloud();
+                                        });
+                                    }
+                                } else {
+                                    logger.error("No interactions received for Interactive Element: " + interactiveElement.getElementID());
+                                }
+                            }
+                        }, interactiveElement.getTimeLimit() * 1000);
                     }
                 }
             }
@@ -160,7 +188,7 @@ public class StudentSession {
         //Initialise the array with eough space for all of the slides. and set the time on ach slide to 0
         slideTimes = new ArrayList<>();
         int numberOfSlides = ediManager.getPresentationManager().getPresentationElement().getMaxSlideNumber();
-        for(int i=0; i <= numberOfSlides; i++){
+        for (int i = 0; i <= numberOfSlides; i++) {
             slideTimes.add(Duration.ZERO);
         }
 
@@ -174,7 +202,7 @@ public class StudentSession {
 
                 //Otherwise if we have been on this slide befre then add to the tiem already spent on it
                 slideTimes.set(previousSlideNumber, slideTimes.get(previousSlideNumber).plus(timeOnPrevSlide));//Add the time on the previous slie to its stored value.
-                logger.info("Time spent on slide " + (previousSlideNumber+1) + ": " + timeOnPrevSlide.getSeconds() + "s Total time: " + slideTimes.get(previousSlideNumber).getSeconds() + "s");
+                logger.info("Time spent on slide " + (previousSlideNumber + 1) + ": " + timeOnPrevSlide.getSeconds() + "s Total time: " + slideTimes.get(previousSlideNumber).getSeconds() + "s");
             } else {
                 slideStart = Instant.now();
                 logger.info("First slide started at: " + slideStart.toString());
