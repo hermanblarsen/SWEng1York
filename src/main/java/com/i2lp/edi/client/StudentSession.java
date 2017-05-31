@@ -48,7 +48,7 @@ public class StudentSession {
         if (isLinked) {
             Integer[] current_slide_states = ediManager.getSocketClient().getCurrentSlideForPresentation(ediManager.getPresentationManager().getPresentationElement().getPresentationMetadata().getPresentationID());
             if ((current_slide_states[0] == -1) && (current_slide_states[1] == -1)) {
-                ediManager.getPresentationManager().getStudentSession().teacherLeft();
+                teacherLeft();
             } else if ((ediManager.getPresentationManager().getCurrentSlideNumber() != current_slide_states[0]) || (ediManager.getPresentationManager().getPresentationElement().getSlide(current_slide_states[0]).getCurrentSequenceNumber() != current_slide_states[1])) {
                 Platform.runLater(() ->{
                     //If the current slide number or sequence number has changed, move to it
@@ -69,15 +69,14 @@ public class StudentSession {
 
     public void setPresentationLink(boolean setLink) {
         if (setLink) {
-            isLinked = false;
-            Image unlockIcon = new Image("file:projectResources/icons/unlock.png", 30, 30, true, true);
-            ediManager.getPresentationManager().linkButton.setImage(unlockIcon);
-            synchroniseWithTeacher();
-        } else {
             isLinked = true;
             Image lockIcon = new Image("file:projectResources/icons/lock.png", 30, 30, true, true);
             ediManager.getPresentationManager().linkButton.setImage(lockIcon);
             synchroniseWithTeacher();
+        } else {
+            isLinked = false;
+            Image unlockIcon = new Image("file:projectResources/icons/unlock.png", 30, 30, true, true);
+            ediManager.getPresentationManager().linkButton.setImage(unlockIcon);
         }
     }
 

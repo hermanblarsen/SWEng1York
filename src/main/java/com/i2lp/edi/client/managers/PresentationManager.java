@@ -71,7 +71,7 @@ public abstract class PresentationManager {
     /* -------------- UI OBJECTS ----------------*/
     protected Scene scene;
     protected StackPane displayPane;
-    private VBox sceneBox;
+    protected VBox sceneBox;
     protected Presentation presentationElement;
     protected ProgressBar progressBar;
     private double slideProgress;
@@ -535,9 +535,9 @@ public abstract class PresentationManager {
         linkButton = makeCustomButton(linkIconURL, evt -> {
             if (studentSession != null) {
                 if (studentSession.isLinked()) {
-                    studentSession.setPresentationLink(true);
-                } else {
                     studentSession.setPresentationLink(false);
+                } else {
+                    studentSession.setPresentationLink(true);
                 }
             }
         });
@@ -998,6 +998,7 @@ public abstract class PresentationManager {
      * @author Amrik Sadhra
      */
     public boolean goToSlide(int targetSlideNumber) {
+        if(targetSlideNumber == currentSlideNumber) return true;
         //If target slide invalid, do nothing and log warning
         if ((targetSlideNumber < 0) || (targetSlideNumber > presentationElement.getMaxSlideNumber())) {
             logger.warn("Target slide number lies outside that which is available in this presentation. Modify XML to account for this.");
