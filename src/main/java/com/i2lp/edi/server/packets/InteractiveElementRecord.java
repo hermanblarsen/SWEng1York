@@ -7,22 +7,20 @@ import java.sql.Time;
  */
 public class InteractiveElementRecord {
     int interactive_element_id;//The unique id
-    int interactive_pres_id;
     int presentation_id;
     String interactive_element_data;
-    int xml_element_id;
 
+
+    int xml_element_id;
     public String getType() {
         return type;
     }
-
     String type;
     boolean isLive;
     Time response_interval;
     int slide_number;
 
     public InteractiveElementRecord(int interactive_element_id,
-                                    int interactive_pres_id,
                                     int presentation_id,
                                     String interactive_element_data,
                                     String type, boolean isLive,
@@ -31,8 +29,6 @@ public class InteractiveElementRecord {
                                     int xml_element_id
     ) {
         this.interactive_element_id = interactive_element_id;
-
-        this.interactive_pres_id = interactive_pres_id;
 
         this.presentation_id = presentation_id;
         this.interactive_element_data = interactive_element_data;
@@ -55,7 +51,9 @@ public class InteractiveElementRecord {
         return response_interval;
     }
 
-    public int getInteractive_pres_id() {
-        return interactive_pres_id;
+    public int getXml_element_id() {
+        return xml_element_id;
     }
+
+
 }

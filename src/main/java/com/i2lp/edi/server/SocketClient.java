@@ -2,7 +2,6 @@ package com.i2lp.edi.server;
 
 import com.i2lp.edi.client.managers.EdiManager;
 import com.i2lp.edi.client.presentationElements.*;
-import com.i2lp.edi.client.managers.PresentationManagerTeacher;
 import com.i2lp.edi.client.utilities.Utilities;
 import com.i2lp.edi.server.packets.*;
 import com.impossibl.postgres.api.jdbc.PGConnection;
@@ -15,7 +14,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.URISyntaxException;
-import java.sql.*;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicReference;
@@ -157,8 +159,6 @@ public class SocketClient {
                         if (ediManager.getPresentationManager().getPresentationSession() != null) {//If in a live session as a teacher
                             logger.info("Updating active user list for live presentation.");
                             ediManager.getPresentationManager().getPresentationSession().setActiveUsers(getPresentationActiveUsers(ediManager.getPresentationManager().getPresentationElement().getPresentationMetadata().getPresentationID()));//Update list of active users in that presentation
-                            PresentationManagerTeacher pt = (PresentationManagerTeacher) ediManager.getPresentationManager();
-                            pt.updateStudentList();
                         }
                     }
                     break;
@@ -190,10 +190,8 @@ public class SocketClient {
                 case "questions":
                     if (ediManager.getPresentationManager() != null) {//If in a presentation
                         if (ediManager.getPresentationManager().getPresentationSession() != null) { //a teacher in a live presentation
-                            logger.info("Updating QuestionQueue for current presentation");
                             ediManager.getPresentationManager().getPresentationSession().setQuestionQueue(ediManager.getSocketClient().getQuestionsForPresentation(ediManager.getPresentationManager().getPresentationElement().getPresentationMetadata().getPresentationID())); //Update the question queue in the session
-                            PresentationManagerTeacher pt = (PresentationManagerTeacher) ediManager.getPresentationManager();
-                            pt.updateQuestionList();
+
                         }
                     }
                     break;
@@ -910,7 +908,6 @@ public class SocketClient {
             while (rs.next()) {
                 interactiveElementRecords.add(new InteractiveElementRecord(
                         rs.getInt("interactive_element_id"),
-                        rs.getInt("interactive_pres_id"),
                         rs.getInt("presentation_id"),
                         rs.getString("interactive_element_data"),
                         rs.getString("type"),

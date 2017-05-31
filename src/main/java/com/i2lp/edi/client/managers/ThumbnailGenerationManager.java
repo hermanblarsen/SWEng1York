@@ -131,7 +131,7 @@ public class ThumbnailGenerationManager extends PresentationManager {
                     logger.debug("All webviews on TextElements in slide " + (slideGenController.currentSlideNumber) + " have completed rendering.");
                     //TODO: Even though the webview has told us its done rendering, there is some overhead before it is visible on StackPane. Account for this with minor delay. I cant find any state variable that we can check to avoid waiting. Maybe you can Kacper
                     //This value may need to be upped on slower systems to ensure successful screenshot
-                    Thread.sleep(1000);
+                    Thread.sleep(100);
                     return null;
                 }
             }

@@ -2,7 +2,6 @@ package com.i2lp.edi.client;
 
 import com.i2lp.edi.client.managers.EdiManager;
 import com.i2lp.edi.client.presentationElements.InteractiveElement;
-import com.i2lp.edi.client.presentationElements.PollElement;
 import com.i2lp.edi.client.presentationElements.Presentation;
 import com.i2lp.edi.client.presentationElements.WordCloudElement;
 import com.i2lp.edi.server.packets.InteractiveElementRecord;
@@ -103,27 +102,40 @@ public class StudentSession {
     public void setInteractiveElementsToRespondRecord(ArrayList<InteractiveElementRecord> interactiveElementsToRespondRecord) {
         this.interactiveElementsToRespondRecord = interactiveElementsToRespondRecord;
 
+        //Event for modification here
         for (InteractiveElementRecord interactiveElementRecord : interactiveElementsToRespondRecord) {
             if (interactiveElementRecord.isLive()) {
                 for (InteractiveElement interactiveElement : interactiveElementsInPresentation) {
-                    if (interactiveElement.getElementID() == interactiveElementRecord.getInteractive_pres_id()) {
+                    if (interactiveElement.getElementID() == interactiveElementRecord.getXml_element_id()) {
                         logger.info("Interactive Element: " + interactiveElement.getElementID() + " of type: " + interactiveElementRecord.getType() + " is now live." + "You have " + interactiveElement.getTimeLimit() + " seconds to respond.");
-                        if(interactiveElement instanceof WordCloudElement){
+                        if (interactiveElement instanceof WordCloudElement) {
                             ((WordCloudElement) interactiveElement).setUpWordCloudData();
                         }
-                        //Send test response
-                        ediManager.getSocketClient().addInteractionToInteractiveElement(ediManager.getUserData().getUserID(), interactiveElementRecord.getInteractive_element_id(), generateString(new Random(), "TestStuffHere", 12));
+
                     }
                 }
             }
         }
     }
 
-    public static String generateString(Random rng, String characters, int length)
-    {
+    public void sendResponse(InteractiveElement elementForResponse, String data) {
+        //Search for interactive element to respond to
+        for (InteractiveElementRecord interactiveElementRecord : interactiveElementsToRespondRecord) {
+            if (elementForResponse.getElementID() == interactiveElementRecord.getXml_element_id()) {
+                if (elementForResponse.getElementID() == interactiveElementRecord.getXml_element_id()) {
+                    logger.info("Interactive Element: " + elementForResponse.getElementID() + " of type: " + interactiveElementRecord.getType() + " is now live." + "You have " + elementForResponse.getTimeLimit() + " seconds to respond.");
+                    if (elementForResponse instanceof WordCloudElement) {
+                        //Send test response
+                        ediManager.getSocketClient().addInteractionToInteractiveElement(ediManager.getUserData().getUserID(), interactiveElementRecord.getInteractive_element_id(), data);
+                    }
+                }
+            }
+        }
+    }
+
+    public static String generateString(Random rng, String characters, int length) {
         char[] text = new char[length];
-        for (int i = 0; i < length; i++)
-        {
+        for (int i = 0; i < length; i++) {
             text[i] = characters.charAt(rng.nextInt(characters.length()));
         }
         return new String(text);

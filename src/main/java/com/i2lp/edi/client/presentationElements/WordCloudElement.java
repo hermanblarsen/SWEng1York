@@ -228,7 +228,8 @@ public class WordCloudElement extends InteractiveElement {
         sendWord = new Button("Send Word");
         sendWord.setAlignment(Pos.CENTER);
         sendWord.addEventHandler(MouseEvent.MOUSE_CLICKED,evt->{
-           wordList.add(words.getText());
+            ediManager.getPresentationManager().getStudentSession().sendResponse(this, words.getText());
+           //wordList.add(words.getText());
            words.clear();
         });
         sendWord.addEventHandler(MouseEvent.MOUSE_ENTERED,evt->{
@@ -239,7 +240,8 @@ public class WordCloudElement extends InteractiveElement {
         });
         words.addEventHandler(KeyEvent.KEY_PRESSED,keyEvent->{
             if(keyEvent.getCode().equals(KeyCode.ENTER)){
-                wordList.add(words.getText());
+                //wordList.add(words.getText());
+                ediManager.getPresentationManager().getStudentSession().sendResponse(this, words.getText());
                 words.clear();
             }
         });
