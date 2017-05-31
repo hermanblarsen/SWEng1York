@@ -222,6 +222,7 @@ public class PollElement extends InteractiveElement {
     }
 
     private void displayDone() {
+
         questionPane.getChildren().remove(questionPane.getBody());
         for(int i = 0; i<possibleAnswers.size();i++){
             chartDataArray[i] = new ChartData(possibleAnswers.get(i),0);

@@ -7,6 +7,7 @@ import com.i2lp.edi.server.packets.Question;
 import javafx.animation.Animation;
 import javafx.animation.Interpolator;
 import javafx.animation.Transition;
+import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
@@ -47,7 +48,16 @@ public class PresentationManagerTeacher extends PresentationManager {
     private int numberOfTestQuestions = 10;
     private int numberOnline = 0;
     private ArrayList<Question> newQuestionList;
-    boolean buttonActive = false;
+    private boolean buttonActive = false;
+    private Tab questions;
+    private Panel[] slides;
+    private StackPane slidePane;
+    private FlowPane fp;
+    private ScrollPane sp;
+    private ScrollPane sp2;
+    private Label lab;
+    private Region backgroundRegion;
+    private Tab studentStats;
     //private Timestamp openTime;
 
     public PresentationManagerTeacher(EdiManager ediManager) {
@@ -78,15 +88,16 @@ public class PresentationManagerTeacher extends PresentationManager {
             tp.setStyle("-fx-background-color: #34495e");
             scene = new Scene(tp, 450, 450);
             scene.getStylesheets().add("bootstrapfx.css");
-            Tab questions = new Tab();
+            questions = new Tab();
             questions.setText("Question Queue");
-            questionList = new ArrayList<String>();
+            //questionList = new ArrayList<String>();
             setListOfQuestions();
             //questionList = generateQuestions();
             questions.setContent(questionQueueFunction(newQuestionList));
+            
             tp.getTabs().add(questions);
 
-            Tab studentStats = new Tab();
+            studentStats = new Tab();
             studentStats.setText("Students");
             studentList = generateStudentList();
             studentStats.setContent(studentStats(studentList));
@@ -124,82 +135,97 @@ public class PresentationManagerTeacher extends PresentationManager {
         bp.setStyle("-fx-background-color: #34495e");
         bp.setPadding(new Insets(0, 10, 10, 10));
 
-        ScrollPane sp = new ScrollPane();
+        sp = new ScrollPane();
         sp.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         sp.setMaxWidth(Double.MAX_VALUE);
-        FlowPane fp = new FlowPane();
+
+        sp.setStyle("-fx-background-color: whitesmoke");
+
+        setUpQuestionList(questions);
+
+        bp.setCenter(sp);
+        return bp;
+    }
+
+    private void setUpQuestionList(List<Question> questions){
+        //System.out.println(questions.size());
+        slides = new Panel[questions.size()];
+        slidePane = new StackPane();
+        sp.setContent(null);
+        fp = new FlowPane();
         fp.setPrefWrapLength(100);
         fp.setMaxWidth(Double.MAX_VALUE);
         fp.setPadding(new Insets(5, 0, 5, 0));
         fp.setVgap(4);
         fp.setHgap(4);
         fp.setStyle("-fx-background-color: whitesmoke");
-        sp.setStyle("-fx-background-color: whitesmoke");
-
-
-        Panel[] slides = new Panel[questions.size()];
-        StackPane slidePane = new StackPane();
 
         for (int i = 0; i < questions.size(); i++) {
             slides[i] = new Panel(questions.get(i).getQuestion_data());
-            Image answered = new Image("file:projectResources/icons/Tick.png",30,30,true,true);
-            ImageView answeredView = new ImageView(answered);
-            final int j= i;
-            answeredView.addEventHandler(MouseEvent.MOUSE_CLICKED, evt->{
-                buttonActive = true;
-                ediManager.getSocketClient().answerQuestionInQuestionQueue(questions.get(0).getQuestion_id());
-                Label questionComplete = new Label("Question Answered!");
-                logger.info("Question: "+j+" Answered");
-                slides[j].setBody(questionComplete);
-                buttonActive = false;
-            });
-            answeredView.addEventHandler(MouseEvent.MOUSE_ENTERED,evt->{
-                buttonActive = true;
-            });
-            answeredView.addEventHandler(MouseEvent.MOUSE_EXITED,evt->{
-                buttonActive = false;
-            });
-            slides[i].setBody(answeredView);
+//            Image answered = new Image("file:projectResources/icons/Tick.png",50,50,true,true);
+//            ImageView answeredView = new ImageView(answered);
+//            final int j= i;
+//            answeredView.addEventHandler(MouseEvent.MOUSE_CLICKED, evt->{
+//                displayPane.getChildren().remove(slidePane);
+//                slidePane.getChildren().removeAll(backgroundRegion, lab);
+//                buttonActive = true;
+//                ediManager.getSocketClient().answerQuestionInQuestionQueue(questions.get(0).getQuestion_id());
+//                Label questionComplete = new Label("Question Answered!");
+//                logger.info("Question: "+j+" Answered");
+//                slides[j].setBody(questionComplete);
+//                buttonActive = false;
+//            });
+//            answeredView.addEventHandler(MouseEvent.MOUSE_ENTERED,evt->{
+//                buttonActive = true;
+//            });
+//            answeredView.addEventHandler(MouseEvent.MOUSE_EXITED,evt->{
+//                buttonActive = false;
+//            });
+//            slides[i].setBody(answeredView);
             //slides[i].getStyleClass().add("panel-primary");
             slides[i].setMinWidth(400);
             fp.getChildren().add(slides[i]);
-            Label lab = new Label(slides[i].getText());
-            Region backgroundRegion = new Region();
+            lab = new Label(slides[i].getText());
+            backgroundRegion = new Region();
             backgroundRegion.setBackground(new Background(new BackgroundFill(Color.web("#34495e"), null, null)));
             setText = new String();
 
-                slides[i].addEventHandler(MouseEvent.MOUSE_CLICKED, evt -> {
-                    if(!buttonActive) {
-                        if (!questionClicked) {
+            slides[i].addEventHandler(MouseEvent.MOUSE_CLICKED, evt -> {
+                if(!buttonActive) {
+                    if (!questionClicked) {
+                        displayPane.getChildren().remove(slidePane);
+                        slidePane.getChildren().removeAll(backgroundRegion, lab);
+                        lab.setFont(new Font("Helvetica", 50));
+                        lab.setTextFill(Color.WHITE);
+                        lab.setWrapText(true);
+                        setText = lab.getText();
+                        slidePane.setPrefSize(slideWidth, slideHeight);
+                        if(!buttonActive) {
+                            slidePane.getChildren().addAll(backgroundRegion, lab);
+                            displayPane.getChildren().addAll(slidePane);
+                        }
+                        questionClicked = true;
+                    } else {
+                        if (Objects.equals(lab.getText(), setText)) {
+                            displayPane.getChildren().remove(slidePane);
+                            slidePane.getChildren().removeAll(backgroundRegion, lab);
+                            questionClicked = false;
+                        } else {
                             displayPane.getChildren().remove(slidePane);
                             slidePane.getChildren().removeAll(backgroundRegion, lab);
                             lab.setFont(new Font("Helvetica", 50));
                             lab.setTextFill(Color.WHITE);
                             lab.setWrapText(true);
                             setText = lab.getText();
-                            slidePane.setPrefSize(slideWidth, slideHeight);
-                            slidePane.getChildren().addAll(backgroundRegion, lab);
-                            displayPane.getChildren().addAll(slidePane);
-                            questionClicked = true;
-                        } else {
-                            if (Objects.equals(lab.getText(), setText)) {
-                                displayPane.getChildren().remove(slidePane);
-                                slidePane.getChildren().removeAll(backgroundRegion, lab);
-                                questionClicked = false;
-                            } else {
-                                displayPane.getChildren().remove(slidePane);
-                                slidePane.getChildren().removeAll(backgroundRegion, lab);
-                                lab.setFont(new Font("Helvetica", 50));
-                                lab.setTextFill(Color.WHITE);
-                                lab.setWrapText(true);
-                                setText = lab.getText();
+                            if(!buttonActive) {
                                 slidePane.getChildren().addAll(backgroundRegion, lab);
                                 displayPane.getChildren().addAll(slidePane);
-                                questionClicked = true;
                             }
+                            questionClicked = true;
                         }
                     }
-                });
+                }
+            });
 
             teacherToolKit.addEventHandler(WindowEvent.WINDOW_CLOSE_REQUEST, evt -> {
                 displayPane.getChildren().remove(slidePane);
@@ -216,50 +242,31 @@ public class PresentationManagerTeacher extends PresentationManager {
             long oneMin = 60000;
             logger.info("TIME TAKEN: "+timeTaken);
             if(timeTaken <= oneMin){
-                System.out.println(">ONE MIN");
-              //  slides[i].setBackground(new Background(new BackgroundFill(Color.GREEN, CornerRadii.EMPTY, Insets.EMPTY)));
+
+                //  slides[i].setBackground(new Background(new BackgroundFill(Color.GREEN, CornerRadii.EMPTY, Insets.EMPTY)));
                 slides[i].setStyle("-fx-background-color: green");
             }else if(timeTaken> oneMin && timeTaken< oneMin*2){
-                System.out.println("ONE MIN");
-              //  slides[i].setBackground(new Background(new BackgroundFill(Color.GREENYELLOW, CornerRadii.EMPTY, Insets.EMPTY)));
+
+                //  slides[i].setBackground(new Background(new BackgroundFill(Color.GREENYELLOW, CornerRadii.EMPTY, Insets.EMPTY)));
                 slides[i].setStyle("-fx-background-color: greenyellow");
             }else if(timeTaken>= oneMin*2 && timeTaken< oneMin*3){
-                System.out.println("TWO MIN");
-               // slides[i].setBackground(new Background(new BackgroundFill(Color.YELLOWGREEN, CornerRadii.EMPTY, Insets.EMPTY)));
+
+                // slides[i].setBackground(new Background(new BackgroundFill(Color.YELLOWGREEN, CornerRadii.EMPTY, Insets.EMPTY)));
                 slides[i].setStyle("-fx-background-color: yellowgreen");
             }else if(timeTaken>= oneMin*3 && timeTaken< oneMin*3){
-                System.out.println("THREE MIN");
-               // slides[i].setBackground(new Background(new BackgroundFill(Color.ORANGE, CornerRadii.EMPTY, Insets.EMPTY)));
+
+                // slides[i].setBackground(new Background(new BackgroundFill(Color.ORANGE, CornerRadii.EMPTY, Insets.EMPTY)));
                 slides[i].setStyle("-fx-background-color: orange");
             }else if(timeTaken>= oneMin*4 && timeTaken< oneMin*5){
-                System.out.println("FOUR MIN");
-               // slides[i].setBackground(new Background(new BackgroundFill(Color.DARKORANGE, CornerRadii.EMPTY, Insets.EMPTY)));
+                // slides[i].setBackground(new Background(new BackgroundFill(Color.DARKORANGE, CornerRadii.EMPTY, Insets.EMPTY)));
                 slides[i].setStyle("-fx-background-color: orangered");
             }else{
-                System.out.println("FIVE MIN");
                 //slides[i].setBackground(new Background(new BackgroundFill(Color.RED, CornerRadii.EMPTY, Insets.EMPTY)));
                 slides[i].setStyle("-fx-background-color: red");
             }
-//            int finalI = i;
-//            Animation animation = new Transition() {
-//                {
-//                    setCycleDuration(Duration.minutes(5));
-//                    setInterpolator(Interpolator.EASE_OUT);
-//                }
-//
-//
-//                @Override
-//                protected void interpolate(double frac) {
-//                    Color vColor = new Color(1, 0, 0, 0 + frac);
-//                    slides[finalI].setBackground(new Background(new BackgroundFill(vColor, CornerRadii.EMPTY, Insets.EMPTY)));
-//                }
-//            };
-//            animation.play();
 
         }
         sp.setContent(fp);
-        bp.setCenter(sp);
-        return bp;
     }
 
     protected BorderPane studentStats(List<Student> studentList) {
@@ -267,8 +274,17 @@ public class PresentationManagerTeacher extends PresentationManager {
         bp.setStyle("-fx-background-color: #34495e");
         bp.setPadding(new Insets(0, 10, 10, 10));
 
-        ScrollPane sp = new ScrollPane();
-        sp.setMaxWidth(Double.MAX_VALUE);
+        sp2 = new ScrollPane();
+        sp2.setMaxWidth(Double.MAX_VALUE);
+        sp2.setStyle("-fx-background-color: whitesmoke");
+
+        setUpStudentList(studentList);
+
+        bp.setCenter(sp2);
+        return bp;
+    }
+
+    private void setUpStudentList(List<Student> studentList){
         FlowPane fp = new FlowPane();
         fp.setPrefWrapLength(100);
         fp.setMaxWidth(Double.MAX_VALUE);
@@ -276,7 +292,7 @@ public class PresentationManagerTeacher extends PresentationManager {
         fp.setVgap(4);
         fp.setHgap(4);
         fp.setStyle("-fx-background-color: whitesmoke");
-        sp.setStyle("-fx-background-color: whitesmoke");
+
 
 
         Panel[] slides = new Panel[studentList.size()];
@@ -320,13 +336,10 @@ public class PresentationManagerTeacher extends PresentationManager {
         generalStats.setMinWidth(400);
         fp.getChildren().add(generalStats);
         for (int i = 0; i < studentList.size(); i++) {
-
             fp.getChildren().add(slides[i]);
         }
 
-        sp.setContent(fp);
-        bp.setCenter(sp);
-        return bp;
+        sp2.setContent(fp);
     }
 
     @Override
@@ -340,6 +353,30 @@ public class PresentationManagerTeacher extends PresentationManager {
 
     public void setQuestionList(List<String> questionList) {
         this.questionList = questionList;
+    }
+
+    public void updateQuestionList(){
+        System.out.println("POOP");
+        setListOfQuestions();
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                setUpQuestionList(newQuestionList);
+            }
+        });
+
+
+    }
+
+    public void updateStudentList(){
+        logger.info("STUDENT LIST UPDATE");
+        studentList = generateStudentList();
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                setUpStudentList(studentList);
+            }
+        });
     }
 
     private class Student {

@@ -112,7 +112,9 @@ public class WordCloudElement extends InteractiveElement {
                 elementActive = true;
                 wordCloudPanel.getChildren().remove(start_Task);
                 VBox test = new VBox();
-                test.getChildren().addAll(countdownTile,wordCloudElements());
+                HBox dataBox = wordCloudElements();
+                dataBox.setAlignment(Pos.CENTER);
+                test.getChildren().addAll(countdownTile,dataBox);
                 wordCloudPanel.setBody(test);
                 timeline.play();
             });
@@ -124,6 +126,7 @@ public class WordCloudElement extends InteractiveElement {
             });
             wordCloudPanel.setBody(start_Task);
         }
+
         remainingTime = new Label("Time Remaining: " + timeLimit);
         final IntegerProperty i = new SimpleIntegerProperty(timeLimit);
         timeline = new Timeline(
@@ -185,7 +188,6 @@ public class WordCloudElement extends InteractiveElement {
                 .descriptionAlignment(Pos.BASELINE_RIGHT)
                 .build();
         wordCloudPanel.setVisible(visibility);
-
         getCoreNode().addEventFilter(MouseEvent.MOUSE_CLICKED, event -> performOnClickAction());
     }
 
