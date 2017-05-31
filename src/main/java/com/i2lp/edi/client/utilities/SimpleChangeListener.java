@@ -5,5 +5,5 @@ package com.i2lp.edi.client.utilities;
  * A Functional Interface for Simple On Change event listeners
  */
 public interface SimpleChangeListener {
-	void changed();
+	void changed(Object oldVal, Object newVal);
 }

@@ -9,6 +9,8 @@ import com.i2lp.edi.server.packets.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Timer;
@@ -35,6 +37,8 @@ public class PresentationSession {
 
     private Date startDate;
     private Date endDate;
+    private ArrayList<Duration> slideTimes;//Amount of time spent on each slide.
+    private Instant slideStart;//The time at which the current slide started.
 
     public PresentationSession(EdiManager ediManager) {
         this.ediManager = ediManager;
@@ -47,6 +51,9 @@ public class PresentationSession {
         interactiveElementRecords = ediManager.getSocketClient().getInteractiveElementsForPresentation(activePresentation.getPresentationMetadata().getPresentationID());
         //Update Question Queue
         questionQueue = ediManager.getSocketClient().getQuestionsForPresentation(activePresentation.getPresentationMetadata().getPresentationID());
+        //Add the slide timers:
+        addSlideTimeListener();
+        logger.info("Added Slide Timers");
 
         logger.info("Live Presentation Session beginning at " + (startDate = new Date()).toString());
     }
@@ -124,5 +131,31 @@ public class PresentationSession {
 
     public void setInteractionDataForInteractiveElements(){
 
+    }
+
+    private void addSlideTimeListener() {
+        //Initialise the array with eough space for all of the slides. and set the time on ach slide to 0
+        slideTimes = new ArrayList<>();
+        int numberOfSlides = ediManager.getPresentationManager().getPresentationElement().getMaxSlideNumber();
+        for(int i=0; i <= numberOfSlides; i++){
+            slideTimes.add(Duration.ZERO);
+        }
+
+        ediManager.getPresentationManager().addSlideChangeListener((prevVal, newVal) -> {
+            int previousSlideNumber = (int) prevVal;
+            int newSlideNumber = (int) newVal;
+
+            if (previousSlideNumber != -1) {//If not at the beginning of the presentation
+                Duration timeOnPrevSlide = Duration.between(slideStart, Instant.now());
+                slideStart = Instant.now();
+
+                //Otherwise if we have been on this slide befre then add to the tiem already spent on it
+                slideTimes.set(previousSlideNumber, slideTimes.get(previousSlideNumber).plus(timeOnPrevSlide));//Add the time on the previous slie to its stored value.
+                logger.info("Time spent on slide " + (previousSlideNumber+1) + ": " + timeOnPrevSlide.getSeconds() + "s Total time: " + slideTimes.get(previousSlideNumber).getSeconds() + "s");
+            } else {
+                slideStart = Instant.now();
+                logger.info("First slide started at: " + slideStart.toString());
+            }
+        });
     }
 }

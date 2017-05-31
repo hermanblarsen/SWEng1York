@@ -230,14 +230,16 @@ public abstract class PresentationManager {
 
         displayCurrentSlide();
 
+        beginLiveSession();//Start the live session before the presentation starts!
+
         if (presentationElement.isAutoplayPresentation()) {
             autoPlay();
         } else {
             //Move to StartSequence 1
             slideAdvance(presentationElement, Slide.SLIDE_FORWARD);
+            notifySlideChangeListener(-1, currentSlideNumber);//Send out initial Slide change event.
         }
 
-        beginLiveSession();
     }
 
     private void beginLiveSession() {
@@ -744,6 +746,7 @@ public abstract class PresentationManager {
                         //Update MainUI panes when changing slides to account for new Slide root pane.
                         displayCurrentSlide();
                     }
+                    notifySlideChangeListener(currentSlideNumber-1, currentSlideNumber);
                 } else if (changeStatus == Slide.SLIDE_PRE_CHANGE) {
                     //Useful state for Thumbnail generation
                     presentationStatus = Presentation.SLIDE_LAST_ELEMENT;
@@ -770,7 +773,9 @@ public abstract class PresentationManager {
 
                     //Update MainUI panes when changing slides to account for new Slide root pane.
                     displayCurrentSlide();
+                    notifySlideChangeListener(currentSlideNumber+1, currentSlideNumber);
                 }
+
             }
         }
         presentationToAdvance.setCurrentSlide(presentationToAdvance.getSlideList().get(currentSlideNumber));
@@ -800,7 +805,7 @@ public abstract class PresentationManager {
                 logger.warn("Failed to find Element with Sequence number of " + slideToAdvance.getCurrentSequenceNumber() + " in slideElementList.");
             }
             currentSequenceNumber++;
-            notifySequenceChangeListeners();//Notify any sequence number listeners that there has been a change
+            notifySequenceChangeListeners(currentSequenceNumber-1, currentSequenceNumber);//Notify any sequence number listeners that there has been a change
         } else if ((slideToAdvance.getCurrentSequenceNumber() > 1) && (direction == Slide.SLIDE_BACKWARD)) {  //If we're going backwards and still elements left
             try {
                 checkInVisibleSet = Slide.searchForSequenceElement(slideToAdvance.getSlideElementList(), slideToAdvance.getCurrentSequenceNumber());
@@ -815,7 +820,7 @@ public abstract class PresentationManager {
             }
             slideToAdvance.setCurrentSequenceNumber(slideToAdvance.getCurrentSequenceNumber() - 1);
             currentSequenceNumber--;
-            notifySequenceChangeListeners();//Notify any sequence number listeners that there has been a change
+            notifySequenceChangeListeners(currentSequenceNumber+1, currentSequenceNumber);//Notify any sequence number listeners that there has been a change
         } else {
             //If we're at limit of sequence number, alert calling method that we need to move to next/previous slide dependent on direction and reset sequence number
             switch (direction) {
@@ -1102,6 +1107,10 @@ public abstract class PresentationManager {
         isEmbeddedBrowserOpen = isOpen;
     }
 
+    public int getCurrentSlideNumber() {
+        return currentSlideNumber;
+    }
+
     //Sequence Number Listener implementations:
     CopyOnWriteArrayList<SimpleChangeListener> sequenceChangeListeners = new CopyOnWriteArrayList<SimpleChangeListener>();
 
@@ -1118,9 +1127,9 @@ public abstract class PresentationManager {
     /**
      * Notifies all of the current sequence change listeners of a change.
      */
-    public void notifySequenceChangeListeners() {
+    public void notifySequenceChangeListeners(int oldVal, int newVal) {
         for (SimpleChangeListener listener : sequenceChangeListeners) {
-            listener.changed();
+            listener.changed(oldVal, newVal);
         }
     }
 
@@ -1132,8 +1141,22 @@ public abstract class PresentationManager {
         return presentationElement;
     }
 
-    public int getCurrentSlideNumber() {
-        return currentSlideNumber;
+
+    //Slide Changed Event:
+    CopyOnWriteArrayList<SimpleChangeListener> slideChangeListeners = new CopyOnWriteArrayList<>();
+
+    public void addSlideChangeListener(SimpleChangeListener listener){
+        slideChangeListeners.add(listener);
+    }
+
+    public void removeSlideChangeListener(SimpleChangeListener listener){
+        slideChangeListeners.remove(listener);
+    }
+
+    public void notifySlideChangeListener(int oldVal, int newVal){
+        for(SimpleChangeListener listener: slideChangeListeners){
+            listener.changed(oldVal, newVal);
+        }
     }
 
     public void setWordCloudActive(boolean wordCloudActive) {

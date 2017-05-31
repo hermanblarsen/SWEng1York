@@ -322,7 +322,7 @@ public abstract class SlideElement {
     final SimpleChangeListener sequenceChangeListener = new SimpleChangeListener() {
         //Changing Sequence so close the browser
         @Override
-        public void changed() {
+        public void changed(Object oldVal, Object newVal) {
             closeEmbeddedBrowser();
         }
     };
