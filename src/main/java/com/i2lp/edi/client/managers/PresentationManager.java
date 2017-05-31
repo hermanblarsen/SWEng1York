@@ -66,7 +66,7 @@ public abstract class PresentationManager {
 
     protected Scene scene;
     protected StackPane displayPane;
-    private VBox sceneBox;
+    protected VBox sceneBox;
 
     protected Presentation presentationElement;
     protected ProgressBar progressBar;
@@ -83,11 +83,11 @@ public abstract class PresentationManager {
     private boolean mouseActivityRegistered = true;
     private boolean mouseDown = false;
     private EventHandler<MouseEvent> disabledCursorFilter;
-    private BorderPane controlsPane;
-    private HBox presControls;
-    private VBox drawControls;
+    protected BorderPane controlsPane;
+    protected HBox presControls;
+    protected VBox drawControls;
     private Region blackRegion;
-    private DrawPane drawPane;
+    protected DrawPane drawPane;
     private ImageView visibilityButton;
     public ImageView linkButton;
     private Popup colourPopup;
@@ -103,9 +103,9 @@ public abstract class PresentationManager {
     private boolean isMouseOverSlide = true;
     private double preFullscreenSlideWidth;
     private double preFullscreenSlideHeight;
-    private boolean isMouseOverControls = false;
-    private boolean isDrawModeOn = false;
-    private boolean isDrawPaneVisible = true;
+    protected boolean isMouseOverControls = false;
+    protected boolean isDrawModeOn = false;
+    protected boolean isDrawPaneVisible = true;
     private boolean isThumbnailGen = false;
     private boolean isEndPresentation = false;
     private StackPane slidePane;

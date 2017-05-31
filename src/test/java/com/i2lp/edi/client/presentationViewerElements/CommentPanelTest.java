@@ -21,7 +21,7 @@ import static org.junit.Assert.*;
 /**
  * Created by Luke on 29/04/2017.
  */
-@Ignore
+//@Ignore
 public class CommentPanelTest extends ApplicationTest {
 
     private CommentPanel myCommentPanel;
@@ -75,11 +75,12 @@ public class CommentPanelTest extends ApplicationTest {
         assertTrue(slide.getUserComments().contains("New Test 456"));
     }
 
+    @Ignore //TODO @Luke
     @Test
     public void submitTest() {
         clickOn(myCommentPanel).write("Test 123");
 //        clickOn(submitButton);
-        assertTrue(true); //TODO
+        assertTrue(true);
         //Comment submission not yet implemented
     }
 

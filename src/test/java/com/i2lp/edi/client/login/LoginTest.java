@@ -68,7 +68,7 @@ public class LoginTest extends ApplicationTest{
         doubleClickOn(userNameField).write("Teacher");
         doubleClickOn(passwordField).write("password");
 
-        clickOn(loginButton);
+        //clickOn(loginButton);
     }
 
     @Test

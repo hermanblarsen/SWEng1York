@@ -98,11 +98,12 @@ public abstract class Dashboard extends Application {
     protected TextField searchField;
     protected Button selectAllButton;
     protected ArrayList<Button> subjectButtons;
-    private ArrayList<CheckBox> subjectCheckboxes;
-    private ArrayList<Subject> filterSubjects;
-    protected Button loadPresButton;
+    protected ArrayList<CheckBox> subjectCheckboxes;
+    protected ArrayList<Subject> filterSubjects;
+    protected Button openPresButton;
     protected FileChooser fileChooser;
     protected MenuBar menuBar;
+    protected Popup aboutPopup;
 
     @Override
     public void start(Stage dashboardStage) {
@@ -195,7 +196,7 @@ public abstract class Dashboard extends Application {
 
         HBox openAddButtonsHBox = new HBox(10);
 
-        final FileChooser fileChooser = new FileChooser();
+        fileChooser = new FileChooser();
         FileChooser.ExtensionFilter xmlExtensionFilter =
                 new FileChooser.ExtensionFilter("XML Presentations (*.XML)", "*.xml", "*.XML");
         fileChooser.getExtensionFilters().add(xmlExtensionFilter);
@@ -204,7 +205,7 @@ public abstract class Dashboard extends Application {
         //fileChooser.setInitialDirectory(new File(System.getProperty("user.home"))); //TODO reinstate when tested
         fileChooser.setTitle("Open Presentation");
 
-        Button openPresButton = new Button("Open Presentation", new ImageView(new Image("file:projectResources/icons/arrow-down.png", 10, 10, true, true)));
+        openPresButton = new Button("Open Presentation", new ImageView(new Image("file:projectResources/icons/arrow-down.png", 10, 10, true, true)));
         openPresButton.getStyleClass().setAll("btn", "btn-default");
         openPresButton.setOnAction(event -> {
             ContextMenu menu = new ContextMenu();
@@ -966,7 +967,7 @@ public abstract class Dashboard extends Application {
     }
 
     private void showAboutWindow() {
-        Popup aboutPopup = new Popup();
+        aboutPopup = new Popup();
         StackPane aboutStackPane = new StackPane();
         aboutStackPane.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> aboutPopup.hide());
         aboutPopup.getContent().add(aboutStackPane);
