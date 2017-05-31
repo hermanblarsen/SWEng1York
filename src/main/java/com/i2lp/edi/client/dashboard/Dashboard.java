@@ -43,6 +43,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicReference;
@@ -1191,6 +1192,9 @@ public abstract class Dashboard extends Application {
         dateTimePicker.getScheduleButton().setOnAction(event -> {
             logger.info("Scheduled to: " + dateTimePicker.getDateTime().toString());
             panel.getPresentation().setGoLiveDate(dateTimePicker.getDateTime());
+            ediManager.getSocketClient().setPresentationGoLive(
+                    panel.getPresentation().getPresentationMetadata().getPresentationID(),
+                    Timestamp.valueOf(panel.getPresentation().getGoLiveDateTime()).toString());
             schedulerPopup.hide();
             updateCalendar();
         });

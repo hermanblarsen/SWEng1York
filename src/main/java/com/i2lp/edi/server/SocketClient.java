@@ -15,10 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.URISyntaxException;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicReference;
@@ -438,15 +435,43 @@ public class SocketClient {
     public void alertServerToUpload(String presentationName, int moduleID, Presentation presentation ) {
         socket.emit("NewUpload", presentationName + " " + moduleID);
         socket.on("NewUploadStatus", objects -> {
+            int presentationId = Integer.parseInt((String)objects[0]);
             logger.info("Added " + presentationName + " presentation with the following ID " + objects[0]);
-            if (Integer.parseInt((String)objects[0]) != -1) {
+            if (presentationId != -1) {
             	logger.info("Adding interactive elements to DB");
                 sendInteractiveElementsToServer(presentation, Integer.parseInt((String)objects[0]));//Update the interactive_elements table for the new presentation
+                presentation.getPresentationMetadata().setDocumentID(Integer.toString(presentationId));
                 ediManager.getPresentationLibraryManager().updatePresentations(); //Go and download the presentation from the server
             } else {
                 logger.warn("Failed to add presentation to the presentations database");
             }
         });
+    }
+
+    public boolean setPresentationGoLive(int presentationId, String goLiveDate) {
+        boolean statementSuccess = false;
+
+        try (PGConnection connection = (PGConnection) dataSource.getConnection()) {
+            PreparedStatement statement = connection.prepareStatement("UPDATE presentations SET go_live_timestamp=? WHERE presentation_id=?");
+
+            statement.setString(1, goLiveDate);
+            statement.setInt(2, presentationId);
+
+            //Call Query on database
+            statementSuccess = statement.execute();
+
+            if (statementSuccess) {
+                logger.error("Unable to set goLive date for presentation:  " + presentationId);
+            } else {
+                logger.info("Added goLive date for presentation " + presentationId + " as " + goLiveDate);
+            }
+
+            statement.close();
+        } catch (Exception e) {
+            logger.error("Unable to connect to PostgreSQL on port 5432. PJDBC dump:", e);
+        }
+
+        return statementSuccess;
     }
 
     private void sendInteractiveElementsToServer(Presentation presentation, int presentationId) {
