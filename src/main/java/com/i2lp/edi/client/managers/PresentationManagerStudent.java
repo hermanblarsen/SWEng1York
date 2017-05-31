@@ -20,6 +20,7 @@ import javafx.stage.Stage;
  */
 public class PresentationManagerStudent extends PresentationManager {
     protected Boolean elementClicked = false;
+    protected Stage questionQueueStage;
 
     public PresentationManagerStudent(EdiManager ediManager) {
         super(ediManager);
@@ -37,7 +38,7 @@ public class PresentationManagerStudent extends PresentationManager {
     }
 
     protected void questionQueueFunction() {
-        Stage questionQueueStage = new Stage();
+        questionQueueStage = new Stage();
         questionQueueStage.setTitle("Send a Question");
         BorderPane border = new BorderPane();
         border.setStyle("-fx-background-color: #34495e");

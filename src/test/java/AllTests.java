@@ -3,6 +3,7 @@
  * Created by habl on 26/02/2017.
  */
 
+import com.i2lp.edi.client.dashboard.DashboardTest;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
@@ -10,10 +11,18 @@ import org.junit.runners.Suite.SuiteClasses;
 @RunWith(Suite.class)
 @SuiteClasses({
         //Dashboard
-        com.i2lp.edi.client.dashboard.TeacherDashboardTest.class,
         com.i2lp.edi.client.dashboard.StudentDashboardTest.class,
+        com.i2lp.edi.client.dashboard.TeacherDashboardTest.class,
+
         //Editor
         com.i2lp.edi.client.editor.PollEditorTest.class,
+
+        //login
+        com.i2lp.edi.client.login.LoginTest.class,
+
+        //Manager
+        com.i2lp.edi.client.managers.StudentPresentationViewerTest.class,
+        com.i2lp.edi.client.managers.TeacherPresentationViewerTest.class,
 
         //PresentationElements
         com.i2lp.edi.client.presentationElements.AudioElementIntegrationTestbench.class,
@@ -33,9 +42,6 @@ import org.junit.runners.Suite.SuiteClasses;
 
         //Utilities
         com.i2lp.edi.client.utilities.ParserXMLTest.class,
-
-        //login
-        com.i2lp.edi.client.login.LoginTest.class,
 })
 public class AllTests {
     //Will run all tests above. -Herman

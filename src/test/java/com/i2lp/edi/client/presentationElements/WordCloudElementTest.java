@@ -1,11 +1,15 @@
 package com.i2lp.edi.client.presentationElements;
 
 import com.i2lp.edi.client.animation.Animation;
+import com.i2lp.edi.client.managers.EdiManager;
+import com.i2lp.edi.client.managers.PresentationManager;
+import com.i2lp.edi.client.managers.PresentationManagerTeacher;
 import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import org.junit.Assume;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.testfx.framework.junit.ApplicationTest;
 
@@ -15,6 +19,8 @@ import static org.junit.Assert.*;
 /**
  * Created by Luke on 26/05/2017.
  */
+
+@Ignore
 public class WordCloudElementTest extends ApplicationTest {
     private WordCloudElement myWordCloudElement;
     private BorderPane wordCloudPane;
@@ -25,6 +31,10 @@ public class WordCloudElementTest extends ApplicationTest {
             System.out.println("Skipping test requiring graphics on circle.ci (CI server is headless)");
             return;
         }
+
+        //EdiManager ediManager = new EdiManager();
+        //PresentationManager presManager = new PresentationManagerTeacher(ediManager);
+        //myWordCloudElement.setPresentationManager(presManager);
 
         wordCloudPane = new BorderPane();
         Scene scene = new Scene(wordCloudPane, 600, 600);
