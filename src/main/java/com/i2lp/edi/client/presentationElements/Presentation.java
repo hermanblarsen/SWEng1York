@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,6 +32,7 @@ public class Presentation extends Pane {
     private String documentTitle;
     private int currentSlideNumber;
     private String documentFilePath;
+    private LocalDateTime goLiveDateTime;
 
     //From Schema
     private String documentID;
@@ -474,9 +476,21 @@ public class Presentation extends Pane {
 
     public void setPresentationMetadata(PresentationMetadata presentationMetadata) {
         this.presentationMetadata = presentationMetadata;
+        try {
+            goLiveDateTime = presentationMetadata.getGoLiveTimestamp().toLocalDateTime();
+        } catch (NullPointerException e) {
+            //Exception will be thrown if goLiveDateTime is not specified. Do nothing.
+        }
     }
 
     public PresentationMetadata getPresentationMetadata() {
         return presentationMetadata;
     }
+
+    public void setGoLiveDate(LocalDateTime goLiveDateTime) {
+        this.goLiveDateTime = goLiveDateTime;
+        presentationMetadata.setGoLiveTimestamp(goLiveDateTime);
+    }
+
+    public LocalDateTime getGoLiveDateTime() { return goLiveDateTime; }
 }

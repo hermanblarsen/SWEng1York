@@ -40,7 +40,6 @@ public class TimePicker extends HBox {
         hours.getItems().add("21");
         hours.getItems().add("22");
         hours.getItems().add("23");
-        hours.setValue(hours.getItems().get(0));
 
         minutes = new ComboBox<>();
         minutes.getItems().add("00");
@@ -55,7 +54,14 @@ public class TimePicker extends HBox {
         minutes.getItems().add("45");
         minutes.getItems().add("50");
         minutes.getItems().add("55");
-        minutes.setValue(minutes.getItems().get(0));
+
+        LocalTime now = LocalTime.now();
+        int hour = now.getHour();
+        int minute = now.getMinute();
+        double minuteRounder = minute/5;
+        minute = ((int) (Math.round(minuteRounder))) % 12;
+        hours.setValue(hours.getItems().get(hour));
+        minutes.setValue(minutes.getItems().get(minute));
 
         Label separator = new Label(":");
 

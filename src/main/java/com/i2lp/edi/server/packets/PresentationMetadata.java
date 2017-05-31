@@ -1,6 +1,8 @@
 package com.i2lp.edi.server.packets;
 
+import java.sql.Date;
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -15,7 +17,7 @@ public class PresentationMetadata {
     private int current_slide_number;
     private String xml_url;
     private boolean live;
-    private String subjectName; //TODO: Get from database
+    private String subjectName;
     private Timestamp go_live_timestamp;
 
     //Temporary
@@ -68,8 +70,9 @@ public class PresentationMetadata {
         this.live = live;
     }
 
+    public int getModule_id() { return module_id; }
 
-    public int getModule_id() {
-        return module_id;
-    }
+    public void setGoLiveTimestamp(LocalDateTime goLiveTimeDateTime) { go_live_timestamp = Timestamp.valueOf(goLiveTimeDateTime); }
+
+    public Timestamp getGoLiveTimestamp() { return go_live_timestamp; }
 }

@@ -62,7 +62,8 @@ public class PresentationPanel extends PreviewPanel {
                                         "Author: " + getPresentation().getAuthor() + "\n" +
                                         "Subject: " + getPresentation().getSubject().getSubjectName() + "\n" +
                                         "Description: " + getPresentation().getDescription() + "\n" +
-                                        "Tags: " + getPresentation().getTags());
+                                        "Tags: " + getPresentation().getTags() + "\n" +
+                                        "pres_id: " + getPresentation().getPresentationMetadata().getPresentationID());
         Tooltip.install(this, tooltip);
     }
 
