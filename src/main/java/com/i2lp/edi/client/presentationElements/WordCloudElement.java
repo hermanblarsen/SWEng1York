@@ -245,13 +245,13 @@ public class WordCloudElement extends InteractiveElement {
         wc.build(wordFrequencies);
 
         String pathName = presentationID+Integer.toString(slideID);
-        File wordcloudPath = new File(PRESENTATIONS_PATH + "/Wordclouds/"+presentationID+"/"+pathName+".png");
+        File wordcloudPath = new File(PRESENTATIONS_PATH+"/" +presentationID+"/Wordclouds/"+pathName+".png");
         if (!wordcloudPath.exists()) {
             wordcloudPath.getParentFile().mkdirs(); //Create directory structure if not present yet
         }
-        wc.writeToFile(PRESENTATIONS_PATH + "/Wordclouds/"+presentationID+"/"+pathName+".png");
+        wc.writeToFile(PRESENTATIONS_PATH+"/" + presentationID+"/Wordclouds/"+pathName+".png");
 
-        Image wordCloud = new Image("file:" + PRESENTATIONS_PATH + "/Wordclouds/"+presentationID+"/"+pathName+".png",xSize,ySize,true,true);
+        Image wordCloud = new Image("file:" + PRESENTATIONS_PATH +"/"+ presentationID+"/Wordclouds/"+pathName+".png",xSize,ySize,true,true);
 
         ImageView iv = new ImageView(wordCloud);
         wordCloudPanel.setBody(iv);
