@@ -201,7 +201,7 @@ public class SocketServer {
 
                 //Insert new presentation into database
                 try (PGConnection connection = (PGConnection) dataSource.getConnection()) {
-                    PreparedStatement statement = connection.prepareStatement("select sp_addpresentationtomodule(?, ?);");
+                    PreparedStatement statement = connection.prepareStatement("select sp_addpresentationtomodulenew(?, ?);");
 
                     //Fill prepared statements to avoid SQL injection
                     statement.setInt(1, moduleID);
@@ -211,7 +211,7 @@ public class SocketServer {
                     ResultSet presentationAddStatus = statement.executeQuery();
 
                     while (presentationAddStatus.next()) {
-                        logger.info("Status of Presentation SQL insertion: " + presentationAddStatus.getString(1));
+                        logger.info("Presentation SQL Insertion returned id: " + presentationAddStatus.getString(1));
                         client.sendEvent("NewUploadStatus", presentationAddStatus.getString(1)); //Send status packet back to user
                     }
                     presentationAddStatus.close();

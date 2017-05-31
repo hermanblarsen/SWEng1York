@@ -1,5 +1,6 @@
 package com.i2lp.edi.client.managers;
 
+import com.i2lp.edi.client.presentationElements.Presentation;
 import com.i2lp.edi.client.utilities.ParserXML;
 import com.i2lp.edi.client.utilities.ZipUtils;
 import com.i2lp.edi.server.SocketClient;
@@ -212,8 +213,9 @@ public class PresentationLibraryManager {
     public void uploadPresentation(String fileToUpload, String filename, int moduleID) {
 
         ParserXML parserXML = new ParserXML(fileToUpload); //TODO: @Amrik Can this entire method be refactored to take a Presentation as an argument instead fileToUpload?
+        Presentation presentation = parserXML.parsePresentation();
         //Generate thumbnails for Slides.
-        ThumbnailGenerationManager.generateSlideThumbnails(parserXML.parsePresentation() ,false);
+        ThumbnailGenerationManager.generateSlideThumbnails( presentation,false);
         try {
             FileUtils.copyFile(new File(fileToUpload), new File(PRESENTATIONS_PATH + filename + File.separator + filename + ".xml"));
         } catch (IOException e) {
@@ -258,7 +260,7 @@ public class PresentationLibraryManager {
                 inputStream.close();
                 if (done) {
                     logger.info("The presentation has uploaded successfully. Awaiting server-side processing.");
-                    socketClient.alertServerToUpload(filename, moduleID); //Tell server a new file has arrived
+                    socketClient.alertServerToUpload(filename, moduleID, presentation); //Tell server a new file has arrived
                     new File(zipPath).delete(); //Clean up zip after upload
                 }
             } catch (IOException e) {

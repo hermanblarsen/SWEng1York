@@ -249,7 +249,7 @@
 
 
         <slide slideid="4">
-            <poll elementid ="0" layer="1" visibility="true" startsequence="1" endsequence="2">
+            <poll elementid ="1" layer="1" visibility="true" startsequence="1" endsequence="2">
                 <timelimit>5</timelimit>
                 <question>Insert Longer Question Here</question>
                 <answers>answer1,answer2,answer3,answer4</answers>

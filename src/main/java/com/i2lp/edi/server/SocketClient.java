@@ -1,6 +1,7 @@
 package com.i2lp.edi.server;
 
 import com.i2lp.edi.client.managers.EdiManager;
+import com.i2lp.edi.client.presentationElements.*;
 import com.i2lp.edi.client.utilities.Utilities;
 import com.i2lp.edi.server.packets.*;
 import com.impossibl.postgres.api.jdbc.PGConnection;
@@ -429,14 +430,36 @@ public class SocketClient {
      * Send packet to server Socket to alert it that a new presentation is available for
      * integration into the Edi database.
      */
-    public void alertServerToUpload(String presentationName, int moduleID) {
+    public void alertServerToUpload(String presentationName, int moduleID, Presentation presentation ) {
         socket.emit("NewUpload", presentationName + " " + moduleID);
         socket.on("NewUploadStatus", objects -> {
-            logger.info("Addition of " + presentationName + " presentation had the following status: " + objects[0]);
-            if (((String) objects[0]).contains("Success")) {
+            logger.info("Added " + presentationName + " presentation with the following ID " + objects[0]);
+            if (Integer.parseInt((String)objects[0]) != -1) {
+            	logger.info("Adding interactive elements to DB");
+                sendInteractiveElementsToServer(presentation, Integer.parseInt((String)objects[0]));//Update the interactive_elements table for the new presentation
                 ediManager.getPresentationLibraryManager().updatePresentations(); //Go and download the presentation from the server
+            } else {
+                logger.warn("Failed to add presentation to the presentations database");
             }
         });
+    }
+
+    private void sendInteractiveElementsToServer(Presentation presentation, int presentationId) {
+    //Presentation successfully uploaded, send the details of the interactive elements to the DB.
+    for( Slide slides : presentation.getSlideList())
+        for (SlideElement element : slides.getSlideElementList()) {
+            if (element instanceof InteractiveElement) {
+                ArrayList<InteractiveElement> interactiveElements = new ArrayList<>();
+                interactiveElements.add((InteractiveElement) element);
+                setInteractiveElementsForPresentation(
+                        interactiveElements,
+                        presentationId,//Pres ID
+                        slides.getSlideID()//Slide Number
+                );
+                logger.info("Adding interactive elements from slide " + slides.getSlideID() + " Presentation: " + presentationId);
+            }
+        }
+    logger.info("Finished uploading interactive elements");
     }
 
     /**
@@ -633,6 +656,49 @@ public class SocketClient {
         toReturn[1] = currentSequenceNumber;
 
         return toReturn;
+    }
+
+    public boolean setInteractiveElementsForPresentation(ArrayList<InteractiveElement> elements, int presentationID, int slideNumber) {
+        boolean statementSuccess = false;
+        try (PGConnection connection = (PGConnection) dataSource.getConnection()) {
+            for (InteractiveElement element : elements) {
+                PreparedStatement statement = connection.prepareStatement("SELECT * FROM public.sp_add_and_replace_interactive_element(?,?,?,?,?,?)");
+
+                statement.setInt(1, element.getElementID());
+                statement.setInt(2, presentationID);
+                statement.setString(3, "");//Data
+
+                if (element instanceof WordCloudElement) {
+                    statement.setString(4, InteractiveElement.WORD_CLOUD);
+                } else if (element instanceof PollElement) {
+                    statement.setString(4, InteractiveElement.POLL);
+                } else {
+                    logger.error("Unknown Interactive element type: " + element.toString());
+                }
+
+                statement.setString(5, "");//Interval
+                statement.setInt(6, slideNumber);
+
+                //Call stored procedure on database
+                ResultSet rs = statement.executeQuery();
+
+                String status = "failure";
+
+                while (rs.next()) {
+                    status = rs.getString(1);
+                }
+
+                if (status.equals("success")) {
+                    statementSuccess = statementSuccess && true;//Ensure we know if any of them have failed.
+                    logger.info("Successfully added interactive element");
+                } else logger.error("Unable to add element " + status);
+
+
+            }
+        } catch (Exception e) {
+            logger.error("Unable to connect to PostgreSQL on port 5432. PJDBC dump:", e);
+        }
+        return true;
     }
 
     public boolean setUserActivePresentation(int presentationID, int userID) {
