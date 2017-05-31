@@ -185,11 +185,15 @@ public class SocketClient {
 
 
                 case "modules":
-                    logger.info("Modules database changed!");
+                    if (ediManager.getPresentationManager() == null) {
+                        if (ediManager.getPresentationLibraryManager() != null) {
+                            ediManager.getPresentationLibraryManager().updatePresentations(); //Update presentation information
+                        }
+                    }
                     break;
 
                 case "questions":
-                    if (ediManager.getPresentationManager() != null) {//If in a presentation
+                    if (ediManager.getPresentationManager() != null) {//If in a presentationforeign
                         if (ediManager.getPresentationManager().getPresentationSession() != null) { //a teacher in a live presentation
                             ediManager.getPresentationManager().getPresentationSession().setQuestionQueue(ediManager.getSocketClient().getQuestionsForPresentation(ediManager.getPresentationManager().getPresentationElement().getPresentationMetadata().getPresentationID())); //Update the question queue in the session
 
@@ -498,37 +502,27 @@ public class SocketClient {
      * Delete the requested presentation from the respective module, deleting the data base table reference and the server zip contents
      *
      * @param presentationID
-     * @param moduleID
      * @return
      */
-    public String removePresentationFromModule(int presentationID, int moduleID) { //TODO @Amrik make delete zip stuff. and maybe my logic
+    public String removePresentationFromModule(int presentationID) {
         String return_status_removal = "";
-        String xml_path = "";
         try (PGConnection connection = (PGConnection) dataSource.getConnection()) {
-            PreparedStatement statementXml = connection.prepareStatement("SELECT * FROM edi.public.sp_getpresentationsformodule(?);");
-            //Fill prepared statements to avoid SQL injection
-            statementXml.setInt(1, moduleID);
-
-            //Call stored procedure on database
-            ResultSet getXmlUrlResultSet = statementXml.executeQuery();
-
-            while (getXmlUrlResultSet.next()) {
-                int presentationIdTemp = getXmlUrlResultSet.getInt("presentation_id");
-                if (presentationIdTemp == presentationID) xml_path = getXmlUrlResultSet.getString("xml_url");
-            }
-            statementXml.close();
-
             //When the xml for the presentation is retrieved, then remove it for the respective module
-            PreparedStatement statementRemovePresentation = connection.prepareStatement("SELECT edi.public.sp_removepresentationfrommodule(?, ?);");
+            PreparedStatement statementRemovePresentation = connection.prepareStatement("SELECT * FROM edi.public.sp_removepresentation(?);");
             //Fill prepared statements to avoid SQL injection
-            statementRemovePresentation.setInt(1, moduleID);
-            statementRemovePresentation.setString(2, xml_path);
+            statementRemovePresentation.setInt(1, presentationID);
 
             //Call stored procedure on database
             ResultSet removalStatus = statementRemovePresentation.executeQuery();
 
             while (removalStatus.next()) {
-                return_status_removal = removalStatus.getString(1); //TODO is this right Amrik?
+                return_status_removal = removalStatus.getString(1);
+            }
+
+            if(return_status_removal.contains("success")){
+                logger.info("Presentation with ID: " + presentationID + " successfully removed");
+            } else {
+                logger.error("Unable to remove presentation: " + return_status_removal);
             }
 
             statementRemovePresentation.close();

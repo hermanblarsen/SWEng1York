@@ -200,10 +200,10 @@ public class PresentationLibraryManager {
         return remotePresentationDocumentIDs;
     }
 
-    public boolean removePresentation(int presentationID, int moduleID){ //TODO needs thinking @Amrik.
+    public boolean removePresentation(int presentationID){
         boolean status = false;
         String return_status;
-        return_status = socketClient.removePresentationFromModule(presentationID, moduleID);
+        return_status = socketClient.removePresentationFromModule(presentationID);
 
         if (return_status.contains("Success")) status = true;
 

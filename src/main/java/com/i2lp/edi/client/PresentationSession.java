@@ -90,7 +90,6 @@ public class PresentationSession {
                 ediManager.getSocketClient().setInteractiveElementLive(activePresentation.getPresentationMetadata().getPresentationID(), finalLiveElement.getInteractive_element_id(), false);
                 logger.info("Interactive element response window closed");
 
-
                 //Find Interactions that belong to this current interactive element
                 if (!interactionsFromStudents.isEmpty()) {
                     for (InteractionRecord interactionRecord : interactionsFromStudents) {

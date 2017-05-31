@@ -982,7 +982,7 @@ public abstract class Dashboard extends Application {
         Presentation presentationToDelete = previewPanel.getPresentation();
 
         //Try to remove the presentation from the server
-        boolean successful_removal = ediManager.getPresentationLibraryManager().removePresentation(presentationToDelete.getPresentationMetadata().getPresentationID(), presentationToDelete.getPresentationMetadata().getModule_id());
+        boolean successful_removal = ediManager.getPresentationLibraryManager().removePresentation(presentationToDelete.getPresentationMetadata().getPresentationID());
 
         if (successful_removal) {
             updateAvailablePresentations();

@@ -257,7 +257,6 @@ public class WordCloudElement extends InteractiveElement {
         wordCloudPanel.setBody(iv);
     }
 
-
     public int getTimeLimit() {
         return timeLimit;
     }
