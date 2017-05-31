@@ -145,37 +145,6 @@ public class WordCloudElement extends InteractiveElement {
             ediManager.getPresentationManager().setWordCloudActive(false);
             elementActive = false;
             wordCloudPanel.getChildren().removeAll();
-            FrequencyAnalyzer fa = new FrequencyAnalyzer();
-            List<WordFrequency> wordFrequencies = fa.load(wordList);
-
-            Dimension dimension = new Dimension((int)(xSize*slideWidth),(int)(ySize*slideHeight));
-            WordCloud wc = new WordCloud(dimension, CollisionMode.PIXEL_PERFECT);
-            wc.setPadding(2);
-            if(cloudShapePath != null){
-                try {
-                    wc.setBackground(new PixelBoundryBackground(cloudShapePath));
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }else {
-                float rad = (xSize*(float)slideWidth)/2;
-                wc.setBackground(new CircleBackground(Math.round(rad)));
-             }
-            wc.setColorPalette(new ColorPalette(Color.ORANGE,Color.GREEN,Color.cyan));
-            wc.setFontScalar(new SqrtFontScalar(10,40));
-            wc.build(wordFrequencies);
-
-            String pathName = presentationID+Integer.toString(slideID);
-            File wordcloudPath = new File(PRESENTATIONS_PATH + "/Wordclouds/"+presentationID+"/"+pathName+".png");
-            if (!wordcloudPath.exists()) {
-                wordcloudPath.getParentFile().mkdirs(); //Create directory structure if not present yet
-            }
-            wc.writeToFile(PRESENTATIONS_PATH + "/Wordclouds/"+presentationID+"/"+pathName+".png");
-
-            Image wordCloud = new Image("file:" + PRESENTATIONS_PATH + "/Wordclouds/"+presentationID+"/"+pathName+".png",xSize,ySize,true,true);
-
-            ImageView iv = new ImageView(wordCloud);
-            wordCloudPanel.setBody(iv);
         });
         countdownTile = TileBuilder.create()
                 .skinType(Tile.SkinType.NUMBER)
@@ -252,6 +221,40 @@ public class WordCloudElement extends InteractiveElement {
 
     public void setWordList(List<String> wordList) {
         this.wordList = wordList;
+    }
+
+    public void generateWordCloud(){
+        FrequencyAnalyzer fa = new FrequencyAnalyzer();
+        List<WordFrequency> wordFrequencies = fa.load(wordList);
+
+        Dimension dimension = new Dimension((int)(xSize*slideWidth),(int)(ySize*slideHeight));
+        WordCloud wc = new WordCloud(dimension, CollisionMode.PIXEL_PERFECT);
+        wc.setPadding(2);
+        if(cloudShapePath != null){
+            try {
+                wc.setBackground(new PixelBoundryBackground(cloudShapePath));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }else {
+            float rad = (xSize*(float)slideWidth)/2;
+            wc.setBackground(new CircleBackground(Math.round(rad)));
+        }
+        wc.setColorPalette(new ColorPalette(Color.ORANGE,Color.GREEN,Color.cyan));
+        wc.setFontScalar(new SqrtFontScalar(10,40));
+        wc.build(wordFrequencies);
+
+        String pathName = presentationID+Integer.toString(slideID);
+        File wordcloudPath = new File(PRESENTATIONS_PATH + "/Wordclouds/"+presentationID+"/"+pathName+".png");
+        if (!wordcloudPath.exists()) {
+            wordcloudPath.getParentFile().mkdirs(); //Create directory structure if not present yet
+        }
+        wc.writeToFile(PRESENTATIONS_PATH + "/Wordclouds/"+presentationID+"/"+pathName+".png");
+
+        Image wordCloud = new Image("file:" + PRESENTATIONS_PATH + "/Wordclouds/"+presentationID+"/"+pathName+".png",xSize,ySize,true,true);
+
+        ImageView iv = new ImageView(wordCloud);
+        wordCloudPanel.setBody(iv);
     }
 
 
