@@ -18,6 +18,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicReference;
@@ -988,5 +989,51 @@ public class SocketClient {
         }
 
         return interactionsForPresentation;
+    }
+
+
+    public boolean sendPresentationStatistics(int presentationId, int userId, ArrayList<Duration> slideTimes){
+
+        //Concatinate the slide times for storage
+        StringBuilder builder = new StringBuilder();
+        for(int i=0; i < slideTimes.size(); i++){
+            builder.append(i+1);
+            builder.append(",");
+            builder.append(slideTimes.get(i).getSeconds());
+            builder.append("\n");
+        }
+        String slideTimesString = builder.toString();
+
+        boolean statementSuccess = false;
+
+        try (PGConnection connection = (PGConnection) dataSource.getConnection()) {
+            PreparedStatement statement = connection.prepareStatement(
+            		"SELECT * FROM sp_addstatistics_to_presentation(?, ?, ?)");
+
+            statement.setInt(1, userId);
+            statement.setInt(2, presentationId);
+            statement.setString(3, slideTimesString);
+
+            //Call Query on database
+            String status = "Failure";
+            ResultSet rs = statement.executeQuery();
+
+            while (rs.next()) {
+                status = rs.getString(1);
+            }
+
+            if (status.equals("success") || status.equals("success: user-presentation pair updated")) {
+                statementSuccess = true;
+                logger.info("Presentation statistics added for presentation id " + presentationId);
+            } else {
+                logger.error("Failed to set the presentation statistics for presentation id:" + presentationId);
+            }
+
+            statement.close();
+        } catch (Exception e) {
+            logger.error("Unable to connect to PostgreSQL on port 5432. PJDBC dump:", e);
+        }
+
+        return statementSuccess;
     }
 }

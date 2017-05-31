@@ -71,10 +71,13 @@ public class StudentSession {
     public void endSession() {
         sendUserStatistics();
         //Set active presentation for user to null (no active presentation)
-        ediManager.getSocketClient().setUserActivePresentation(0, ediManager.getUserData().getUserID());
+        ediManager.getSocketClient().setUserActivePresentation(0, ediManager.getUserData().getUserID());//TODO presentation ID is hardcoded
 
         endDate = new Date();
         logger.info("Live Presentation session ending. Presentation lasted " + (int) ((endDate.getTime() - startDate.getTime()) / 1000) + " seconds.");
+
+        //Submit the slide times to the DB:
+        ediManager.getSocketClient().sendPresentationStatistics(ediManager.getPresentationManager().getPresentationElement().getPresentationMetadata().getPresentationID(), ediManager.getUserData().getUserID(), slideTimes);
     }
 
     public void setPresentationLink(boolean setLink) {
