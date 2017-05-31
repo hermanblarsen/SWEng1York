@@ -2,7 +2,9 @@ package com.i2lp.edi.client;
 
 import com.i2lp.edi.client.managers.EdiManager;
 import com.i2lp.edi.client.presentationElements.InteractiveElement;
+import com.i2lp.edi.client.presentationElements.PollElement;
 import com.i2lp.edi.client.presentationElements.Presentation;
+import com.i2lp.edi.client.presentationElements.WordCloudElement;
 import com.i2lp.edi.server.packets.InteractiveElementRecord;
 import javafx.application.Platform;
 import javafx.scene.image.Image;
@@ -101,6 +103,9 @@ public class StudentSession {
                 for (InteractiveElement interactiveElement : interactiveElementsInPresentation) {
                     if (interactiveElement.getElementID() == interactiveElementRecord.getInteractive_pres_id()) {
                         logger.info("Interactive Element: " + interactiveElement.getElementID() + " of type: " + interactiveElementRecord.getType() + " is now live." + "You have " + interactiveElement.getTimeLimit() + " seconds to respond.");
+                        if(interactiveElement instanceof WordCloudElement){
+                            ((WordCloudElement) interactiveElement).setUpWordCloudData();
+                        }
                         //Send test response
                         ediManager.getSocketClient().addInteractionToInteractiveElement(ediManager.getUserData().getUserID(), interactiveElementRecord.getInteractive_element_id(), generateString(new Random(), "TestStuffHere", 12));
                     }

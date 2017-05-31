@@ -12,6 +12,7 @@ import eu.hansolo.tilesfx.Tile;
 import eu.hansolo.tilesfx.TileBuilder;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.application.Platform;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.geometry.Pos;
@@ -109,14 +110,9 @@ public class WordCloudElement extends InteractiveElement {
             start_Task.setAlignment(Pos.TOP_CENTER);
             //wordCloudPanel.getChildren().add(start_Task);
             start_Task.addEventHandler(MouseEvent.MOUSE_CLICKED,evt->{
-                elementActive = true;
+
                 wordCloudPanel.getChildren().remove(start_Task);
-                VBox test = new VBox();
-                HBox dataBox = wordCloudElements();
-                dataBox.setAlignment(Pos.CENTER);
-                test.getChildren().addAll(countdownTile,dataBox);
-                wordCloudPanel.setBody(test);
-                timeline.play();
+                setUpWordCloudData();
                 if(ediManager.getPresentationManager().getPresentationSession() != null) {
                     ediManager.getPresentationManager().getPresentationSession().beginInteraction(this, true);
                 }
@@ -181,7 +177,6 @@ public class WordCloudElement extends InteractiveElement {
             ImageView iv = new ImageView(wordCloud);
             wordCloudPanel.setBody(iv);
         });
-
         countdownTile = TileBuilder.create()
                 .skinType(Tile.SkinType.NUMBER)
                 .prefSize((xSize*slideWidth)/3,(ySize*slideHeight)/3)
@@ -192,6 +187,22 @@ public class WordCloudElement extends InteractiveElement {
                 .build();
         wordCloudPanel.setVisible(visibility);
         getCoreNode().addEventFilter(MouseEvent.MOUSE_CLICKED, event -> performOnClickAction());
+    }
+
+    public void setUpWordCloudData(){
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                elementActive = true;
+                VBox wordCloudBox = new VBox();
+                HBox dataBox = wordCloudElements();
+                dataBox.setAlignment(Pos.CENTER);
+                wordCloudBox.getChildren().addAll(countdownTile,dataBox);
+                wordCloudPanel.setBody(wordCloudBox);
+                timeline.play();
+            }
+        });
+
     }
 
     @Override

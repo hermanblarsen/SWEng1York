@@ -361,7 +361,9 @@ public class PresentationManagerTeacher extends PresentationManager {
         Platform.runLater(new Runnable() {
             @Override
             public void run() {
-                setUpQuestionList(newQuestionList);
+                if(teacherToolKit != null) {
+                    setUpQuestionList(newQuestionList);
+                }
             }
         });
 
@@ -374,7 +376,9 @@ public class PresentationManagerTeacher extends PresentationManager {
         Platform.runLater(new Runnable() {
             @Override
             public void run() {
-                setUpStudentList(studentList);
+                if(teacherToolKit != null) {
+                    setUpStudentList(studentList);
+                }
             }
         });
     }
