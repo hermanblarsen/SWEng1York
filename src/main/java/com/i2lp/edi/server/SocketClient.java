@@ -908,7 +908,17 @@ public class SocketClient {
             int size = 0;
 
             while (rs.next()) {
-                interactiveElementRecords.add(new InteractiveElementRecord(rs.getInt("interactive_element_id"), rs.getInt("interactive_pres_id"), rs.getInt("presentation_id"), rs.getString("interactive_element_data"), rs.getString("type"), rs.getBoolean("live"), rs.getTime("response_interval"), rs.getInt("slide_number")));
+                interactiveElementRecords.add(new InteractiveElementRecord(
+                        rs.getInt("interactive_element_id"),
+                        rs.getInt("interactive_pres_id"),
+                        rs.getInt("presentation_id"),
+                        rs.getString("interactive_element_data"),
+                        rs.getString("type"),
+                        rs.getBoolean("live"),
+                        rs.getTime("response_interval"),
+                        rs.getInt("slide_number"),
+                        rs.getInt("xml_element_id")
+                ));
                 size++;
             }
 
