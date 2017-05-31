@@ -46,6 +46,7 @@ import java.net.URLConnection;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static com.i2lp.edi.client.Constants.PRESENTATIONS_PATH;
@@ -65,7 +66,6 @@ public abstract class Dashboard extends Application {
     protected PresentationManager presentationManager;
     protected Scene scene;
     protected BorderPane border;
-    private VBox rootBox;
     protected Stage dashboardStage;
     private PresentationPanel selectedPresPanel;
     private ModulePanel selectedModulePanel;
@@ -83,23 +83,22 @@ public abstract class Dashboard extends Application {
     private boolean isWelcomeTextHidden = false;
     private DashboardState currentState;
     private Text noMatchesSubject, noMatchesPres;
-    private Button addToServerButton;
     private VBox constantControlsVBox, removableControlsVBox, controlsContainerVBox;
     private ScrollPane leftPanelScroll;
     private Panel searchPanel, subjectFilterPanel, presSortPanel, moduleSortPanel, subjectSortPanel;
     private DashModule selectedModule;
-    private DatePicker calendar;
-    private DatePickerSkin calendarSkin;
-    private Node calendarNode;
     private VBox rightPanelVBox;
     private ScrollPane rightPanelScroll;
     private Panel schedulePanel;
+    private DatePicker calendar;
 
     protected TextField searchField;
     protected Button selectAllButton;
     protected ArrayList<Button> subjectButtons;
     protected ArrayList<CheckBox> subjectCheckboxes;
     protected ArrayList<Subject> filterSubjects;
+    private ArrayList<PresSchedulePanel> schedulePanels;
+    private VBox scheduleVBox;
     protected Button openPresButton;
     protected FileChooser fileChooser;
     protected MenuBar menuBar;
@@ -117,7 +116,7 @@ public abstract class Dashboard extends Application {
         dashboardStage.setMinHeight(600);
 
         border = new BorderPane();
-        rootBox = new VBox(addMenuBar(), border);
+        VBox rootBox = new VBox(addMenuBar(), border);
         scene = new Scene(rootBox, 1000, 600);
         noMatchesSubject = new Text("No matches found"); //TODO: move setup of global nodes to separate method
         noMatchesSubject.setFill(Color.GRAY);
@@ -125,12 +124,6 @@ public abstract class Dashboard extends Application {
         noMatchesPres = new Text("No matches found");
         noMatchesPres.setFill(Color.GRAY);
         noMatchesPres.getStyleClass().add("italic");
-        calendar = new DatePicker(LocalDate.now());
-        //updateCalendar();
-        calendarSkin = new DatePickerSkin(calendar);
-        calendarNode = calendarSkin.getPopupContent();
-        calendarNode.setStyle("-fx-font-size: 8.9px;");
-        calendarNode.setEffect(null);
         schedulePanel = new Panel("Schedule");
         schedulePanel.getStyleClass().add("panel-primary");
 
@@ -221,7 +214,7 @@ public abstract class Dashboard extends Application {
         topPanel.getChildren().add(openAddButtonsHBox);
 
         if (this instanceof TeacherDashboard) {
-            addToServerButton = new Button("Add pres to server");
+            Button addToServerButton = new Button("Add pres to server");
             addToServerButton.getStyleClass().setAll("btn", "btn-success");
             addToServerButton.setOnAction(event -> {
                 AtomicReference<File> xmlLocation = new AtomicReference<>(); //Store location of XML from filechooser, for upload to presentation after Thumbnail and CSS gen
@@ -637,12 +630,42 @@ public abstract class Dashboard extends Application {
             border.setRight(rightPanelScroll);
         }
 
+        calendar = new DatePicker(LocalDate.now());
+        calendar.setOnAction(event -> updateSchedulePanels());
+        final Callback<DatePicker, DateCell> dayCellFactory =
+                new Callback<DatePicker, DateCell>() {
+                    @Override
+                    public DateCell call(final DatePicker datePicker) {
+                        return new DateCell() {
+                            @Override
+                            public void updateItem(LocalDate item, boolean empty) {
+                                super.updateItem(item, empty);
+
+                                for (Presentation presentation : availablePresentations) {
+                                    try {
+                                        if (item.isEqual(presentation.getGoLiveDateTime().toLocalDate())) {
+                                            setStyle("-fx-background-color: #80e980;");
+                                        }
+                                    } catch (NullPointerException e) {
+                                        //Exception thrown when goLiveTimeDate has not been specified for a presentation. Do nothing
+                                    }
+                                }
+                            }
+                        };
+                    }
+                };
+        calendar.setDayCellFactory(dayCellFactory);
+        DatePickerSkin calendarSkin = new DatePickerSkin(calendar);
+        Node calendarNode = calendarSkin.getPopupContent();
+        calendarNode.setStyle("-fx-font-size: 8.9px;");
+        calendarNode.setEffect(null);
+
         switch (state) {
             case TOP_LEVEL:
             case SEARCH_ALL:
                 rightPanelVBox.setPadding(new Insets(10));
                 rightPanelVBox.getChildren().clear();
-                rightPanelVBox.getChildren().addAll(schedulePanel, calendarNode);
+                rightPanelVBox.getChildren().addAll(schedulePanel, calendarNode, scheduleVBox);
                 break;
 
             case MODULE:
@@ -664,7 +687,7 @@ public abstract class Dashboard extends Application {
                 } else {
                     rightPanelVBox.setPadding(new Insets(10));
                     rightPanelVBox.getChildren().clear();
-                    rightPanelVBox.getChildren().addAll(schedulePanel, calendarNode);
+                    rightPanelVBox.getChildren().addAll(schedulePanel, calendarNode, scheduleVBox);
                 }
                 break;
 
@@ -724,7 +747,7 @@ public abstract class Dashboard extends Application {
         setupSubjectPanels();
         setupModulePanels();
         setupPresentationPanels();
-        //updateCalendar();
+        setupSchedulePanels();
 
         if (currentState != null) {
             if (currentState == DashboardState.SEARCH_ALL || currentState == DashboardState.TOP_LEVEL) {
@@ -857,6 +880,48 @@ public abstract class Dashboard extends Application {
         if (presSortCombo != null)
             sortPresentations(presSortCombo.getValue());
 
+    }
+
+    private void setupSchedulePanels() {
+        if (schedulePanels == null) {
+            schedulePanels = new ArrayList<>();
+        } else {
+            schedulePanels.clear();
+        }
+
+        scheduleVBox = new VBox();
+
+        for (PresentationPanel presPanel : presentationPanels) {
+            if (presPanel.getPresentation().getGoLiveDateTime() != null) {
+                PresSchedulePanel schedulePanel = new PresSchedulePanel(scheduleVBox, presPanel);
+                schedulePanels.add(schedulePanel);
+                schedulePanel.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
+                    setSelectedPreviewPanel(presPanel, true);
+                    selectedModule = presPanel.getPresentation().getModule();
+                    goToState(DashboardState.MODULE);
+                });
+            }
+        }
+
+        schedulePanels.sort(Comparator.comparing(PresSchedulePanel::getGoLiveDateTime));
+
+        updateSchedulePanels();
+    }
+
+    private void updateSchedulePanels() {
+        for (PresSchedulePanel schedulePanel : schedulePanels) {
+            schedulePanel.setFiltered(true);
+
+            if (calendar != null) {
+                if (calendar.getValue().isEqual(schedulePanel.getGoLiveDateTime().toLocalDate())) {
+                    schedulePanel.setFiltered(false);
+                }
+            } else {
+                if (LocalDate.now().isEqual(schedulePanel.getGoLiveDateTime().toLocalDate())) {
+                    schedulePanel.setFiltered(false);
+                }
+            }
+        }
     }
 
     private void setLive(PresentationPanel presPanel, boolean live) {
@@ -1196,7 +1261,7 @@ public abstract class Dashboard extends Application {
                     panel.getPresentation().getPresentationMetadata().getPresentationID(),
                     Timestamp.valueOf(panel.getPresentation().getGoLiveDateTime()).toString());
             schedulerPopup.hide();
-            updateCalendar();
+            setupSchedulePanels();
         });
 
         schedulerPopup.setAutoHide(true);
@@ -1277,36 +1342,6 @@ public abstract class Dashboard extends Application {
 
     public void setEdiManager(EdiManager ediManager) {
         this.ediManager = ediManager;
-    }
-
-    private void updateCalendar() {
-        final Callback<DatePicker, DateCell> dayCellFactory =
-                new Callback<DatePicker, DateCell>() {
-                    @Override
-                    public DateCell call(final DatePicker datePicker) {
-                        return new DateCell() {
-                            @Override
-                            public void updateItem(LocalDate item, boolean empty) {
-                                super.updateItem(item, empty);
-
-//                                for (Presentation presentation : availablePresentations) {
-//                                    try {
-//                                        if (item.isEqual(presentation.getGoLiveDateTime().toLocalDate())) {
-//                                            setStyle("-fx-background-color: #80e980;");
-//                                        }
-//                                    } catch (NullPointerException e) {
-//                                        //Do nothing. Exception thrown when goLiveDateTime is not specified
-//                                        logger.info("Couldn't set date for presentation " + presentation.getDocumentTitle());
-//                                    }
-//                                }
-                                if (item.getDayOfMonth() % 2 == 0) {
-                                    setStyle("-fx-background-color: #80e980;");
-                                }
-                            }
-                        };
-                    }
-                };
-        calendar.setDayCellFactory(dayCellFactory);
     }
 }
 

@@ -26,7 +26,7 @@ import java.util.ArrayList;
 public class PresentationPanel extends PreviewPanel {
     private static final double MAX_PRES_PREVIEW_WIDTH = 200;
     private static final double MAX_PRES_PREVIEW_HEIGHT = 100;
-    private static final double MARGIN_FOR_LIVE_ICON = 50;
+    private static final double MARGIN_FOR_LIVE_ICON = 55;
     private static final double MARGIN_AROUND_PRES_PREVIEW = 10;
     protected static Logger logger = LoggerFactory.getLogger(PresentationPanel.class);
     private final Presentation presentation;
