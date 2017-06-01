@@ -169,10 +169,8 @@ public class StudentSession {
             if (elementForResponse.getElementID() == interactiveElementRecord.getXml_element_id()) {
                 if (elementForResponse.getElementID() == interactiveElementRecord.getXml_element_id()) {
                     logger.info("Interactive Element: " + elementForResponse.getElementID() + " of type: " + interactiveElementRecord.getType() + " is now live." + "You have " + elementForResponse.getTimeLimit() + " seconds to respond.");
-                    if (elementForResponse instanceof WordCloudElement) {
-                        //Send test response
-                        ediManager.getSocketClient().addInteractionToInteractiveElement(ediManager.getUserData().getUserID(), interactiveElementRecord.getInteractive_element_id(), data);
-                    }
+                    //Send test response
+                    ediManager.getSocketClient().addInteractionToInteractiveElement(ediManager.getUserData().getUserID(), interactiveElementRecord.getInteractive_element_id(), data);
                 }
             }
         }

@@ -112,9 +112,7 @@ public class PresentationSession {
                         logger.error("No interactions received for Interactive Element: " + interactiveElement.getElementID());
                     }
                     ((WordCloudElement) interactiveElement).setWordList(elementInteractions);
-                    Platform.runLater(() -> {
-                        ((WordCloudElement) interactiveElement).generateWordCloud();
-                    });
+                    Platform.runLater(() -> ((WordCloudElement) interactiveElement).generateWordCloud());
                 } else if (interactiveElement instanceof PollElement) { //If its a poll, set the answer data
                     ((PollElement) interactiveElement).setPollOutput(elementInteractions);
                     Platform.runLater(() -> {
