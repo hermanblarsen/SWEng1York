@@ -31,6 +31,7 @@ import java.util.List;
 public class PollElement extends InteractiveElement {
     protected String question;
     protected List<String> possibleAnswers;
+    protected List<String> pollOutput;
     protected String answers;
     protected boolean answered = false;
     protected boolean timerStart = false;
@@ -131,7 +132,7 @@ public class PollElement extends InteractiveElement {
         timeline.setCycleCount(timeLimit);
         timeline.setOnFinished(event -> {
             elementActive = false;
-            displayDone();
+            //displayDone();
         });
 
         countdownTile = TileBuilder.create()
@@ -214,6 +215,8 @@ public class PollElement extends InteractiveElement {
                 //checkIfDone();
                 setValue = number;
                 ediManager.getPresentationManager().getStudentSession().sendResponse(this, answerButton[finalI].getText());
+                //ediManager.getPresentationManager().getStudentSession().sendResponse(this, Integer.toString(setValue));
+
             });
             answerButton[i].addEventHandler(MouseEvent.MOUSE_ENTERED, evt->{
                 buttonActive = true;
@@ -229,13 +232,16 @@ public class PollElement extends InteractiveElement {
     }
 
     public void displayDone() {
-
         questionPane.getChildren().remove(questionPane.getBody());
         for(int i = 0; i<possibleAnswers.size();i++){
             chartDataArray[i] = new ChartData(possibleAnswers.get(i),0);
             chartDataArray[i].setColor(assignBarColour(i));
         }
-        chartDataArray[setValue].setValue(chartDataArray[setValue].getValue()+1);
+        for(int i = 0; i<pollOutput.size();i++){
+            int resultValue = Integer.parseInt(pollOutput.get(i));
+            chartDataArray[resultValue].setValue(chartDataArray[resultValue].getValue()+1);
+        }
+        //chartDataArray[setValue].setValue(chartDataArray[setValue].getValue()+1);
         answerOutputTile.setRadialChartData(chartDataArray);
         questionPane.setBody(answerOutputTile);
     }
@@ -356,13 +362,19 @@ public class PollElement extends InteractiveElement {
         return answers;
     }
 
-    public void setAnswers(ArrayList<String> answers) {
-        //this.answers = answers;
+    public void setAnswers(String answers) {
+        this.answers = answers;
+    }
+
+    public void setPollOutput(ArrayList<String> answers) {
+        pollOutput = answers;
     }
 
     public void setUpQuestionList(String answers){
         possibleAnswers = new ArrayList<String>();
         possibleAnswers = Arrays.asList(answers.split(","));
     }
+
+
 
 }

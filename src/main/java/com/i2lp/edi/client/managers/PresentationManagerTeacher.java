@@ -62,6 +62,15 @@ public class PresentationManagerTeacher extends PresentationManager {
     }
 
     private void setListOfQuestions(){
+        if(slidePane != null){
+            Platform.runLater(new Runnable() {
+                @Override
+                public void run() {
+                    displayPane.getChildren().remove(slidePane);
+                }
+            });
+
+        }
         if(getPresentationSession() != null) {
             newQuestionList = getPresentationSession().getQuestionQueue();
         }
@@ -148,6 +157,7 @@ public class PresentationManagerTeacher extends PresentationManager {
         //System.out.println(questions.size());
         slides = new Panel[questions.size()];
         slidePane = new StackPane();
+        slidePane.setPickOnBounds(false);
         sp.setContent(null);
         fp = new FlowPane();
         fp.setPrefWrapLength(100);
@@ -181,13 +191,15 @@ public class PresentationManagerTeacher extends PresentationManager {
 //            slides[i].setBody(answeredView);
             //slides[i].getStyleClass().add("panel-primary");
             slides[i].setMinWidth(400);
+            slides[i].setPickOnBounds(false);
             fp.getChildren().add(slides[i]);
-            lab = new Label(slides[i].getText());
+
             backgroundRegion = new Region();
             backgroundRegion.setBackground(new Background(new BackgroundFill(Color.web("#34495e"), null, null)));
             setText = new String();
-
+            final int val = i;
             slides[i].addEventHandler(MouseEvent.MOUSE_CLICKED, evt -> {
+                lab = new Label(slides[val].getText());
                 if(!buttonActive) {
                     if (!questionClicked) {
                         displayPane.getChildren().remove(slidePane);
@@ -198,16 +210,20 @@ public class PresentationManagerTeacher extends PresentationManager {
                         setText = lab.getText();
                         slidePane.setPrefSize(slideWidth, slideHeight);
                         if(!buttonActive) {
+                            System.out.println("Button "+val+" Pressed");
                             slidePane.getChildren().addAll(backgroundRegion, lab);
                             displayPane.getChildren().addAll(slidePane);
                         }
                         questionClicked = true;
                     } else {
                         if (Objects.equals(lab.getText(), setText)) {
-                            displayPane.getChildren().remove(slidePane);
+                            System.out.println("Button "+val+" Pressed");
                             slidePane.getChildren().removeAll(backgroundRegion, lab);
+                            displayPane.getChildren().remove(slidePane);
+
                             questionClicked = false;
                         } else {
+                            System.out.println("Button "+val+" Pressed");
                             displayPane.getChildren().remove(slidePane);
                             slidePane.getChildren().removeAll(backgroundRegion, lab);
                             lab.setFont(new Font("Helvetica", 50));

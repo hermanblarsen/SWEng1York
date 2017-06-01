@@ -148,7 +148,7 @@ public class StudentSession {
                                         ((WordCloudElement) interactiveElement).generateWordCloud();
                                     });
                                 } else if (interactiveElement instanceof PollElement) { //If its a poll, set the answer data
-                                    ((PollElement) interactiveElement).setAnswers(elementInteractions);
+                                    ((PollElement) interactiveElement).setPollOutput(elementInteractions);
                                     Platform.runLater(() -> {
                                         ((PollElement) interactiveElement).displayDone();
                                     });
