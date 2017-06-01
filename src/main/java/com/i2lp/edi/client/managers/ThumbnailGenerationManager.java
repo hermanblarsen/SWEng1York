@@ -11,6 +11,7 @@ import javafx.scene.image.WritableImage;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -71,6 +72,11 @@ public class ThumbnailGenerationManager extends PresentationManager {
 
     @Override
     protected void createCommentPanel() {}//Empty
+
+    @Override
+    protected VBox addQuestionQueueControls() {
+        return null;
+    }
 
     public static void generateSlideThumbnails(Presentation presentation, boolean savePresentationToPdf) {
         ThumbnailGenerationManager slideGenController = new ThumbnailGenerationManager(null);

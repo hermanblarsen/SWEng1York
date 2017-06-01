@@ -115,4 +115,6 @@ public abstract class PreviewPanel extends StackPane {
     }
 
     public Panel getDisplayPanel() { return displayPanel; }
+
+    public Pane getParentPane() { return parentPane; }
 }
