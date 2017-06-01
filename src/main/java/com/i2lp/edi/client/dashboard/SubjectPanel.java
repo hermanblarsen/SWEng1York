@@ -38,7 +38,6 @@ public class SubjectPanel extends PreviewPanel {
         super(parentPane, false);
         this.subject = subject;
         modulePanelsHBox = new HBox(SPACING);
-        modulePanelsHBox.setBackground(new Background(new BackgroundFill(Color.WHITE, null, null)));
         modulePanels = new ArrayList<>();
         BorderPane.setMargin(modulePanelsHBox, new Insets(5));
 
@@ -50,6 +49,8 @@ public class SubjectPanel extends PreviewPanel {
         centerScroll.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         centerScroll.setVbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         centerScroll.getStyleClass().add("edge-to-edge");
+        //centerScroll.setBackground(new Background(new BackgroundFill(Color.WHITE, null, null)));
+        centerScroll.setStyle("-fx-background-color: white");
         centerScroll.setContent(modulePanelsHBox);
 
         borderPane = new BorderPane();
