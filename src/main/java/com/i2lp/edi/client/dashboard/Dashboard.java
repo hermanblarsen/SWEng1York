@@ -1317,9 +1317,10 @@ public abstract class Dashboard extends Application {
 
     private void showOpenRemotePres(String defaultURLField) {
         TextField urlInput = new TextField(defaultURLField);
-        urlInput.setPrefWidth(250);
+        urlInput.setPrefWidth(450);
 
         Button okButton = new Button("OK");
+        okButton.setDefaultButton(true);
 
         HBox root = new HBox();
         root.setAlignment(Pos.CENTER);

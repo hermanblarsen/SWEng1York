@@ -74,11 +74,13 @@ public class TextElement extends SlideElement {
         webEngine.loadContent(textContent);
 
 
-        //TODO: --- Remove this Hack ---
+        //TODO: --- Remove this Hack --- @Amrik
         //moduleName should be set inside a presentation
-        String moduleName = "missing";
+        String moduleName = "";
         if(ediManager.getPresentationManager() != null){
-            moduleName =  ediManager.getPresentationManager().getPresentationElement().getModule().getModuleName();
+            if(ediManager.getPresentationManager().getPresentationElement().getPresentationMetadata() != null){
+                moduleName =  ediManager.getPresentationManager().getPresentationElement().getModule().getModuleName();
+            } else moduleName = "Local";
         }
         //Apply Dynamically created CSS to TextElement
         cssFilePath = Utilities.cssGen(presentationID, moduleName, slideID, elementID, fontSize, font, fontColour, bgColour, borderColour, borderSize, hasBorder);

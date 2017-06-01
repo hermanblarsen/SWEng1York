@@ -100,8 +100,6 @@
 
 		<slide slideid="2">
             <graphic elementid ="0" layer="1" visibility="true" startsequence="2" endsequence="3">
-                <onclickaction>dynamicmediatoggle</onclickaction>
-                <onclickinfo>3</onclickinfo>
                 <aspectratiolock>true</aspectratiolock>
                 <elementaspectratio>1.0</elementaspectratio>
                 <linecolour>#aaffaaFF</linecolour>
@@ -133,7 +131,7 @@
 					<rotation>45</rotation>
 				</oval>
 				<onclickaction>dynamicmediatoggle</onclickaction>
-				<onclickinfo>3</onclickinfo>
+				<onclickinfo>2</onclickinfo>
 				<animation type="in">
                 <pathtransition duration="1000"
 					path="M0.314,0

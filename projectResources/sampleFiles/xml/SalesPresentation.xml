@@ -19,6 +19,9 @@
 		</defaults>
 
         <!-- brackets       &lt;&gt; &lt;/&gt;       -->
+        <!-- paragraph       &lt;p align="left"&gt; &lt;/p&gt;       -->
+        <!-- paragraph       &lt;p align="right center justify"&gt; &lt;/&gt;       -->
+
         <!--italic          &lt;i&gt; &lt;/i&gt;     -->
         <!--bold            &lt;b&gt; &lt;/b&gt;     -->
         <!--list            &lt;ul&gt;
@@ -42,23 +45,25 @@
 
             <text elementid ="1" layer="1" startsequence="2" endsequence="-1" duration="-1">
                 <textcontent>
-                    &lt;p&gt;
+                    &lt;p align="left"&gt;
+                        This is a paragraph
                         &lt;ul&gt;
-                            &lt;li&gt; &lt;/li&gt;
-                            &lt;li&gt; &lt;/li&gt;
+                            &lt;li&gt;Test Item 1&lt;/li&gt;
+                            &lt;li&gt;Test Item 2 &lt;/li&gt;
                         &lt;/ul&gt;
+                        This is the end of a paragraph.
                     &lt;/p&gt;
+                    &lt;p&gt;Another!&lt;/p&gt;
                 </textcontent>
 				<xposition>0.3</xposition>  <yposition>0.1</yposition>
 				<xsize>0.8</xsize>          <ysize>0.6</ysize>
                 <onclickaction>none</onclickaction><onclickinfo></onclickinfo>
             </text>
-
+        </slide>
 
 		<slide slideid="2">
 
 		</slide>
-
 
         <slide slideid="5">
             <wordcloud elementid ="0" layer="1"  startsequence="1">
@@ -66,8 +71,6 @@
                 <timelimit>20</timelimit>
             </wordcloud>
         </slide>
-
-
 
         <slide slideid="6">
             <poll elementid ="1" layer="2" startsequence="1">
