@@ -60,8 +60,8 @@ public class Utilities {
      * @return Filename of CSS file that stores the CSS for a given TextElement
      * @author Amrik Sadhra
      */
-    public static String cssGen(String presentationID, int slideID, int elementID, int fontSize, String font, String fontColour, String bgColor, String borderColour, int borderSize, boolean hasBorder) {
-        File cssFilePath = new File(PRESENTATIONS_PATH + presentationID + "/CSS/" + "Slide" + slideID + "Element" + elementID + "format.css");
+    public static String cssGen(String presentationID, String moduleName, int slideID, int elementID, int fontSize, String font, String fontColour, String bgColor, String borderColour, int borderSize, boolean hasBorder) {
+        File cssFilePath = new File(PRESENTATIONS_PATH + File.separator + moduleName + File.separator + presentationID + "/CSS/" + "Slide" + slideID + "Element" + elementID + "format.css");
 
         if (!cssFilePath.exists()) cssFilePath.getParentFile().mkdirs(); //Create directory structure if not present yet
 
@@ -213,6 +213,12 @@ public class Utilities {
         final File folder = new File(path);
 
         if (!folder.exists()) folder.mkdirs(); //Create directory structure if not present yet
+
+
+        if(path.contains(".DS_Store")){//TODO: HACK HACK HACK
+            return new ArrayList<>();
+        }
+
 
         //Generate array of files in folder
         for (File fileEntry : folder.listFiles()) {

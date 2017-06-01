@@ -77,7 +77,7 @@ public class PresentationSession {
         }
 
         //If couldn't find the interactive element in database that matches the XML interactive element, throw an error and return
-        if(liveElementRecord == null){
+        if (liveElementRecord == null) {
             logger.error("Couldn't find InteractiveElementRecord in database that matches InteractiveElement " + interactiveElement.getElementID());
             return;
         }
@@ -97,22 +97,26 @@ public class PresentationSession {
                 logger.info("Interactive element response window closed");
 
                 //Find Interactions that belong to this current interactive element
-                if (!interactionsFromStudents.isEmpty()) {
-                    for (InteractionRecord interactionRecord : interactionsFromStudents) {
-                        if (interactionRecord.getInteractive_element_id() == finalLiveElement.getInteractive_element_id()) {
-                            elementInteractions.add(interactionRecord.getInteraction_data());
-                        }
+                for (InteractionRecord interactionRecord : interactionsFromStudents) {
+                    if (interactionRecord.getInteractive_element_id() == finalLiveElement.getInteractive_element_id()) {
+                        elementInteractions.add(interactionRecord.getInteraction_data());
                     }
-                    //If its a WordCloud, set the wordList
-                    if (interactiveElement instanceof WordCloudElement) {
-                        ((WordCloudElement) interactiveElement).setWordList(elementInteractions);
-                        Platform.runLater(() -> {
-                            ((WordCloudElement) interactiveElement).generateWordCloud();
-                        });
-                    }
-                } else {
-                    logger.error("No interactions received for Interactive Element: " + interactiveElement.getElementID());
                 }
+
+                //If its a WordCloud, set the wordList
+                if (interactiveElement instanceof WordCloudElement) {
+                    if (interactionsFromStudents.isEmpty()) {
+                        for (int i = 0; i < 100; i++) {
+                            elementInteractions.add("NONE");
+                        }
+                        logger.error("No interactions received for Interactive Element: " + interactiveElement.getElementID());
+                    }
+                    ((WordCloudElement) interactiveElement).setWordList(elementInteractions);
+                    Platform.runLater(() -> {
+                        ((WordCloudElement) interactiveElement).generateWordCloud();
+                    });
+                }
+
             }
         }, interactiveElement.getTimeLimit() * 1000);
     }
