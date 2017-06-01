@@ -467,6 +467,7 @@ public abstract class PresentationManager {
         if (!isCommentPanelVisible) {
             commentPanel.setSlide(presentationElement.getCurrentSlide());
             sceneBox.getChildren().add(commentPanel);
+
             if (!isFullscreen && !presentationStage.isMaximized()) {
                 presentationStage.setHeight(presentationStage.getHeight() + commentPanel.getPrefHeight());
             }
@@ -524,11 +525,11 @@ public abstract class PresentationManager {
 
         ImageView backButton = makeCustomButton("file:projectResources/icons/Left_NEW.png", event -> controlPresentation(Slide.SLIDE_BACKWARD));
 
-        ImageView fullScreenButton = makeCustomButton("file:projectResources/icons/Fullscreen_NEW.png", event -> toggleFullscreen());
+        ImageView fullScreenButton = makeCustomButton("file:projectResources/icons/FullScreen_NEW.png", event -> toggleFullscreen());
 
         String specificFeatsIconURL;
         if (this instanceof PresentationManagerStudent) {
-            specificFeatsIconURL = "file:projectResources/icons/QM_Filled.png";
+            specificFeatsIconURL = "file:projectResources/icons/Question_Filled.png";
         } else {
             specificFeatsIconURL = "file:projectResources/icons/TeacherToolKit.png";
         }
@@ -556,7 +557,13 @@ public abstract class PresentationManager {
             }
         });
 
-        ImageView commentButton = makeCustomButton("file:projectResources/icons/SB_filled.png", event -> toggleCommentsWindow());
+        ImageView commentButton = makeCustomButton("file:projectResources/icons/SB_Filled.png", event -> {
+            try {
+                toggleCommentsWindow();
+            } catch (NullPointerException e) {
+            //Exception occasionally thrown by JavaFX's HTML editor for unknown reasons. No handling needed - do nothing.
+            }
+        });
 
         String drawIconURL;
         if (isDrawModeOn) {
@@ -611,7 +618,7 @@ public abstract class PresentationManager {
 
     private VBox addDrawControls() {
         VBox drawControls = new VBox(5);
-        drawControls.setStyle("-fx-background-color:transparent");//#34495e
+        drawControls.setStyle("-fx-background-color:transparent");
         drawControls.setPadding(new Insets(5, 12, 5, 12));
 
         ImageView undoButton = makeCustomButton("file:projectResources/icons/undo.png", event -> drawPane.setSlideDrawing(presentationElement.getSlide(currentSlideNumber).getPreviousSlideDrawing()));
@@ -627,7 +634,7 @@ public abstract class PresentationManager {
         eraserButton = makeCustomButton(eraserIconURL, event -> toggleEraserMode());
 
         ColorPicker colorPicker = new ColorPicker(drawPane.getBrushColor());
-        ImageView colourButton = makeCustomButton("file:projectResources/icons/selectBrushColour.png", event -> {
+        ImageView colourButton = makeCustomButton("file:projectResources/icons/selectBrushColor.png", event -> {
             colourPopup = new Popup();
             colorPicker.setOnAction(event1 -> {
                 drawPane.setBrushColor(colorPicker.getValue());
@@ -724,7 +731,6 @@ public abstract class PresentationManager {
                 FadeTransition ft0 = new FadeTransition(Duration.millis(500), controls);
                 ft0.setFromValue(controls.getOpacity());
                 ft0.setToValue(0.0);
-                logger.info("Hiding controls");
                 if (!isMouseOverControls) {
                     ft0.play();
                 }

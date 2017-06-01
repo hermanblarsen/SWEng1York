@@ -21,13 +21,6 @@ public class DashModule {
     private final Timestamp timeCreated;
     private final ArrayList<Presentation> presentations;
 
-//    public DashModule(Subject subject, String moduleName, ArrayList<DashModule> availableModules) {
-//        this.moduleName = moduleName;
-//        this.subject = subject;
-//        presentations = new ArrayList<>();
-//        availableModules.add(this);
-//    }
-
     public DashModule(Module module, Subject subject) {
         moduleName = module.getModule_name();
         moduleID = module.getModule_id();

@@ -61,8 +61,8 @@ import static javafx.scene.layout.BorderPane.setAlignment;
  */
 @SuppressWarnings({"WeakerAccess", "unused", "Duplicates"})
 public abstract class Dashboard extends Application {
-    private static final double RIGHT_PANEL_WIDTH = 210;
-    private static final double LEFT_PANEL_WIDTH = 200;
+    protected static final double RIGHT_PANEL_WIDTH = 210;
+    protected static final double LEFT_PANEL_WIDTH = 200;
     private static final String OPEN_LOCAL_PRES_CAPTION = "Local (from this computer)";
     private static final String OPEN_REMOTE_PRES_CAPTION = "Remote (from this http)";
     protected static Logger logger = LoggerFactory.getLogger(Dashboard.class);
@@ -93,7 +93,6 @@ public abstract class Dashboard extends Application {
     private DashModule selectedModule;
     private VBox rightPanelVBox;
     private ScrollPane rightPanelScroll;
-    private Panel schedulePanel;
     private DatePicker calendar;
     private LocalDate selectedDate;
 
@@ -131,9 +130,6 @@ public abstract class Dashboard extends Application {
         noMatchesPres = new Text("No matches found");
         noMatchesPres.setFill(Color.GRAY);
         noMatchesPres.getStyleClass().add("italic");
-        schedulePanel = new Panel("Schedule");
-        schedulePanel.getStyleClass().add("panel-primary");
-        schedulePanel.setMaxWidth(RIGHT_PANEL_WIDTH);
         selectedDate = LocalDate.now();
 
         scene.getStylesheets().add("bootstrapfx.css");
@@ -305,7 +301,7 @@ public abstract class Dashboard extends Application {
                     textVBox.getChildren().add(welcomeText);
                     VBox.setMargin(welcomeText, new Insets(5, 0, 5, 0));
 
-                    Text updateText = new Text("Here we can put some updates and stuff");
+                    Text updateText = new Text(Constants.WELCOME_TEXT);
                     updateText.getStyleClass().setAll("h6", "text-justify");
                     textVBox.getChildren().add(updateText);
                     VBox.setMargin(updateText, new Insets(5, 0, 5, 0));
@@ -572,6 +568,7 @@ public abstract class Dashboard extends Application {
         if (rightPanelVBox == null) {
             rightPanelVBox = new VBox(2);
             rightPanelVBox.setAlignment(Pos.TOP_CENTER);
+            rightPanelVBox.setMaxWidth(RIGHT_PANEL_WIDTH + 20);
         }
 
         if (rightPanelScroll == null) {
@@ -583,8 +580,12 @@ public abstract class Dashboard extends Application {
             border.setRight(rightPanelScroll);
         }
 
+        Panel schedulePanel = new Panel("Schedule");
+        schedulePanel.getStyleClass().add("panel-primary");
+        schedulePanel.setMaxWidth(RIGHT_PANEL_WIDTH);
+
         calendar = new DatePicker(LocalDate.now());
-        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("EEEE, dd LLLL");
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("E, dd LLLL");
         schedulePanel.setText("Schedule for " + selectedDate.format(dtf));
         calendar.setOnAction(event -> {
             updateSchedulePanels();
@@ -755,10 +756,24 @@ public abstract class Dashboard extends Application {
             try {
                 ModulePanel modulePanel = new ModulePanel(module, subjectPanel);
                 modulePanel.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
-                    if (modulePanel.isSelected()) {
-                        goToState(DashboardState.MODULE);
-                    } else {
+                    if (event.getButton().equals(MouseButton.PRIMARY)) {
+                        if (modulePanel.isSelected()) {
+                            goToState(DashboardState.MODULE);
+                        } else {
+                            setSelectedPreviewPanel(modulePanel, true);
+                        }
+                    } else if (event.getButton().equals(MouseButton.SECONDARY)) {
                         setSelectedPreviewPanel(modulePanel, true);
+
+                        ContextMenu menu = new ContextMenu();
+                        MenuItem open = new MenuItem("Open");
+                        open.setOnAction(event1 -> goToState(DashboardState.MODULE));
+                        menu.getItems().add(open);
+                        MenuItem details = new MenuItem("Details");
+                        details.setOnAction(event1 -> showDetailsWindow(modulePanel.getModule()));
+                        menu.getItems().add(details);
+
+                        menu.show(modulePanel, event.getScreenX(), event.getScreenY());
                     }
                     event.consume();
                 });
@@ -1238,6 +1253,49 @@ public abstract class Dashboard extends Application {
 
     private void showPresentationEditor(String presentationPath) {
         new PresentationEditor(presentationPath);
+    }
+
+    private void showDetailsWindow(DashModule module) {
+        Popup detailsPopup = new Popup();
+
+        GridPane detailsPane = new GridPane();
+        detailsPane.setBackground(new Background(new BackgroundFill(Color.WHITE, new CornerRadii(5), null)));
+        detailsPane.setPadding(new Insets(10));
+        detailsPane.setEffect(new DropShadow());
+        detailsPane.setAlignment(Pos.CENTER);
+        detailsPane.getColumnConstraints().add(new ColumnConstraints(100));
+        detailsPane.getColumnConstraints().add(new ColumnConstraints(200));
+        detailsPopup.getContent().add(detailsPane);
+
+        Label name = new Label(module.getModuleName());
+        name.getStyleClass().add("h4");
+        name.setPadding(new Insets(5));
+        GridPane.setHalignment(name, HPos.CENTER);
+        detailsPane.add(name, 0, 0, 2, 1);
+
+        Label subjectLabel = new Label("Subject: ");
+        subjectLabel.setPadding(new Insets(5));
+        GridPane.setValignment(subjectLabel, VPos.TOP);
+        detailsPane.add(subjectLabel, 0, 1);
+
+        Label subject = new Label(module.getSubject().getSubjectName());
+        subject.setPadding(new Insets(5));
+        detailsPane.add(subject, 1, 1);
+
+        Label descriptionLabel = new Label("Description: ");
+        descriptionLabel.setPadding(new Insets(5));
+        GridPane.setValignment(descriptionLabel, VPos.TOP);
+        detailsPane.add(descriptionLabel, 0, 2);
+
+        Text description = new Text(module.getModuleDescription());
+        StackPane descriptionPane = new StackPane(description);
+        descriptionPane.setPadding(new Insets(5));
+        descriptionPane.setAlignment(Pos.TOP_LEFT);
+        description.setWrappingWidth(200);
+        detailsPane.add(descriptionPane, 1, 2);
+
+        detailsPopup.setAutoHide(true);
+        detailsPopup.show(dashboardStage);
     }
 
     private void printPresentation(Presentation presentation) {
