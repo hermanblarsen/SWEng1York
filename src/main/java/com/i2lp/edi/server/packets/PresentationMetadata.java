@@ -1,6 +1,5 @@
 package com.i2lp.edi.server.packets;
 
-import java.sql.Date;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.regex.Matcher;
@@ -19,6 +18,7 @@ public class PresentationMetadata {
     private boolean live;
     private String subjectName;
     private Timestamp go_live_timestamp;
+    private String moduleName;
 
     //Temporary
     private String documentID;
@@ -47,8 +47,6 @@ public class PresentationMetadata {
         else return MISSING_DOCUMENT_ID;
     }
 
-    public String getModuleName() { return "DashModule" + module_id; }
-
     public int getPresentationID() {
         return presentation_id;
     }
@@ -75,4 +73,12 @@ public class PresentationMetadata {
     public void setGoLiveTimestamp(LocalDateTime goLiveTimeDateTime) { go_live_timestamp = Timestamp.valueOf(goLiveTimeDateTime); }
 
     public Timestamp getGoLiveTimestamp() { return go_live_timestamp; }
+
+    public void setModuleName(String moduleName) {
+        this.moduleName = moduleName;
+    }
+
+    public String getModuleName() {
+        return moduleName;
+    }
 }

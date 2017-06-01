@@ -84,9 +84,9 @@ public class ThumbnailGenerationManager extends PresentationManager {
 
         //Check if thumbnail already there
         if(!savePresentationToPdf) {
-            thumbnailFile = new File(PRESENTATIONS_PATH + this.presentationElement.getDocumentID() + "/Thumbnails/" + "slide" + (slideGenController.currentSlideNumber) + "_thumbnail.png");
+            thumbnailFile = new File(PRESENTATIONS_PATH + File.separator + presentation.getModule().getModuleName() + File.separator + this.presentationElement.getDocumentID() + "/Thumbnails/" + "slide" + (slideGenController.currentSlideNumber) + "_thumbnail.png");
         }else{
-            thumbnailFile = new File(PRESENTATIONS_PATH + this.presentationElement.getDocumentID() + "/Print/" + "slide" + (slideGenController.currentSlideNumber) + "_thumbnail.png");
+            thumbnailFile = new File(PRESENTATIONS_PATH + File.separator + presentation.getModule().getModuleName() + File.separator + this.presentationElement.getDocumentID() + "/Print/" + "slide" + (slideGenController.currentSlideNumber) + "_thumbnail.png");
 
         }
         if (!thumbnailFile.exists()) {

@@ -439,11 +439,11 @@ public class Presentation extends Pane {
 
     public ImageView getSlidePreview(int slideNumber, double thumbnailWidth) {
         ImageView preview;
-        File thumbnailFile = new File(PRESENTATIONS_PATH + getDocumentID() + "/Thumbnails/" + "slide" + slideNumber + "_thumbnail.png");
+        File thumbnailFile = new File(PRESENTATIONS_PATH + File.separator + getModule().getModuleName() + File.separator + getDocumentID() + "/Thumbnails/" + "slide" + slideNumber + "_thumbnail.png");
 
         if (thumbnailFile.exists()) {
             try {
-                preview = new ImageView("file:" + PRESENTATIONS_PATH + getDocumentID() + "/Thumbnails/" + "slide" + slideNumber + "_thumbnail.png");
+                preview = new ImageView("file:" + PRESENTATIONS_PATH + File.separator + getModule().getModuleName() + File.separator + getDocumentID() + "/Thumbnails/" + "slide" + slideNumber + "_thumbnail.png");
                 Rectangle2D viewport = new Rectangle2D(0, 0, THUMBNAIL_WIDTH, THUMBNAIL_WIDTH/getDocumentAspectRatio());
                 preview.setViewport(viewport);
             } catch (NullPointerException | IllegalArgumentException e) {

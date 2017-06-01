@@ -18,7 +18,7 @@ VALUES (1, 'teacher', 'Teacher', 'Joe', 'Bloggs', 'em@il', 'hashedPasswordxxx', 
 
 CREATE TABLE "modules" (
   "module_id" SERIAL,
-  "module_name" varchar(255) NOT NULL,
+  "moduleName" varchar(255) NOT NULL,
   "subject" varchar(255) NOT NULL,
   "description" TEXT NOT NULL,
   "time_last_updated" TIME NOT NULL,
@@ -27,7 +27,7 @@ CREATE TABLE "modules" (
 ) WITH (
 OIDS=FALSE
 );
-INSERT INTO public.modules (module_id, module_name, description, subject, time_last_updated)
+INSERT INTO public.modules (module_id, moduleName, description, subject, time_last_updated)
 VALUES (1, 'TestName', 'TestDescription', 'TestSubject', '12:00:00');
 
 

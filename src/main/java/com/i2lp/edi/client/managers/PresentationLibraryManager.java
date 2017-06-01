@@ -141,6 +141,11 @@ public class PresentationLibraryManager {
      * @param remoteList Server side presentation metadata list
      */
     private void updateLocalPresentationList(ArrayList<PresentationMetadata> remoteList) {
+        //TODO: Modify to use Module names read from folder if in offline mode
+        //Update metadata with correct module name if no download occurs.
+        for(PresentationMetadata presentationMetadata : remoteList){
+            presentationMetadata.setModuleName(getModuleNameForPresentation(presentationMetadata));
+        }
         this.localPresentationList = remoteList;
     }
 
@@ -175,15 +180,38 @@ public class PresentationLibraryManager {
                 return;
             }
             logger.info("Unzipping " + toDownload.getXml_url() + ", " + i + " / " + downloadList.size());
-            ZipUtils.unzipPresentation(tempDir.getAbsolutePath() + File.separator + toDownload.getDocumentID() + ".zip", presDir.getAbsolutePath() + File.separator + toDownload.getDocumentID());
+
+            //Set Module name for presentation
+            toDownload.setModuleName(getModuleNameForPresentation(toDownload));
+
+            ZipUtils.unzipPresentation(tempDir.getAbsolutePath() + File.separator + toDownload.getDocumentID() + ".zip", presDir.getAbsolutePath() + File.separator + toDownload.getModuleName() + File.separator + toDownload.getDocumentID());
             i++;
         }
     }
 
+    private String getModuleNameForPresentation(PresentationMetadata toRetrieveModuleName){
+        for(Module module : userModuleList){
+            if(toRetrieveModuleName.getModule_id() == module.getModule_id()){
+                return module.getModule_name();
+            }
+        }
+
+        logger.error("Unable to find module name for Presentation with ID: " + toRetrieveModuleName.getPresentationID());
+        return "MISSING";
+    }
+
 
     private ArrayList<String> getLocalPresentationListString() {
+        ArrayList<String> localListOfPresentations = new ArrayList<>();
+        //Get list of Modules
+        ArrayList<String> moduleFolders = getFilesInFolder(PRESENTATIONS_PATH);
+
+        //For every module, get presentations inside
+        for(String moduleFolder : moduleFolders){
+            localListOfPresentations.addAll(getFilesInFolder(PRESENTATIONS_PATH + File.separator + moduleFolder));
+        }
         //Assume folder names are DocumentID for now, else have to fire up parser to get them
-        return getFilesInFolder(BASE_PATH + "Presentations/");
+        return localListOfPresentations;
     }
 
     private ArrayList<PresentationMetadata> getRemotePresentationList() {

@@ -731,7 +731,7 @@ public abstract class Dashboard extends Application {
 
         //Create a list of available presentations based on metadata from server
         for (PresentationMetadata presMeta : ediManager.getPresentationLibraryManager().getLocalPresentationList()) {
-            ParserXML parser = new ParserXML(PRESENTATIONS_PATH + presMeta.getDocumentID() + File.separator + presMeta.getDocumentID() + ".xml");
+            ParserXML parser = new ParserXML(PRESENTATIONS_PATH + File.separator + presMeta.getModuleName() + File.separator + presMeta.getDocumentID() + File.separator + presMeta.getDocumentID() + ".xml");
             Presentation presentation = parser.parsePresentation();
             presentation.setPresentationMetadata(presMeta);
 
