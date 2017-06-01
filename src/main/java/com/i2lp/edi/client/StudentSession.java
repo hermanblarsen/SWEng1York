@@ -54,16 +54,14 @@ public class StudentSession {
 
     //Go to current slide of teacher
     public void synchroniseWithTeacher() {
-        if (isLinked) {
-            Integer[] current_slide_states = ediManager.getSocketClient().getCurrentSlideForPresentation(ediManager.getPresentationManager().getPresentationElement().getPresentationMetadata().getPresentationID());
-            if ((current_slide_states[0] == -1) && (current_slide_states[1] == -1)) {
-                teacherLeft();
-            } else if ((ediManager.getPresentationManager().getCurrentSlideNumber() != current_slide_states[0]) || (ediManager.getPresentationManager().getPresentationElement().getSlide(current_slide_states[0]).getCurrentSequenceNumber() != current_slide_states[1])) {
-                Platform.runLater(() -> {
-                    //If the current slide number or sequence number has changed, move to it
-                    ediManager.getPresentationManager().goToSlideElement(current_slide_states);
-                });
-            }
+        Integer[] current_slide_states = ediManager.getSocketClient().getCurrentSlideForPresentation(ediManager.getPresentationManager().getPresentationElement().getPresentationMetadata().getPresentationID());
+        if ((current_slide_states[0] == -1) && (current_slide_states[1] == -1)) {
+            teacherLeft();
+        } else if ((ediManager.getPresentationManager().getCurrentSlideNumber() != current_slide_states[0]) || (ediManager.getPresentationManager().getPresentationElement().getSlide(current_slide_states[0]).getCurrentSequenceNumber() != current_slide_states[1])) {
+            Platform.runLater(() -> {
+                //If the current slide number or sequence number has changed, move to it
+                ediManager.getPresentationManager().goToSlideElement(current_slide_states);
+            });
         }
     }
 
@@ -71,7 +69,7 @@ public class StudentSession {
     public void endSession() {
         sendUserStatistics();
         //Set active presentation for user to null (no active presentation)
-        ediManager.getSocketClient().setUserActivePresentation(0, ediManager.getUserData().getUserID());//TODO presentation ID is hardcoded
+        ediManager.getSocketClient().setUserActivePresentation(0, ediManager.getUserData().getUserID());
 
         endDate = new Date();
         logger.info("Live Presentation session ending. Presentation lasted " + (int) ((endDate.getTime() - startDate.getTime()) / 1000) + " seconds.");
@@ -109,6 +107,8 @@ public class StudentSession {
             if (interactiveElementRecord.isLive()) {
                 for (InteractiveElement interactiveElement : interactiveElementsInPresentation) {
                     if (interactiveElement.getElementID() == interactiveElementRecord.getXml_element_id()) {
+                        //Move to the slide of the teacher
+                        synchroniseWithTeacher();
                         logger.info("Interactive Element: " + interactiveElement.getElementID() + " of type: " + interactiveElementRecord.getType() + " is now live." + "You have " + interactiveElement.getTimeLimit() + " seconds to respond.");
 
 
@@ -119,6 +119,7 @@ public class StudentSession {
                         //Start timer of response interval, in which to set Interactive element non live
                         Timer responseWindow = new Timer();
                         responseWindow.schedule(new TimerTask() {
+                            @SuppressWarnings("Duplicates")
                             @Override
                             public void run() {
                                 ArrayList<InteractionRecord> interactionsFromStudents = ediManager.getSocketClient().getInteractionsForPresentation(ediManager.getPresentationManager().getPresentationElement().getPresentationMetadata().getPresentationID());

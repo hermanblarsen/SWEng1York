@@ -173,7 +173,9 @@ public class SocketClient {
                     }
                     if (ediManager.getPresentationManager() != null) {//If there is a presentation
                         if (ediManager.getPresentationManager().getStudentSession() != null) {//that is live and am a student
-                            ediManager.getPresentationManager().getStudentSession().synchroniseWithTeacher();
+                            if (ediManager.getPresentationManager().getStudentSession().isLinked()) {
+                                ediManager.getPresentationManager().getStudentSession().synchroniseWithTeacher();
+                            }
                         }
                     }
                     break;
@@ -519,7 +521,7 @@ public class SocketClient {
                 return_status_removal = removalStatus.getString(1);
             }
 
-            if(return_status_removal.contains("success")){
+            if (return_status_removal.contains("success")) {
                 logger.info("Presentation with ID: " + presentationID + " successfully removed");
             } else {
                 logger.error("Unable to remove presentation: " + return_status_removal);
@@ -986,12 +988,12 @@ public class SocketClient {
     }
 
 
-    public boolean sendPresentationStatistics(int presentationId, int userId, ArrayList<Duration> slideTimes){
+    public boolean sendPresentationStatistics(int presentationId, int userId, ArrayList<Duration> slideTimes) {
 
         //Concatinate the slide times for storage
         StringBuilder builder = new StringBuilder();
-        for(int i=0; i < slideTimes.size(); i++){
-            builder.append(i+1);
+        for (int i = 0; i < slideTimes.size(); i++) {
+            builder.append(i + 1);
             builder.append(",");
             builder.append(slideTimes.get(i).getSeconds());
             builder.append("\n");
@@ -1002,7 +1004,7 @@ public class SocketClient {
 
         try (PGConnection connection = (PGConnection) dataSource.getConnection()) {
             PreparedStatement statement = connection.prepareStatement(
-            		"SELECT * FROM sp_addstatistics_to_presentation(?, ?, ?)");
+                    "SELECT * FROM sp_addstatistics_to_presentation(?, ?, ?)");
 
             statement.setInt(1, userId);
             statement.setInt(2, presentationId);

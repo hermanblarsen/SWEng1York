@@ -12,7 +12,6 @@ import com.i2lp.edi.server.packets.Module;
 import com.i2lp.edi.server.packets.PresentationMetadata;
 import com.sun.javafx.scene.control.skin.DatePickerSkin;
 import javafx.application.Application;
-import javafx.application.Platform;
 import javafx.geometry.*;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -111,7 +110,9 @@ public abstract class Dashboard extends Application {
         dashboardStage.setTitle("Edi");
         Image ediLogoSmall = new Image("file:projectResources/logos/ediLogo32x32.png");
         dashboardStage.getIcons().add(ediLogoSmall);
-        dashboardStage.setOnCloseRequest(event -> Platform.exit());
+        dashboardStage.setOnCloseRequest(event -> {
+            ediManager.stop();
+        });
         dashboardStage.setMinWidth(800);
         dashboardStage.setMinHeight(600);
 
@@ -1118,8 +1119,8 @@ public abstract class Dashboard extends Application {
     private void filterBy(Object filter) {
         if (filter != null) {
             if (filter instanceof ArrayList) {
-                if (((ArrayList)filter).size() != 0) {
-                    if (((ArrayList)filter).get(0) instanceof Subject) {
+                if (((ArrayList) filter).size() != 0) {
+                    if (((ArrayList) filter).get(0) instanceof Subject) {
                         setAllFiltering(true);
 
                         ArrayList<Subject> filterSubjects = (ArrayList<Subject>) filter;
@@ -1306,7 +1307,7 @@ public abstract class Dashboard extends Application {
 
         okButton.setOnMouseClicked((e) -> {
             UrlValidator urlValidator = new UrlValidator(new String[]{"http", "https"});
-            if(urlValidator.isValid(urlInput.getText())) {
+            if (urlValidator.isValid(urlInput.getText())) {
                 //Valid URL
                 String presentationURL = urlInput.getText();
                 onlineChooser.close();
@@ -1320,9 +1321,9 @@ public abstract class Dashboard extends Application {
                     Presentation presentation = parser.parsePresentation();
                     launchPresentation(presentation);
 
-                } catch (MalformedURLException murle){
+                } catch (MalformedURLException murle) {
                     logger.error("Malformed URL given for remote presentation.");
-                } catch (IOException ioe){
+                } catch (IOException ioe) {
                     logger.warn("IOException when trying to get remote http presentation.");
                     new Alert(Alert.AlertType.ERROR, "Couldn't get presentation from this URL.");
                     openOnlineXMLSelectorWindow(presentationURL);//Reopen the url entry window so that the user can try again.

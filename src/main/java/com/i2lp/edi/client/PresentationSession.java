@@ -76,6 +76,12 @@ public class PresentationSession {
             }
         }
 
+        //If couldn't find the interactive element in database that matches the XML interactive element, throw an error and return
+        if(liveElementRecord == null){
+            logger.error("Couldn't find InteractiveElementRecord in database that matches InteractiveElement " + interactiveElement.getElementID());
+            return;
+        }
+
         //Use TimeLimit from local XML
         logger.info("Response time is: " + interactiveElement.getTimeLimit());
         ediManager.getSocketClient().setInteractiveElementLive(activePresentation.getPresentationMetadata().getPresentationID(), liveElementRecord.getInteractive_element_id(), isLive);

@@ -24,20 +24,19 @@ public class EdiManager extends Application {
     protected Login loginDialog;
 
     private PresentationManager presentationManager;
-
     private PresentationLibraryManager presentationLibraryManager;
     private Dashboard dashboard;
     protected SocketClient socketClient;
     protected User userData; //Store currently logged in users data
     private boolean offline = false;
 
-    public static void main(String [] args) {
+    public static void main(String[] args) {
         //Instantiate the ediManager, which will automatically call init() and start(Stage)
         launch(args);
     }
 
     //Temporary, so that edimanager can close the ports and prevent port-in-use errors on next execution
-    public void setClient(SocketClient mySocketClient){
+    public void setClient(SocketClient mySocketClient) {
         this.socketClient = mySocketClient;
     }
 
@@ -53,7 +52,7 @@ public class EdiManager extends Application {
         //Checking for internet connection: //TODO maybe put on a timer and/or in a thread if not connected? Or maybe just bad idea...
         //TODO put recurrent connections tries on timer? -Herman
         verifyInternetAccess();
-        
+
         loginDialog = new Login();
         Stage loginStage = new Stage();
         loginDialog.setEdiManager(this);
@@ -63,9 +62,9 @@ public class EdiManager extends Application {
 
     private void verifyInternetAccess() {
         Socket testSocket = new Socket();
-        InetSocketAddress address = new InetSocketAddress("google.com",80);
+        InetSocketAddress address = new InetSocketAddress("google.com", 80);
         try {
-            testSocket.connect(address,2000);
+            testSocket.connect(address, 2000);
         } catch (IOException e) {
             logger.info("You are not connected to the WWW. Offline Mode activated");
             offline = true;
@@ -80,10 +79,11 @@ public class EdiManager extends Application {
 
     /**
      * Custom logic when user is logged in should go here. Currently displaying First name of user.
+     *
      * @param userToSet User data received from Edi server
      * @author Amrik Sadhra
      */
-    public void setUserData(User userToSet){
+    public void setUserData(User userToSet) {
         this.userData = userToSet;
         logger.info("Welcome " + userData.getFirstName());
     }
@@ -115,6 +115,10 @@ public class EdiManager extends Application {
     //Closing down Edi; shutting down sockets
     @Override
     public void stop() {
+        //Shut down any live sessions
+        if (presentationManager != null){
+            presentationManager.close();
+        }
         logger.info("Closing client-side networking ports.");
         socketClient.closeAll();
     }
@@ -123,7 +127,7 @@ public class EdiManager extends Application {
         this.presentationManager = presentationManager;
     }
 
-    public PresentationManager getPresentationManager(){
+    public PresentationManager getPresentationManager() {
         return this.presentationManager;
     }
 

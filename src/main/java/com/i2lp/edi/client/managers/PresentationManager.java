@@ -903,7 +903,6 @@ public abstract class PresentationManager {
     /**
      * Shutdown the presentation manager cleanly. End Teacher/Student Session
      */
-    @SuppressWarnings("FinalizeCalledExplicitly")
     public void close() {
         if (this instanceof PresentationManagerTeacher) {
             if (presentationSession != null) {
