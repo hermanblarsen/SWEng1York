@@ -1,6 +1,7 @@
 package com.i2lp.edi.client;
 
 import com.i2lp.edi.client.managers.EdiManager;
+import com.i2lp.edi.client.managers.PresentationManager;
 import com.i2lp.edi.client.presentationElements.InteractiveElement;
 import com.i2lp.edi.client.presentationElements.PollElement;
 import com.i2lp.edi.client.presentationElements.Presentation;
@@ -82,12 +83,12 @@ public class StudentSession {
     public void setPresentationLink(boolean setLink) {
         if (setLink) {
             isLinked = true;
-            Image lockIcon = new Image("file:projectResources/icons/lock.png", 30, 30, true, true);
+            Image lockIcon = new Image("file:projectResources/icons/lock.png", PresentationManager.DEFAULT_BUTTON_WIDTH, PresentationManager.DEFAULT_BUTTON_HEIGHT, true, true);
             ediManager.getPresentationManager().linkButton.setImage(lockIcon);
             synchroniseWithTeacher();
         } else {
             isLinked = false;
-            Image unlockIcon = new Image("file:projectResources/icons/unlock.png", 30, 30, true, true);
+            Image unlockIcon = new Image("file:projectResources/icons/unlock.png", PresentationManager.DEFAULT_BUTTON_WIDTH, PresentationManager.DEFAULT_BUTTON_HEIGHT, true, true);
             ediManager.getPresentationManager().linkButton.setImage(unlockIcon);
         }
     }

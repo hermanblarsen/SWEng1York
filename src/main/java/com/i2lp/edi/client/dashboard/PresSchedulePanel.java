@@ -1,11 +1,14 @@
 package com.i2lp.edi.client.dashboard;
 
+import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Text;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;

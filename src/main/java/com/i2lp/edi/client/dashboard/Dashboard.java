@@ -12,6 +12,8 @@ import com.i2lp.edi.server.packets.Module;
 import com.i2lp.edi.server.packets.PresentationMetadata;
 import com.sun.javafx.scene.control.skin.DatePickerSkin;
 import javafx.application.Application;
+import javafx.application.Platform;
+import javafx.event.ActionEvent;
 import javafx.geometry.*;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -44,6 +46,7 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.sql.Timestamp;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.concurrent.atomic.AtomicReference;
@@ -58,8 +61,10 @@ import static javafx.scene.layout.BorderPane.setAlignment;
  */
 @SuppressWarnings({"WeakerAccess", "unused", "Duplicates"})
 public abstract class Dashboard extends Application {
-    private static final double RIGHT_PANEL_WIDTH = 200;
+    private static final double RIGHT_PANEL_WIDTH = 210;
     private static final double LEFT_PANEL_WIDTH = 200;
+    private static final String OPEN_LOCAL_PRES_CAPTION = "Local (from this computer)";
+    private static final String OPEN_REMOTE_PRES_CAPTION = "Remote (from this http)";
     protected static Logger logger = LoggerFactory.getLogger(Dashboard.class);
     private EdiManager ediManager;
     protected PresentationManager presentationManager;
@@ -90,6 +95,7 @@ public abstract class Dashboard extends Application {
     private ScrollPane rightPanelScroll;
     private Panel schedulePanel;
     private DatePicker calendar;
+    private LocalDate selectedDate;
 
     protected TextField searchField;
     protected Button selectAllButton;
@@ -127,6 +133,8 @@ public abstract class Dashboard extends Application {
         noMatchesPres.getStyleClass().add("italic");
         schedulePanel = new Panel("Schedule");
         schedulePanel.getStyleClass().add("panel-primary");
+        schedulePanel.setMaxWidth(RIGHT_PANEL_WIDTH);
+        selectedDate = LocalDate.now();
 
         scene.getStylesheets().add("bootstrapfx.css");
         dashboardStage.setScene(scene);
@@ -188,23 +196,13 @@ public abstract class Dashboard extends Application {
         openPresButton.setOnAction(event -> {
             ContextMenu menu = new ContextMenu();
 
-            MenuItem local = new MenuItem("From this computer");
-            local.setOnAction(event1 -> {
-                Node source = (Node) event.getSource();
-                Window stage = source.getScene().getWindow();
+            MenuItem local = new MenuItem(OPEN_LOCAL_PRES_CAPTION);
+            local.setOnAction(event1 -> showOpenLocalPres(event1));
 
-
-                File file = fileChooser.showOpenDialog(stage);
-                if (file != null) {
-                    ParserXML parserXML = new ParserXML(file.getPath());
-                    launchPresentation(parserXML.parsePresentation());
-                } else logger.info("No presentation was selected");
-            });
-
-            MenuItem online = new MenuItem("Remotely (from HTTP)");
+            MenuItem online = new MenuItem(OPEN_REMOTE_PRES_CAPTION);
             online.setOnAction(event1 -> {
                 //For testing you can use :https://raw.githubusercontent.com/hermanblarsen/SWEng1York/master/projectResources/sampleFiles/xml/i2lpSampleXml.xml?token=AYLAhZswVfz-zJFrEDKoquw1Eg0XybCKks5ZNcqAwA%3D%3D
-                openOnlineXMLSelectorWindow("");
+                showOpenRemotePres("");
             });
 
             menu.getItems().addAll(local, online);
@@ -217,56 +215,8 @@ public abstract class Dashboard extends Application {
         if (this instanceof TeacherDashboard) {
             Button addToServerButton = new Button("Add pres to server");
             addToServerButton.getStyleClass().setAll("btn", "btn-success");
-            addToServerButton.setOnAction(event -> {
-                AtomicReference<File> xmlLocation = new AtomicReference<>(); //Store location of XML from filechooser, for upload to presentation after Thumbnail and CSS gen
-
-                if (addToServerStage != null) {
-                    addToServerStage.close();
-                }
-
-                addToServerStage = new Stage();
-                GridPane addToServerGridPane = new GridPane();
-                addToServerGridPane.setAlignment(Pos.CENTER);
-
-                addToServerGridPane.setHgap(10);
-                addToServerGridPane.setVgap(10);
-                addToServerGridPane.setPadding(new Insets(25, 25, 25, 25));
-                Scene addToServerScene = new Scene(addToServerGridPane, 300, 300);
-                addToServerScene.getStylesheets().add("bootstrapfx.css");
-
-                Button selectXML = new Button("Select XML");
-                selectXML.getStyleClass().setAll("btn", "btn-primary");
-                selectXML.setOnAction(event1 -> {
-                    File file = fileChooser.showOpenDialog(addToServerStage);
-                    xmlLocation.set(file);
-                });
-                addToServerGridPane.add(selectXML, 0, 0);
-                GridPane.setConstraints(selectXML, 0, 0, 1, 1, HPos.CENTER, VPos.CENTER);
-
-                Label saveInModule = new Label("Save in module:");
-                addToServerGridPane.add(saveInModule, 0, 1);
-                GridPane.setConstraints(saveInModule, 0, 1, 1, 1, HPos.CENTER, VPos.CENTER);
-
-                ComboBox<DashModule> modulesCombo = new ComboBox<>();
-                modulesCombo.getItems().addAll(availableModules);
-                addToServerGridPane.add(modulesCombo, 0, 2);
-                GridPane.setConstraints(modulesCombo, 0, 2, 1, 1, HPos.CENTER, VPos.CENTER);
-
-                Button addButton = new Button("Add");
-                addButton.getStyleClass().setAll("btn", "btn-success");
-                addButton.setOnAction(event1 -> {
-                    ediManager.getPresentationLibraryManager().uploadPresentation(xmlLocation.get().getAbsolutePath(), removeFileExtension(xmlLocation.get().getName()), modulesCombo.getValue().getModuleID());
-                    addToServerStage.close();
-                });
-                addToServerGridPane.add(addButton, 0, 3);
-                GridPane.setConstraints(addButton, 0, 3, 1, 1, HPos.CENTER, VPos.CENTER);
-
-                addToServerStage.setScene(addToServerScene);
-                addToServerStage.show();
-            });
-
-            openAddButtonsHBox.getChildren().add(addToServerButton);
-
+            addToServerButton.setOnAction(event -> showAddPresToServer());
+            topPanel.getChildren().add(addToServerButton);
         }
 
         topPanel.getChildren().add(platformTitleHBox);
@@ -367,6 +317,7 @@ public abstract class Dashboard extends Application {
                 border.setCenter(vbox);
 
                 filterBy(filterSubjects);
+                Platform.runLater(() -> updateModuleScrollControls());
                 break;
 
             case SEARCH_ALL:
@@ -389,6 +340,7 @@ public abstract class Dashboard extends Application {
                 border.setCenter(searchScrollPane);
 
                 filterBy(filterSubjects);
+                Platform.runLater(() -> updateModuleScrollControls());
                 break;
 
             case MODULE:
@@ -632,7 +584,13 @@ public abstract class Dashboard extends Application {
         }
 
         calendar = new DatePicker(LocalDate.now());
-        calendar.setOnAction(event -> updateSchedulePanels());
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("EEEE, dd LLLL");
+        schedulePanel.setText("Schedule for " + selectedDate.format(dtf));
+        calendar.setOnAction(event -> {
+            updateSchedulePanels();
+            selectedDate = calendar.getValue();
+            schedulePanel.setText("Schedule for " + selectedDate.format(dtf));
+        });
         final Callback<DatePicker, DateCell> dayCellFactory =
                 new Callback<DatePicker, DateCell>() {
                     @Override
@@ -680,7 +638,7 @@ public abstract class Dashboard extends Application {
                         vbox.setAlignment(Pos.CENTER);
                         vbox.setPadding(new Insets(5));
 
-                        vbox.getChildren().add(selectedPresPanel.getPresentation().getSlidePreview(i, RIGHT_PANEL_WIDTH));
+                        vbox.getChildren().add(selectedPresPanel.getPresentation().getSlidePreview(i, RIGHT_PANEL_WIDTH - 10));
                         vbox.getChildren().add(new Label(Integer.toString(i + 1)));
                         vbox.setStyle("-fx-background-color: #ffffff");
                         rightPanelVBox.getChildren().add(vbox);
@@ -996,8 +954,15 @@ public abstract class Dashboard extends Application {
         //Due to travis fails, this couldn't be done in the constructor:
 
         Menu fileMenu = new Menu("File");
+        Menu openPresMenu = new Menu("Open presentation...");
+        fileMenu.getItems().add(openPresMenu);
+        MenuItem openLocal = new MenuItem(OPEN_LOCAL_PRES_CAPTION);
+        openLocal.setOnAction(event -> showOpenLocalPres(event));
+        MenuItem openRemote = new MenuItem(OPEN_REMOTE_PRES_CAPTION);
+        openRemote.setOnAction(event -> showOpenRemotePres(""));
+        openPresMenu.getItems().addAll(openLocal, openRemote);
 
-        Menu editMenu = new Menu("Edit");
+        Menu editMenu = new Menu("Administration");
 
         Menu viewMenu = new Menu("View");
         MenuItem showWelcomeMessage = new MenuItem("Show Welcome Message");
@@ -1283,7 +1248,18 @@ public abstract class Dashboard extends Application {
         rm.openReportPanel(presentation, ediManager);
     }
 
-    private void openOnlineXMLSelectorWindow(String defaultURLField) {
+    private void showOpenLocalPres(ActionEvent event) {
+        Node source = (Node) event.getSource();
+        Window stage = source.getScene().getWindow();
+
+        File file = fileChooser.showOpenDialog(stage);
+        if (file != null) {
+            ParserXML parserXML = new ParserXML(file.getPath());
+            launchPresentation(parserXML.parsePresentation());
+        } else logger.info("No presentation was selected");
+    }
+
+    private void showOpenRemotePres(String defaultURLField) {
         TextField urlInput = new TextField(defaultURLField);
         urlInput.setPrefWidth(250);
 
@@ -1326,7 +1302,7 @@ public abstract class Dashboard extends Application {
                 } catch (IOException ioe) {
                     logger.warn("IOException when trying to get remote http presentation.");
                     new Alert(Alert.AlertType.ERROR, "Couldn't get presentation from this URL.");
-                    openOnlineXMLSelectorWindow(presentationURL);//Reopen the url entry window so that the user can try again.
+                    showOpenRemotePres(presentationURL);//Reopen the url entry window so that the user can try again.
                     return;
                 }
 
@@ -1341,8 +1317,77 @@ public abstract class Dashboard extends Application {
         onlineChooser.show();
     }
 
+    private void showAddPresToServer() {
+        AtomicReference<File> xmlLocation = new AtomicReference<>(); //Store location of XML from filechooser, for upload to presentation after Thumbnail and CSS gen
+
+        if (addToServerStage != null) {
+            addToServerStage.close();
+        }
+
+        addToServerStage = new Stage();
+        //addToServerStage.setResizable(false);
+        addToServerStage.resizableProperty().setValue(Boolean.FALSE);
+        GridPane addToServerGridPane = new GridPane();
+        addToServerGridPane.setAlignment(Pos.CENTER);
+
+        BorderPane rootPane = new BorderPane();
+        rootPane.setCenter(addToServerGridPane);
+
+        addToServerGridPane.setHgap(10);
+        addToServerGridPane.setVgap(10);
+        addToServerGridPane.setPadding(new Insets(10));
+        Scene addToServerScene = new Scene(rootPane, Constants.THUMBNAIL_WIDTH + 20, 200);
+        addToServerScene.getStylesheets().add("bootstrapfx.css");
+
+        Button selectXML = new Button("Select XML");
+        selectXML.getStyleClass().setAll("btn", "btn-primary");
+        selectXML.setOnAction(event1 -> {
+            File file = fileChooser.showOpenDialog(addToServerStage);
+            if (file != null) {
+                ParserXML parser = new ParserXML(file.getPath());
+                Presentation presentation = parser.parsePresentation();
+                StackPane previewPane = new StackPane();
+                previewPane.setPadding(new Insets(10));
+                rootPane.setBottom(previewPane);
+                ImageView presPreview = presentation.getSlidePreview(0, Constants.THUMBNAIL_WIDTH);
+                previewPane.getChildren().add(presPreview);
+                addToServerStage.setHeight(200 + presPreview.getImage().getHeight());
+                xmlLocation.set(file);
+            }
+        });
+        addToServerGridPane.add(selectXML, 0, 0);
+        GridPane.setConstraints(selectXML, 0, 0, 1, 1, HPos.CENTER, VPos.CENTER);
+
+        Label saveInModule = new Label("Save in module:");
+        addToServerGridPane.add(saveInModule, 0, 1);
+        GridPane.setConstraints(saveInModule, 0, 1, 1, 1, HPos.CENTER, VPos.CENTER);
+
+        ComboBox<DashModule> modulesCombo = new ComboBox<>();
+        modulesCombo.getItems().addAll(availableModules);
+        addToServerGridPane.add(modulesCombo, 0, 2);
+        GridPane.setConstraints(modulesCombo, 0, 2, 1, 1, HPos.CENTER, VPos.CENTER);
+
+        Button addButton = new Button("Add");
+        addButton.getStyleClass().setAll("btn", "btn-success");
+        addButton.setOnAction(event1 -> {
+            ediManager.getPresentationLibraryManager().uploadPresentation(xmlLocation.get().getAbsolutePath(), removeFileExtension(xmlLocation.get().getName()), modulesCombo.getValue().getModuleID());
+            addToServerStage.close();
+        });
+        addToServerGridPane.add(addButton, 0, 3);
+        GridPane.setConstraints(addButton, 0, 3, 1, 1, HPos.CENTER, VPos.CENTER);
+
+        addToServerStage.setScene(addToServerScene);
+        addToServerStage.show();
+    }
+
     public void setEdiManager(EdiManager ediManager) {
         this.ediManager = ediManager;
+    }
+
+    private void updateModuleScrollControls() {
+        for (SubjectPanel panel : subjectPanels) {
+            panel.updateScrollControls();
+        }
     }
 }
 

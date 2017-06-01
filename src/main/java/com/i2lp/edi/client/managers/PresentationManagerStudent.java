@@ -1,6 +1,8 @@
 package com.i2lp.edi.client.managers;
 
 import com.i2lp.edi.client.presentationViewerElements.CommentPanel;
+import com.i2lp.edi.client.utilities.CursorState;
+import javafx.animation.FadeTransition;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -11,8 +13,14 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+import javafx.util.Duration;
+
+import java.util.Timer;
+import java.util.TimerTask;
 
 
 /**
@@ -35,6 +43,35 @@ public class PresentationManagerStudent extends PresentationManager {
     @Override
     protected void createCommentPanel() {
         commentPanel = new CommentPanel(false);
+    }
+
+    @Override
+    protected VBox addQuestionQueueControls() {
+        ImageView questionBase = makeCustomButton("file:projectResources/icons/Question_Filled.png", event -> {
+            if (!questionQueueActive) {
+                loadSpecificFeatures();
+                questionQueueActive = true;
+
+            } else {
+                loadSpecificFeatures();
+                questionQueueActive = false;
+            }
+        });
+        questionBase.addEventFilter(MouseEvent.MOUSE_ENTERED, event -> {
+            if (!mouseDown) {
+                isMouseOverControls = true;
+                setCursorState(CursorState.DEFAULT);
+            }
+        });
+        questionBase.addEventFilter(MouseEvent.MOUSE_EXITED, event -> isMouseOverControls = false);
+
+        VBox contentVBox = new VBox();
+        contentVBox.setAlignment(Pos.TOP_CENTER);
+        contentVBox.setPadding(new Insets(5));
+
+        contentVBox.getChildren().add(questionBase);
+
+        return contentVBox;
     }
 
     protected void questionQueueFunction() {

@@ -174,7 +174,9 @@ public class Login extends Application {
     }
 
     private void changeGuiLoggingIn() {
-        gridPane.add(loadingImage, 0, 6, 2, 1);
+        if (!gridPane.getChildren().contains(loadingImage)) {
+            gridPane.add(loadingImage, 0, 6, 2, 1);
+        }
         messageLabel.setText("Logging in...");
     }
 

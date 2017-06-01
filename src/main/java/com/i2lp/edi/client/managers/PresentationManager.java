@@ -54,14 +54,15 @@ public abstract class PresentationManager {
     private static final int STAGE_MIN_WIDTH = 500;
     private static final int STAGE_MIN_HEIGHT = 300;
     private static final int HIDE_CURSOR_DELAY = 2000;
+    public static final int HIDE_CONTROLS_DELAY = 5000;
     public static final int MIN_ERASER_SIZE = 10;
     private static final double MAX_ERASER_SIZE = 30;
-    private static final double DEFAULT_BUTTON_WIDTH = 30;
-    private static final double DEFAULT_BUTTON_HEIGHT = 30;
+    public static final double DEFAULT_BUTTON_WIDTH = 35;
+    public static final double DEFAULT_BUTTON_HEIGHT = 35;
 
     Logger logger = LoggerFactory.getLogger(PresentationManager.class);
 
-    /* -------------- LIVE SESSION OBJECCTS ----------------*/
+    /* -------------- LIVE SESSION OBJECTS ----------------*/
     protected final EdiManager ediManager;
     private PresentationSession presentationSession;
     private StudentSession studentSession;
@@ -85,11 +86,11 @@ public abstract class PresentationManager {
     protected Boolean isEmbeddedBrowserOpen = false;
     private boolean isShowBlack = false;
     private boolean mouseActivityRegistered = true;
-    private boolean mouseDown = false;
+    protected boolean mouseDown = false;
     private EventHandler<MouseEvent> disabledCursorFilter;
     protected BorderPane controlsPane;
     protected HBox presControls;
-    protected VBox drawControls;
+    protected VBox drawControls, questionQueueControls;
     private Region blackRegion;
     protected DrawPane drawPane;
     private ImageView visibilityButton;
@@ -97,6 +98,8 @@ public abstract class PresentationManager {
     private Popup colourPopup;
     private CursorState currentCursorState = CursorState.DEFAULT;
     private Pane eraseCursorPane;
+    private ImageView drawButton;
+    private ImageView eraserButton;
 
     protected double slideWidth;
     protected double slideHeight;
@@ -161,6 +164,7 @@ public abstract class PresentationManager {
         displayPane.setPickOnBounds(false);
         presControls = addPresentationControls();
         drawControls = addDrawControls();
+        questionQueueControls = addQuestionQueueControls();
     }
 
     /**
@@ -358,13 +362,20 @@ public abstract class PresentationManager {
 
                 mouseActivityRegistered = false;
             }
-        }, 0, 2000);
+        }, 0, HIDE_CURSOR_DELAY);
 
         displayPane.addEventFilter(MouseEvent.ANY, event -> {
             if (event.getEventType().equals(MouseEvent.MOUSE_ENTERED)) {
                 isMouseOverSlide = true;
             } else if (event.getEventType().equals(MouseEvent.MOUSE_EXITED)) {
                 isMouseOverSlide = false;
+            }
+
+            if (drawControls.getOpacity() == 0) {
+                controlsFadeInTimed(drawControls);
+            }
+            if (drawControls.getOpacity() == 0) {
+                controlsFadeInTimed(presControls);
             }
 
             mouseActivityRegistered = true;
@@ -478,10 +489,12 @@ public abstract class PresentationManager {
             isDrawModeOn = true;
             setDrawPaneVisible(true);
             drawPane.setActive(true);
-            controlsFadeIn(drawControls);
+            controlsFadeInTimed(drawControls);
+            drawButton.setImage(new Image("file:projectResources/icons/cursor_icon.png", DEFAULT_BUTTON_WIDTH, DEFAULT_BUTTON_HEIGHT, true, true));
         } else {
             isDrawModeOn = false;
             drawPane.setActive(false);
+            drawButton.setImage(new Image("file:projectResources/icons/draw.png", DEFAULT_BUTTON_WIDTH, DEFAULT_BUTTON_HEIGHT, true, true));
         }
 
         displayCurrentSlide();
@@ -490,17 +503,16 @@ public abstract class PresentationManager {
     private void setDrawPaneVisible(boolean setVisible) {
         if (setVisible) {
             isDrawPaneVisible = true;
-            Image hiddenIcon = new Image("file:projectResources/icons/eyeHidden.png", 30, 30, true, true);
+            Image hiddenIcon = new Image("file:projectResources/icons/eyeHidden.png", DEFAULT_BUTTON_WIDTH, DEFAULT_BUTTON_HEIGHT, true, true);
             visibilityButton.setImage(hiddenIcon);
             displayCurrentSlide();
         } else {
             isDrawPaneVisible = false;
             displayPane.getChildren().remove(drawPane);
-            Image visibleIcon = new Image("file:projectResources/icons/eyeVisible.png", 30, 30, true, true);
+            Image visibleIcon = new Image("file:projectResources/icons/eyeVisible.png", DEFAULT_BUTTON_WIDTH, DEFAULT_BUTTON_HEIGHT, true, true);
             visibilityButton.setImage(visibleIcon);
         }
     }
-
 
     public HBox addPresentationControls() {
         HBox presControls = new HBox();
@@ -544,10 +556,16 @@ public abstract class PresentationManager {
             }
         });
 
-
         ImageView commentButton = makeCustomButton("file:projectResources/icons/SB_filled.png", event -> toggleCommentsWindow());
 
-        ImageView drawButton = makeCustomButton("file:projectResources/icons/draw.png", event -> toggleDrawingMode());
+        String drawIconURL;
+        if (isDrawModeOn) {
+            drawIconURL = "file:projectResources/icons/cursor_icon.png";
+        } else {
+            drawIconURL = "file:projectResources/icons/draw.png";
+        }
+
+        drawButton = makeCustomButton(drawIconURL, event -> toggleDrawingMode());
 
         String visibilityIconURL;
         if (isDrawPaneVisible)
@@ -582,12 +600,8 @@ public abstract class PresentationManager {
         return presControls;
     }
 
-    private ImageView makeCustomButton(String iconURL, EventHandler<MouseEvent> mouseClickedEventHandler) {
-        return makeCustomButton(iconURL, mouseClickedEventHandler, DEFAULT_BUTTON_WIDTH, DEFAULT_BUTTON_HEIGHT);
-    }
-
-    private ImageView makeCustomButton(String iconURL, EventHandler<MouseEvent> mouseClickedEventHandler, double width, double height) {
-        ImageView button = new ImageView(new Image(iconURL, width, height, true, true));
+    protected ImageView makeCustomButton(String iconURL, EventHandler<MouseEvent> mouseClickedEventHandler) {
+        ImageView button = new ImageView(new Image(iconURL, DEFAULT_BUTTON_WIDTH, DEFAULT_BUTTON_HEIGHT, true, true));
         button.addEventHandler(MouseEvent.MOUSE_CLICKED, mouseClickedEventHandler);
         button.addEventHandler(MouseEvent.MOUSE_ENTERED, event -> button.setEffect(new DropShadow()));
         button.addEventHandler(MouseEvent.MOUSE_EXITED, event -> button.setEffect(null));
@@ -604,13 +618,13 @@ public abstract class PresentationManager {
 
         ImageView redoButton = makeCustomButton("file:projectResources/icons/redo.png", event -> drawPane.setSlideDrawing(presentationElement.getSlide(currentSlideNumber).getNextSlideDrawing()));
 
-        ImageView eraserButton = makeCustomButton("file:projectResources/icons/erase.png", event -> {
-            if (drawPane.isEraserMode()) {
-                drawPane.setEraserMode(false);
-            } else {
-                drawPane.setEraserMode(true);
-            }
-        });
+        String eraserIconURL;
+        if (drawPane.isEraserMode())
+            eraserIconURL = "file:projectResources/icons/draw.png";
+        else
+            eraserIconURL = "file:projectResources/icons/erase.png";
+
+        eraserButton = makeCustomButton(eraserIconURL, event -> toggleEraserMode());
 
         ColorPicker colorPicker = new ColorPicker(drawPane.getBrushColor());
         ImageView colourButton = makeCustomButton("file:projectResources/icons/selectBrushColour.png", event -> {
@@ -665,10 +679,22 @@ public abstract class PresentationManager {
         return drawControls;
     }
 
+    private void toggleEraserMode() {
+        if (drawPane.isEraserMode()) {
+            drawPane.setEraserMode(false);
+            eraserButton.setImage(new Image("file:projectResources/icons/erase.png", DEFAULT_BUTTON_WIDTH, DEFAULT_BUTTON_HEIGHT, true, true));
+        } else {
+            drawPane.setEraserMode(true);
+            eraserButton.setImage(new Image("file:projectResources/icons/draw.png", DEFAULT_BUTTON_WIDTH, DEFAULT_BUTTON_HEIGHT, true, true));
+        }
+    }
+
+    protected abstract VBox addQuestionQueueControls();
+
     private void addMouseHandlersToControls(Node controls) {
         controls.addEventHandler(MouseEvent.MOUSE_ENTERED, event -> {
             if (!mouseDown) {
-                controlsFadeIn(controls);
+                controlsFadeInTimed(controls);
                 isMouseOverControls = true;
                 setCursorState(CursorState.DEFAULT);
             }
@@ -678,16 +704,19 @@ public abstract class PresentationManager {
             isMouseOverControls = false;
         });
 
-        controlsFadeIn(controls);
+        controlsFadeInTimed(controls);
     }
 
-    private void controlsFadeIn(Node controls) {
+    protected void controlsFadeInTimed(Node controls) {
         FadeTransition ft0 = new FadeTransition(Duration.millis(500), controls);
         ft0.setFromValue(controls.getOpacity());
         ft0.setToValue(1.0);
         ft0.play();
 
+        hideControlsTimed(controls);
+    }
 
+    protected void hideControlsTimed(Node controls) {
         Timer hideControlsTimer = new Timer(true);
         hideControlsTimer.schedule(new TimerTask() {
             @Override
@@ -695,13 +724,15 @@ public abstract class PresentationManager {
                 FadeTransition ft0 = new FadeTransition(Duration.millis(500), controls);
                 ft0.setFromValue(controls.getOpacity());
                 ft0.setToValue(0.0);
-                if (!isMouseOverControls)
+                logger.info("Hiding controls");
+                if (!isMouseOverControls) {
                     ft0.play();
+                }
             }
-        }, (long) HIDE_CURSOR_DELAY);
+        }, (long) HIDE_CONTROLS_DELAY);
     }
 
-    private void controlsFadeOut(Node controls) {
+    protected void controlsFadeOut(Node controls) {
         FadeTransition ft0 = new FadeTransition(Duration.millis(500), controls);
         ft0.setFromValue(controls.getOpacity());
         ft0.setToValue(0.0);
@@ -950,6 +981,7 @@ public abstract class PresentationManager {
             displayPane.getChildren().add(blackRegion);
 
         controlsPane.setBottom(presControls);
+        controlsPane.setRight(questionQueueControls);
 
         if (isDrawModeOn)
             controlsPane.setLeft(drawControls);
@@ -1083,7 +1115,7 @@ public abstract class PresentationManager {
         return slideElement;
     }
 
-    private void setCursorState(CursorState cursorState) {
+    protected void setCursorState(CursorState cursorState) {
         logger.trace("Cursor state: " + cursorState.name());
         currentCursorState = cursorState;
         if (displayPane.getChildren().contains(eraseCursorPane)) {

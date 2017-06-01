@@ -4,6 +4,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.Pane;
 import org.apache.xpath.operations.Mod;
+import org.kordamp.bootstrapfx.scene.layout.Panel;
 
 import java.util.ArrayList;
 
@@ -12,12 +13,16 @@ import java.util.ArrayList;
  */
 public class ModulePanel extends PreviewPanel {
 
+    private static final int WIDTH = 120;
     private final DashModule module;
 
     public ModulePanel(DashModule module, SubjectPanel parentPanel) {
         super(parentPanel.getModulePanelsHBox());
         this.module = module;
         parentPanel.addModulePanel(this);
+        getDisplayPanel().setPrefWidth(WIDTH);
+        getDisplayPanel().setMinWidth(Panel.USE_PREF_SIZE);
+        getDisplayPanel().setMaxWidth(Panel.USE_PREF_SIZE);
 
         getDisplayPanel().setText(module.getModuleName());
         getDisplayPanel().setFooter(new Label(module.getPresentations().size() + " presentations"));

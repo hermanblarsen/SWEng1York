@@ -1,14 +1,13 @@
 package com.i2lp.edi.client.managers;
 
-import com.i2lp.edi.client.PresentationSession;
 import com.i2lp.edi.client.presentationViewerElements.CommentPanel;
-import com.i2lp.edi.server.packets.PresentationMetadata;
+import com.i2lp.edi.client.utilities.CursorState;
 import com.i2lp.edi.server.packets.Question;
-import javafx.animation.Animation;
-import javafx.animation.Interpolator;
-import javafx.animation.Transition;
+import javafx.animation.FadeTransition;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
@@ -24,10 +23,8 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.stage.WindowEvent;
 import javafx.util.Duration;
-import org.apache.commons.net.ntp.TimeStamp;
 import org.kordamp.bootstrapfx.scene.layout.Panel;
 
-import java.lang.reflect.Array;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
@@ -42,7 +39,6 @@ public class PresentationManagerTeacher extends PresentationManager {
     protected boolean questionClicked = false;
     protected boolean toolkitOpen = false;
     protected String setText;
-    protected List<String> questionList;
     protected List<Student> studentList;
     protected Stage teacherToolKit;
     private int numberOfTestQuestions = 10;
@@ -58,6 +54,7 @@ public class PresentationManagerTeacher extends PresentationManager {
     private Label lab;
     private Region backgroundRegion;
     private Tab studentStats;
+    private Label questionNumberLabel;
     //private Timestamp openTime;
 
     public PresentationManagerTeacher(EdiManager ediManager) {
@@ -347,27 +344,78 @@ public class PresentationManagerTeacher extends PresentationManager {
         commentPanel = new CommentPanel(true);
     }
 
-    public List<String> getQuestionList() {
-        return questionList;
+    @Override
+    protected VBox addQuestionQueueControls() {
+        if (newQuestionList != null) {
+            questionNumberLabel = new Label(Integer.toString(newQuestionList.size()));
+        } else {
+            questionNumberLabel = new Label("0");
+        }
+        questionNumberLabel.setMouseTransparent(true);
+        questionNumberLabel.getStyleClass().add("b");
+
+        ImageView questionBase = new ImageView(new Image("file:projectResources/icons/empty_icon.png", DEFAULT_BUTTON_WIDTH, DEFAULT_BUTTON_HEIGHT, true, true));
+        ImageView questionIcon = makeCustomButton("file:projectResources/icons/Question_Filled.png", event -> {
+            if (!questionQueueActive) {
+                loadSpecificFeatures();
+                questionQueueActive = true;
+
+            } else {
+                loadSpecificFeatures();
+                questionQueueActive = false;
+            }
+        });
+        questionIcon.setOpacity(0);
+        questionIcon.addEventHandler(MouseEvent.MOUSE_ENTERED, event -> {
+            if (!mouseDown) {
+                controlsFadeIn(questionIcon);
+                controlsFadeOut(questionNumberLabel);
+                isMouseOverControls = true;
+                setCursorState(CursorState.DEFAULT);
+            }
+        });
+        questionIcon.addEventHandler(MouseEvent.MOUSE_EXITED, event -> {
+            controlsFadeOut(questionIcon);
+            controlsFadeIn(questionNumberLabel);
+            hideControlsTimed(presControls);
+            hideControlsTimed(drawControls);
+            isMouseOverControls = false;
+        });
+
+        StackPane questionQueueButton = new StackPane(questionBase, questionIcon, questionNumberLabel);
+        questionQueueButton.addEventHandler(MouseEvent.MOUSE_ENTERED, event -> {
+            if (!mouseDown) {
+                isMouseOverControls = true;
+                setCursorState(CursorState.DEFAULT);
+            }
+        });
+        questionQueueButton.addEventHandler(MouseEvent.MOUSE_EXITED, event -> isMouseOverControls = false);
+
+        VBox contentVBox = new VBox();
+        contentVBox.setAlignment(Pos.TOP_CENTER);
+        contentVBox.setPadding(new Insets(5));
+
+        contentVBox.getChildren().add(questionQueueButton);
+
+        return contentVBox;
     }
 
-    public void setQuestionList(List<String> questionList) {
-        this.questionList = questionList;
+    protected void controlsFadeIn(Node controls) {
+        FadeTransition ft0 = new FadeTransition(Duration.millis(500), controls);
+        ft0.setFromValue(controls.getOpacity());
+        ft0.setToValue(1.0);
+        ft0.play();
     }
 
     public void updateQuestionList(){
-        System.out.println("POOP");
         setListOfQuestions();
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-                if(teacherToolKit != null) {
-                    setUpQuestionList(newQuestionList);
-                }
-            }
-        });
+        Platform.runLater(() -> setUpQuestionList(newQuestionList));
+        Platform.runLater(() -> notifyQuestionQueueUI());
+    }
 
-
+    private void notifyQuestionQueueUI() {
+        questionNumberLabel.setText(Integer.toString(newQuestionList.size()));
+        logger.info("Setting question queue number to " + newQuestionList.size());
     }
 
     public void updateStudentList(){
