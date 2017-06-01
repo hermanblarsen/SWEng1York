@@ -24,11 +24,13 @@ public class PresSchedulePanel extends PreviewPanel {
     public PresSchedulePanel(Pane parentPane, PresentationPanel presPanel) {
         super(parentPane, false);
         this.presPanel = presPanel;
+        getDisplayPanel().setMaxWidth(Dashboard.RIGHT_PANEL_WIDTH);
 
         HBox body = new HBox();
         Label title = new Label(presPanel.getPresentation().getDocumentTitle());
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm");
         Label time = new Label(presPanel.getPresentation().getGoLiveDateTime().toLocalTime().format(dtf));
+        time.setMinWidth(Label.USE_PREF_SIZE);
         Region spacer = new Region();
         body.getChildren().addAll(title, spacer, time);
         HBox.setHgrow(spacer, Priority.ALWAYS);

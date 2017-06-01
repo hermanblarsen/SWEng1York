@@ -1,5 +1,8 @@
 package com.i2lp.edi.client.dashboard;
 
+import javafx.application.Platform;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.ListChangeListener;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -12,6 +15,7 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 
+import javax.swing.event.ChangeListener;
 import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -45,13 +49,22 @@ public class SubjectPanel extends PreviewPanel {
         title.getStyleClass().setAll("h4");
         BorderPane.setMargin(title, new Insets(5));
 
+        Region backgroundRegion = new Region();
+        backgroundRegion.setBackground(new Background(new BackgroundFill(Color.WHITE, null, null)));
+
+        StackPane stackPane = new StackPane(backgroundRegion, modulePanelsHBox);
+
         centerScroll = new ScrollPane();
         centerScroll.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         centerScroll.setVbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         centerScroll.getStyleClass().add("edge-to-edge");
-        //centerScroll.setBackground(new Background(new BackgroundFill(Color.WHITE, null, null)));
-        centerScroll.setStyle("-fx-background-color: white");
-        centerScroll.setContent(modulePanelsHBox);
+        centerScroll.setContent(stackPane);
+        centerScroll.widthProperty().addListener((observable, oldValue, newValue) -> {
+            backgroundRegion.setPrefWidth(newValue.doubleValue());
+        });
+        centerScroll.heightProperty().addListener((observable, oldValue, newValue) -> {
+            backgroundRegion.setPrefHeight(newValue.doubleValue());
+        });
 
         borderPane = new BorderPane();
         borderPane.setCenter(centerScroll);
