@@ -107,6 +107,7 @@ public class WordCloudElement extends InteractiveElement {
         wordCloudPanel.setStyle("-fx-background-color: #2a2a2a");
         if(teacher){
             Button start_Task = new Button("Start");
+            start_Task.getStyleClass().setAll("btn","btn-default");
             start_Task.setAlignment(Pos.TOP_CENTER);
             //wordCloudPanel.getChildren().add(start_Task);
             start_Task.addEventHandler(MouseEvent.MOUSE_CLICKED,evt->{
