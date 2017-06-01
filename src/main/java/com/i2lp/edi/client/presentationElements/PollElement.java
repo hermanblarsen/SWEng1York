@@ -6,6 +6,7 @@ import eu.hansolo.tilesfx.TileBuilder;
 import eu.hansolo.tilesfx.tools.ChartData;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.application.Platform;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.geometry.Pos;
@@ -150,18 +151,7 @@ public class PollElement extends InteractiveElement {
             startTimer = new Button("START");
             startTimer.getStyleClass().setAll("btn", "btn-default");
             startTimer.addEventHandler(MouseEvent.MOUSE_CLICKED, evt->{
-                elementActive = true;
-                timerStart = true;
-                //responseIndicator = new ResponseIndicator();
-                //responseIndicator.setNumberOfStudents(20); //TODO: Get this from server
-                pollOptions = new VBox();
-                pollOptions.getChildren().setAll(countdownTile,setUpQuestions());
-                pollOptions.setAlignment(Pos.CENTER);
-                pollOptions.setSpacing(20);
-                //pollPane.setCenter(pollOptions);
-                questionPane.setBody(pollOptions);
-                //delay.play();
-                timeline.play();
+                setUpPollData();
                 if(ediManager.getPresentationManager().getPresentationSession() != null) {
                     ediManager.getPresentationManager().getPresentationSession().beginInteraction(this, true);
                 }
@@ -182,6 +172,26 @@ public class PollElement extends InteractiveElement {
     @Override
     public void destroyElement() {
 
+    }
+
+    public void setUpPollData(){
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                elementActive = true;
+                timerStart = true;
+                //responseIndicator = new ResponseIndicator();
+                //responseIndicator.setNumberOfStudents(20); //TODO: Get this from server
+                pollOptions = new VBox();
+                pollOptions.getChildren().setAll(countdownTile,setUpQuestions());
+                pollOptions.setAlignment(Pos.CENTER);
+                pollOptions.setSpacing(20);
+                //pollPane.setCenter(pollOptions);
+                questionPane.setBody(pollOptions);
+                //delay.play();
+                timeline.play();
+            }
+        });
     }
 
     private HBox setUpQuestions(){

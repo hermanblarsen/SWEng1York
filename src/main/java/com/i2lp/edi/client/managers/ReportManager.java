@@ -1,5 +1,7 @@
 package com.i2lp.edi.client.managers;
 
+import com.i2lp.edi.client.presentationElements.Presentation;
+import com.i2lp.edi.server.packets.Question;
 import eu.hansolo.tilesfx.Tile;
 import eu.hansolo.tilesfx.TileBuilder;
 import eu.hansolo.tilesfx.skins.BarChartItem;
@@ -28,14 +30,15 @@ import static com.i2lp.edi.client.Constants.PRESENTATIONS_PATH;
  */
 public class ReportManager {
 
-    public void openReportPanel(String presentationID){
+    public void openReportPanel(Presentation presentation, EdiManager ediManager){
         Stage stage = new Stage();
-        stage.setTitle(presentationID + " Report");
+        stage.setTitle(presentation.getDocumentID() + " Report");
         ScrollPane reportPane = new ScrollPane();
         stage.setScene(new Scene(reportPane,750,500));
         stage.show();
         VBox flow = new VBox();
         HBox reportPanels = new HBox();
+        ArrayList<Question> questionQueueQuestions = ediManager.getSocketClient().getQuestionsForPresentation(presentation.getPresentationMetadata().getPresentationID());
 
         Tile studentsInPresentation = TileBuilder.create()
                 .skinType(Tile.SkinType.NUMBER)
@@ -51,7 +54,7 @@ public class ReportManager {
                 .skinType(Tile.SkinType.NUMBER)
                 .prefSize(250,250)
                 .title("Question Queue")
-                .value(8)
+                .value(questionQueueQuestions.size())
                 .decimals(0)
                 .description("Click to see questions")
                 .textVisible(true)
@@ -65,7 +68,7 @@ public class ReportManager {
                 .unit("\u0025")
                 .build();
         reportPanels.getChildren().addAll(studentsInPresentation,questionsAsked,presentationParticipation);
-        questionsAsked.addEventHandler(MouseEvent.MOUSE_CLICKED,evt-> {new ReportManager().showQuestions();});
+        questionsAsked.addEventHandler(MouseEvent.MOUSE_CLICKED,evt-> {new ReportManager().showQuestions(questionQueueQuestions);});
         studentsInPresentation.addEventHandler(MouseEvent.MOUSE_CLICKED,evt->{new ReportManager().showStudents();});
         flow.getChildren().add(reportPanels);
         //reportPane.setContent(reportPanels);
@@ -76,8 +79,10 @@ public class ReportManager {
         }
 
 
-        File wordcloudPath = new File(PRESENTATIONS_PATH + "/Wordclouds/"+presentationID);
+        File wordcloudPath = new File(PRESENTATIONS_PATH+"/" +presentation.getDocumentID()+"/Wordclouds/");
+        System.out.println(wordcloudPath.toString());
         if(wordcloudPath.exists()){
+            System.out.println("TEST");
             String[] ext = {"png"};
             FilenameFilter imageFilter = (dir, name) -> {
                 for (final String ext1 : ext) {
@@ -89,8 +94,9 @@ public class ReportManager {
             };
 
             for(File f: wordcloudPath.listFiles(imageFilter)){
-                Image wordCloud = new Image(f.getAbsolutePath());
-                ImageView wordCloudImage = new ImageView();
+                System.out.println(f.getAbsolutePath());
+                Image wordCloud = new Image("file:"+f.getAbsolutePath());
+                ImageView wordCloudImage = new ImageView(wordCloud);
                 flow.getChildren().add(wordCloudImage);
             }
         }
@@ -117,7 +123,7 @@ public class ReportManager {
                 .build();
         return pollPanel;
     }
-    public void showQuestions(){
+    public void showQuestions(ArrayList<Question> questionQueueQuestions){
         Stage stage = new Stage();
         stage.setTitle("Questions");
         ScrollPane sp = new ScrollPane();
@@ -130,24 +136,18 @@ public class ReportManager {
         fp.setStyle("-fx-background-color: whitesmoke");
         sp.setStyle("-fx-background-color: whitesmoke");
 
-        ArrayList<Questions> questions = new ArrayList<>();
-        questions.add(new Questions("Poop!",2));
-        questions.add(new Questions("Poop?",3));
-        questions.add(new Questions("Poop!?",9));
-        questions.add(new Questions("||Poop||",6));
+        Panel[] slides = new Panel[questionQueueQuestions.size()];
 
-        Panel[] slides = new Panel[questions.size()];
-
-        for(int i = 0;i<questions.size();i++){
+        for(int i = 0;i<questionQueueQuestions.size();i++){
             slides[i] = new Panel();
-            Label question = new Label(questions.get(i).getQuestion());
+            Label question = new Label(questionQueueQuestions.get(i).getQuestion_data());
             question.setWrapText(true);
             question.setTextFill(Color.WHITE);
-            Label timeWaited = new Label("Time waited "+questions.get(i).getTimeWaited()+" minutes");
-            timeWaited.setTextFill(Color.WHITE);
-            timeWaited.setWrapText(true);
+            //Label timeWaited = new Label("Time waited "+questions.get(i).getTimeWaited()+" minutes");
+           // timeWaited.setTextFill(Color.WHITE);
+            //timeWaited.setWrapText(true);
             VBox slideBox = new VBox();
-            slideBox.getChildren().addAll(question,timeWaited);
+            slideBox.getChildren().addAll(question);
             slides[i].setStyle("-fx-background-color: #34495e");
             slides[i].setBody(slideBox);
             slides[i].setMinWidth(430);

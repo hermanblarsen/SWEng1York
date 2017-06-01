@@ -867,7 +867,7 @@ public abstract class Dashboard extends Application {
                         cMenu.getItems().add(print);
 
                         MenuItem report = new MenuItem("Report");
-                        report.setOnAction(reportEvent -> showReport(presentationPanel.getId()));
+                        report.setOnAction(reportEvent -> showReport(presentationPanel.getPresentation()));
                         cMenu.getItems().add(report);
 
                     }
@@ -1278,9 +1278,9 @@ public abstract class Dashboard extends Application {
         ThumbnailGenerationManager.generateSlideThumbnails(presentation, true);
     }
 
-    private void showReport(String presentationID) {
+    private void showReport(Presentation presentation) {
         ReportManager rm = new ReportManager();
-        rm.openReportPanel(presentationID);
+        rm.openReportPanel(presentation, ediManager);
     }
 
     private void openOnlineXMLSelectorWindow(String defaultURLField) {

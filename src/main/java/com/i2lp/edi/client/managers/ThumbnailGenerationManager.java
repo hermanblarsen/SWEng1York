@@ -166,7 +166,7 @@ public class ThumbnailGenerationManager extends PresentationManager {
     private void savePresentationToPdf() {
         PDDocument doc = new PDDocument();
 
-        String[] ext = {"png"};
+
         File path = new File(PRESENTATIONS_PATH + this.presentationElement.getDocumentID() + "/Print/");
         File pathPDF = new File(PRESENTATIONS_PATH + this.presentationElement.getDocumentID() + "/Print/" + "/pdf/");
         if (!pathPDF.exists()) {
@@ -189,6 +189,7 @@ public class ThumbnailGenerationManager extends PresentationManager {
                 pdfPath.delete();
             }
             logger.info("PDF Save path: " + pdfPath.getAbsolutePath());
+            String[] ext = {"png"};
             FilenameFilter imageFilter = (dir, name) -> {
                 for (final String ext1 : ext) {
                     if (name.endsWith("." + ext1)) {

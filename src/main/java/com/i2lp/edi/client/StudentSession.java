@@ -2,6 +2,7 @@ package com.i2lp.edi.client;
 
 import com.i2lp.edi.client.managers.EdiManager;
 import com.i2lp.edi.client.presentationElements.InteractiveElement;
+import com.i2lp.edi.client.presentationElements.PollElement;
 import com.i2lp.edi.client.presentationElements.Presentation;
 import com.i2lp.edi.client.presentationElements.WordCloudElement;
 import com.i2lp.edi.server.packets.InteractionRecord;
@@ -114,6 +115,9 @@ public class StudentSession {
 
                         if (interactiveElement instanceof WordCloudElement) {
                             ((WordCloudElement) interactiveElement).setUpWordCloudData();
+                        }
+                        if (interactiveElement instanceof PollElement) {
+                            ((PollElement) interactiveElement).setUpPollData();
                         }
 
                         //Start timer of response interval, in which to set Interactive element non live
