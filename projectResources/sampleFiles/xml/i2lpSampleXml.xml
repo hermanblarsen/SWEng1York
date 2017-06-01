@@ -17,7 +17,7 @@
 			<graphicscolour>#2ecc71FF</graphicscolour>
 			<autoplaymedia>true</autoplaymedia>
 		</defaults>
-		<slide slideid="1">
+		<slide slideid="24">
             <!--Title-->
             <text elementid ="0" layer="10" startsequence="1">
                 <textcontent>
@@ -195,7 +195,7 @@
 				<ysize>0.8</ysize>
 				<path>projectResources/logos/ediLogo1000x1000.png</path>
 				<onclickaction>gotoslide</onclickaction>
-				<onclickinfo>3</onclickinfo>
+				<onclickinfo>24</onclickinfo>
 				<opacity>1</opacity>
 				<aspectratiolock>true</aspectratiolock>
 				<elementaspectratio>1.5</elementaspectratio>

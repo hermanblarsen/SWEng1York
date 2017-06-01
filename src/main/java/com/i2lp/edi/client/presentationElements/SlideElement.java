@@ -281,17 +281,19 @@ public abstract class SlideElement {
                     break;
                 case "gotoslide":
                     if(!(slideElement instanceof InteractiveElement)) {
-                        ediManager.getPresentationManager().goToSlide(Integer.parseInt(onClickInfo));
+                        //ediManager.getPresentationManager().goToSlide(Integer.parseInt(onClickInfo));
+                        ediManager.getPresentationManager().goToSlideID(Integer.parseInt(onClickInfo));
                     }else{
                         if(!(((InteractiveElement) slideElement).elementActive)){
-                            ediManager.getPresentationManager().goToSlide(Integer.parseInt(onClickInfo));
+                            //ediManager.getPresentationManager().goToSlide(Integer.parseInt(onClickInfo));
+                            ediManager.getPresentationManager().goToSlideID(Integer.parseInt(onClickInfo));
                         }
                     }
                     break;
 
                 case "dynamicmediatoggle":
 
-                    SlideElement se = ediManager.getPresentationManager().getElement(Integer.parseInt(onClickInfo));
+                    SlideElement se = ediManager.getPresentationManager().getElement(Integer.parseInt(onClickInfo)-1);
                     if (se instanceof VideoElement) {
                         if (((VideoElement) se).getMediaPlayer().getStatus() == MediaPlayer.Status.PLAYING) {
                             ((VideoElement) se).getMediaPlayer().pause();

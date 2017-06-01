@@ -1030,6 +1030,24 @@ public abstract class PresentationManager {
         return true;
     }
 
+    public void goToSlideID(int targetSlideID){
+        int slideID = 0;
+        int slideNumber = 0;
+        boolean slideFound = false;
+        for(int i = 0; i< presentationElement.getMaxSlideNumber();i++){
+            slideID  = presentationElement.getSlideList().get(i).getSlideID();
+            if(slideID == targetSlideID){
+                slideNumber = i;
+                slideFound = true;
+                break;
+            }
+        }
+        if(slideFound){
+            logger.info("Going to slide with ID: "+slideID);
+            goToSlide(slideNumber);
+        }
+    }
+
     private void setFullscreen(boolean fullscreen) {
         presentationStage.setFullScreen(fullscreen);
         isFullscreen = fullscreen;
