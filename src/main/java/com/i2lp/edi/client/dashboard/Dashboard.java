@@ -197,7 +197,7 @@ public abstract class Dashboard extends Application {
             ContextMenu menu = new ContextMenu();
 
             MenuItem local = new MenuItem(OPEN_LOCAL_PRES_CAPTION);
-            local.setOnAction(event1 -> showOpenLocalPres(event1));
+            local.setOnAction(event1 -> showOpenLocalPres());
 
             MenuItem online = new MenuItem(OPEN_REMOTE_PRES_CAPTION);
             online.setOnAction(event1 -> {
@@ -707,6 +707,7 @@ public abstract class Dashboard extends Application {
         setupModulePanels();
         setupPresentationPanels();
         setupSchedulePanels();
+        Platform.runLater(() -> updateModuleScrollControls());
 
         if (currentState != null) {
             if (currentState == DashboardState.SEARCH_ALL || currentState == DashboardState.TOP_LEVEL) {
@@ -957,7 +958,7 @@ public abstract class Dashboard extends Application {
         Menu openPresMenu = new Menu("Open presentation...");
         fileMenu.getItems().add(openPresMenu);
         MenuItem openLocal = new MenuItem(OPEN_LOCAL_PRES_CAPTION);
-        openLocal.setOnAction(event -> showOpenLocalPres(event));
+        openLocal.setOnAction(event -> showOpenLocalPres());
         MenuItem openRemote = new MenuItem(OPEN_REMOTE_PRES_CAPTION);
         openRemote.setOnAction(event -> showOpenRemotePres(""));
         openPresMenu.getItems().addAll(openLocal, openRemote);
@@ -1248,11 +1249,8 @@ public abstract class Dashboard extends Application {
         rm.openReportPanel(presentation, ediManager);
     }
 
-    private void showOpenLocalPres(ActionEvent event) {
-        Node source = (Node) event.getSource();
-        Window stage = source.getScene().getWindow();
-
-        File file = fileChooser.showOpenDialog(stage);
+    private void showOpenLocalPres() {
+        File file = fileChooser.showOpenDialog(dashboardStage);
         if (file != null) {
             ParserXML parserXML = new ParserXML(file.getPath());
             launchPresentation(parserXML.parsePresentation());
