@@ -43,31 +43,35 @@ public class PresentationManagerStudent extends PresentationManager {
 
     @Override
     protected VBox addQuestionQueueControls() {
-        ImageView questionBase = makeCustomButton("file:projectResources/icons/Question_Filled.png", event -> {
-            if (!questionQueueActive) {
-                loadSpecificFeatures();
-                questionQueueActive = true;
+        if (studentSession != null) {
+            ImageView questionBase = makeCustomButton("file:projectResources/icons/Question_Filled.png", event -> {
+                if (!questionQueueActive) {
+                    loadSpecificFeatures();
+                    questionQueueActive = true;
 
-            } else {
-                loadSpecificFeatures();
-                questionQueueActive = false;
-            }
-        });
-        questionBase.addEventFilter(MouseEvent.MOUSE_ENTERED, event -> {
-            if (!mouseDown) {
-                isMouseOverControls = true;
-                setCursorState(CursorState.DEFAULT);
-            }
-        });
-        questionBase.addEventFilter(MouseEvent.MOUSE_EXITED, event -> isMouseOverControls = false);
+                } else {
+                    loadSpecificFeatures();
+                    questionQueueActive = false;
+                }
+            });
+            questionBase.addEventFilter(MouseEvent.MOUSE_ENTERED, event -> {
+                if (!mouseDown) {
+                    isMouseOverControls = true;
+                    setCursorState(CursorState.DEFAULT);
+                }
+            });
+            questionBase.addEventFilter(MouseEvent.MOUSE_EXITED, event -> isMouseOverControls = false);
 
-        VBox contentVBox = new VBox();
-        contentVBox.setAlignment(Pos.TOP_CENTER);
-        contentVBox.setPadding(new Insets(5));
+            VBox contentVBox = new VBox();
+            contentVBox.setAlignment(Pos.TOP_CENTER);
+            contentVBox.setPadding(new Insets(5));
 
-        contentVBox.getChildren().add(questionBase);
+            contentVBox.getChildren().add(questionBase);
 
-        return contentVBox;
+            return contentVBox;
+        } else {
+            return new VBox();
+        }
     }
 
     protected void questionQueueFunction() {

@@ -58,7 +58,7 @@ public abstract class SlideElement {
     protected double slideHeight;
     protected boolean teacher;
     protected SlideElement mediaElement;
-    protected boolean isThumbnailGen;
+    protected boolean isForceMute;
 
     public abstract void doClassSpecificRender();
 
@@ -430,13 +430,11 @@ public abstract class SlideElement {
         ediManager.getPresentationManager().removeSequenceChangeListener(sequenceChangeListener);
     }
 
-    public boolean isThumbnailGen() {
-        return isThumbnailGen;
+    public boolean isForceMute() {
+        return isForceMute;
     }
 
-    public void setThumbnailGen(boolean thumbnailGen) {
-        isThumbnailGen = thumbnailGen;
-    }
+    public void setForceMute(boolean isForceMute) { this.isForceMute = isForceMute; }
 
     public void setStartAnimation(Animation startAnimation) {
         this.startAnimation = startAnimation;
