@@ -73,8 +73,15 @@ public class TextElement extends SlideElement {
         //Put HTML into WebView
         webEngine.loadContent(textContent);
 
+
+        //TODO: --- Remove this Hack ---
+        //moduleName should be set inside a presentation
+        String moduleName = "missing";
+        if(ediManager.getPresentationManager() != null){
+            moduleName =  ediManager.getPresentationManager().getPresentationElement().getModule().getModuleName();
+        }
         //Apply Dynamically created CSS to TextElement
-        cssFilePath = Utilities.cssGen(presentationID, ediManager.getPresentationManager().getPresentationElement().getModule().getModuleName(), slideID, elementID, fontSize, font, fontColour, bgColour, borderColour, borderSize, hasBorder);
+        cssFilePath = Utilities.cssGen(presentationID, moduleName, slideID, elementID, fontSize, font, fontColour, bgColour, borderColour, borderSize, hasBorder);
         webEngine.setUserStyleSheetLocation(cssFilePath);
 
         //Stage 3 Setup: DoClassSpecificRender for resizing, register State Handlers, register onClickAction method in superclass

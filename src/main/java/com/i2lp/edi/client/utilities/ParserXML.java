@@ -41,8 +41,10 @@ public class ParserXML {
             logger.info("Path valid...");
         } else {
             logger.warn("Path not valid, sample XML loaded...");
+
             throw new InvalidPathException(presentationXmlPath, presentationXmlPath.substring(presentationXmlPath.lastIndexOf(".") + 1));
         }
+
 
         //Create a DOMParser, try parsing XML
         xmlParser = new DOMParser(); //Equivalent to DocumentBuilder when not writing to XML
@@ -1000,11 +1002,5 @@ public class ParserXML {
             else logger.warn("File Extension " + extension + " not accepted");
         }
         return validated;
-    }
-
-    private String produceLegalXmlCharacters(String textContent) {
-        String xmlSafeHtmlText = "";
-        //TODO do this properly, but not needed until writing
-        return xmlSafeHtmlText;
     }
 }

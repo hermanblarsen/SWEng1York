@@ -204,17 +204,16 @@ public class PollElement extends InteractiveElement {
         //answerSelection.setMaxHeight(slideCanvas.getMaxHeight());
         for (int i = 0; i < possibleAnswers.size(); i++) {
             final int number = i;
-
             //chartDataArray[i].setName(possibleAnswers.get(i));
-
             answerButton[i] = new ToggleButton(possibleAnswers.get(i));
             //answerButton[i].setMinWidth(slideCanvas.getWidth());
             answerButton[i].getStyleClass().setAll("btn","btn-default");
+            int finalI = i;
             answerButton[i].addEventHandler(MouseEvent.MOUSE_CLICKED, evt -> {
                 //responseIndicator.incrementResponses();
                 //checkIfDone();
                 setValue = number;
-
+                ediManager.getPresentationManager().getStudentSession().sendResponse(this, answerButton[finalI].getText());
             });
             answerButton[i].addEventHandler(MouseEvent.MOUSE_ENTERED, evt->{
                 buttonActive = true;
@@ -224,14 +223,12 @@ public class PollElement extends InteractiveElement {
             });
             answerSelection.getChildren().add(answerButton[i]);
             answerButton[i].setToggleGroup(group);
-
-
         }
         answerSelection.setAlignment(Pos.CENTER);
         return answerSelection;
     }
 
-    private void displayDone() {
+    public void displayDone() {
 
         questionPane.getChildren().remove(questionPane.getBody());
         for(int i = 0; i<possibleAnswers.size();i++){
@@ -359,8 +356,8 @@ public class PollElement extends InteractiveElement {
         return answers;
     }
 
-    public void setAnswers(String answers) {
-        this.answers = answers;
+    public void setAnswers(ArrayList<String> answers) {
+        //this.answers = answers;
     }
 
     public void setUpQuestionList(String answers){

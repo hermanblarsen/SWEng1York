@@ -17,7 +17,6 @@ import java.net.URISyntaxException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.concurrent.*;
@@ -73,28 +72,6 @@ public class SocketClient {
 
         try (PGConnection connection = (PGConnection) dataSource.getConnection()) {
             logger.info("Successful connection from client to PostgreSQL database instance");
-        } catch (Exception e) {
-            logger.error("Unable to connect to PostgreSQL on port 5432. PJDBC dump:", e);
-        }
-    }
-
-    public void addResponse(int presentation_id, int question_id, String data) {
-        //Attempt to add a user
-        try (PGConnection connection = (PGConnection) dataSource.getConnection()) {
-            Statement statement = connection.createStatement();
-            StringBuilder sb = new StringBuilder();
-
-            //TODO: Create Stored Procedure on PostgreSQL
-            sb.append("INSERT INTO public.responses (presentation_id, question_id, data) VALUES ('");
-            sb.append(presentation_id).append("', '");
-            sb.append(question_id).append("', '");
-            sb.append(data).append("');");
-
-            logger.info("Adding response to database using SQL: " + sb.toString());
-            statement.execute(sb.toString());
-            //Let client know whether their operation was successful
-            //TODO: Do what the comment above says
-            statement.close();
         } catch (Exception e) {
             logger.error("Unable to connect to PostgreSQL on port 5432. PJDBC dump:", e);
         }
@@ -351,7 +328,6 @@ public class SocketClient {
             obj.put("password", toAdd.getPassword());
             obj.put("userType", toAdd.getUserType());
 
-            //TODO: If failed, throw custom userAdd exception
             socket.emit("AddUser", obj);
             socket.on("AddUser", objects -> {
                 if (!(objects[0]).equals("user_add_failed")) {
@@ -503,7 +479,7 @@ public class SocketClient {
     /**
      * Delete the requested presentation from the respective module, deleting the data base table reference and the server zip contents
      *
-     * @param presentationID
+     * @param presentationID Presentation ID to delete
      * @return
      */
     public String removePresentationFromModule(int presentationID) {

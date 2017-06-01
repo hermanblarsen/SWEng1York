@@ -58,8 +58,6 @@ public class ThumbnailGenerationManager extends PresentationManager {
         presentationStage.show();
 
         //Hide the presentation manager
-        //TODO: Put the stage in the bottom right of the screen
-        //TODO a possibility would be to only show it exactly when the snapshot is taken, and then rehide it again - Herman
         presentationStage.toBack();
         assignAttributes(presentationElement);
     }

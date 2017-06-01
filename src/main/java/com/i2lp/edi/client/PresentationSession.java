@@ -3,6 +3,7 @@ package com.i2lp.edi.client;
 import com.i2lp.edi.client.managers.EdiManager;
 import com.i2lp.edi.client.managers.PresentationManagerTeacher;
 import com.i2lp.edi.client.presentationElements.InteractiveElement;
+import com.i2lp.edi.client.presentationElements.PollElement;
 import com.i2lp.edi.client.presentationElements.Presentation;
 import com.i2lp.edi.client.presentationElements.WordCloudElement;
 import com.i2lp.edi.server.packets.InteractionRecord;
@@ -28,8 +29,6 @@ public class PresentationSession {
     private EdiManager ediManager;
     private Presentation activePresentation;
 
-    private PresentationStatistics presentationStatistics;
-
     private ArrayList<InteractiveElementRecord> interactiveElementRecords = new ArrayList<>();
     private ArrayList<InteractiveElement> interactiveElementsInPresentation = new ArrayList<>(); //Needed to link records to InteractiveElements in presentation
     private ArrayList<InteractionRecord> interactionsFromStudents = new ArrayList<>();
@@ -38,7 +37,6 @@ public class PresentationSession {
     private ArrayList<User> activeUsers;
 
     //Configuration Variables for session
-
 
     private Date startDate;
     private Date endDate;
@@ -52,11 +50,13 @@ public class PresentationSession {
 
         //Update database with slide number and start sequence of 0
         ediManager.getSocketClient().setCurrentSlideAndSequenceForPresentation(activePresentation.getPresentationMetadata().getPresentationID(), 0, 0);
+
         //Get Interactive Elements
         interactiveElementRecords = ediManager.getSocketClient().getInteractiveElementsForPresentation(activePresentation.getPresentationMetadata().getPresentationID());
 
         //Update Question Queue
         questionQueue = ediManager.getSocketClient().getQuestionsForPresentation(activePresentation.getPresentationMetadata().getPresentationID());
+
         //Add the slide timers:
         addSlideTimeListener();
         logger.info("Added Slide Timers");
@@ -115,8 +115,12 @@ public class PresentationSession {
                     Platform.runLater(() -> {
                         ((WordCloudElement) interactiveElement).generateWordCloud();
                     });
+                } else if (interactiveElement instanceof PollElement) { //If its a poll, set the answer data
+                    ((PollElement) interactiveElement).setAnswers(elementInteractions);
+                    Platform.runLater(() -> {
+                        ((PollElement) interactiveElement).displayDone();
+                    });
                 }
-
             }
         }, interactiveElement.getTimeLimit() * 1000);
     }
@@ -205,5 +209,4 @@ public class PresentationSession {
             }
         });
     }
-
 }

@@ -67,7 +67,6 @@ public class StudentSession {
         }
     }
 
-    //TODO: Do other session termination stuff
     public void endSession() {
         sendUserStatistics();
         //Set active presentation for user to null (no active presentation)
@@ -113,7 +112,7 @@ public class StudentSession {
                         synchroniseWithTeacher();
                         logger.info("Interactive Element: " + interactiveElement.getElementID() + " of type: " + interactiveElementRecord.getType() + " is now live." + "You have " + interactiveElement.getTimeLimit() + " seconds to respond.");
 
-
+                        //Open the element for interaction
                         if (interactiveElement instanceof WordCloudElement) {
                             ((WordCloudElement) interactiveElement).setUpWordCloudData();
                         }
@@ -131,19 +130,28 @@ public class StudentSession {
                                 ArrayList<String> elementInteractions = new ArrayList<>();
 
                                 //Find Interactions that belong to this current interactive element
-                                if (!interactionsFromStudents.isEmpty()) {
-                                    for (InteractionRecord interactionRecord : interactionsFromStudents) {
-                                        if (interactionRecord.getInteractive_element_id() == interactiveElementRecord.getInteractive_element_id()) {
-                                            elementInteractions.add(interactionRecord.getInteraction_data());
+                                for (InteractionRecord interactionRecord : interactionsFromStudents) {
+                                    if (interactionRecord.getInteractive_element_id() == interactiveElementRecord.getInteractive_element_id()) {
+                                        elementInteractions.add(interactionRecord.getInteraction_data());
+                                    }
+                                }
+                                //If its a WordCloud, set the wordList
+                                if (interactiveElement instanceof WordCloudElement) {
+                                    if (interactionsFromStudents.isEmpty()) {
+                                        for (int i = 0; i < 100; i++) {
+                                            elementInteractions.add("NONE");
                                         }
+                                        logger.error("No interactions received for Interactive Element: " + interactiveElement.getElementID());
                                     }
-                                    //If its a WordCloud, set the wordList
-                                    if (interactiveElement instanceof WordCloudElement) {
-                                        ((WordCloudElement) interactiveElement).setWordList(elementInteractions);
-                                        Platform.runLater(() -> {
-                                            ((WordCloudElement) interactiveElement).generateWordCloud();
-                                        });
-                                    }
+                                    ((WordCloudElement) interactiveElement).setWordList(elementInteractions);
+                                    Platform.runLater(() -> {
+                                        ((WordCloudElement) interactiveElement).generateWordCloud();
+                                    });
+                                } else if (interactiveElement instanceof PollElement) { //If its a poll, set the answer data
+                                    ((PollElement) interactiveElement).setAnswers(elementInteractions);
+                                    Platform.runLater(() -> {
+                                        ((PollElement) interactiveElement).displayDone();
+                                    });
                                 } else {
                                     logger.error("No interactions received for Interactive Element: " + interactiveElement.getElementID());
                                 }

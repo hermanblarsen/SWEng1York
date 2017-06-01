@@ -2,7 +2,6 @@ package com.i2lp.edi.client.managers;
 
 import com.i2lp.edi.client.presentationViewerElements.CommentPanel;
 import com.i2lp.edi.client.utilities.CursorState;
-import javafx.animation.FadeTransition;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -13,14 +12,11 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
-import javafx.util.Duration;
 
-import java.util.Timer;
-import java.util.TimerTask;
+import static com.i2lp.edi.client.Constants.MAX_QUESTION_LENGTH;
 
 
 /**
@@ -101,10 +97,14 @@ public class PresentationManagerStudent extends PresentationManager {
         ImageView tickPanel = new ImageView(tick);
         tickPanel.addEventHandler(MouseEvent.MOUSE_CLICKED, evt -> {
             //TODO: Add length limiting to questions
-            if(!ta.getText().isEmpty()){
-               getStudentSession().addQuestionToQueue(ta.getText());
+            if (ta.getText().length() <= MAX_QUESTION_LENGTH) {
+                if (!ta.getText().isEmpty()) {
+                    getStudentSession().addQuestionToQueue(ta.getText());
+                    questionQueueStage.close();
+                }
+            } else {
+                ta.setText(ta.getText() + " \n Response is too long. Reduce length by " + (MAX_QUESTION_LENGTH -ta.getText().length()) + " characters.");
             }
-            questionQueueStage.close();
         });
 
         Image cross = new Image("file:projectResources/icons/cancel.png", 30, 30, true, true);

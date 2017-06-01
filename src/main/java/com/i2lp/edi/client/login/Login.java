@@ -6,8 +6,6 @@ import com.i2lp.edi.server.SocketClient;
 import com.i2lp.edi.server.packets.User;
 import com.i2lp.edi.server.packets.UserAuth;
 import javafx.application.Application;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
@@ -246,7 +244,6 @@ public class Login extends Application {
         if (!offline) {
             //Connect to edi server
             mySocketClient = new SocketClient(remoteServerAddress, 8080);
-            //TODO: Should I move ediManager to SocketClient constructor?
             mySocketClient.setEdiManager(ediManager);
             ediManager.setClient(mySocketClient);
         }

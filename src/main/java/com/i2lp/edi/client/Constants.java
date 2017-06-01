@@ -25,6 +25,10 @@ public class Constants {
     public static final String FTP_USER = "bscftp";
     public static final String FTP_PASS = "Combline90+";
 
+    //Length limiting constant for responses
+    public static final int MAX_WORDCLOUD_RESPONSE_LENGTH = 20;
+    public static final int MAX_QUESTION_LENGTH = 200;
+
     //Work out if CircleCI is running, and skip graphical tests
     public static final Boolean IS_CIRCLE_BUILD = Boolean.parseBoolean(System.getenv("CIRCLECI"));
 

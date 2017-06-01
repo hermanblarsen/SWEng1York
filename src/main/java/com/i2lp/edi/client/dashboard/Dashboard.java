@@ -946,7 +946,7 @@ public abstract class Dashboard extends Application {
         if (successful_removal) {
             updateAvailablePresentations();
             presentationPanelsFlowPane.getChildren().remove(previewPanel);
-        } else logger.warn("Presentation Could not be removed"); //TODO improve this
+        } else logger.warn("Presentation Could not be removed");
     }
 
     private MenuBar addMenuBar() {
