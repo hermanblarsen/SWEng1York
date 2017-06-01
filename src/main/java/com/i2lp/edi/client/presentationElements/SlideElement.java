@@ -293,7 +293,7 @@ public abstract class SlideElement {
 
                 case "dynamicmediatoggle":
 
-                    SlideElement se = ediManager.getPresentationManager().getElement(Integer.parseInt(onClickInfo)-1);
+                    SlideElement se = ediManager.getPresentationManager().getElement(Integer.parseInt(onClickInfo));
                     if (se instanceof VideoElement) {
                         if (((VideoElement) se).getMediaPlayer().getStatus() == MediaPlayer.Status.PLAYING) {
                             ((VideoElement) se).getMediaPlayer().pause();

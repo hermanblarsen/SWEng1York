@@ -1,0 +1,80 @@
+<document documentid="SalesPresentation">
+	<documentdetails>
+		<title>Sales Presentation</title>
+		<author>Herman Larsen</author>
+		<version>1.0</version>
+		<documentaspectratio>1.33</documentaspectratio>
+		<description>A sales presentation for Edi, developed by I2LP throughout the third year at University of York in a module called Software Engineering</description>
+		<tags>sales,presentation,Edi,I2LP</tags>
+		<groupformat>2</groupformat>
+	</documentdetails>
+	<slideshow>
+		<defaults>
+			<bgcolour>##abcdefFF</bgcolour>
+			<font>"Times New Roman", Times, serif</font>
+			<fontsize>20</fontsize>
+			<fontcolour>#000000FF</fontcolour>
+			<graphicscolour>#2ecc71FF</graphicscolour>
+			<autoplaymedia>true</autoplaymedia>
+		</defaults>
+
+        <!-- brackets       &lt;&gt; &lt;/&gt;       -->
+        <!--italic          &lt;i&gt; &lt;/i&gt;     -->
+        <!--bold            &lt;b&gt; &lt;/b&gt;     -->
+        <!--list            &lt;ul&gt;
+                                &lt;li&gt; &lt;/li&gt;
+                                &lt;li&gt; &lt;/li&gt;
+                            &lt;/ul&gt;    -->
+        <!--illegals        &lt; &gt; &amp; &apos; &quot;     -->
+
+
+
+		<slide slideid="1">
+            <!--Title-->
+            <text elementid ="0" layer="10" startsequence="1">
+                <textcontent>
+                    &lt;p&gt;&lt;center&gt;Text Slide&lt;/center&gt;&lt;/p&gt;
+                </textcontent>
+                <fontsize>20</fontsize>
+                <xposition>0.2</xposition>  <yposition>0.05</yposition>
+                <xsize>0.6</xsize>          <ysize>0.15</ysize>
+            </text>
+
+            <text elementid ="1" layer="1" startsequence="2" endsequence="-1" duration="-1">
+                <textcontent>
+                    &lt;p&gt;
+                        &lt;ul&gt;
+                            &lt;li&gt; &lt;/li&gt;
+                            &lt;li&gt; &lt;/li&gt;
+                        &lt;/ul&gt;
+                    &lt;/p&gt;
+                </textcontent>
+				<xposition>0.3</xposition>  <yposition>0.1</yposition>
+				<xsize>0.8</xsize>          <ysize>0.6</ysize>
+                <onclickaction>none</onclickaction><onclickinfo></onclickinfo>
+            </text>
+
+
+		<slide slideid="2">
+
+		</slide>
+
+
+        <slide slideid="5">
+            <wordcloud elementid ="0" layer="1"  startsequence="1">
+                <question>Insert Words About Edi Here</question>
+                <timelimit>20</timelimit>
+            </wordcloud>
+        </slide>
+
+
+
+        <slide slideid="6">
+            <poll elementid ="1" layer="2" startsequence="1">
+                <timelimit>5</timelimit>
+                <question>Insert Longer Question Here</question>
+                <answers>answer1,answer2,answer3,answer4</answers>
+            </poll>
+        </slide>
+	</slideshow>
+</document>

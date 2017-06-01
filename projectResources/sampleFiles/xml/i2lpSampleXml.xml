@@ -148,7 +148,7 @@
 				</animation>
 			</graphic>
 
-			<audio elementid ="3" startsequence="3">
+			<audio elementid ="2" startsequence="3">
 				<path>projectResources/sampleFiles/NeverGonnaGiveYouUp.mp3</path>
 				<loop>true</loop>
 				<autoplay>true</autoplay>
@@ -157,7 +157,7 @@
 			</audio>
 
 
-			<text elementid ="4" layer="3" startsequence="3">
+			<text elementid ="3" layer="3" startsequence="3">
 				<textcontent>
 					&lt;h1&gt;Click me to Toggle the Video playing!&lt;/h1&gt;</textcontent>
 				<bordercolour>#ABCDEFFF</bordercolour>
@@ -167,7 +167,7 @@
 				<xsize>0.5</xsize>
 				<ysize>0.2</ysize>
 				<onclickaction>dynamicmediatoggle</onclickaction>
-				<onclickinfo>3</onclickinfo>
+				<onclickinfo>2</onclickinfo>
 			</text>
 		</slide>
 
@@ -178,8 +178,8 @@
 			<image elementid ="0" layer="2" visibility="true" startsequence="1" >
 				<xposition>0.1</xposition>
 				<yposition>0.1</yposition>
-				<xsize>0.8</xsize>
-				<ysize>0.8</ysize>
+				<xsize>0.5</xsize>
+				<ysize>0.5</ysize>
 				<path>projectResources/logos/ediLogo1000x1000.png</path>
 				<onclickaction>gotoslide</onclickaction>
 				<onclickinfo>2</onclickinfo>
@@ -191,11 +191,27 @@
 			<image elementid ="1" layer="1" visibility="true" startsequence="2">
 				<xposition>0.2</xposition>
 				<yposition>0.2</yposition>
-				<xsize>0.8</xsize>
-				<ysize>0.8</ysize>
+				<xsize>0.5</xsize>
+				<ysize>0.5</ysize>
 				<path>projectResources/logos/ediLogo1000x1000.png</path>
 				<onclickaction>gotoslide</onclickaction>
-				<onclickinfo>24</onclickinfo>
+				<onclickinfo>3</onclickinfo>
+				<opacity>1</opacity>
+				<aspectratiolock>true</aspectratiolock>
+				<elementaspectratio>1.5</elementaspectratio>
+				<animation type="in">
+					<simplefade start="0" end="1" duration="1000"/>
+				</animation>
+			</image>
+
+			<image elementid ="2" layer="3" visibility="true" startsequence="3">
+				<xposition>0.3</xposition>
+				<yposition>0.3</yposition>
+				<xsize>0.5</xsize>
+				<ysize>0.5</ysize>
+				<path>projectResources/logos/ediLogo1000x1000.png</path>
+				<onclickaction>gotoslide</onclickaction>
+				<onclickinfo>4</onclickinfo>
 				<opacity>1</opacity>
 				<aspectratiolock>true</aspectratiolock>
 				<elementaspectratio>1.5</elementaspectratio>
@@ -249,7 +265,7 @@
 
 
         <slide slideid="6">
-            <poll elementid ="1" layer="2" startsequence="1">
+            <poll elementid ="0" layer="2" startsequence="1">
                 <timelimit>5</timelimit>
                 <question>Insert Longer Question Here</question>
                 <answers>answer1,answer2,answer3,answer4</answers>
