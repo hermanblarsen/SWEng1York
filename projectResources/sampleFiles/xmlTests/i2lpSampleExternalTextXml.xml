@@ -221,7 +221,7 @@
 			</text>
 		</slide>
 
-        <slide slideid="4">
+        <slide slideid="5">
             <wordcloud elementid ="0" layer="1" visibility="true" startsequence="1">
                 <question>Insert Words About Edi Here</question>
                 <timelimit>20</timelimit>
@@ -230,7 +230,7 @@
 
 
 
-        <slide slideid="4">
+        <slide slideid="6">
             <poll elementid ="0" layer="1" visibility="true" startsequence="1" endsequence="2">
                 <timelimit>20</timelimit>
                 <question>Insert Longer Question Here</question>

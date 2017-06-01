@@ -287,7 +287,6 @@ public abstract class SlideElement {
                             ediManager.getPresentationManager().goToSlide(Integer.parseInt(onClickInfo));
                         }
                     }
-
                     break;
 
                 case "dynamicmediatoggle":

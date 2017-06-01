@@ -29,6 +29,7 @@ public class EdiManager extends Application {
     protected SocketClient socketClient;
     protected User userData; //Store currently logged in users data
     private boolean offline = false;
+    private boolean loggedIn = false;
 
     public static void main(String[] args) {
         //Instantiate the ediManager, which will automatically call init() and start(Stage)
@@ -85,13 +86,14 @@ public class EdiManager extends Application {
      */
     public void setUserData(User userToSet) {
         this.userData = userToSet;
-        logger.info("Welcome " + userData.getFirstName());
+        logger.info("Welcome " + userData.getFirstName() + " " + userData.getSecondName() + "!");
     }
-
 
     //This is called from loginWindow when the user has input valid credentials
     public void loginSucceeded(boolean isTeacher, User userData) {
-        logger.info("Login succeeded");
+        logger.debug("Login succeeded");
+        loggedIn = true;
+
         Stage dashboardStage = new Stage();
 
         setUserData(userData); //User data is now available throughout Edi
@@ -145,5 +147,9 @@ public class EdiManager extends Application {
 
     public User getUserData() {
         return userData;
+    }
+
+    public boolean isLoggedIn() {
+        return loggedIn;
     }
 }

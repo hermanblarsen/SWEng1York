@@ -6,6 +6,8 @@ import com.i2lp.edi.server.SocketClient;
 import com.i2lp.edi.server.packets.User;
 import com.i2lp.edi.server.packets.UserAuth;
 import javafx.application.Application;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
@@ -44,8 +46,11 @@ public class Login extends Application {
     private ImageView loadingImage;
     private HBox rootBox;
 
+    protected boolean attemptingLogin = false;
     protected boolean loginSuccessful = false;
+
     protected boolean offline = false;
+
 
     @Override
     public void start(Stage loginStage) {
@@ -140,12 +145,16 @@ public class Login extends Application {
         loginButton.setAlignment(Pos.CENTER);
         loginButton.getStyleClass().setAll("btn", "btn-primary");
         loginButton.setDefaultButton(true); //ties enter button to Login button
+        loginButton.disableProperty().addListener((observable, oldValue, newValue) -> {
+            loginButton.setDisable(attemptingLogin);
+        });
         loginButton.setOnAction((ActionEvent event) -> {
             changeGuiLoggingIn();
             if (!offline) login();
             else ;//TODO decide what to do if offline
         });
         gridPane.add(loginButton, 0, 5, 2, 1);
+
         GridPane.setHalignment(loginButton, HPos.CENTER);
 
         loadingImage = new ImageView(new Image("file:projectResources/preloaders/loader.gif"));
@@ -175,6 +184,7 @@ public class Login extends Application {
     }
 
     private void login() {
+        attemptingLogin = true;
         User userData;
 
         if(Constants.developerOffline){
@@ -200,10 +210,7 @@ public class Login extends Application {
                 loginSuccessful = true;
                 break;
             case "auth_fail":
-                loginSuccessful = false;
-                break;
             case "noresponse":
-                loginSuccessful = false;
                 //TODO try again to connect
                 break;
             default:
@@ -227,6 +234,7 @@ public class Login extends Application {
         } else {
             changeGuiLoginFailed();
             logger.info("Login unsuccessful");
+            attemptingLogin = false;
             //TODO add colour events and stuff here to notify user of unsuccessful login.
         }
     }

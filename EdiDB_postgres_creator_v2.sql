@@ -116,25 +116,39 @@ OIDS=FALSE
 INSERT INTO public.thumbnails (thumbnail_id, presentation_id, thumbnail_url, slide_number)
 VALUES (1, 1,'httpsTest', 1);
 
+CREATE TABLE "jnct_users_presentations_statistics" (
+  "user_id" integer NOT NULL,
+  "presentation_id" integer NOT NULL,
+  "time_per_slide" TEXT,
+  PRIMARY KEY (user_id, presentation_id)
+) WITH (
+OIDS=FALSE
+);
+INSERT INTO public.jnct_users_presentations_statistics (user_id, module_id)
+VALUES (1, 1);
+
 
 
 ALTER TABLE "users" ADD CONSTRAINT "users_fk0" FOREIGN KEY ("active_presentation_id") REFERENCES "presentations"("presentation_id");
 
 
-ALTER TABLE "presentations" ADD CONSTRAINT "presentations_fk0" FOREIGN KEY ("module_id") REFERENCES "modules"("module_id");
+ALTER TABLE "presentations" ADD CONSTRAINT "presentations_fk0" FOREIGN KEY ("module_id") REFERENCES "modules"("module_id")ON DELETE CASCADE;
 
-ALTER TABLE "questions" ADD CONSTRAINT "questions_fk0" FOREIGN KEY ("user_id") REFERENCES "users"("user_id");
-ALTER TABLE "questions" ADD CONSTRAINT "questions_fk1" FOREIGN KEY ("presentation_id") REFERENCES "presentations"("presentation_id");
+ALTER TABLE "questions" ADD CONSTRAINT "questions_fk0" FOREIGN KEY ("user_id") REFERENCES "users"("user_id")ON DELETE CASCADE;
+ALTER TABLE "questions" ADD CONSTRAINT "questions_fk1" FOREIGN KEY ("presentation_id") REFERENCES "presentations"("presentation_id") ON DELETE CASCADE;
 
-ALTER TABLE "interactive_elements" ADD CONSTRAINT "interactive_elements_fk0" FOREIGN KEY ("presentation_id") REFERENCES "presentations"("presentation_id");
+ALTER TABLE "interactive_elements" ADD CONSTRAINT "interactive_elements_fk0" FOREIGN KEY ("presentation_id") REFERENCES "presentations"("presentation_id")ON DELETE CASCADE;
 
-ALTER TABLE "interactions" ADD CONSTRAINT "interactions_fk0" FOREIGN KEY ("user_id") REFERENCES "users"("user_id");
-ALTER TABLE "interactions" ADD CONSTRAINT "interactions_fk1" FOREIGN KEY ("interactive_element_id") REFERENCES "interactive_elements"("interactive_element_id");
+ALTER TABLE "interactions" ADD CONSTRAINT "interactions_fk0" FOREIGN KEY ("user_id") REFERENCES "users"("user_id") ON DELETE CASCADE;
+ALTER TABLE "interactions" ADD CONSTRAINT "interactions_fk1" FOREIGN KEY ("interactive_element_id") REFERENCES "interactive_elements"("interactive_element_id") ON DELETE CASCADE;
 
 ALTER TABLE "jnct_users_modules" ADD CONSTRAINT "jnct_users_modules_fk0" FOREIGN KEY ("user_id") REFERENCES "users"("user_id") ON UPDATE CASCADE ON DELETE CASCADE;
 ALTER TABLE "jnct_users_modules" ADD CONSTRAINT "jnct_users_modules_fk1" FOREIGN KEY ("module_id") REFERENCES "modules"("module_id") ON UPDATE CASCADE ON DELETE CASCADE;
 
-ALTER TABLE "thumbnails" ADD CONSTRAINT "thumbnails_fk0" FOREIGN KEY ("presentation_id") REFERENCES "presentations"("presentation_id");
+ALTER TABLE "jnct_users_presentations_statistics" ADD CONSTRAINT "jnct_users_presentations_statistics_fk0" FOREIGN KEY ("user_id") REFERENCES "users"("user_id") ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE "jnct_users_presentations_statistics" ADD CONSTRAINT "jnct_users_presentations_statistics_fk1" FOREIGN KEY ("presentation_id") REFERENCES "presentations"("presentation_id") ON UPDATE CASCADE ON DELETE CASCADE;
+
+ALTER TABLE "thumbnails" ADD CONSTRAINT "thumbnails_fk0" FOREIGN KEY ("presentation_id") REFERENCES "presentations"("presentation_id")ON DELETE CASCADE;
 
 
 --Example SQL statement for junction table

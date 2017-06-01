@@ -1010,10 +1010,9 @@ public abstract class PresentationManager {
         if(targetSlideNumber == currentSlideNumber) return true;
         //If target slide invalid, do nothing and log warning
         if ((targetSlideNumber < 0) || (targetSlideNumber > presentationElement.getMaxSlideNumber())) {
-            logger.warn("Target slide number lies outside that which is available in this presentation. Modify XML to account for this.");
+            logger.warn("Target slide number lies outside that which is available in this presentation. ");
             return false;
         }
-
 
         if (targetSlideNumber < currentSlideNumber) {
             while (currentSlideNumber != targetSlideNumber) {

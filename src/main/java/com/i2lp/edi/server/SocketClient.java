@@ -136,7 +136,7 @@ public class SocketClient {
      */
     public void updateLocalTables(Object tableToUpdate) {
         //If the user has logged in
-        if (ediManager.getUserData() != null) {
+        if (ediManager.isLoggedIn()) {
             //SocketIO will pass a generic object. But we know its a string because that's what DB_notify returns from com.i2lp.edi.server side
             switch ((String) tableToUpdate) {
                 case "interactions":
@@ -219,7 +219,7 @@ public class SocketClient {
         Future<User> future = executor.submit(new UserAuthTask(toAuth));
 
         try {
-            logger.info("Attempting login of User: " + toAuth.getUserToLogin());
+            logger.info("Attempting login of user with username: " + toAuth.getUserToLogin());
             return future.get(LOGIN_TIMEOUT, TimeUnit.SECONDS);
         } catch (TimeoutException e) {
             future.cancel(true);
