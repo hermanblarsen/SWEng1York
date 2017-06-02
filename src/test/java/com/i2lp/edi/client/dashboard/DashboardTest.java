@@ -7,9 +7,11 @@ import com.i2lp.edi.client.utilities.ParserXML;
 import com.i2lp.edi.client.utilities.PresSortKey;
 import com.i2lp.edi.client.utilities.SubjectSortKey;
 import com.i2lp.edi.server.packets.User;
+import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseButton;
+import javafx.scene.layout.BorderPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.junit.*;
@@ -17,6 +19,7 @@ import org.testfx.api.FxToolkit;
 import org.testfx.framework.junit.ApplicationTest;
 
 import java.io.File;
+import java.time.LocalDateTime;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.concurrent.TimeoutException;
@@ -36,6 +39,8 @@ public abstract class DashboardTest extends ApplicationTest {
     protected Button openPresButton;
     protected FileChooser fileChooser;
     protected MenuBar menuBar;
+    protected Node calendarNode;
+    protected DatePicker calendar;
     protected ComboBox<DashModuleSortKey> moduleSortCombo;
     protected ComboBox<SubjectSortKey> subjectSortCombo;
     protected ComboBox<PresSortKey> presSortCombo;
@@ -68,6 +73,8 @@ public abstract class DashboardTest extends ApplicationTest {
         openPresButton = myDashboard.openPresButton;
         fileChooser = myDashboard.fileChooser;
         menuBar = myDashboard.menuBar;
+        calendarNode = myDashboard.calendarNode;
+        calendar = myDashboard.calendar;
 
         subjectSortCombo = myDashboard.subjectSortCombo;
         moduleSortCombo = myDashboard.moduleSortCombo;
@@ -290,10 +297,12 @@ public abstract class DashboardTest extends ApplicationTest {
         }
 
         doubleClickOn(subjectPanels.get(0).getModulePanels().get(0));
+        presSortCombo = myDashboard.presSortCombo;
         clickOn(presSortCombo);
+
         for(int i = 0; i < 6; i++) {
             for (PresentationPanel temp : currentPresPanels) {
-                currentName = temp.getPresentation().getDocumentTitle();
+                currentName = temp.getPresentation().getId();
                 if (currentName == null) currentName = "";
                 if (previousName == null) previousName = "";
                 currentSubject = temp.getPresentation().getSubject().getSubjectName();
@@ -352,13 +361,14 @@ public abstract class DashboardTest extends ApplicationTest {
         assertFalse("Author Z-A sorting failed", zaAuthorFailed);
     }
 
+    //@Ignore
     @Test
-    public void testAddPresentation() {
+    public void testOpenPresentation() {
         clickOn(openPresButton);
         push(KeyCode.DOWN);
         push(KeyCode.ENTER);
 
-        push(KeyCode.S).push(KeyCode.A);
+        push(KeyCode.S).push(KeyCode.A).push(KeyCode.M).push(KeyCode.P).push(KeyCode.L).push(KeyCode.E);
         push(KeyCode.DOWN);
         push(KeyCode.ENTER);
 
@@ -371,34 +381,80 @@ public abstract class DashboardTest extends ApplicationTest {
         }
         Presentation pres = parser.parsePresentation();
 
-        assertEquals(pres.getDocumentTitle(), myDashboard.presentationManager.getPresentationElement().getDocumentTitle());
-        //assertEquals(pres.getSubject(), myDashboard.presentationManager.getPresentationElement().getSubject());
-        assertEquals(pres.getAuthor(), myDashboard.presentationManager.getPresentationElement().getAuthor());
-        assertEquals(pres.getDescription(), myDashboard.presentationManager.getPresentationElement().getDescription());
-        assertEquals(pres.getDocumentID(), myDashboard.presentationManager.getPresentationElement().getDocumentID());
-        assertEquals(pres.getModule(), myDashboard.presentationManager.getPresentationElement().getModule());
-        //assertEquals(pres.getSlideList(), myDashboard.presentationManager.getPresentationElement().getSlideList());
-        assertEquals(pres.getTags(), myDashboard.presentationManager.getPresentationElement().getTags());
-        //assertEquals(pres.getTheme(), myDashboard.presentationManager.getPresentationElement().getTheme());
-        assertEquals(pres.getVersion(), myDashboard.presentationManager.getPresentationElement().getVersion());
+        //TODO @Luke Subject assertion fails due to no module
+        if(pres.getDocumentTitle() == null)
+            assertNull(myDashboard.presentationManager.getPresentationElement().getDocumentTitle());
+        else
+            assertEquals(pres.getDocumentTitle(), myDashboard.presentationManager.getPresentationElement().getDocumentTitle());
+        //if(pres.getSubject() == null)
+        //    assertNull(myDashboard.presentationManager.getPresentationElement().getSubject());
+        //else
+        //    assertEquals(pres.getSubject(), myDashboard.presentationManager.getPresentationElement().getSubject());
+        if(pres.getAuthor() == null)
+            assertNull(myDashboard.presentationManager.getPresentationElement().getAuthor());
+        else
+            assertEquals(pres.getAuthor(), myDashboard.presentationManager.getPresentationElement().getAuthor());
+        if(pres.getDescription() == null)
+            assertNull(myDashboard.presentationManager.getPresentationElement().getDescription());
+        else
+            assertEquals(pres.getDescription(), myDashboard.presentationManager.getPresentationElement().getDescription());
+        if(pres.getDocumentID() == null)
+            assertNull(myDashboard.presentationManager.getPresentationElement().getDocumentID());
+        else
+            assertEquals(pres.getModule(), myDashboard.presentationManager.getPresentationElement().getModule());
+        if(pres.getModule() == null)
+            assertNull(myDashboard.presentationManager.getPresentationElement().getModule());
+        else
+            assertEquals(pres.getModule(), myDashboard.presentationManager.getPresentationElement().getModule());
+        //if(pres.getSlideList() == null)
+        //    assertNull(myDashboard.presentationManager.getPresentationElement().getSlideList());
+        //else
+        //    assertEquals(pres.getSlideList(), myDashboard.presentationManager.getPresentationElement().getSlideList());
+        if(pres.getTags() == null)
+            assertNull(myDashboard.presentationManager.getPresentationElement().getTags());
+        else
+            assertEquals(pres.getTags(), myDashboard.presentationManager.getPresentationElement().getTags());
+        //if(pres.getTheme() == null)
+        //    assertNull(myDashboard.presentationManager.getPresentationElement().getTheme());
+        //else
+         //   assertEquals(pres.getTheme(), myDashboard.presentationManager.getPresentationElement().getTheme());
+        if(pres.getVersion() == null)
+            assertNull(myDashboard.presentationManager.getPresentationElement().getVersion());
+        else
+            assertEquals(pres.getVersion(), myDashboard.presentationManager.getPresentationElement().getVersion());
     }
 
+    @Ignore //Possibly not needed
     @Test
-    public void testMenuBar() {
+    public void testAboutPopup() {
         moveTo(menuBar);
         moveBy(menuBar.getLayoutX() - (int)(menuBar.getWidth() / 2.0) + 20, menuBar.getLayoutY());
         clickOn();
         push(KeyCode.RIGHT).push(KeyCode.RIGHT).push(KeyCode.RIGHT);
+        push(KeyCode.DOWN).push(KeyCode.DOWN).push(KeyCode.ENTER);
+        assertTrue(myDashboard.aboutPopup.isShowing());
+    }
+
+    @Test
+    public void testWelcomeMessage() {
+        assertTrue(myDashboard.welcomePane.isVisible());
+        assertFalse(myDashboard.isWelcomeTextHidden);
+
+        clickOn(myDashboard.closeWelcomeButton);
+        assertTrue(myDashboard.isWelcomeTextHidden);
+
+        moveTo(menuBar);
+        moveBy(menuBar.getLayoutX() - (int)(menuBar.getWidth() / 2.0) + 20, menuBar.getLayoutY());
+        clickOn();
+        push(KeyCode.RIGHT);
         push(KeyCode.DOWN).push(KeyCode.DOWN);
         push(KeyCode.ENTER);
-        assertTrue(myDashboard.aboutPopup.isShowing());
-
-        //TODO @Luke
+        assertFalse(myDashboard.isWelcomeTextHidden);
     }
 
     @Test
     public void testCalendar() {
-
+        clickOn(myDashboard.calendarNode);
     }
 
     @After

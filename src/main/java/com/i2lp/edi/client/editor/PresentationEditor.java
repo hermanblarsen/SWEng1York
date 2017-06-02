@@ -33,10 +33,13 @@ public class PresentationEditor {
     private String presentationPath;
     private BorderPane border;
     private ScrollPane scroll;
-    private VBox vbox;
+    protected VBox vbox;
     private Stage stage;
 
     private Text statusText;
+
+    protected MenuBar menuBar;
+    protected HBox statusBar;
 
     public PresentationEditor(String path) {
         presentationPath = path;
@@ -63,7 +66,7 @@ public class PresentationEditor {
     }
 
     private MenuBar addMenuBar() {
-        MenuBar menuBar = new MenuBar();
+        menuBar = new MenuBar();
 
         //Menu fileMenu = new Menu("File");
         //Menu editMenu = new Menu("Edit");

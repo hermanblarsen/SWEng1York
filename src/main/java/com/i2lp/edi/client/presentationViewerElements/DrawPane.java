@@ -23,9 +23,9 @@ public class DrawPane extends Pane {
     private boolean isActive;
     private boolean isEraserMode;
     private Logger logger = LoggerFactory.getLogger(DrawPane.class);
-    private Canvas canvas;
-    private GraphicsContext graphicsContext;
-    private WritableImage drawing;
+    protected Canvas canvas;
+    protected GraphicsContext graphicsContext;
+    protected WritableImage drawing;
     private final StackPane parentPane;
     private double eraserSize = MIN_ERASER_SIZE;
     private boolean newPathStarted = false;

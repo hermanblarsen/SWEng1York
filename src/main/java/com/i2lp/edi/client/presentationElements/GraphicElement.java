@@ -203,8 +203,16 @@ public class GraphicElement extends SlideElement {
         this.normalisedOvalPos[0] = x;
     }
 
+    public float getOvalXPosition(){
+        return normalisedOvalPos[0];
+    }
+
     public void setOvalYPosition(float y){
         this.normalisedOvalPos[1] = y;
+    }
+
+    public float getOvalYPosition(){
+        return normalisedOvalPos[1];
     }
 
     public void setrHorizontal(float r){
@@ -233,5 +241,9 @@ public class GraphicElement extends SlideElement {
 
     public void setPolygon(boolean isPolygon){
         this.isPolygon = isPolygon;
+    }
+
+    public Boolean isPolygon(){
+        return isPolygon;
     }
 }

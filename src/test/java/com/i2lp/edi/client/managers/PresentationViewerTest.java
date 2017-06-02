@@ -4,7 +4,9 @@ import com.i2lp.edi.client.presentationElements.Presentation;
 import com.i2lp.edi.client.presentationElements.Slide;
 import com.i2lp.edi.client.presentationViewerElements.CommentPanel;
 import com.i2lp.edi.client.presentationViewerElements.DrawPane;
+import com.i2lp.edi.client.utilities.CursorState;
 import com.i2lp.edi.client.utilities.ParserXML;
+import javafx.geometry.VerticalDirection;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseButton;
@@ -38,14 +40,14 @@ public abstract class PresentationViewerTest extends ApplicationTest {
     protected DrawPane drawPane;
     protected Pane displayPane;
 
-    protected ImageView leftButton, rightButton, fullscreenButton, toolkitButton,
-            questionButton, commentButton, drawButton, visibleButton;
+    protected ImageView leftButton, rightButton, fullscreenButton, linkButton,
+            toolkitButton, questionButton, commentButton, drawButton, visibleButton;
 
     @Test
     public void testFullscreen() {
         javafx.geometry.Rectangle2D screenBounds = Screen.getPrimary().getBounds();
-        javafx.geometry.Rectangle2D initialPresBounds = new javafx.geometry.Rectangle2D(0.0,0.0,
-                myPresentationManager.displayPane.getWidth(),myPresentationManager.displayPane.getHeight());
+        Double initialPresWidth = myPresentationManager.displayPane.getWidth();
+        Double initialPresHeight = myPresentationManager.displayPane.getHeight();
 
         clickOn(fullscreenButton);
         assertTrue(myPresentationManager.isFullscreen);
@@ -58,11 +60,8 @@ public abstract class PresentationViewerTest extends ApplicationTest {
         assertFalse(myPresentationManager.isFullscreen);
 
         //TODO @Luke Out by one pixel
-        /*
-        presBounds = new javafx.geometry.Rectangle2D(0.0,0.0,
-                myPresentationManager.displayPane.getWidth(),myPresentationManager.displayPane.getHeight());
-        assertEquals(initialPresBounds, presBounds);
-        */
+        assertEquals(initialPresWidth, myPresentationManager.displayPane.getWidth(), 1);
+        assertEquals(initialPresHeight, myPresentationManager.displayPane.getHeight(), 1);
     }
 
     @Test
@@ -128,6 +127,77 @@ public abstract class PresentationViewerTest extends ApplicationTest {
         assertEquals(commentPanel, myPresentationManager.sceneBox.getChildren().get(1));
         clickOn(commentButton);
         assertEquals(1, myPresentationManager.sceneBox.getChildren().size());
+    }
+
+    @Test
+    public void testKeyboardListeners() {
+        assertEquals(1, myPresentationManager.currentSequenceNumber);
+        push(KeyCode.SPACE);
+        assertEquals(2, myPresentationManager.currentSequenceNumber);
+        push(KeyCode.BACK_SPACE);
+        assertEquals(1, myPresentationManager.currentSequenceNumber);
+        push(KeyCode.PAGE_UP);
+        assertEquals(2, myPresentationManager.currentSequenceNumber);
+        push(KeyCode.PAGE_DOWN);
+        assertEquals(1, myPresentationManager.currentSequenceNumber);
+        push(KeyCode.UP);
+        assertEquals(2, myPresentationManager.currentSequenceNumber);
+        push(KeyCode.DOWN);
+        assertEquals(1, myPresentationManager.currentSequenceNumber);
+        push(KeyCode.RIGHT);
+        assertEquals(2, myPresentationManager.currentSequenceNumber);
+        push(KeyCode.LEFT);
+        assertEquals(1, myPresentationManager.currentSequenceNumber);
+
+        assertFalse(myPresentationManager.isFullscreen);
+        push(KeyCode.F5);
+        assertTrue(myPresentationManager.isFullscreen);
+        push(KeyCode.F5);
+        push(KeyCode.ESCAPE);
+        assertFalse(myPresentationManager.isFullscreen);
+
+        assertFalse(myPresentationManager.isShowBlack);
+        push(KeyCode.B);
+        assertTrue(myPresentationManager.isShowBlack);
+        push(KeyCode.B);
+        assertFalse(myPresentationManager.isShowBlack);
+
+        push(KeyCode.END);
+        assertEquals(myPresentation.getMaxSlideNumber() - 1, myPresentationManager.currentSlideNumber);
+        push(KeyCode.HOME);
+        assertEquals(0, myPresentationManager.currentSlideNumber);
+    }
+
+    @Test //TODO @Luke Presentation elements interfere with test
+    public void testMouseListeners() {
+        moveTo(0, 0);
+        assertFalse(myPresentationManager.isMouseOverSlide);
+        moveTo(Screen.getPrimary().getBounds().getMaxX()/2, Screen.getPrimary().getBounds().getMaxY()/2);
+        assertTrue(myPresentationManager.isMouseOverSlide);
+
+        assertEquals(1, myPresentationManager.currentSequenceNumber);
+        scroll(1, VerticalDirection.DOWN);
+        assertEquals(2, myPresentationManager.currentSequenceNumber);
+        scroll(1, VerticalDirection.UP);
+        assertEquals(1, myPresentationManager.currentSequenceNumber);
+
+        //clickOn(MouseButton.PRIMARY);
+        //assertEquals(2, myPresentationManager.currentSequenceNumber);
+        //clickOn(MouseButton.SECONDARY);
+        //assertEquals(1, myPresentationManager.currentSequenceNumber);
+
+        moveBy(20,0);
+        sleep(1500);
+        assertEquals(CursorState.DEFAULT, myPresentationManager.currentCursorState);
+        sleep(2500);
+        assertEquals(CursorState.HIDDEN, myPresentationManager.currentCursorState);
+
+        moveBy(20,0);
+        assertEquals(CursorState.DEFAULT, myPresentationManager.currentCursorState);
+
+        //assertFalse(myPresentationManager.cMenu.isShowing());
+        //clickOn(MouseButton.SECONDARY);
+        //assertTrue(myPresentationManager.cMenu.isShowing());
     }
 
     @After

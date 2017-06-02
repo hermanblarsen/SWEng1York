@@ -1,6 +1,10 @@
 package com.i2lp.edi.client.managers;
 
+import com.i2lp.edi.client.dashboard.DashModule;
+import com.i2lp.edi.client.dashboard.Subject;
 import com.i2lp.edi.client.utilities.ParserXML;
+import com.i2lp.edi.server.packets.Module;
+import com.i2lp.edi.server.packets.PresentationMetadata;
 import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
 import org.junit.Assume;
@@ -8,6 +12,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
+import java.sql.Time;
+import java.sql.Timestamp;
 
 import static com.i2lp.edi.client.Constants.IS_CIRCLE_BUILD;
 import static org.junit.Assert.*;
@@ -28,10 +34,11 @@ public class StudentPresentationViewerTest extends PresentationViewerTest {
         EdiManager ediManager = new EdiManager();
         myPresentationManager = new PresentationManagerStudent(ediManager);
 
-        File file = new File("projectResources/sampleFiles/xml/sampleXmlSimple.xml");
         ParserXML parser = new ParserXML("projectResources/sampleFiles/xml/sampleXmlSimple.xml");
         myPresentation = parser.parsePresentation();
 
+        myPresentation.setPresentationMetadata(new PresentationMetadata(
+                0,0,0, "", false, null));
         myPresentationManager.openPresentation(myPresentation, false);
 
         stage.toFront();
@@ -51,16 +58,15 @@ public class StudentPresentationViewerTest extends PresentationViewerTest {
         leftButton = (ImageView) presControls.getChildren().get(0);
         rightButton = (ImageView) presControls.getChildren().get(1);
         fullscreenButton = (ImageView) presControls.getChildren().get(2);
-        questionButton = (ImageView) presControls.getChildren().get(4);
-        commentButton = (ImageView) presControls.getChildren().get(5);
-        drawButton = (ImageView) presControls.getChildren().get(6);
-        visibleButton = (ImageView) presControls.getChildren().get(7);
+        //linkButton = (ImageView) presControls.getChildren().get(3);
+        //questionButton = (ImageView) presControls.getChildren().get(4);
+        commentButton = (ImageView) presControls.getChildren().get(3);
+        drawButton = (ImageView) presControls.getChildren().get(4);
+        visibleButton = (ImageView) presControls.getChildren().get(5);
     }
 
     @Test
-    public void testTeacherToolkitCreation() {
-        assertEquals(null, ((PresentationManagerStudent) myPresentationManager).questionQueueStage);
-        clickOn(questionButton);
-        assertTrue(((PresentationManagerStudent) myPresentationManager).questionQueueStage.isShowing());
+    public void testLink() {
+        //TODO @Luke
     }
 }

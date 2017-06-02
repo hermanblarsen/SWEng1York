@@ -1,6 +1,7 @@
 package com.i2lp.edi.client.presentationElements;
 
 import com.i2lp.edi.client.animation.Animation;
+import com.i2lp.edi.client.managers.EdiManager;
 import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
@@ -31,6 +32,8 @@ public class TextElementTest extends ApplicationTest {
         Scene scene = new Scene(textPane, 600, 600);
 
         myTextElement = new TextElement();
+        myTextElement.setPresentation(new Presentation());
+        myTextElement.setEdiManager(new EdiManager());
         myTextElement.setTextContent("Test Text");
 
         myTextElement.setFont("Arial");
@@ -109,4 +112,6 @@ public class TextElementTest extends ApplicationTest {
         myTextElement.setHasBorder(true);
         assertTrue(myTextElement.getHasBorder());
     }
+
+
 }

@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
  */
 public class DateTimePicker extends VBox {
 
-    private Button scheduleButton;
+    protected Button scheduleButton;
     private DatePicker datePicker;
     private TimePicker timePicker;
 

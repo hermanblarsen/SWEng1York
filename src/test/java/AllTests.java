@@ -3,7 +3,7 @@
  * Created by habl on 26/02/2017.
  */
 
-import com.i2lp.edi.client.dashboard.DashboardTest;
+import com.i2lp.edi.client.presentationElements.ImageElementTest;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
@@ -16,6 +16,7 @@ import org.junit.runners.Suite.SuiteClasses;
 
         //Editor
         com.i2lp.edi.client.editor.PollEditorTest.class,
+        com.i2lp.edi.client.editor.PresentationEditorTest.class,
 
         //login
         com.i2lp.edi.client.login.LoginTest.class,
@@ -28,7 +29,7 @@ import org.junit.runners.Suite.SuiteClasses;
         com.i2lp.edi.client.presentationElements.AudioElementIntegrationTestbench.class,
         com.i2lp.edi.client.presentationElements.GraphicElementTest.class,
         com.i2lp.edi.client.presentationElements.GraphicElementIntegrationTest.class,
-        com.i2lp.edi.client.presentationElements.ImageElementTestbench.class,
+        com.i2lp.edi.client.presentationElements.ImageElementTest.class,
         com.i2lp.edi.client.presentationElements.ImageElementIntegrationTestbench.class,
         com.i2lp.edi.client.presentationElements.PollElementTest.class,
         com.i2lp.edi.client.presentationElements.TextElementTest.class,
@@ -37,6 +38,7 @@ import org.junit.runners.Suite.SuiteClasses;
 
         //PresentationViewerElements
         com.i2lp.edi.client.presentationViewerElements.CommentPanelTest.class,
+        com.i2lp.edi.client.presentationViewerElements.DrawPaneTest.class,
         com.i2lp.edi.client.presentationViewerElements.QuestionIndicatorTest.class,
         com.i2lp.edi.client.presentationViewerElements.ResponseIndicatorTest.class,
 

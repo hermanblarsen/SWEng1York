@@ -8,13 +8,16 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ToggleButton;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.MouseButton;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
-import org.junit.Assume;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.*;
+import org.testfx.api.FxToolkit;
+
+import java.util.ArrayList;
+import java.util.concurrent.TimeoutException;
 
 import static com.i2lp.edi.client.Constants.IS_CIRCLE_BUILD;
 import static org.junit.Assert.*;
@@ -46,7 +49,6 @@ public class PollElementTest extends GraphicalTest {
         Scene scene = new Scene(pane, 600, 600);
 
         myPollElement = new PollElement();
-
         myPollElement.setTeacher(true);
         myPollElement.setAnswers("ANS1,ANS2");
         myPollElement.setQuestion("Test question?");
@@ -108,7 +110,7 @@ public class PollElementTest extends GraphicalTest {
         assertEquals("Time Remaining: 0", remainingTime.getText());
     }
 
-    @Ignore //TODO @Luke Possible issue
+    @Ignore
     @Test
     public void testAnswerButtons() {
         clickOn(startTimer);
@@ -123,15 +125,24 @@ public class PollElementTest extends GraphicalTest {
         });
         sleep(500);
 
-        //assertEquals(0.0, answerOutputTile.getRadialChartData().get(0).getValue(), 0);
-        //assertEquals(0.0, answerOutputTile.getRadialChartData().get(1).getValue(), 0);
-
+        //TODO @Luke No longer works due to no instance of StudentSession
         clickOn(answerButton[0]);
         sleep(1000);
         clickOn(answerButton[1]);
-        sleep(1000);
+        sleep(2000);
 
-        assertEquals(1.0, answerOutputTile.getRadialChartData().get(0).getValue(), 0);
+        answerOutputTile = myPollElement.answerOutputTile;
         assertEquals(1.0, answerOutputTile.getRadialChartData().get(1).getValue(), 0);
+    }
+
+    @After
+    public void tearDown() {
+        try {
+            FxToolkit.hideStage();
+        } catch (TimeoutException e) {
+            e.printStackTrace();
+        }
+        release(new KeyCode[]{});
+        release(new MouseButton[]{});
     }
 }

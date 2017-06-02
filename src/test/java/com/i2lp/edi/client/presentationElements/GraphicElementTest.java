@@ -92,4 +92,41 @@ public class GraphicElementTest extends ApplicationTest {
         assertEquals(new Color(0, 1, 0, 1), GraphicElement.parseRGBAString("#00ff00FF"));
         assertEquals(new Color(0, 1, 0, 127f / 255f), GraphicElement.parseRGBAString("#00FF007F"));
     }
+
+    @Test
+    public void testOvalCreation() {
+        assertEquals(1, myOval.getLayer());
+        assertEquals(1, myOval.getStartSequence());
+        assertEquals(2, myOval.getEndSequence());
+        assertEquals("#FF00008F", myOval.getFillColour());
+        assertEquals("#00FF00FF", myOval.getLineColour());
+        assertEquals(0.4f, myOval.getOvalYPosition(), 0);
+        assertEquals(0.5f, myOval.getOvalXPosition(), 0);
+        assertEquals(0.1f, myOval.getrHorizontal(), 0);
+        assertEquals(0.3f, myOval.getrVertical(), 0);
+        assertEquals(45, myOval.getRotation(), 0);
+        assertEquals(false, myOval.isPolygon());
+    }
+
+    @Test
+    public void testPolygonCreation() {
+        assertEquals(myPolygon.getLayer(), 1);
+        assertEquals(myPolygon.getStartSequence(), 1);
+        assertEquals(myPolygon.getEndSequence(), 2);
+        assertEquals(myPolygon.getFillColour(), "#00FF00FF");
+        assertEquals(myPolygon.getLineColour(), "#0000FFFF");
+        assertEquals(myPolygon.getPolyXPositions()[0], 0.1f, 0);
+        assertEquals(myPolygon.getPolyXPositions()[1], 0.5f, 0);
+        assertEquals(myPolygon.getPolyXPositions()[2], 0.5f, 0);
+        assertEquals(myPolygon.getPolyYPositions()[0], 0.1f, 0);
+        assertEquals(myPolygon.getPolyYPositions()[1], 0.1f, 0);
+        assertEquals(myPolygon.getPolyYPositions()[2], 0.6f, 0);
+        assertEquals(myPolygon.isPolygon(), true);
+        assertEquals(myPolygon.isClosed(), true);
+    }
+
+    @Test
+    public void testVectorCreation() {
+
+    }
 }

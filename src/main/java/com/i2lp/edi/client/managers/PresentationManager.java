@@ -81,7 +81,7 @@ public abstract class PresentationManager {
     protected CommentPanel commentPanel;
     protected Boolean isCommentPanelVisible = false;
     protected Boolean isEmbeddedBrowserOpen = false;
-    private boolean isShowBlack = false;
+    protected boolean isShowBlack = false;
     private boolean mouseActivityRegistered = true;
     protected boolean mouseDown = false;
     private EventHandler<MouseEvent> disabledCursorFilter;
@@ -93,10 +93,11 @@ public abstract class PresentationManager {
     private ImageView visibilityButton;
     public ImageView linkButton;
     private Popup colourPopup;
-    private CursorState currentCursorState = CursorState.DEFAULT;
+    protected CursorState currentCursorState = CursorState.DEFAULT;
     private Pane eraseCursorPane;
     private ImageView drawButton;
     private ImageView eraserButton;
+    protected ContextMenu cMenu;
 
     protected double slideWidth;
     protected double slideHeight;
@@ -104,7 +105,7 @@ public abstract class PresentationManager {
 
     protected int currentSlideNumber = 0; //Current slide number in presentation
     protected int currentSequenceNumber = 0; //Current sequence number in presentation (total)
-    private boolean isMouseOverSlide = true;
+    protected boolean isMouseOverSlide = true;
     private double preFullscreenSlideWidth;
     private double preFullscreenSlideHeight;
     protected boolean isMouseOverControls = false;
@@ -304,7 +305,7 @@ public abstract class PresentationManager {
     private void addMouseListeners() {  //TODO maybe add hide or show to context menu.
         scene.setOnMouseClicked(mouseEvent -> {
             if (mouseEvent.getButton().equals(MouseButton.SECONDARY)) {
-                ContextMenu cMenu = new ContextMenu();
+                cMenu = new ContextMenu();
 
                 MenuItem nextSequence = new MenuItem("Next sequence");
                 nextSequence.setOnAction(nextEvent -> controlPresentation(Slide.SLIDE_FORWARD));

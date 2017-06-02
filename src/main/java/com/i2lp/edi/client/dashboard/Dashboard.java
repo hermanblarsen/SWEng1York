@@ -47,6 +47,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Stack;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static com.i2lp.edi.client.Constants.PRESENTATIONS_PATH;
@@ -82,7 +83,7 @@ public abstract class Dashboard extends Application {
     private ArrayList<Presentation> availablePresentations;
     private ArrayList<DashModule> availableModules;
     private ArrayList<Subject> availableSubjects;
-    private boolean isWelcomeTextHidden = false;
+    protected boolean isWelcomeTextHidden = false;
     private DashboardState currentState;
     private Text noMatchesSubject, noMatchesPres;
     private VBox constantControlsVBox, removableControlsVBox, controlsContainerVBox;
@@ -91,7 +92,6 @@ public abstract class Dashboard extends Application {
     private DashModule selectedModule;
     private VBox rightPanelVBox;
     private ScrollPane rightPanelScroll;
-    private DatePicker calendar;
     private LocalDate selectedDate;
     private ScrollPane presentationsScrollPane;
 
@@ -107,6 +107,11 @@ public abstract class Dashboard extends Application {
     protected MenuBar menuBar;
     protected Popup aboutPopup;
     private Text welcomeText;
+    protected Node calendarNode;
+    protected DatePicker calendar;
+    protected DateTimePicker dateTimePicker;
+    protected StackPane welcomePane;
+    protected Button closeWelcomeButton;
 
     @Override
     public void start(Stage dashboardStage) {
@@ -268,7 +273,7 @@ public abstract class Dashboard extends Application {
         switch (state) {
             case TOP_LEVEL:
                 if (!isWelcomeTextHidden) {
-                    StackPane textStackPane = new StackPane();
+                    welcomePane = new StackPane();
 
                     VBox textVBox = new VBox();
                     textVBox.setAlignment(Pos.TOP_CENTER);
@@ -276,18 +281,18 @@ public abstract class Dashboard extends Application {
                     textPanel.getStyleClass().add("panel-primary");
                     textPanel.setBody(textVBox);
 
-                    Button closeTextButton = new Button("X");
-                    closeTextButton.getStyleClass().setAll("btn", "btn-default");
-                    closeTextButton.setOnAction(event -> {
+                    closeWelcomeButton = new Button("X");
+                    closeWelcomeButton.getStyleClass().setAll("btn", "btn-default");
+                    closeWelcomeButton.setOnAction(event -> {
                         isWelcomeTextHidden = true;
-                        vbox.getChildren().remove(textStackPane);
+                        vbox.getChildren().remove(welcomePane);
                     });
-                    closeTextButton.setStyle("-fx-font-size: 10px; -fx-min-width: 0; -fx-padding: 6px 6px 6px 6px;");
+                    closeWelcomeButton.setStyle("-fx-font-size: 10px; -fx-min-width: 0; -fx-padding: 6px 6px 6px 6px;");
 
-                    StackPane.setAlignment(closeTextButton, Pos.TOP_RIGHT);
-                    StackPane.setMargin(closeTextButton, new Insets(5));
+                    StackPane.setAlignment(closeWelcomeButton, Pos.TOP_RIGHT);
+                    StackPane.setMargin(closeWelcomeButton, new Insets(5));
 
-                    textStackPane.getChildren().addAll(textPanel, closeTextButton);
+                    welcomePane.getChildren().addAll(textPanel, closeWelcomeButton);
 
                     Text welcomeHeader = new Text("Welcome to Edi");
                     welcomeHeader.getStyleClass().setAll("h3");
@@ -300,7 +305,7 @@ public abstract class Dashboard extends Application {
                     textVBox.getChildren().add(welcomeText);
                     VBox.setMargin(welcomeText, new Insets(5, 0, 5, 0));
 
-                    vbox.getChildren().add(textStackPane);
+                    vbox.getChildren().add(welcomePane);
                 }
 
                 vbox.getChildren().add(subjectsScrollPane);
@@ -611,8 +616,8 @@ public abstract class Dashboard extends Application {
                 };
         calendar.setDayCellFactory(dayCellFactory);
         DatePickerSkin calendarSkin = new DatePickerSkin(calendar);
-        Node calendarNode = calendarSkin.getPopupContent();
-        calendarNode.setStyle("-fx-font-size: 8px;");
+        calendarNode = calendarSkin.getPopupContent();
+        calendarNode.setStyle("-fx-font-size: 8.5px;");
         calendarNode.setEffect(null);
 
         switch (state) {
@@ -1263,7 +1268,7 @@ public abstract class Dashboard extends Application {
     private void showScheduler(PresentationPanel panel, double x, double y) {
         Popup schedulerPopup = new Popup();
 
-        DateTimePicker dateTimePicker = new DateTimePicker();
+        dateTimePicker = new DateTimePicker();
 
         dateTimePicker.getScheduleButton().setOnAction(event -> {
             logger.info("Scheduled to: " + dateTimePicker.getDateTime().toString());
