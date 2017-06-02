@@ -10,6 +10,13 @@ public abstract class InteractiveElement extends SlideElement {
 
     protected int timeLimit; //TODO get from server
 
+    public abstract void sendDataToServer();
+    public abstract void receiveDataFromServer();
+
+    public boolean isElementActive() {
+        return elementActive;
+    }
+
     protected boolean elementActive = false;
 
 
