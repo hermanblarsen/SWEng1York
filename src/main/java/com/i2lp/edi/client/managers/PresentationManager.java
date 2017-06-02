@@ -896,7 +896,7 @@ public abstract class PresentationManager {
                     elementToAnimate.setForceMute(true);
                 }
                 elementToAnimate.renderElement(Animation.ENTRY_ANIMATION); //Entry Sequence
-            } else if ((elementToAnimate.getEndSequence() == slideToAdvance.getCurrentSequenceNumber()) && (!isThumbnailGen)) {
+            } else if ((elementToAnimate.getEndSequence() == slideToAdvance.getCurrentSequenceNumber()) && (!(this instanceof  ThumbnailGenerationManager))) {
                 if (((elementToAnimate instanceof AudioElement || elementToAnimate instanceof VideoElement) && studentSession != null) || this instanceof ThumbnailGenerationManager) {
                     elementToAnimate.setForceMute(true);
                 }
