@@ -44,6 +44,7 @@ public class ReportManager {
     ArrayList<InteractionRecord> interactions;
     ArrayList<InteractiveElementRecord> interactiveElementsData;
     HashMap<Integer, Students> students = new HashMap<>();
+    private int totalParticipatingStudents = 0;
 
     EdiManager ediManager;
     Presentation presentation;
@@ -54,13 +55,20 @@ public class ReportManager {
 
         questionQueueQuestions = sock.getQuestionsForPresentation(presentationId);
         presentationStatistics = sock.getPresentationStatistics(presentationId);
-        sock.getStudentsForModule(presentation.getPresentationMetadata().getModule_id()).forEach(item -> students.put(item.getUserID(), new Students(item, 0)));
-        interactions = sock.getInteractionsForPresentation(presentationId);
-        interactiveElementsData = sock.getInteractiveElementsForPresentation(presentationId);
+	    interactions = sock.getInteractionsForPresentation(presentationId);
+	    interactiveElementsData = sock.getInteractiveElementsForPresentation(presentationId);
+        sock.getStudentsForModule(presentation.getPresentationMetadata().getModule_id()).forEach(item -> students.put(
+        		item.getUserID(),
+		        new Students(
+        		    item,
+				        (int) interactions.stream().filter( interaction->interaction.getUser_id() == item.getUserID()).count() )
+        ));
+
 
         // Populate students with whether they were present or not (based on whether there is a statistics entry for that student)
         for(PresentationStatisticsRecord statEntry: presentationStatistics){
             students.get(statEntry.getUserID()).setWasPresent(true);
+            totalParticipatingStudents++;
         }
     }
 
@@ -85,10 +93,10 @@ public class ReportManager {
         Tile studentsInPresentation = TileBuilder.create()
                 .skinType(Tile.SkinType.NUMBER)
                 .prefSize(250,250)
-                .title("Students")
-                .value(25)
+                .title("Attendance")
+                .value(presentationStatistics.size())
                 .decimals(0)
-                .description("of 30")
+                .description("of " + students.size())
                 .textVisible(true)
                 .build();
 
@@ -104,11 +112,12 @@ public class ReportManager {
                 .build();
 
         //Participation Tile
+	    int averageParticipation = students.values().stream().filter( i->i.getWasPresent() ).mapToInt( i->i.getParticipation() ).sum()/(totalParticipatingStudents*interactiveElementsData.size());
         Tile presentationParticipation = TileBuilder.create()
                 .skinType(Tile.SkinType.CIRCULAR_PROGRESS)
                 .prefSize(250,250)
                 .title("Average Participation")
-                .value(70)
+                .value(averageParticipation*100)
                 .unit("\u0025")
                 .build();
 
@@ -148,13 +157,6 @@ public class ReportManager {
         });
 
 
-//        int numberOfPolls = 2;//Todo Remove this once connected to server.
-//        for(int i = 0;i<numberOfPolls;i++){
-//            int numberOfQuestions = 2+(int)Math.random()*6;
-//            reportPane.getChildren().add(this.generatePollTile("Generic Question",numberOfQuestions));
-//        }
-
-
         //Wordcloud Element
         File wordcloudPath = new File(PRESENTATIONS_PATH+"/" +presentation.getDocumentID()+"/Wordclouds/");
         System.out.println(wordcloudPath.toString());
@@ -179,8 +181,6 @@ public class ReportManager {
                 reportPane.getChildren().add(wordCloudImage);
             }
         }
-
-        //reportPane.setContent(flow);
     }
 
     private TableView generateSlideTimesTable(Presentation presentation, ArrayList<PresentationStatisticsRecord> presentationStatistics){
@@ -299,7 +299,7 @@ public class ReportManager {
             Label studentName = new Label(student.getFullName());
             studentName.setWrapText(true);
             studentName.setTextFill(Color.WHITE);
-            Label participation = new Label("Participation: "+student.getParticipation()+" of "+10);//TODO Remove hardcoded total participations
+            Label participation = new Label("Participation: "+student.getParticipation()+" of "+interactiveElementsData.size());
             participation.setTextFill(Color.WHITE);
             participation.setWrapText(true);
             VBox slideBox = new VBox();
