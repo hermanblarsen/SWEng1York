@@ -190,33 +190,32 @@ public class PresentationManagerTeacher extends PresentationManager {
 
         for (int i = 0; i < questions.size(); i++) {
             slides[i] = new Panel(questions.get(i).getQuestion_data());
-//            Image answered = new Image("file:projectResources/icons/Tick.png",50,50,true,true);
-//            ImageView answeredView = new ImageView(answered);
             final int j= i;
-//            answeredView.addEventHandler(MouseEvent.MOUSE_CLICKED, evt->{
-//                test = true;
-//                displayPane.getChildren().remove(slidePane);
-//                slidePane.getChildren().removeAll(backgroundRegion, lab);
-//                buttonActive = true;
-//                ediManager.getSocketClient().answerQuestionInQuestionQueue(questions.get(0).getQuestion_id());
-//                Label questionComplete = new Label("Question Answered!");
-//                logger.info("Question: "+j+" Answered");
-//                slides[j].setBody(questionComplete);
-//            });
-//            answeredView.addEventHandler(MouseEvent.MOUSE_ENTERED,evt->{
-//                buttonActive = true;
-//            });
-//            answeredView.addEventHandler(MouseEvent.MOUSE_EXITED,evt->{
-//                buttonActive = false;
-//            });
-//            slides[i].setBody(answeredView);
-            //slides[i].getStyleClass().add("panel-primary");
             slides[i].setMinWidth(400);
             slides[i].setPickOnBounds(false);
             fp.getChildren().add(slides[i]);
+            Image answered = new Image("file:projectResources/icons/Tick.png",50,50,true,true);
+            ImageView answeredView = new ImageView(answered);
 
-            //backgroundRegion = new Region();
-            //backgroundRegion.setBackground(new Background(new BackgroundFill(Color.web("#34495e"), null, null)));
+            answeredView.addEventHandler(MouseEvent.MOUSE_CLICKED, evt->{
+                test = true;
+                displayPane.getChildren().remove(slidePane);
+                slidePane.getChildren().removeAll(backgroundRegion, lab);
+                buttonActive = true;
+                ediManager.getSocketClient().answerQuestionInQuestionQueue(questions.get(0).getQuestion_id());
+                Label questionComplete = new Label("Question Answered!");
+                logger.info("Question: "+j+" Answered");
+                slides[j].setBody(questionComplete);
+            });
+            answeredView.addEventHandler(MouseEvent.MOUSE_ENTERED,evt->{
+                buttonActive = true;
+            });
+            answeredView.addEventHandler(MouseEvent.MOUSE_EXITED,evt->{
+                buttonActive = false;
+            });
+            slides[i].setBody(answeredView);
+            //slides[i].getStyleClass().add("panel-primary");
+
             setText = new String();
             final int val = i;
             slides[i].addEventHandler(MouseEvent.MOUSE_CLICKED, evt -> {
@@ -263,7 +262,11 @@ public class PresentationManagerTeacher extends PresentationManager {
                     }
                 }
             });
-
+            presentationStage.addEventHandler(MouseEvent.MOUSE_CLICKED, evt->{
+                displayPane.getChildren().remove(slidePane);
+                slidePane.getChildren().removeAll(backgroundRegion, lab);
+                questionClicked = false;
+            });
             teacherToolKit.addEventHandler(WindowEvent.WINDOW_CLOSE_REQUEST, evt -> {
                 displayPane.getChildren().remove(slidePane);
                 slidePane.getChildren().removeAll(backgroundRegion, lab);
