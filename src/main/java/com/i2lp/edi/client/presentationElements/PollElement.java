@@ -233,9 +233,9 @@ public class PollElement extends InteractiveElement {
                 //responseIndicator.incrementResponses();
                 //checkIfDone();
                 setValue = number;
-                logger.info("Pressed Answer: " + possibleAnswers.get(finalI));
-                if((ediManager.getPresentationManager().getStudentSession() != null)){
-                    //ediManager.getPresentationManager().getStudentSession().sendResponse(this, possibleAnswers.get(finalI));
+                if((ediManager.getPresentationManager().getTeacherSession()) != null){
+                    ediManager.getPresentationManager().getTeacherSession().sendResponse(this, Integer.toString(finalI));
+                } else if((ediManager.getPresentationManager().getStudentSession() != null)){
                     ediManager.getPresentationManager().getStudentSession().sendResponse(this, Integer.toString(finalI));
                 }
             });

@@ -1,11 +1,8 @@
 package com.i2lp.edi.client.login;
 
 import com.i2lp.edi.client.Constants;
-import com.i2lp.edi.client.dashboard.StudentDashboard;
-import com.i2lp.edi.client.dashboard.TeacherDashboard;
 import com.i2lp.edi.client.managers.EdiManager;
 import com.i2lp.edi.client.managers.PresentationManagerStudent;
-import com.i2lp.edi.client.managers.PresentationManagerTeacher;
 import com.i2lp.edi.client.presentationElements.Presentation;
 import com.i2lp.edi.client.utilities.ParserXML;
 import com.i2lp.edi.server.SocketClient;
@@ -24,7 +21,8 @@ import javafx.scene.control.TextField;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.*;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
@@ -50,7 +48,7 @@ public class Login extends Application {
     protected PasswordField passwordField;
     protected Button loginButton;
     protected Button forgotPasswordButton;
-    private Label messageLabel;
+    public Label messageLabel;
     private ImageView loadingImage;
     private HBox rootBox;
 

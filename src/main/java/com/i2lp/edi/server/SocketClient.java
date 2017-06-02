@@ -367,6 +367,7 @@ public class SocketClient {
                     //Parse user data
                     loginSuccessFinal.set(new User((Integer) objects[0], (String) objects[1], (String) objects[2], (String) objects[3], (String) objects[4]));
                 } else {
+                    Platform.runLater(() -> ediManager.getLoginDialog().messageLabel.setText("Incorrect username/password."));
                     logger.error("Incorrect username/password for login.");
                 }
             });
