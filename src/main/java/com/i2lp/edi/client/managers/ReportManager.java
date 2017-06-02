@@ -1,8 +1,10 @@
 package com.i2lp.edi.client.managers;
 
 import com.i2lp.edi.client.presentationElements.Presentation;
+import com.i2lp.edi.server.SocketClient;
 import com.i2lp.edi.server.packets.PresentationStatisticsRecord;
 import com.i2lp.edi.server.packets.Question;
+import com.i2lp.edi.server.packets.User;
 import eu.hansolo.tilesfx.Tile;
 import eu.hansolo.tilesfx.TileBuilder;
 import eu.hansolo.tilesfx.skins.BarChartItem;
@@ -27,6 +29,8 @@ import org.kordamp.bootstrapfx.scene.layout.Panel;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import static com.i2lp.edi.client.Constants.PRESENTATIONS_PATH;
 
@@ -34,8 +38,31 @@ import static com.i2lp.edi.client.Constants.PRESENTATIONS_PATH;
  * Created by Koen on 25/05/2017.
  */
 public class ReportManager {
+    ArrayList<Question> questionQueueQuestions;
+    ArrayList<PresentationStatisticsRecord> presentationStatistics;
+    HashMap<Integer, Students> students = new HashMap<>();
+    EdiManager ediManager;
+    Presentation presentation;
+
+    private void getAllPresentationData(){
+        SocketClient sock = ediManager.getSocketClient();
+        int presentationId = presentation.getPresentationMetadata().getPresentationID();
+
+        questionQueueQuestions = sock.getQuestionsForPresentation(presentationId);
+        presentationStatistics = sock.getPresentationStatistics(presentationId);
+        sock.getStudentsForModule(presentation.getPresentationMetadata().getModule_id()).forEach(item -> students.put(item.getUserID(), new Students(item, 0)));
+
+        // Populate students with thether they were present or not (based on whether there is a statistics entry for that student)
+        for(PresentationStatisticsRecord statEntry: presentationStatistics){
+            students.get(statEntry.getUserID()).setWasPresent(true);
+        }
+    }
 
     public void openReportPanel(Presentation presentation, EdiManager ediManager){
+        this.ediManager = ediManager;
+        this.presentation = presentation;
+        getAllPresentationData();
+
         Stage stage = new Stage();
         stage.setTitle(presentation.getDocumentID() + " Report");
         ScrollPane reportPane = new ScrollPane();
@@ -43,10 +70,8 @@ public class ReportManager {
         stage.show();
         VBox flow = new VBox();
         HBox reportPanels = new HBox();
-        ArrayList<Question> questionQueueQuestions = ediManager.getSocketClient().getQuestionsForPresentation(presentation.getPresentationMetadata().getPresentationID());
-        ArrayList<PresentationStatisticsRecord> presentationStatistics =
-                ediManager.getSocketClient().getPresentationStatistics(presentation.getPresentationMetadata().getPresentationID());
 
+        //Attendance Tile
         Tile studentsInPresentation = TileBuilder.create()
                 .skinType(Tile.SkinType.NUMBER)
                 .prefSize(250,250)
@@ -57,6 +82,7 @@ public class ReportManager {
                 .textVisible(true)
                 .build();
 
+        //Question Queue Tile
         Tile questionsAsked = TileBuilder.create()
                 .skinType(Tile.SkinType.NUMBER)
                 .prefSize(250,250)
@@ -67,6 +93,7 @@ public class ReportManager {
                 .textVisible(true)
                 .build();
 
+        //Participation Tile
         Tile presentationParticipation = TileBuilder.create()
                 .skinType(Tile.SkinType.CIRCULAR_PROGRESS)
                 .prefSize(250,250)
@@ -75,8 +102,8 @@ public class ReportManager {
                 .unit("\u0025")
                 .build();
 
+        //Slide Times slide
         TableView slideTimeTable = generateSlideTimesTable(presentation, presentationStatistics);
-
 
         reportPanels.getChildren().addAll(
                 studentsInPresentation,
@@ -86,7 +113,7 @@ public class ReportManager {
         );
 
         questionsAsked.addEventHandler(MouseEvent.MOUSE_CLICKED,evt-> {new ReportManager().showQuestions(questionQueueQuestions);});
-        studentsInPresentation.addEventHandler(MouseEvent.MOUSE_CLICKED,evt->{new ReportManager().showStudents();});
+        studentsInPresentation.addEventHandler(MouseEvent.MOUSE_CLICKED,evt->showStudents());
         flow.getChildren().add(reportPanels);
         //reportPane.setContent(reportPanels);
 
@@ -140,10 +167,14 @@ public class ReportManager {
             slideTimeTable.getColumns().add(column);
         }
 
-        //Populate the table:
+        //Populate the table: (Process each statistics record intto a StudentSlideTime and add it to a list)
         ObservableList<StudentSlideTimes> slideTimesTableData = FXCollections.observableArrayList();
         for (PresentationStatisticsRecord record : presentationStatistics){
-            slideTimesTableData.add(new StudentSlideTimes(record.getSlideTimes(), Integer.toString(record.getUserID())));
+            slideTimesTableData.add(
+                    new StudentSlideTimes(record.getSlideTimes(),
+                            students.get(record.getUserID()).getFullName()
+                    )
+            );
         }
 
         slideTimeTable.setItems(slideTimesTableData);
@@ -172,6 +203,7 @@ public class ReportManager {
                 .build();
         return pollPanel;
     }
+
     public void showQuestions(ArrayList<Question> questionQueueQuestions){
         Stage stage = new Stage();
         stage.setTitle("Questions");
@@ -219,33 +251,35 @@ public class ReportManager {
         fp.setStyle("-fx-background-color: whitesmoke");
         sp.setStyle("-fx-background-color: whitesmoke");
 
-        ArrayList<Students> students = new ArrayList<>();
-        students.add(new Students("Koen","Arroo",7));
-        students.add(new Students("Amrik","Sadhra",9));
-        students.add(new Students("Herman","Larsen",10));
-        students.add(new Students("Kacper","Sagnowski",7));
-
         Panel[] slides = new Panel[students.size()];
 
-        for(int i = 0;i<students.size();i++){
-            slides[i] = new Panel();
-            Label studentName = new Label(students.get(i).getFirstName() +" "+students.get(i).getLastName());
+        for (Map.Entry<Integer, Students> entry : students.entrySet()){
+            Students student = entry.getValue();
+            Panel studentParticipationPanel = new Panel();
+
+            Label studentName = new Label(student.getFullName());
             studentName.setWrapText(true);
             studentName.setTextFill(Color.WHITE);
-            Label participation = new Label("Participation: "+students.get(i).getParticipation()+" of "+10);
+            Label participation = new Label("Participation: "+student.getParticipation()+" of "+10);//TODO Remove hardcoded total participations
             participation.setTextFill(Color.WHITE);
             participation.setWrapText(true);
             VBox slideBox = new VBox();
             slideBox.getChildren().addAll(studentName,participation);
-            slides[i].setStyle("-fx-background-color: #34495e");
-            slides[i].setBody(slideBox);
-            slides[i].setMinWidth(430);
-            fp.getChildren().add(slides[i]);
+            if (student.getWasPresent()) {
+                studentParticipationPanel.setStyle("-fx-background-color: #65d16c");
+            } else {
+                studentParticipationPanel.setStyle("-fx-background-color: #d64c45");
+            }
+            studentParticipationPanel.setBody(slideBox);
+            studentParticipationPanel.setMinWidth(430);
+            fp.getChildren().add(studentParticipationPanel);
         }
+
         sp.setContent(fp);
         stage.show();
     }
 
+    // Classes
     private class Questions{
         private String question;
         private int timeWaited;
@@ -273,14 +307,22 @@ public class ReportManager {
     }
 
     private class Students{
+        int userId;
         private String firstName;
         private String lastName;
-        private int participation;
+        private int participation;//Number of interactiv elements the student participated in.
+		private boolean wasPresent = false;
 
-        public Students(String firstName, String lastName, int participation) {
+        public Students(int userId, String firstName, String lastName, int participation) {
+            this.userId = userId;
             this.firstName = firstName;
             this.lastName = lastName;
             this.participation = participation;
+        }
+
+        //Initialise Student from their db record.
+        public Students(User userRecord, int participation){
+            this(userRecord.getUserID(), userRecord.getFirstName(), userRecord.getSecondName(), participation);
         }
 
         public String getFirstName() {
@@ -305,6 +347,22 @@ public class ReportManager {
 
         public void setParticipation(int participation) {
             this.participation = participation;
+        }
+
+        public int getUserId() {
+            return userId;
+        }
+
+        public String getFullName(){
+            return this.firstName + " " + this.lastName;
+        }
+
+        public void setWasPresent(boolean wasPresent){
+            this.wasPresent = wasPresent;
+        }
+
+        public boolean getWasPresent() {
+            return wasPresent;
         }
     }
 
