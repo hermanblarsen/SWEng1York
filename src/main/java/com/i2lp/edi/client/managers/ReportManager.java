@@ -1,10 +1,11 @@
 package com.i2lp.edi.client.managers;
 
+import com.i2lp.edi.client.presentationElements.PollElement;
 import com.i2lp.edi.client.presentationElements.Presentation;
+import com.i2lp.edi.client.presentationElements.SlideElement;
+import com.i2lp.edi.client.presentationElements.WordCloudElement;
 import com.i2lp.edi.server.SocketClient;
-import com.i2lp.edi.server.packets.PresentationStatisticsRecord;
-import com.i2lp.edi.server.packets.Question;
-import com.i2lp.edi.server.packets.User;
+import com.i2lp.edi.server.packets.*;
 import eu.hansolo.tilesfx.Tile;
 import eu.hansolo.tilesfx.TileBuilder;
 import eu.hansolo.tilesfx.skins.BarChartItem;
@@ -20,17 +21,16 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.FlowPane;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import org.kordamp.bootstrapfx.scene.layout.Panel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FilenameFilter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import static com.i2lp.edi.client.Constants.PRESENTATIONS_PATH;
 
@@ -38,9 +38,13 @@ import static com.i2lp.edi.client.Constants.PRESENTATIONS_PATH;
  * Created by Koen on 25/05/2017.
  */
 public class ReportManager {
+    private Logger logger = LoggerFactory.getLogger(this.getClass());
     ArrayList<Question> questionQueueQuestions;
     ArrayList<PresentationStatisticsRecord> presentationStatistics;
+    ArrayList<InteractionRecord> interactions;
+    ArrayList<InteractiveElementRecord> interactiveElementsData;
     HashMap<Integer, Students> students = new HashMap<>();
+
     EdiManager ediManager;
     Presentation presentation;
 
@@ -51,8 +55,10 @@ public class ReportManager {
         questionQueueQuestions = sock.getQuestionsForPresentation(presentationId);
         presentationStatistics = sock.getPresentationStatistics(presentationId);
         sock.getStudentsForModule(presentation.getPresentationMetadata().getModule_id()).forEach(item -> students.put(item.getUserID(), new Students(item, 0)));
+        interactions = sock.getInteractionsForPresentation(presentationId);
+        interactiveElementsData = sock.getInteractiveElementsForPresentation(presentationId);
 
-        // Populate students with thether they were present or not (based on whether there is a statistics entry for that student)
+        // Populate students with whether they were present or not (based on whether there is a statistics entry for that student)
         for(PresentationStatisticsRecord statEntry: presentationStatistics){
             students.get(statEntry.getUserID()).setWasPresent(true);
         }
@@ -65,11 +71,15 @@ public class ReportManager {
 
         Stage stage = new Stage();
         stage.setTitle(presentation.getDocumentID() + " Report");
-        ScrollPane reportPane = new ScrollPane();
-        stage.setScene(new Scene(reportPane,750,500));
+        FlowPane reportPane = new FlowPane();
+        ScrollPane scrollWrapper = new ScrollPane();
+        scrollWrapper.setFitToHeight(true);
+        scrollWrapper.setFitToWidth(true);
+        scrollWrapper.setContent(reportPane);
+        reportPane.setPadding(new Insets(10,10,10,10));
+        stage.setScene(new Scene(scrollWrapper,780,1000));
+        stage.setResizable(false);
         stage.show();
-        VBox flow = new VBox();
-        HBox reportPanels = new HBox();
 
         //Attendance Tile
         Tile studentsInPresentation = TileBuilder.create()
@@ -105,25 +115,47 @@ public class ReportManager {
         //Slide Times slide
         TableView slideTimeTable = generateSlideTimesTable(presentation, presentationStatistics);
 
-        reportPanels.getChildren().addAll(
+        //Add the elements so far to the window.
+        reportPane.getChildren().addAll(
                 studentsInPresentation,
                 questionsAsked,
                 presentationParticipation,
                 slideTimeTable
         );
 
+
+        //Listeners
         questionsAsked.addEventHandler(MouseEvent.MOUSE_CLICKED,evt-> {new ReportManager().showQuestions(questionQueueQuestions);});
         studentsInPresentation.addEventHandler(MouseEvent.MOUSE_CLICKED,evt->showStudents());
-        flow.getChildren().add(reportPanels);
-        //reportPane.setContent(reportPanels);
-
-        int numberOfPolls = 2;//Todo Remove this once connected to server.
-        for(int i = 0;i<numberOfPolls;i++){
-            int numberOfQuestions = 2+(int)Math.random()*6;
-            flow.getChildren().add(this.generatePollTile("Generic Question",numberOfQuestions));
-        }
 
 
+        //Poll results:
+        interactiveElementsData.forEach(interactiveElement ->{
+            SlideElement correspondingSlideElement = presentation.getSlide( interactiveElement.getSlide_number()-1 )
+                                                    .getElementWithID( interactiveElement.getXml_element_id() );
+            if(correspondingSlideElement instanceof PollElement) {
+                reportPane.getChildren().add(generatePollTile(
+                        interactiveElement,
+                        ((PollElement)correspondingSlideElement).getQuestion(),
+                        Arrays.asList(((PollElement)correspondingSlideElement).getAnswers().split( "," ))
+                ));
+            } else if(correspondingSlideElement instanceof WordCloudElement){
+            	//generateWordCloudTile(interactiveElement, ((WordCloudElement)correspondingSlideElement).getQuestion());
+            } else {
+                logger.error("Mismatching interactive element IDs between database entry and the local presentation!!");
+                return;
+            }
+        });
+
+
+//        int numberOfPolls = 2;//Todo Remove this once connected to server.
+//        for(int i = 0;i<numberOfPolls;i++){
+//            int numberOfQuestions = 2+(int)Math.random()*6;
+//            reportPane.getChildren().add(this.generatePollTile("Generic Question",numberOfQuestions));
+//        }
+
+
+        //Wordcloud Element
         File wordcloudPath = new File(PRESENTATIONS_PATH+"/" +presentation.getDocumentID()+"/Wordclouds/");
         System.out.println(wordcloudPath.toString());
         if(wordcloudPath.exists()){
@@ -140,12 +172,15 @@ public class ReportManager {
 
             for(File f: wordcloudPath.listFiles(imageFilter)){
                 System.out.println(f.getAbsolutePath());
-                Image wordCloud = new Image("file:"+f.getAbsolutePath());
+                Image wordCloud = new Image("file:" + f.getAbsolutePath());
                 ImageView wordCloudImage = new ImageView(wordCloud);
-                flow.getChildren().add(wordCloudImage);
+                wordCloudImage.prefWidth(750);
+                wordCloudImage.setPreserveRatio(true);
+                reportPane.getChildren().add(wordCloudImage);
             }
         }
-        reportPane.setContent(flow);
+
+        //reportPane.setContent(flow);
     }
 
     private TableView generateSlideTimesTable(Presentation presentation, ArrayList<PresentationStatisticsRecord> presentationStatistics){
@@ -178,29 +213,33 @@ public class ReportManager {
         }
 
         slideTimeTable.setItems(slideTimesTableData);
+        slideTimeTable.setPrefWidth(750);
 
         return slideTimeTable;
     }
 
-    private Tile generatePollTile(String task, int numberOfQuestions){
-        PollQuestions pQ = new PollQuestions(task,numberOfQuestions);
-        ArrayList<Integer> pollOutput = pQ.generatePollResults();
-        ArrayList<BarChartItem> chartDataList = new ArrayList<>();
+    private Tile generatePollTile(InteractiveElementRecord elementRecord, String question, List<String> possibleAnswers){
+        ArrayList<BarChartItem> pollResults = new ArrayList<>();
+        int[] resultsTally = new int[possibleAnswers.size()];
 
+        // Tally the number of responses for each possibly answer
+        interactions.stream()
+                .filter(interaction -> interaction.getInteractive_element_id() == elementRecord.getInteractive_element_id())
+                .forEach(result -> resultsTally[ Integer.parseInt( result.getInteraction_data() ) ]++);
 
-        for(int j= 0;j<pollOutput.size();j++){
-            chartDataList.add(new BarChartItem(Integer.toString(j),pollOutput.get(j).intValue(),Tile.BLUE));
+        // Format the responses ready for the bar chart.
+        for (int i=0; i<possibleAnswers.size(); i++){
+            pollResults.add(new BarChartItem(possibleAnswers.get(i), resultsTally[i], Tile.BLUE));
         }
 
-        System.out.println(chartDataList.size());
-        System.out.println(chartDataList.get(0).getValue());
         Tile pollPanel = TileBuilder.create()
                 .skinType(Tile.SkinType.BAR_CHART)
-                .prefSize(500,250)
-                .title(pQ.getTask())
-                .barChartItems(chartDataList)
+                .prefSize(750,250)
+                .title(question)
+                .barChartItems(pollResults)
                 .decimals(0)
                 .build();
+
         return pollPanel;
     }
 
