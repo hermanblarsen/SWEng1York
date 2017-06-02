@@ -11,17 +11,23 @@ import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ToggleButton;
-import javafx.scene.control.ToggleGroup;
+import javafx.scene.Scene;
+import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.stage.Stage;
 import javafx.util.Duration;
 import org.kordamp.bootstrapfx.scene.layout.Panel;
 
+import java.sql.Time;
+import java.time.Instant;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,6 +41,7 @@ public class PollElement extends InteractiveElement {
     protected String answers;
     protected boolean answered = false;
     protected boolean timerStart = false;
+    protected LocalTime startTime;
 
     protected VBox pollOptions;
     protected Timeline timeline;
@@ -53,6 +60,7 @@ public class PollElement extends InteractiveElement {
     protected boolean buttonActive = false;
     protected int setValue;
     protected Button startTimer;
+    protected ContextMenu cm;
 
     public PollElement() {
 
@@ -72,7 +80,9 @@ public class PollElement extends InteractiveElement {
         questionPane.setTranslateY(slideHeight * yPosition);
 
         getCoreNode().addEventHandler(MouseEvent.MOUSE_CLICKED, evt -> {
-            if (!buttonActive) {
+            System.out.println("BA: "+ buttonActive);
+            System.out.println("EA: "+elementActive);
+            if (this.isElementActive() == false && this.isButtonActive() == false) {
                 performOnClickAction();
             }
         });
@@ -85,10 +95,10 @@ public class PollElement extends InteractiveElement {
 
     @Override
     public void setupElement() {
-        //Label question = new Label(question);
-        questionPane = new Panel(question);
 
-        questionPane.getStyleClass().add("panel-primary");
+        questionPane = new Panel();
+        setUpQuestionList(answers);
+        //questionPane.getStyleClass().add("panel-primary");
         //questionPane.setBackground(new Background(new BackgroundFill(Tile.BACKGROUND, null, null)));
         questionPane.setStyle("-fx-background-color: #2a2a2a");
         //question.setMinWidth(Double.MAX_VALUE);
@@ -102,28 +112,7 @@ public class PollElement extends InteractiveElement {
 
 //        });
 
-        remainingTime = new Label("Time Remaining: " + timeLimit);
-        final IntegerProperty i = new SimpleIntegerProperty(timeLimit);
-        timeline = new Timeline(
-                new KeyFrame(
-                        Duration.seconds(1),
-                        evt -> {
-                            i.set(i.get() - 1);
-                            //double percentage = ((i.get()/timeLimit)*100);
-                            //System.out.println("Test "+percentage);
-                            countdownTile.setMaxValue(timeLimit);
-                            countdownTile.setValue(i.get());
 
-                            remainingTime.setText("Time Remaining: " + i.get());
-                        }
-                )
-        );
-
-        timeline.setCycleCount(timeLimit);
-        timeline.setOnFinished(event -> {
-            elementActive = false;
-            //displayDone();
-        });
 
         countdownTile = TileBuilder.create()
                 .skinType(Tile.SkinType.NUMBER)
@@ -139,25 +128,30 @@ public class PollElement extends InteractiveElement {
                 .title("Responses")
                 .build();
         if (teacher && !timerStart) {
-            startTimer = new Button("START");
-            startTimer.getStyleClass().setAll("btn", "btn-default");
-            startTimer.addEventHandler(MouseEvent.MOUSE_CLICKED, evt -> {
-                setUpPollData();
-                if (ediManager.getPresentationManager().getTeacherSession() != null) {
+            Image startPollIcon = new Image("file:projectResources/icons/StartPoll.png");
+            ImageView startPoll = new ImageView(startPollIcon);
+            HBox startBox = new HBox();
+            startBox.getChildren().add(startPoll);
+            startBox.setAlignment(Pos.CENTER);
+            //startTimer = new Button("START");
+            //startTimer.getStyleClass().setAll("btn", "btn-default");
+            startPoll.addEventHandler(MouseEvent.MOUSE_CLICKED, evt -> {
+                setUpPollData(new Time(Instant.now().toEpochMilli()));
+                if (ediManager.getPresentationManager().getTeacherSession()!= null) {
                     ediManager.getPresentationManager().getTeacherSession().beginInteraction(this, true);
                 }
             });
-            startTimer.addEventHandler(MouseEvent.MOUSE_ENTERED, evt -> {
+            startPoll.addEventHandler(MouseEvent.MOUSE_ENTERED, evt -> {
                 buttonActive = true;
             });
-            startTimer.addEventHandler(MouseEvent.MOUSE_EXITED, evt -> {
+            startPoll.addEventHandler(MouseEvent.MOUSE_EXITED, evt -> {
                 buttonActive = false;
             });
             //pollPane.setCenter(startTimer);
-            questionPane.setBody(startTimer);
+            questionPane.setBody(startBox);
         }
         questionPane.setVisible(visibility);
-        getCoreNode().addEventFilter(MouseEvent.MOUSE_CLICKED, event -> performOnClickAction());
+        //getCoreNode().addEventFilter(MouseEvent.MOUSE_CLICKED, event -> performOnClickAction());
     }
 
     @Override
@@ -165,16 +159,52 @@ public class PollElement extends InteractiveElement {
 
     }
 
-    public void setUpPollData() {
+    public void setUpPollData(Time startTime) {
+        this.startTime = startTime.toLocalTime();
         Platform.runLater(new Runnable() {
             @Override
             public void run() {
+                LocalTime currentTime = LocalTime.now();
+                int timeDifference = currentTime.getSecond()-startTime.toLocalTime().getSecond();
+                int newTimeLimit = Math.round(timeLimit-timeDifference);
+
+                remainingTime = new Label("Time Remaining: " + newTimeLimit);
+                final IntegerProperty i = new SimpleIntegerProperty(newTimeLimit);
+                timeline = new Timeline(
+                        new KeyFrame(
+                                Duration.seconds(1),
+                                evt -> {
+                                    i.set(i.get() - 1);
+                                    //double percentage = ((i.get()/timeLimit)*100);
+                                    //System.out.println("Test "+percentage);
+                                    countdownTile.setMaxValue(newTimeLimit);
+                                    countdownTile.setValue(i.get());
+
+                                    remainingTime.setText("Time Remaining: " + i.get());
+                                }
+                        )
+                );
+
+                timeline.setCycleCount(newTimeLimit);
+                timeline.setOnFinished(event -> {
+                    elementActive = false;
+                    //displayDone();
+                });
+
+
                 elementActive = true;
                 timerStart = true;
+                if(countdownTile.getValue() == 0.0){
+                    countdownTile.setValue(newTimeLimit);
+                }
+                Label pollQuestion = new Label(question);
+                pollQuestion.setFont(new javafx.scene.text.Font("Helvetica", 50));
+                pollQuestion.setTextFill(javafx.scene.paint.Color.WHITE);
+                pollQuestion.setWrapText(true);
                 //responseIndicator = new ResponseIndicator();
                 //responseIndicator.setNumberOfStudents(20); //TODO: Get this from server
                 pollOptions = new VBox();
-                pollOptions.getChildren().setAll(countdownTile, setUpQuestions());
+                pollOptions.getChildren().setAll(pollQuestion,countdownTile, setUpQuestions());
                 pollOptions.setAlignment(Pos.CENTER);
                 pollOptions.setSpacing(20);
                 //pollPane.setCenter(pollOptions);
@@ -186,7 +216,7 @@ public class PollElement extends InteractiveElement {
     }
 
     private HBox setUpQuestions() {
-        setUpQuestionList(answers);
+        elementActive = true;
         answerButton = new ToggleButton[possibleAnswers.size()];
         final ToggleGroup group = new ToggleGroup();
         HBox answerSelection = new HBox();
@@ -223,6 +253,7 @@ public class PollElement extends InteractiveElement {
     }
 
     public void displayDone() {
+
         double testShit[] = new double[possibleAnswers.size()];
         chartDataArray = new ChartData[possibleAnswers.size()];
         questionPane.getChildren().remove(questionPane.getBody());
@@ -241,6 +272,34 @@ public class PollElement extends InteractiveElement {
 
         answerOutputTile.setRadialChartData(chartDataArray);
         questionPane.setBody(answerOutputTile);
+
+        answerOutputTile.addEventHandler(MouseEvent.MOUSE_CLICKED,evt->{
+            if(cm != null){
+                cm.hide();
+            }
+            cm = new ContextMenu();
+
+
+            if(evt.getButton() == MouseButton.SECONDARY){
+                MenuItem reset = new MenuItem("Reset Element");
+                reset.addEventHandler(MouseEvent.MOUSE_CLICKED,event->{
+                        System.out.println("ELEMENT RESET!");
+
+                });
+                reset.addEventHandler(MouseEvent.MOUSE_ENTERED,event->{
+                    System.out.println("POOP");
+                    //elementActive = true;
+                });
+                reset.addEventHandler(MouseEvent.MOUSE_EXITED,event->{
+                    System.out.println("poop2");
+                    //elementActive = false;
+                });
+                cm.getItems().add(reset);
+                cm.show(this.getCoreNode(),evt.getScreenX(),evt.getScreenY());
+            }
+        });
+
+
     }
 
     public String getQuestion() {
@@ -371,4 +430,18 @@ public class PollElement extends InteractiveElement {
     }
 
 
+    public boolean isButtonActive() {
+        return buttonActive;
+    }
+
+
+    @Override
+    public void sendDataToServer() {
+
+    }
+
+    @Override
+    public void receiveDataFromServer() {
+
+    }
 }
