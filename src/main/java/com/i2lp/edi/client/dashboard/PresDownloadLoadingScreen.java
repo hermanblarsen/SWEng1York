@@ -1,8 +1,6 @@
 package com.i2lp.edi.client.dashboard;
 
-import com.i2lp.edi.client.managers.EdiManager;
 import javafx.application.Application;
-import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
@@ -51,6 +49,6 @@ public class PresDownloadLoadingScreen extends Application {
     }
 
     public void exitPresDownloadingState() {
-        Platform.exit();
+        //Platform.exit();
     }
 }

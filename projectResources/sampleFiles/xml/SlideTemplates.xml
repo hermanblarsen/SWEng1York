@@ -1,4 +1,4 @@
-<document documentid="SalesPresentation">
+<document documentid="SalesPresentationAnotherOne">
 	<documentdetails>
 		<title>Sales Presentation</title>
 		<author>Herman Larsen</author>
@@ -34,7 +34,7 @@
         <!--Title Slide-->
         <slide slideid="1">
             <!--Title-->
-            <text elementid ="0" layer="9" startsequence="1" endsequence="-1" duration="-1">
+            <text elementid ="0" layer="9" startsequence="1" endsequence="2" duration="-1">
                 <textcontent>
                     &lt;p&gt;&lt;center&gt;Title&lt;/center&gt;&lt;/p&gt;
                 </textcontent>
@@ -44,7 +44,7 @@
             </text>
 
             <!--SubTitle-->
-            <text elementid ="1" layer="9" startsequence="1" endsequence="-1" duration="-1">
+            <text elementid ="1" layer="9" startsequence="1" endsequence="2" duration="-1">
                 <textcontent>
                     &lt;p&gt;&lt;center&gt;Subtitle&lt;/center&gt;&lt;/p&gt;
                 </textcontent>
@@ -60,7 +60,7 @@
         <!--Normal Text Slide-->
 		<slide slideid="2">
             <!--Title-->
-            <text elementid ="0" layer="10" startsequence="1" endsequence="-1" duration="-1">
+            <text elementid ="0" layer="10" startsequence="1" endsequence="2" duration="-1">
                 <textcontent>
                     &lt;p&gt;&lt;center&gt;Text Slide&lt;/center&gt;&lt;/p&gt;
                 </textcontent>
@@ -69,7 +69,7 @@
                 <xsize>0.6</xsize>          <ysize>0.15</ysize>
             </text>
 
-            <text elementid ="1" layer="1" startsequence="1" endsequence="-1" duration="-1">
+            <text elementid ="1" layer="1" startsequence="1" endsequence="2" duration="-1">
                 <textcontent>
                     &lt;p align="left"&gt;
                         This is a paragraph
@@ -91,7 +91,7 @@
         <!--Split Text Slide-->
         <slide slideid="3">
             <!--Title-->
-            <text elementid ="0" layer="10" startsequence="1" endsequence="-1" duration="-1">
+            <text elementid ="0" layer="10" startsequence="1" endsequence="3" duration="-1">
                 <textcontent>
                     &lt;p&gt;&lt;center&gt;Text Slide&lt;/center&gt;&lt;/p&gt;
                 </textcontent>
@@ -100,7 +100,7 @@
                 <xsize>0.6</xsize>          <ysize>0.15</ysize>
             </text>
 
-            <text elementid ="1" layer="1" startsequence="1" endsequence="-1" duration="-1">
+            <text elementid ="1" layer="1" startsequence="1" endsequence="3" duration="-1">
                 <textcontent>
                     &lt;p align="left"&gt;
                     This is a paragraph
@@ -117,7 +117,7 @@
                 <onclickaction>none</onclickaction><onclickinfo></onclickinfo>
             </text>
 
-            <text elementid ="1" layer="1" startsequence="1" endsequence="-1" duration="-1">
+            <text elementid ="2" layer="1" startsequence="1" endsequence="3" duration="-1">
                 <textcontent>
                     &lt;p align="left"&gt;
                     This is a paragraph

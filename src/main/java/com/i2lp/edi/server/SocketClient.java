@@ -1029,7 +1029,6 @@ public class SocketClient {
             //Call stored procedure on database
             ResultSet rs = statement.executeQuery();
 
-
             while (rs.next()) {
                 statisticEntries.add(
                         new PresentationStatisticsRecord(
@@ -1051,4 +1050,8 @@ public class SocketClient {
 
         return statisticEntries;
     }
+
+   /* public boolean resetInteractionsForPresentation(int presentationID){
+
+    }*/
 }

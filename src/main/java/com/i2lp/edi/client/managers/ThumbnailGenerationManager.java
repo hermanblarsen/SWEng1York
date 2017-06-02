@@ -103,8 +103,6 @@ public class ThumbnailGenerationManager extends PresentationManager {
         if (!thumbnailFile.exists()) {
             thumbnailFile.getParentFile().mkdirs(); //Create directory structure if not present yet
         } else {
-            logger.debug("Thumbnail at " + thumbnailFile.getAbsolutePath() + " already exists");
-            slideGenController.close(); //TODO: This causes thumbGen to close even if all thumbs are missing apart from the first one
             if (slideGenController.slideAdvance(presentation, Slide.SLIDE_FORWARD) == Presentation.PRESENTATION_FINISH) {
                 logger.info("Done generating thumbnails for presentation " + presentation.getDocumentID());
                 slideGenController.close();
@@ -115,8 +113,8 @@ public class ThumbnailGenerationManager extends PresentationManager {
         }
 
         //Move to end of current slide so all elements are visible in snapshot
-        //noinspection StatementWithEmptyBody
-        while (slideGenController.slideAdvance(presentation, Slide.SLIDE_FORWARD) != Presentation.SLIDE_LAST_ELEMENT) ;
+        while (slideGenController.slideAdvance(presentation, Slide.SLIDE_FORWARD) != Presentation.SLIDE_LAST_ELEMENT);
+
         //If we're in last element of slide, take snapshot
         displayCurrentSlide();
 

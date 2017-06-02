@@ -229,7 +229,7 @@ public class PresentationLibraryManager {
     }
 
     public void uploadPresentation(String fileToUpload, int moduleID) {
-        ParserXML parserXML = new ParserXML(fileToUpload); //TODO: @Amrik Can this entire method be refactored to take a Presentation as an argument instead fileToUpload?
+        ParserXML parserXML = new ParserXML(fileToUpload);
         Presentation presentation = parserXML.parsePresentation();
         //Generate thumbnails for Slides.
         ThumbnailGenerationManager.generateSlideThumbnails( presentation,false);
@@ -280,6 +280,7 @@ public class PresentationLibraryManager {
                     logger.info("The presentation has uploaded successfully. Awaiting server-side processing.");
                     socketClient.alertServerToUpload(presentation.getDocumentID(), moduleID, presentation); //Tell server a new file has arrived
                     new File(zipPath).delete(); //Clean up zip after upload
+                    new File(TEMP_PATH + presentation.getDocumentID()).delete();
                 }
             } catch (IOException e) {
                 logger.error("Error uploading presentation data to Edi Server! ", e);
