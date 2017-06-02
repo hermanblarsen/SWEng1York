@@ -37,6 +37,7 @@ import org.xml.sax.InputSource;
 
 import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -682,7 +683,12 @@ public abstract class Dashboard extends Application {
 
         //Create a list of available presentations based on metadata from server
         for (PresentationMetadata presMeta : ediManager.getPresentationLibraryManager().getLocalPresentationList()) {
-            ParserXML parser = new ParserXML(PRESENTATIONS_PATH + File.separator + presMeta.getModuleName() + File.separator + presMeta.getDocumentID() + File.separator + presMeta.getDocumentID() + ".xml");
+            ParserXML parser = null;
+            try {
+                parser = new ParserXML(PRESENTATIONS_PATH + File.separator + presMeta.getModuleName() + File.separator + presMeta.getDocumentID() + File.separator + presMeta.getDocumentID() + ".xml");
+            } catch (FileNotFoundException e) {
+                logger.error("XML file not found: " + presMeta.getXml_url());
+            }
             Presentation presentation = parser.parsePresentation();
             presentation.setPresentationMetadata(presMeta);
 
@@ -1322,7 +1328,12 @@ public abstract class Dashboard extends Application {
     private void showOpenLocalPres() {
         File file = fileChooser.showOpenDialog(dashboardStage);
         if (file != null) {
-            ParserXML parserXML = new ParserXML(file.getPath());
+            ParserXML parserXML = null;
+            try {
+                parserXML = new ParserXML(file.getPath());
+            } catch (FileNotFoundException e) {
+                logger.error("XML file not found: " + file.getPath());
+            }
             launchPresentation(parserXML.parsePresentation());
         } else logger.info("No presentation was selected");
     }

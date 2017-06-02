@@ -33,6 +33,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 
 import static com.i2lp.edi.client.Constants.BASE_PATH;
 import static com.i2lp.edi.client.Constants.remoteServerAddress;
@@ -296,7 +297,12 @@ public class Login extends Application {
 
         File file = fileChooser.showOpenDialog(loginStage);
         if (file != null) {
-            ParserXML parserXML = new ParserXML(file.getPath());
+            ParserXML parserXML = null;
+            try {
+                parserXML = new ParserXML(file.getPath());
+            } catch (FileNotFoundException e) {
+                logger.error("XML file not found: " + file.getPath());
+            }
             Presentation presentation = parserXML.parsePresentation();
 
             PresentationManagerStudent presentationManager = new PresentationManagerStudent(ediManager);

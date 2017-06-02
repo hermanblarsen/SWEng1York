@@ -4,6 +4,8 @@ import com.i2lp.edi.client.managers.PresentationManagerTeacher;
 import javafx.application.Application;
 import javafx.stage.Stage;
 
+import java.io.FileNotFoundException;
+
 /**
  * Created by zain on 22/04/2017.
  */
@@ -17,7 +19,12 @@ public class AnimationIntegrationTestbench extends Application {
     @Override
     public void start(Stage primaryStage){
         PresentationManagerTeacher presentationManager = new PresentationManagerTeacher(null);
-        ParserXML parserXML = new ParserXML("file:projectResources/sampleFiles/xml/i2lpSampleXml.xml");
+        ParserXML parserXML = null;
+        try {
+            parserXML = new ParserXML("file:projectResources/sampleFiles/xml/i2lpSampleXml.xml");
+        } catch (FileNotFoundException e) {
+            //FileNotFound.eat()
+        }
 
         presentationManager.openPresentation(parserXML.parsePresentation(), false);
     }
