@@ -342,17 +342,17 @@ public abstract class SlideElement {
         webView.setPrefWidth(getSlideWidth());
         webView.setPrefHeight(getSlideHeight());
 
+        Text exitButton = GlyphsDude.createIcon(FontAwesomeIcon.CLOSE);
         Text backButton = GlyphsDude.createIcon(FontAwesomeIcon.CHEVRON_LEFT);
         Text forwardButton = GlyphsDude.createIcon(FontAwesomeIcon.CHEVRON_RIGHT);
         Text reloadButton = GlyphsDude.createIcon(FontAwesomeIcon.REFRESH);
         TextField browserLocation = new TextField(engine.getLocation());
-        Text exitButton = GlyphsDude.createIcon(FontAwesomeIcon.CLOSE);
 
         //Setup the toolbar
+        exitButton.setFill(Color.WHITE);
         backButton.setFill(Color.WHITE);
         forwardButton.setFill(Color.WHITE);
         reloadButton.setFill(Color.WHITE);
-        exitButton.setFill(Color.WHITE);
         browserLocation.setEditable(false);
 
         //Stylise the toolbar:
@@ -398,11 +398,11 @@ public abstract class SlideElement {
         exitButton.setOnMouseClicked(event -> closeEmbeddedBrowser());
 
         //Add things to the toolbar
+        browserToolbar.getChildren().add(exitButton);
         browserToolbar.getChildren().add(backButton);
         browserToolbar.getChildren().add(forwardButton);
         browserToolbar.getChildren().add(reloadButton);
         browserToolbar.getChildren().add(browserLocation);
-        browserToolbar.getChildren().add(exitButton);
 
         embeddedBrowserPane.setTop(browserToolbar);
         embeddedBrowserPane.setCenter(webView);

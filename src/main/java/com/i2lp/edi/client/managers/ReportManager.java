@@ -1,14 +1,19 @@
 package com.i2lp.edi.client.managers;
 
 import com.i2lp.edi.client.presentationElements.Presentation;
+import com.i2lp.edi.server.packets.PresentationStatisticsRecord;
 import com.i2lp.edi.server.packets.Question;
 import eu.hansolo.tilesfx.Tile;
 import eu.hansolo.tilesfx.TileBuilder;
 import eu.hansolo.tilesfx.skins.BarChartItem;
+import javafx.beans.property.ReadOnlyObjectWrapper;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
-import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
@@ -39,6 +44,8 @@ public class ReportManager {
         VBox flow = new VBox();
         HBox reportPanels = new HBox();
         ArrayList<Question> questionQueueQuestions = ediManager.getSocketClient().getQuestionsForPresentation(presentation.getPresentationMetadata().getPresentationID());
+        ArrayList<PresentationStatisticsRecord> presentationStatistics =
+                ediManager.getSocketClient().getPresentationStatistics(presentation.getPresentationMetadata().getPresentationID());
 
         Tile studentsInPresentation = TileBuilder.create()
                 .skinType(Tile.SkinType.NUMBER)
@@ -67,11 +74,22 @@ public class ReportManager {
                 .value(70)
                 .unit("\u0025")
                 .build();
-        reportPanels.getChildren().addAll(studentsInPresentation,questionsAsked,presentationParticipation);
+
+        TableView slideTimeTable = generateSlideTimesTable(presentation, presentationStatistics);
+
+
+        reportPanels.getChildren().addAll(
+                studentsInPresentation,
+                questionsAsked,
+                presentationParticipation,
+                slideTimeTable
+        );
+
         questionsAsked.addEventHandler(MouseEvent.MOUSE_CLICKED,evt-> {new ReportManager().showQuestions(questionQueueQuestions);});
         studentsInPresentation.addEventHandler(MouseEvent.MOUSE_CLICKED,evt->{new ReportManager().showStudents();});
         flow.getChildren().add(reportPanels);
         //reportPane.setContent(reportPanels);
+
         int numberOfPolls = 2;//Todo Remove this once connected to server.
         for(int i = 0;i<numberOfPolls;i++){
             int numberOfQuestions = 2+(int)Math.random()*6;
@@ -102,6 +120,37 @@ public class ReportManager {
         }
         reportPane.setContent(flow);
     }
+
+    private TableView generateSlideTimesTable(Presentation presentation, ArrayList<PresentationStatisticsRecord> presentationStatistics){
+        TableView slideTimeTable = new TableView();
+        ArrayList<TableColumn> slideTimeColumns= new ArrayList<>();
+        ArrayList<TableRow> slideTimeRows = new ArrayList<>();
+
+        //Add first column
+        TableColumn<StudentSlideTimes, String> studentColumn = new TableColumn("Student");
+        studentColumn.setCellValueFactory(data -> data.getValue().studentNameProperty());
+        slideTimeTable.getColumns().add(studentColumn);
+
+        for(int i=0; i < presentation.getMaxSlideNumber(); i++){
+            //Generate columns
+            TableColumn<StudentSlideTimes, Integer> column= new TableColumn(Integer.toString(i+1));
+            final int columnIndex = i;
+            column.setCellValueFactory(data -> data.getValue().getSlideTime(columnIndex));
+            slideTimeColumns.add(column);
+            slideTimeTable.getColumns().add(column);
+        }
+
+        //Populate the table:
+        ObservableList<StudentSlideTimes> slideTimesTableData = FXCollections.observableArrayList();
+        for (PresentationStatisticsRecord record : presentationStatistics){
+            slideTimesTableData.add(new StudentSlideTimes(record.getSlideTimes(), Integer.toString(record.getUserID())));
+        }
+
+        slideTimeTable.setItems(slideTimesTableData);
+
+        return slideTimeTable;
+    }
+
     private Tile generatePollTile(String task, int numberOfQuestions){
         PollQuestions pQ = new PollQuestions(task,numberOfQuestions);
         ArrayList<Integer> pollOutput = pQ.generatePollResults();
@@ -293,4 +342,44 @@ public class ReportManager {
             this.numberOfQuestions = numberOfQuestions;
         }
     }
+
+    //Class for the slide timing table's structure.
+    private class StudentSlideTimes{
+        private ArrayList<ObservableValue<Integer>> slideTimes = new ArrayList<>();
+        private SimpleStringProperty studentName;
+
+        public StudentSlideTimes(ArrayList<Integer> slideTimes, String studentName) {
+
+            for(Integer slideTime : slideTimes){
+                this.slideTimes.add(new ReadOnlyObjectWrapper<Integer>(slideTime));
+            }
+            this.studentName = new SimpleStringProperty(studentName);
+        }
+
+        public ArrayList<ObservableValue<Integer>> getSlideTimes() {
+            return slideTimes;
+        }
+
+        public void setSlideTimes(ArrayList<ObservableValue<Integer>> slideTimes) {
+            this.slideTimes = slideTimes;
+        }
+
+        public String getStudentName() {
+            return studentName.get();
+        }
+
+        public SimpleStringProperty studentNameProperty() {
+            return studentName;
+        }
+
+        public void setStudentName(String studentName) {
+            this.studentName.set(studentName);
+        }
+
+        public ObservableValue<Integer> getSlideTime(int slideNum){
+            return this.slideTimes.get(slideNum);
+        }
+    }
 }
+
+
