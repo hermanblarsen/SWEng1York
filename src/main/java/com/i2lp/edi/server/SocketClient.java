@@ -1136,6 +1136,52 @@ public class SocketClient {
         return statisticEntries;
     }
 
+    /**
+     * Resets all free components tied to an interactive element, setting the
+     * interactive elements non-live, and deleting all interactions linked
+     * to the element
+     * @param interactiveElementID the PK of presentation
+     * @return true successful
+     */
+    public boolean resetInteractionsForInteractiveElement(int interactiveElementID){
+        boolean statementSuccess = false;
+
+        //Attempt to add a user using stored procedure
+        try (PGConnection connection = (PGConnection) dataSource.getConnection()) {
+            PreparedStatement statement = connection.prepareStatement(
+                    "SELECT * FROM public.sp_reset_interactions_for_interactiveelement(?);");
+
+            //Fill prepared statements to avoid SQL injection
+            statement.setInt(1, interactiveElementID);
+
+            //Call stored procedure on database
+            ResultSet rs = statement.executeQuery();
+
+            String status = "failure";
+
+            while (rs.next()) {
+                status = rs.getString(1);
+            }
+
+            if (status.contains("success")) {
+                statementSuccess = true;
+                logger.info("Successfully removed interactions from interactive element.");
+            } else logger.error("Unable to reset interactions for interactive element with ID: " + interactiveElementID);
+
+            statement.close();
+        } catch (Exception e) {
+            logger.error("Unable to connect to PostgreSQL on port 5432. PJDBC dump:", e);
+        }
+        return statementSuccess;
+    }
+
+    /**
+     * Resets all free components tied to a presentation, setting the presentation
+     * and any interactive elements non-live, and deleting all interactions with
+     * the presentation.
+     * @param presentationID the PK of presentation
+     * @return true successful
+     */
     public boolean resetInteractionsForPresentation(int presentationID){
         boolean statementSuccess = false;
 
