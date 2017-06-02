@@ -76,7 +76,6 @@ public class PresentationSession {
 
         //Find interactive elementRecord with correct ID so we can retrieve its interactive_element_id PK:
         for (InteractiveElementRecord interactiveElementRecord : interactiveElementRecords) {
-            //TODO: CHECK ON SLIDE NUMBER
             if ((interactiveElementRecord.getXml_element_id() == interactiveElement.getElementID())&&(interactiveElement.getSlideID() == interactiveElementRecord.getSlide_number())) {
                 liveElementRecord = interactiveElementRecord;
                 break;

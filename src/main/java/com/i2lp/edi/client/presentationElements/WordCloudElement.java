@@ -33,6 +33,8 @@ import org.kordamp.bootstrapfx.scene.layout.Panel;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
+import java.sql.Time;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,6 +46,7 @@ import static com.i2lp.edi.client.Constants.PRESENTATIONS_PATH;
  * Created by Koen on 06/04/2017.
  */
 public class WordCloudElement extends InteractiveElement {
+    protected Time startTime;
     protected String question;
     protected Panel wordCloudPanel;
     protected List<String> wordList;
@@ -101,9 +104,8 @@ public class WordCloudElement extends InteractiveElement {
             start_Task.setAlignment(Pos.TOP_CENTER);
             //wordCloudPanel.getChildren().add(start_Task);
             start_Task.addEventHandler(MouseEvent.MOUSE_CLICKED,evt->{
-
                 wordCloudPanel.getChildren().remove(start_Task);
-                setUpWordCloudData();
+                setUpWordCloudData(new Time(Instant.now().toEpochMilli()));
                 if(ediManager.getPresentationManager().getPresentationSession() != null) {
                     ediManager.getPresentationManager().getPresentationSession().beginInteraction(this, true);
                 }
@@ -117,6 +119,9 @@ public class WordCloudElement extends InteractiveElement {
             wordCloudPanel.setBody(start_Task);
         }
 
+        //Start Time
+        //We count out from current system time
+        //And display current System time - startTime
         remainingTime = new Label("Time Remaining: " + timeLimit);
         final IntegerProperty i = new SimpleIntegerProperty(timeLimit);
         timeline = new Timeline(
@@ -149,7 +154,8 @@ public class WordCloudElement extends InteractiveElement {
         getCoreNode().addEventFilter(MouseEvent.MOUSE_CLICKED, event -> performOnClickAction());
     }
 
-    public void setUpWordCloudData(){
+    public void setUpWordCloudData(Time startTime){
+        this.startTime = startTime;
         Platform.runLater(new Runnable() {
             @Override
             public void run() {
@@ -189,7 +195,6 @@ public class WordCloudElement extends InteractiveElement {
         sendWord.setAlignment(Pos.CENTER);
         sendWord.addEventHandler(MouseEvent.MOUSE_CLICKED,evt->{
             ediManager.getPresentationManager().getStudentSession().sendResponse(this, words.getText());
-           //wordList.add(words.getText());
            words.clear();
         });
         sendWord.addEventHandler(MouseEvent.MOUSE_ENTERED,evt->{

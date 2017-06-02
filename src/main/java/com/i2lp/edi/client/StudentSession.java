@@ -76,7 +76,7 @@ public class StudentSession {
         logger.info("Live Presentation session ending. Presentation lasted " + (int) ((endDate.getTime() - startDate.getTime()) / 1000) + " seconds.");
 
         //Submit the slide times to the DB:
-        if(ediManager.getPresentationManager() != null) {
+        if (ediManager.getPresentationManager() != null) {
             ediManager.getSocketClient().sendPresentationStatistics(ediManager.getPresentationManager().getPresentationElement().getPresentationMetadata().getPresentationID(), ediManager.getUserData().getUserID(), slideTimes);
 
         }
@@ -110,14 +110,16 @@ public class StudentSession {
         for (InteractiveElementRecord interactiveElementRecord : interactiveElementsToRespondRecord) {
             if (interactiveElementRecord.isLive()) {
                 for (InteractiveElement interactiveElement : interactiveElementsInPresentation) {
-                    if (interactiveElement.getElementID() == interactiveElementRecord.getXml_element_id()) {
+                    if ((interactiveElementRecord.getXml_element_id() == interactiveElement.getElementID()) && (interactiveElement.getSlideID() == interactiveElementRecord.getSlide_number())) {
                         //Move to the slide of the teacher
                         synchroniseWithTeacher();
                         logger.info("Interactive Element: " + interactiveElement.getElementID() + " of type: " + interactiveElementRecord.getType() + " is now live." + "You have " + interactiveElement.getTimeLimit() + " seconds to respond.");
 
+
                         //Open the element for interaction
                         if (interactiveElement instanceof WordCloudElement) {
-                            ((WordCloudElement) interactiveElement).setUpWordCloudData();
+                            ((WordCloudElement) interactiveElement).setUpWordCloudData(interactiveElementRecord.getResponse_interval())
+                            ;
                         }
                         if (interactiveElement instanceof PollElement) {
                             ((PollElement) interactiveElement).setUpPollData();
