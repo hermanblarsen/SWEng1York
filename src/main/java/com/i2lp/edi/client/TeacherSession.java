@@ -112,7 +112,7 @@ public class TeacherSession {
                 if (interactiveElement instanceof WordCloudElement) {
                     if (interactionsFromStudents.isEmpty()) {
                         for (int i = 0; i < 100; i++) {
-                            elementInteractions.add("NONE");
+                            elementInteractions.add("No Response");
                         }
                         logger.error("No interactions received for Interactive Element: " + interactiveElement.getElementID());
                     }

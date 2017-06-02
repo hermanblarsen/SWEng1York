@@ -17,6 +17,7 @@ import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
@@ -26,15 +27,22 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.*;
+import javafx.scene.text.*;
+import javafx.stage.Stage;
 import javafx.util.Duration;
 import org.kordamp.bootstrapfx.scene.layout.Panel;
 
 import java.awt.*;
+import java.awt.Color;
 import java.io.File;
 import java.io.IOException;
 import java.sql.Time;
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -95,48 +103,66 @@ public class WordCloudElement extends InteractiveElement {
     @Override
     public void setupElement() {
         wordList = new ArrayList<String>();
-        wordCloudPanel = new Panel(question);
-        wordCloudPanel.getStyleClass().add("panel-primary");
+        wordCloudPanel = new Panel();
+        //wordCloudPanel.getStyleClass().add("panel-primary");
         wordCloudPanel.setStyle("-fx-background-color: #2a2a2a");
         if(teacher){
-            Button start_Task = new Button("Start");
-            start_Task.getStyleClass().setAll("btn","btn-default");
-            start_Task.setAlignment(Pos.TOP_CENTER);
-            //wordCloudPanel.getChildren().add(start_Task);
-            start_Task.addEventHandler(MouseEvent.MOUSE_CLICKED,evt->{
-                wordCloudPanel.getChildren().remove(start_Task);
+//            Button start_Task = new Button("Start");
+            Image startWordCloudTask = new Image("file:projectResources/icons/startWC.png");
+            ImageView startWordCloud = new ImageView(startWordCloudTask);
+            HBox startBox = new HBox();
+            startBox.setAlignment(Pos.CENTER);
+            startBox.getChildren().add(startWordCloud);
+//            start_Task.getStyleClass().setAll("btn","btn-default");
+//            start_Task.setAlignment(Pos.TOP_CENTER);
+//            //wordCloudPanel.getChildren().add(start_Task);
+            startWordCloud.addEventHandler(MouseEvent.MOUSE_CLICKED,evt->{
+                wordCloudPanel.getChildren().remove(startBox);
                 setUpWordCloudData(new Time(Instant.now().toEpochMilli()));
                 if(ediManager.getPresentationManager().getTeacherSession() != null) {
                     ediManager.getPresentationManager().getTeacherSession().beginInteraction(this, true);
                 }
             });
-            start_Task.addEventHandler(MouseEvent.MOUSE_ENTERED,evt->{
+            startWordCloud.addEventHandler(MouseEvent.MOUSE_ENTERED,evt->{
                 buttonActive = true;
             });
-            start_Task.addEventHandler(MouseEvent.MOUSE_EXITED,evt->{
+            startWordCloud.addEventHandler(MouseEvent.MOUSE_EXITED,evt->{
                 buttonActive = false;
             });
-            wordCloudPanel.setBody(start_Task);
+            wordCloudPanel.setBody(startBox);
         }
+
+
+    }
+
+    public void setUpWordCloudData(Time startTime){
+        this.startTime = startTime;
 
         //Start Time
         //We count out from current system time
         //And display current System time - startTime
-        remainingTime = new Label("Time Remaining: " + timeLimit);
-        final IntegerProperty i = new SimpleIntegerProperty(timeLimit);
+        //Time currentTime = new Time(Instant.now().toEpochMilli());
+        LocalTime currentTime = LocalTime.now();
+        LocalTime startTimeNew = startTime.toLocalTime();
+        int timeDifference = currentTime.getSecond()-startTimeNew.getSecond();
+        //Time timeDifference = new Time(currentTime.toInstant().getEpochSecond()-startTime.toInstant().getEpochSecond());
+        System.out.println("TD: "+timeDifference);
+        int newTimeLimit = Math.round(timeLimit-timeDifference);
+        remainingTime = new Label("Time Remaining: " + (newTimeLimit));
+        final IntegerProperty i = new SimpleIntegerProperty(newTimeLimit);
         timeline = new Timeline(
                 new KeyFrame(
                         Duration.seconds(1),
                         evt -> {
                             i.set(i.get() - 1);
-                            countdownTile.setMaxValue(timeLimit);
+                            countdownTile.setMaxValue(newTimeLimit);
                             countdownTile.setValue(i.get());
 
                         }
                 )
         );
 
-        timeline.setCycleCount(timeLimit);
+        timeline.setCycleCount(newTimeLimit);
         timeline.setOnFinished(event -> {
             ediManager.getPresentationManager().setWordCloudActive(false);
             elementActive = false;
@@ -151,19 +177,24 @@ public class WordCloudElement extends InteractiveElement {
                 .descriptionAlignment(Pos.BASELINE_RIGHT)
                 .build();
         wordCloudPanel.setVisible(visibility);
-        getCoreNode().addEventFilter(MouseEvent.MOUSE_CLICKED, event -> performOnClickAction());
-    }
+        //getCoreNode().addEventFilter(MouseEvent.MOUSE_CLICKED, event -> performOnClickAction());
 
-    public void setUpWordCloudData(Time startTime){
-        this.startTime = startTime;
         Platform.runLater(new Runnable() {
             @Override
             public void run() {
+                if(countdownTile.getValue() == 0){
+                    countdownTile.setValue(timeLimit);
+                }
+                Label wordCloudQuestion = new Label(question);
+                wordCloudQuestion.setFont(new javafx.scene.text.Font("Helvetica", 50));
+                wordCloudQuestion.setTextFill(javafx.scene.paint.Color.WHITE);
+                wordCloudQuestion.setWrapText(true);
                 elementActive = true;
                 VBox wordCloudBox = new VBox();
                 HBox dataBox = wordCloudElements();
                 dataBox.setAlignment(Pos.CENTER);
-                wordCloudBox.getChildren().addAll(countdownTile,dataBox);
+                wordCloudBox.setAlignment(Pos.CENTER);
+                wordCloudBox.getChildren().addAll(wordCloudQuestion,countdownTile,dataBox);
                 wordCloudPanel.setBody(wordCloudBox);
                 timeline.play();
             }
@@ -257,7 +288,27 @@ public class WordCloudElement extends InteractiveElement {
         Image wordCloud = new Image("file:" + PRESENTATIONS_PATH +"/"+ presentationID+"/Wordclouds/"+pathName+".png",xSize,ySize,true,true);
 
         ImageView iv = new ImageView(wordCloud);
+
+        Button reset = new Button("Reset");
+        reset.getStyleClass().setAll("btn","btn-default");
+
+        VBox wordCloudBox  = new VBox();
+        wordCloudBox.getChildren().addAll(reset,iv);
         wordCloudPanel.setBody(iv);
+
+        reset.addEventHandler(MouseEvent.MOUSE_CLICKED,evt->{
+
+        });
+    }
+
+    @Override
+    public void sendDataToServer() {
+
+    }
+
+    @Override
+    public void receiveDataFromServer() {
+
     }
 
     public int getTimeLimit() {
