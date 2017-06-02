@@ -14,6 +14,7 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.InvalidPathException;
@@ -34,7 +35,7 @@ public class ParserXML {
     private Presentation myPresentation;
     private ArrayList<String> faultsDetected = new ArrayList<>();
 
-    public ParserXML(String presentationXmlPath) throws InvalidPathException {
+    public ParserXML(String presentationXmlPath) throws InvalidPathException, FileNotFoundException {
         if (this.validateExtension(presentationXmlPath))
         {
             this.presentationXmlPath = presentationXmlPath; //Set the path if valid
@@ -45,21 +46,28 @@ public class ParserXML {
             throw new InvalidPathException(presentationXmlPath, presentationXmlPath.substring(presentationXmlPath.lastIndexOf(".") + 1));
         }
 
+        File newFile = new File(this.presentationXmlPath);
 
-        //Create a DOMParser, try parsing XML
-        xmlParser = new DOMParser(); //Equivalent to DocumentBuilder when not writing to XML
-        try {
-            xmlParser.parse(this.presentationXmlPath);
-        } catch (SAXException e) {
-            e.printStackTrace();
-            logger.warn("SAXExeption when accessing XML");
-        } catch (IOException e) {
-            e.printStackTrace();
-            logger.warn("IOExeption when accessing XML");
+        if (newFile.exists()&& !newFile.isDirectory()) {
+            //Create a DOMParser, try parsing XML
+            xmlParser = new DOMParser(); //Equivalent to DocumentBuilder when not writing to XML
+            try {
+                xmlParser.parse(this.presentationXmlPath);
+            } catch (SAXException e) {
+                e.printStackTrace();
+                logger.warn("SAXExeption when accessing XML");
+            } catch (IOException e) {
+                e.printStackTrace();
+                logger.warn("IOExeption when accessing XML");
+            }
+            xmlDocument = xmlParser.getDocument();
         }
-        xmlDocument = xmlParser.getDocument();
+        else {
+            throw new FileNotFoundException(this.presentationXmlPath);
+        }
     }
 
+    // HTTP Parser direct
     public ParserXML(InputSource input, String sourcePath){
         //Parses an XML from any InputSource.
         xmlParser = new DOMParser();

@@ -7,6 +7,7 @@ import javafx.stage.Stage;
 import org.junit.Test;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 
 import static org.junit.Assert.assertTrue;
 
@@ -23,7 +24,12 @@ public class ImageElementIntegrationTestbench extends Application{
 	public void start(Stage primaryStage){
 		PresentationManagerTeacher presentationManager = new PresentationManagerTeacher(null);
 		File file = new File("projectResources/sampleFiles/xmlTests/imageElementTestXml.xml");
-        ParserXML parserXML = new ParserXML(file.toURI().toString());
+		ParserXML parserXML = null;
+		try {
+			parserXML = new ParserXML(file.toURI().toString());
+		} catch (FileNotFoundException e) {
+			//FileNotFound.eat()
+		}
 
 		presentationManager.openPresentation(parserXML.parsePresentation(),false);
 	}

@@ -95,10 +95,6 @@ public class ModulePanel extends PreviewPanel {
         } catch (NullPointerException | IllegalArgumentException e) {
             //Do nothing
         }
-
-        if (subjectPanel != null) {
-            subjectPanel.layoutBorderPane();
-        }
     }
 
     public SubjectPanel getSubjectPanel() { return subjectPanel; }

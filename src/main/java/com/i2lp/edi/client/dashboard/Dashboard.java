@@ -37,6 +37,7 @@ import org.xml.sax.InputSource;
 
 import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -49,6 +50,7 @@ import java.util.Comparator;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static com.i2lp.edi.client.Constants.PRESENTATIONS_PATH;
+import static com.i2lp.edi.client.Constants.THUMBNAIL_WIDTH;
 import static javafx.scene.layout.BorderPane.setAlignment;
 
 
@@ -305,7 +307,6 @@ public abstract class Dashboard extends Application {
                 border.setCenter(vbox);
 
                 filterBy(filterSubjects);
-                updateModuleScrollControls();
                 break;
 
             case SEARCH_ALL:
@@ -328,7 +329,6 @@ public abstract class Dashboard extends Application {
                 border.setCenter(searchScrollPane);
 
                 filterBy(filterSubjects);
-                updateModuleScrollControls();
                 break;
 
             case MODULE:
@@ -682,7 +682,12 @@ public abstract class Dashboard extends Application {
 
         //Create a list of available presentations based on metadata from server
         for (PresentationMetadata presMeta : ediManager.getPresentationLibraryManager().getLocalPresentationList()) {
-            ParserXML parser = new ParserXML(PRESENTATIONS_PATH + File.separator + presMeta.getModuleName() + File.separator + presMeta.getDocumentID() + File.separator + presMeta.getDocumentID() + ".xml");
+            ParserXML parser = null;
+            try {
+                parser = new ParserXML(PRESENTATIONS_PATH + File.separator + presMeta.getModuleName() + File.separator + presMeta.getDocumentID() + File.separator + presMeta.getDocumentID() + ".xml");
+            } catch (FileNotFoundException e) {
+                logger.error("XML file not found: " + presMeta.getXml_url());
+            }
             Presentation presentation = parser.parsePresentation();
             presentation.setPresentationMetadata(presMeta);
 
@@ -700,7 +705,6 @@ public abstract class Dashboard extends Application {
         setupModulePanels();
         setupPresentationPanels();
         setupSchedulePanels();
-        updateModuleScrollControls();
 
         if (currentState != null) {
             if (currentState == DashboardState.SEARCH_ALL || currentState == DashboardState.TOP_LEVEL) {
@@ -765,7 +769,7 @@ public abstract class Dashboard extends Application {
                         details.setOnAction(event1 -> showDetailsWindow(modulePanel.getModule()));
                         menu.getItems().add(details);
 
-                        menu.show(modulePanel, event.getScreenX(), event.getScreenY());
+                        menu.show(dashboardStage, event.getScreenX(), event.getScreenY());
                     }
                     event.consume();
                 });
@@ -816,6 +820,12 @@ public abstract class Dashboard extends Application {
                         });
                         cMenu.getItems().add(openAndGoLive);
 
+                        MenuItem resetInteractions = new MenuItem("Reset interaction data");
+                        resetInteractions.setOnAction(resetEvent -> {
+                            //TODO: tie this to server
+                        });
+                        cMenu.getItems().add(resetInteractions);
+
                         MenuItem edit = new MenuItem("Edit");
                         edit.setOnAction(editEvent -> showPresentationEditor(presentationPanel.getPresentation().getPath()));
                         cMenu.getItems().add(edit);
@@ -835,6 +845,10 @@ public abstract class Dashboard extends Application {
                         MenuItem report = new MenuItem("Report");
                         report.setOnAction(reportEvent -> showReport(presentationPanel.getPresentation()));
                         cMenu.getItems().add(report);
+
+                        MenuItem details = new MenuItem("Details");
+                        details.setOnAction(detailsEvent -> showDetailsWindow(presentationPanel.getPresentation()));
+                        cMenu.getItems().add(details);
 
                     }
                     cMenu.show(dashboardStage, event.getScreenX(), event.getScreenY());
@@ -988,9 +1002,12 @@ public abstract class Dashboard extends Application {
         MenuItem openRemote = new MenuItem(OPEN_REMOTE_PRES_CAPTION);
         openRemote.setOnAction(event -> showOpenRemotePres(""));
         openPresMenu.getItems().addAll(openLocal, openRemote);
-        MenuItem upload = new MenuItem("Upload presentation to server");
-        upload.setOnAction(event -> showAddPresToServer());
-        fileMenu.getItems().add(upload);
+
+        if (this instanceof TeacherDashboard) {
+            MenuItem upload = new MenuItem("Upload presentation to server");
+            upload.setOnAction(event -> showAddPresToServer());
+            fileMenu.getItems().add(upload);
+        }
 
         Menu viewMenu = new Menu("View");
         MenuItem showWelcomeMessage = new MenuItem("Show Welcome Message");
@@ -1267,6 +1284,76 @@ public abstract class Dashboard extends Application {
         new PresentationEditor(presentationPath);
     }
 
+    private void showDetailsWindow(Presentation presentation) {
+        Popup detailsPopup = new Popup();
+
+        GridPane detailsPane = new GridPane();
+        detailsPane.setBackground(new Background(new BackgroundFill(Color.WHITE, new CornerRadii(5), null)));
+        detailsPane.setPadding(new Insets(10));
+        detailsPane.setEffect(new DropShadow());
+        detailsPane.setAlignment(Pos.CENTER);
+        detailsPane.getColumnConstraints().add(new ColumnConstraints(100));
+        detailsPane.getColumnConstraints().add(new ColumnConstraints(200));
+        detailsPopup.getContent().add(detailsPane);
+
+        Label name = new Label(presentation.getDocumentTitle());
+        name.getStyleClass().add("h4");
+        name.setPadding(new Insets(5));
+        GridPane.setHalignment(name, HPos.CENTER);
+        detailsPane.add(name, 0, 0, 2, 1);
+
+        Label authorLabel = new Label("Author: ");
+        authorLabel.setPadding(new Insets(5));
+        GridPane.setValignment(authorLabel, VPos.TOP);
+        detailsPane.add(authorLabel, 0, 1);
+
+        Label author = new Label(presentation.getAuthor());
+        author.setPadding(new Insets(5));
+        detailsPane.add(author, 1, 1);
+
+        Label moduleLabel = new Label("Module: ");
+        moduleLabel.setPadding(new Insets(5));
+        GridPane.setValignment(moduleLabel, VPos.TOP);
+        detailsPane.add(moduleLabel, 0, 2);
+
+        Label module = new Label(presentation.getModule().getModuleName());
+        module.setPadding(new Insets(5));
+        detailsPane.add(module, 1, 2);
+
+        Label subjectLabel = new Label("Subject: ");
+        subjectLabel.setPadding(new Insets(5));
+        GridPane.setValignment(subjectLabel, VPos.TOP);
+        detailsPane.add(subjectLabel, 0, 3);
+
+        Label subject = new Label(presentation.getSubject().getSubjectName());
+        subject.setPadding(new Insets(5));
+        detailsPane.add(subject, 1, 3);
+
+        Label descriptionLabel = new Label("Description: ");
+        descriptionLabel.setPadding(new Insets(5));
+        GridPane.setValignment(descriptionLabel, VPos.TOP);
+        detailsPane.add(descriptionLabel, 0, 4);
+
+        Text description = new Text(presentation.getDescription());
+        StackPane descriptionPane = new StackPane(description);
+        descriptionPane.setPadding(new Insets(5));
+        descriptionPane.setAlignment(Pos.TOP_LEFT);
+        description.setWrappingWidth(200);
+        detailsPane.add(descriptionPane, 1, 4);
+
+        Label tagsLabel = new Label("Tags: ");
+        tagsLabel.setPadding(new Insets(5));
+        GridPane.setValignment(tagsLabel, VPos.TOP);
+        detailsPane.add(tagsLabel, 0, 5);
+
+        Label tags = new Label(presentation.getTags());
+        tags.setPadding(new Insets(5));
+        detailsPane.add(tags, 1, 5);
+
+        detailsPopup.setAutoHide(true);
+        detailsPopup.show(dashboardStage);
+    }
+
     private void showDetailsWindow(DashModule module) {
         Popup detailsPopup = new Popup();
 
@@ -1310,10 +1397,6 @@ public abstract class Dashboard extends Application {
         detailsPopup.show(dashboardStage);
     }
 
-    private void printPresentation(Presentation presentation) {
-        ThumbnailGenerationManager.generateSlideThumbnails(presentation, true);
-    }
-
     private void showReport(Presentation presentation) {
         ReportManager rm = new ReportManager();
         rm.openReportPanel(presentation, ediManager);
@@ -1322,7 +1405,12 @@ public abstract class Dashboard extends Application {
     private void showOpenLocalPres() {
         File file = fileChooser.showOpenDialog(dashboardStage);
         if (file != null) {
-            ParserXML parserXML = new ParserXML(file.getPath());
+            ParserXML parserXML = null;
+            try {
+                parserXML = new ParserXML(file.getPath());
+            } catch (FileNotFoundException e) {
+                logger.error("XML file not found: " + file.getPath());
+            }
             launchPresentation(parserXML.parsePresentation());
         } else logger.info("No presentation was selected");
     }
@@ -1402,10 +1490,12 @@ public abstract class Dashboard extends Application {
         rootPane.setCenter(addToServerGridPane);
 
         addToServerGridPane.setHgap(10);
-        addToServerGridPane.setVgap(10);
+        addToServerGridPane.setVgap(5);
         addToServerGridPane.setPadding(new Insets(10));
-        Scene addToServerScene = new Scene(rootPane, Constants.THUMBNAIL_WIDTH + 20, 200);
+        Scene addToServerScene = new Scene(rootPane, THUMBNAIL_WIDTH + 20, 200);
         addToServerScene.getStylesheets().add("bootstrapfx.css");
+
+        Label filename = new Label("No file selected");
 
         Button selectXML = new Button("Select XML");
         selectXML.getStyleClass().setAll("btn", "btn-primary");
@@ -1413,41 +1503,47 @@ public abstract class Dashboard extends Application {
             File file = fileChooser.showOpenDialog(addToServerStage);
             if (file != null) {
                 xmlLocation.set(file);
+                filename.setText(file.getName());
+            } else {
+                filename.setText("No file selected");
             }
         });
         addToServerGridPane.add(selectXML, 0, 0);
         GridPane.setConstraints(selectXML, 0, 0, 1, 1, HPos.CENTER, VPos.CENTER);
 
+        addToServerGridPane.add(filename, 0, 1);
+        GridPane.setConstraints(filename, 0, 1, 1, 1, HPos.CENTER, VPos.CENTER);
+
         Label saveInModule = new Label("Save in module:");
-        addToServerGridPane.add(saveInModule, 0, 1);
-        GridPane.setConstraints(saveInModule, 0, 1, 1, 1, HPos.CENTER, VPos.CENTER);
+        saveInModule.setPadding(new Insets(10, 0, 0, 0));
+        addToServerGridPane.add(saveInModule, 0, 2);
+        GridPane.setConstraints(saveInModule, 0, 2, 1, 1, HPos.CENTER, VPos.CENTER);
 
         ComboBox<DashModule> modulesCombo = new ComboBox<>();
         modulesCombo.getItems().addAll(availableModules);
-        addToServerGridPane.add(modulesCombo, 0, 2);
-        GridPane.setConstraints(modulesCombo, 0, 2, 1, 1, HPos.CENTER, VPos.CENTER);
+        addToServerGridPane.add(modulesCombo, 0, 3);
+        GridPane.setConstraints(modulesCombo, 0, 3, 1, 1, HPos.CENTER, VPos.CENTER);
 
         Button addButton = new Button("Add");
+        addButton.setAlignment(Pos.CENTER);
         addButton.getStyleClass().setAll("btn", "btn-success");
         addButton.setOnAction(event1 -> {
             ediManager.getPresentationLibraryManager().uploadPresentation(xmlLocation.get().getAbsolutePath(), modulesCombo.getValue().getModuleID());
             addToServerStage.close();
         });
-        addToServerGridPane.add(addButton, 0, 3);
-        GridPane.setConstraints(addButton, 0, 3, 1, 1, HPos.CENTER, VPos.CENTER);
+        addToServerGridPane.add(addButton, 0, 7);
+        GridPane.setConstraints(addButton, 0, 7, 1, 1, HPos.CENTER, VPos.CENTER);
 
         addToServerStage.setScene(addToServerScene);
         addToServerStage.show();
     }
 
-    public void setEdiManager(EdiManager ediManager) {
-        this.ediManager = ediManager;
+    private void printPresentation(Presentation presentation) {
+        ThumbnailGenerationManager.generateSlideThumbnails(presentation, true);
     }
 
-    private void updateModuleScrollControls() {
-        for (SubjectPanel panel : subjectPanels) {
-            panel.updateScrollControls();
-        }
+    public void setEdiManager(EdiManager ediManager) {
+        this.ediManager = ediManager;
     }
 }
 

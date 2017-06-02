@@ -5,6 +5,9 @@ import com.i2lp.edi.client.presentationElements.Slide;
 import com.i2lp.edi.client.presentationElements.TextElement;
 import javafx.concurrent.Task;
 import javafx.embed.swing.SwingFXUtils;
+import javafx.geometry.Point2D;
+import javafx.geometry.Pos;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.image.WritableImage;
@@ -40,14 +43,13 @@ public class ThumbnailGenerationManager extends PresentationManager {
     private static Logger logger = LoggerFactory.getLogger(ThumbnailGenerationManager.class);
     private File thumbnailFile;
 
-    public ThumbnailGenerationManager(EdiManager ediManager) {
-        super(ediManager);
-    }
+    public ThumbnailGenerationManager(EdiManager ediManager) { super(ediManager); }
 
     public void openPresentation(Presentation presentation, boolean printToggle) {
         this.presentationElement = presentation;
         presentationStage = new Stage();
         displayPane = new StackPane();
+        displayPane.setAlignment(Pos.TOP_LEFT);
         //Lower resolution for thumbnails
         if (!printToggle) {
             scene = new Scene(displayPane, THUMBNAIL_GEN_WIDTH, THUMBNAIL_GEN_HEIGHT);
@@ -155,7 +157,11 @@ public class ThumbnailGenerationManager extends PresentationManager {
         {
             logger.info("Generating thumbnail file for " + presentation.getDocumentID() + " Slide " + (slideGenController.currentSlideNumber) + " at " + thumbnailFile.getAbsolutePath());
             Slide slideToRender = presentation.getSlide(slideGenController.currentSlideNumber);
-            WritableImage thumbnail = slideToRender.snapshot(new SnapshotParameters(), new WritableImage((int) slideToRender.getWidth(), (int) slideToRender.getHeight()));
+            SnapshotParameters snapParam = new SnapshotParameters();
+            Point2D upperLeft = slideToRender.sceneToLocal(0, 0);
+            Point2D lowerRight = slideToRender.sceneToLocal(slideToRender.getWidth(), slideToRender.getHeight());
+            snapParam.setViewport(new Rectangle2D(upperLeft.getX(), upperLeft.getY(), lowerRight.getX(), lowerRight.getY()));
+            WritableImage thumbnail = slideToRender.snapshot(snapParam, null);
             try {
                 //Write the snapshot to the chosen file
                 ImageIO.write(SwingFXUtils.fromFXImage(thumbnail, null), "png", thumbnailFile);

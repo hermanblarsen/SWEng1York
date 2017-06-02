@@ -248,6 +248,70 @@ public class SocketClient {
         return "USER_ADD_FAILED";
     }
 
+    public ArrayList<User> getStudentsForModule(int moduleId) {
+        ArrayList<User> associatedUsers = new ArrayList<>();
+
+        // First get find what module a presentation belongs to.
+        // Then find all the users which have access to that module.
+        try (PGConnection connection = (PGConnection) dataSource.getConnection()) {
+            PreparedStatement getUsersForModuleStatement = connection.prepareStatement("SELECT * FROM jnct_users_modules WHERE module_id = ?;");
+
+            getUsersForModuleStatement.setInt(1, moduleId);
+
+            //Query the database
+            ResultSet rs = getUsersForModuleStatement.executeQuery();
+
+            //Handle results
+            while (rs.next()) {
+            	associatedUsers.add(getUser(rs.getInt("user_id")));
+            }
+
+            if (associatedUsers.size() == 0) {
+                logger.warn("Module " + moduleId + "Didn't return any users.  Does it exist?");
+            }
+
+            getUsersForModuleStatement.close();
+        } catch (SQLException e) {
+            logger.error("Unable to connect to PostgreSQL on port 5432. PJDBC dump:", e);
+        }
+
+        return associatedUsers;
+    }
+
+    //Gets most of a User entry (Doesn't get password or salt)
+    public User getUser(int userId){
+        User retrievedUser = null;
+
+        try (PGConnection connection = (PGConnection) dataSource.getConnection()) {
+            PreparedStatement statement = connection.prepareStatement("SELECT user_id,user_type,username,first_name,last_name,email_address FROM users WHERE user_id=?;");
+
+            //Fill prepared statements to avoid SQL injection
+            statement.setInt(1, userId);
+
+            //Call stored procedure on database
+            ResultSet rs = statement.executeQuery();
+
+            if (rs.next()) {
+                retrievedUser = new User(rs.getInt("user_id"),
+                        rs.getString("first_name"),
+                        rs.getString("last_name"),
+                        rs.getString("email_address"),
+                        rs.getString("user_type")
+                );
+                logger.error("Retrieved User " + userId);
+            } else {
+                logger.info("Failed to retrieve user with Id " + userId);
+            }
+
+            statement.close();
+        } catch (Exception e) {
+            logger.error("Unable to connect to PostgreSQL on port 5432. PJDBC dump:", e);
+        }
+
+        return retrievedUser;
+    }
+
+
     class UserAuthTask implements Callable<User> {
         UserAuth toAuth;
 

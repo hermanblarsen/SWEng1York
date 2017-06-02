@@ -6,6 +6,8 @@ import javafx.application.Application;
 import javafx.stage.Stage;
 import org.junit.Test;
 
+import java.io.FileNotFoundException;
+
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -21,7 +23,12 @@ public class AudioElementIntegrationTestbench extends Application {
     @Override
     public void start(Stage primaryStage){
         PresentationManagerTeacher presentationManager = new PresentationManagerTeacher(null);
-        ParserXML parserXML = new ParserXML("file:projectResources/sampleFiles/xmlTests/audioElementTest.xml");
+        ParserXML parserXML = null;
+        try {
+            parserXML = new ParserXML("file:projectResources/sampleFiles/xmlTests/audioElementTest.xml");
+        } catch (FileNotFoundException e) {
+            //FileNotFound.eat()
+        }
 
         presentationManager.openPresentation(parserXML.parsePresentation(),false);
     }

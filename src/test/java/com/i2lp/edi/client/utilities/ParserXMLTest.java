@@ -11,6 +11,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.FileNotFoundException;
 import java.nio.file.InvalidPathException;
 import java.util.ArrayList;
 
@@ -234,7 +235,12 @@ public class ParserXMLTest {
 
     @Test
     public void testFaultyXml(){
-        ParserXML faultyParserXML = new ParserXML("projectResources/sampleFiles/xmlTests/faultyTestXml.xml");
+        ParserXML faultyParserXML = null;
+        try {
+            faultyParserXML = new ParserXML("projectResources/sampleFiles/xmlTests/faultyTestXml.xml");
+        } catch (FileNotFoundException e) {
+            //FileNotFound.eat()
+        }
         Presentation faultyPresentation;
         logger.info("Testing Faulty XML document: ...");
         faultyPresentation = faultyParserXML.parsePresentation();
@@ -243,7 +249,12 @@ public class ParserXMLTest {
 
     @Test
     public void testEmptyXml(){
-        ParserXML faultyParserXML = new ParserXML("projectResources/sampleFiles/xmlTests/emptyTestXml.xml");
+        ParserXML faultyParserXML = null;
+        try {
+            faultyParserXML = new ParserXML("projectResources/sampleFiles/xmlTests/emptyTestXml.xml");
+        } catch (FileNotFoundException e) {
+            //FileNotFound.eat()
+        }
         Presentation faultyPresentation = null;
         logger.info("Testing Empty XML document: ...");
         faultyPresentation = faultyParserXML.parsePresentation();

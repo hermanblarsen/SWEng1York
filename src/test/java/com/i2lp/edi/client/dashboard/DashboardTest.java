@@ -17,6 +17,7 @@ import org.testfx.api.FxToolkit;
 import org.testfx.framework.junit.ApplicationTest;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.concurrent.TimeoutException;
 
@@ -362,7 +363,12 @@ public abstract class DashboardTest extends ApplicationTest {
         push(KeyCode.ENTER);
 
         File file = new File("projectResources/sampleFiles/xml/sampleXmlSimple.xml");
-        ParserXML parser = new ParserXML("projectResources/sampleFiles/xml/sampleXmlSimple.xml");
+        ParserXML parser = null;
+        try {
+            parser = new ParserXML("projectResources/sampleFiles/xml/sampleXmlSimple.xml");
+        } catch (FileNotFoundException e) {
+            //FileNotFound.eat()
+        }
         Presentation pres = parser.parsePresentation();
 
         assertEquals(pres.getDocumentTitle(), myDashboard.presentationManager.getPresentationElement().getDocumentTitle());

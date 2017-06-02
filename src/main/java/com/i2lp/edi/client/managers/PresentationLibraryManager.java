@@ -269,7 +269,13 @@ public class PresentationLibraryManager {
     }
 
     public void uploadPresentation(String fileToUpload, int moduleID) {
-        ParserXML parserXML = new ParserXML(fileToUpload);
+        ParserXML parserXML = null;
+        try {
+            parserXML = new ParserXML(fileToUpload);
+        } catch (FileNotFoundException e) {
+            logger.error("XML file not found: " + fileToUpload);
+        }
+
         Presentation presentation = parserXML.parsePresentation();
         //Generate thumbnails for Slides.
         ThumbnailGenerationManager.generateSlideThumbnails(presentation, false);
