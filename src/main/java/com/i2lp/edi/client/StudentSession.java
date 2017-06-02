@@ -76,7 +76,10 @@ public class StudentSession {
         logger.info("Live Presentation session ending. Presentation lasted " + (int) ((endDate.getTime() - startDate.getTime()) / 1000) + " seconds.");
 
         //Submit the slide times to the DB:
-        ediManager.getSocketClient().sendPresentationStatistics(ediManager.getPresentationManager().getPresentationElement().getPresentationMetadata().getPresentationID(), ediManager.getUserData().getUserID(), slideTimes);
+        if(ediManager.getPresentationManager() != null) {
+            ediManager.getSocketClient().sendPresentationStatistics(ediManager.getPresentationManager().getPresentationElement().getPresentationMetadata().getPresentationID(), ediManager.getUserData().getUserID(), slideTimes);
+
+        }
     }
 
     public void setPresentationLink(boolean setLink) {

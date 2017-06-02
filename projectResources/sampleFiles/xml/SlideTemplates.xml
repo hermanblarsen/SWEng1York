@@ -1,10 +1,10 @@
-<document documentid="SlideTemplates">
+<document documentid="SalesPresentation">
 	<documentdetails>
 		<title>Sales Presentation</title>
 		<author>Herman Larsen</author>
 		<version>1.0</version>
 		<documentaspectratio>1.33</documentaspectratio>
-		<description>Templates for Sides</description>
+		<description>A sales presentation for Edi, developed by I2LP throughout the third year at University of York in a module called Software Engineering</description>
 		<tags>sales,presentation,Edi,I2LP</tags>
 		<groupformat>2</groupformat>
 	</documentdetails>
