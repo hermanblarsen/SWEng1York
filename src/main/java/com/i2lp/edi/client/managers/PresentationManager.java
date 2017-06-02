@@ -831,7 +831,7 @@ public abstract class PresentationManager {
         }
         presentationToAdvance.setCurrentSlide(presentationToAdvance.getSlideList().get(currentSlideNumber));
 
-        if ((presentationToAdvance.getCurrentSlide().getCurrentSequenceNumber() == 0) && (currentSlideNumber != 0)&&(!(presentationToAdvance.getSlide(currentSlideNumber).getSlideElementList().size() == 0)))
+        if ((presentationToAdvance.getCurrentSlide().getCurrentSequenceNumber() == 0) && (currentSlideNumber != 0) && (!(presentationToAdvance.getSlide(currentSlideNumber).getSlideElementList().size() == 0)))
             slideAdvance(presentationToAdvance, direction);
 
         if (commentPanel != null) commentPanel.setSlide(this.presentationElement.getCurrentSlide());
@@ -864,8 +864,10 @@ public abstract class PresentationManager {
 
                 for (SlideElement toCheckVisible : checkInVisibleSet) {
                     if (slideToAdvance.getVisibleSlideElementList().contains(toCheckVisible)) {
-                        slideToAdvance.getVisibleSlideElementList().remove(toCheckVisible);
-                        toCheckVisible.removeElement();
+                        if (!(toCheckVisible instanceof InteractiveElement)) {
+                            slideToAdvance.getVisibleSlideElementList().remove(toCheckVisible);
+                            toCheckVisible.removeElement();
+                        }
                     }
                 }
             } catch (SequenceNotFoundException e) {
@@ -894,7 +896,7 @@ public abstract class PresentationManager {
                     elementToAnimate.setForceMute(true);
                 }
                 elementToAnimate.renderElement(Animation.ENTRY_ANIMATION); //Entry Sequence
-            } else if ((elementToAnimate.getEndSequence() == slideToAdvance.getCurrentSequenceNumber())&&(!isThumbnailGen)) {
+            } else if ((elementToAnimate.getEndSequence() == slideToAdvance.getCurrentSequenceNumber()) && (!isThumbnailGen)) {
                 if (((elementToAnimate instanceof AudioElement || elementToAnimate instanceof VideoElement) && studentSession != null) || this instanceof ThumbnailGenerationManager) {
                     elementToAnimate.setForceMute(true);
                 }
@@ -981,7 +983,6 @@ public abstract class PresentationManager {
         }
         presentationStage.close();
     }
-
 
 
     protected void displayCurrentSlide() {
