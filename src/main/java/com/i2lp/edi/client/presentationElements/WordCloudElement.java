@@ -194,7 +194,11 @@ public class WordCloudElement extends InteractiveElement {
         sendWord = new Button("Send Word");
         sendWord.setAlignment(Pos.CENTER);
         sendWord.addEventHandler(MouseEvent.MOUSE_CLICKED,evt->{
-            ediManager.getPresentationManager().getStudentSession().sendResponse(this, words.getText());
+            if((ediManager.getPresentationManager().getTeacherSession()) != null){
+                ediManager.getPresentationManager().getTeacherSession().sendResponse(this, words.getText());
+            } else if((ediManager.getPresentationManager().getStudentSession() != null)){
+                ediManager.getPresentationManager().getStudentSession().sendResponse(this, words.getText());
+            }
            words.clear();
         });
         sendWord.addEventHandler(MouseEvent.MOUSE_ENTERED,evt->{
@@ -205,8 +209,11 @@ public class WordCloudElement extends InteractiveElement {
         });
         words.addEventHandler(KeyEvent.KEY_PRESSED,keyEvent->{
             if(keyEvent.getCode().equals(KeyCode.ENTER)){
-                //wordList.add(words.getText());
-                ediManager.getPresentationManager().getStudentSession().sendResponse(this, words.getText());
+                if((ediManager.getPresentationManager().getTeacherSession()) != null){
+                    ediManager.getPresentationManager().getTeacherSession().sendResponse(this, words.getText());
+                } else if((ediManager.getPresentationManager().getStudentSession() != null)){
+                    ediManager.getPresentationManager().getStudentSession().sendResponse(this, words.getText());
+                }
                 words.clear();
             }
         });
