@@ -49,10 +49,10 @@ public class ThumbnailGenerationManager extends PresentationManager {
         presentationStage = new Stage();
         displayPane = new StackPane();
         //Lower resolution for thumbnails
-        if(!printToggle) {
+        if (!printToggle) {
             scene = new Scene(displayPane, THUMBNAIL_GEN_WIDTH, THUMBNAIL_GEN_HEIGHT);
-        }else{
-            scene = new Scene(displayPane,PRINT_WIDTH_300DPI,PRINT_HEIGHT_300DPI);
+        } else {
+            scene = new Scene(displayPane, PRINT_WIDTH_300DPI, PRINT_HEIGHT_300DPI);
         }
         presentationStage.setScene(scene);
         presentationStage.show();
@@ -63,13 +63,16 @@ public class ThumbnailGenerationManager extends PresentationManager {
     }
 
     @Override
-    protected void loadSpecificFeatures() {}//Empty
+    protected void loadSpecificFeatures() {
+    }//Empty
 
     @Override
-    protected void toggleCommentsWindow() {}//Empty
+    protected void toggleCommentsWindow() {
+    }//Empty
 
     @Override
-    protected void createCommentPanel() {}//Empty
+    protected void createCommentPanel() {
+    }//Empty
 
     @Override
     protected VBox addQuestionQueueControls() {
@@ -80,16 +83,20 @@ public class ThumbnailGenerationManager extends PresentationManager {
         ThumbnailGenerationManager slideGenController = new ThumbnailGenerationManager(null);
         slideGenController.openPresentation(presentation, savePresentationToPdf);
         slideGenController.generateSlideThumbNail(slideGenController, savePresentationToPdf);
-        if(savePresentationToPdf) slideGenController.savePresentationToPdf();
+        if (savePresentationToPdf) slideGenController.savePresentationToPdf();
     }
 
     public void generateSlideThumbNail(ThumbnailGenerationManager slideGenController, boolean savePresentationToPdf) {
         Presentation presentation = slideGenController.presentationElement;
 
         //Check if thumbnail already there
-        if(!savePresentationToPdf) {
-            thumbnailFile = new File(PRESENTATIONS_PATH + File.separator + presentation.getModule().getModuleName() + File.separator + this.presentationElement.getDocumentID() + "/Thumbnails/" + "slide" + (slideGenController.currentSlideNumber) + "_thumbnail.png");
-        }else{
+        if (!savePresentationToPdf) {
+            if (slideGenController.presentationElement.getPresentationMetadata() != null) {
+                thumbnailFile = new File(PRESENTATIONS_PATH + File.separator + presentation.getModule().getModuleName() + File.separator + this.presentationElement.getDocumentID() + "/Thumbnails/" + "slide" + (slideGenController.currentSlideNumber) + "_thumbnail.png");
+            } else {
+                thumbnailFile = new File(TEMP_PATH + slideGenController.getPresentationElement().getDocumentID() + "/Thumbnails/" + "slide" + (slideGenController.currentSlideNumber) + "_thumbnail.png");
+            }
+        } else {
             thumbnailFile = new File(PRESENTATIONS_PATH + File.separator + presentation.getModule().getModuleName() + File.separator + this.presentationElement.getDocumentID() + "/Print/" + "slide" + (slideGenController.currentSlideNumber) + "_thumbnail.png");
 
         }
@@ -109,7 +116,7 @@ public class ThumbnailGenerationManager extends PresentationManager {
 
         //Move to end of current slide so all elements are visible in snapshot
         //noinspection StatementWithEmptyBody
-        while (slideGenController.slideAdvance(presentation, Slide.SLIDE_FORWARD) != Presentation.SLIDE_LAST_ELEMENT);
+        while (slideGenController.slideAdvance(presentation, Slide.SLIDE_FORWARD) != Presentation.SLIDE_LAST_ELEMENT) ;
         //If we're in last element of slide, take snapshot
         displayCurrentSlide();
 
@@ -185,7 +192,7 @@ public class ThumbnailGenerationManager extends PresentationManager {
         File pdfPath = fileChooser.showSaveDialog(testStage);
 
 
-        if(pdfPath == null){
+        if (pdfPath == null) {
             logger.info("Invalid path entered! PDF Not Generated");
         }
         if (pdfPath != null) {

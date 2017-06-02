@@ -63,20 +63,6 @@ public class PresentationLibraryManager {
     }
 
     /**
-     * Get list of modules that has been retrieved by server strings
-     * @return List of modules
-     */
-    public ArrayList<String> getUserModuleListString() {
-        ArrayList<String> userModuleListString = new ArrayList<>();
-
-        for(Module module : userModuleList){
-            userModuleListString.add(module.getModule_name());
-        }
-
-        return userModuleListString;
-    }
-
-    /**
      * Update local presentation list with all available on server. Called whenever a presentation is added or goes live.
      */
     @SuppressWarnings("unchecked")
@@ -238,18 +224,18 @@ public class PresentationLibraryManager {
         return status;
     }
 
-    public void uploadPresentation(String fileToUpload, String filename, int moduleID) {
-
+    public void uploadPresentation(String fileToUpload, int moduleID) {
         ParserXML parserXML = new ParserXML(fileToUpload); //TODO: @Amrik Can this entire method be refactored to take a Presentation as an argument instead fileToUpload?
         Presentation presentation = parserXML.parsePresentation();
         //Generate thumbnails for Slides.
         ThumbnailGenerationManager.generateSlideThumbnails( presentation,false);
+
         try {
-            FileUtils.copyFile(new File(fileToUpload), new File(PRESENTATIONS_PATH + filename + File.separator + filename + ".xml"));
+            FileUtils.copyFile(new File(fileToUpload), new File(TEMP_PATH + presentation.getDocumentID() + File.separator + presentation.getDocumentID() + ".xml"));
         } catch (IOException e) {
-            logger.error("Unable to copy XML file into local presentation library.", e);
+            logger.error("Unable to copy XML file into local temporary directory.", e);
         }
-        final String zipPath = TEMP_PATH + filename + ".zip";
+        final String zipPath = TEMP_PATH + presentation.getDocumentID() + ".zip";
 
         //Create zip after thumbnail and CSS generation are done-
         Task zipCreationTask = new Task() {
@@ -257,7 +243,7 @@ public class PresentationLibraryManager {
             protected Object call() throws Exception {
                 try {
                     Thread.sleep(2000); //Wait for thumbnails to be generated TODO: replace with checker for numFiles (y)
-                    new ZipUtils(PRESENTATIONS_PATH + filename, zipPath);
+                    new ZipUtils(TEMP_PATH + presentation.getDocumentID(), zipPath);
                     return null;
                 } catch (InterruptedException e) {
                     logger.error("Unable to sleep on Zip generation thread.");
@@ -280,15 +266,15 @@ public class PresentationLibraryManager {
                 //Upload file using an InputStream
                 File localFile = new File(zipPath);
 
-                String remoteFile = "Uploads/" + filename + ".zip";
+                String remoteFile = "Uploads/" + presentation.getDocumentID() + ".zip";
                 InputStream inputStream = new FileInputStream(localFile);
-                logger.info("Start uploading " + filename + " data");
+                logger.info("Start uploading " + presentation.getDocumentID() + " data");
 
                 boolean done = ftpClient.storeFile(remoteFile, inputStream);
                 inputStream.close();
                 if (done) {
                     logger.info("The presentation has uploaded successfully. Awaiting server-side processing.");
-                    socketClient.alertServerToUpload(filename, moduleID, presentation); //Tell server a new file has arrived
+                    socketClient.alertServerToUpload(presentation.getDocumentID(), moduleID, presentation); //Tell server a new file has arrived
                     new File(zipPath).delete(); //Clean up zip after upload
                 }
             } catch (IOException e) {

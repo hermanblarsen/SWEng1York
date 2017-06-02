@@ -394,6 +394,8 @@ public class ParserXML {
                 //Find the element name and its content, and store this in the textElement
                 String elementName = elementNode.getNodeName();
                 String elementContent = elementNode.getTextContent();
+                //Needed for CSS Gen
+                textElement.setPresentation(myPresentation);
 
                 switch (elementName){
                     case "textcontent":

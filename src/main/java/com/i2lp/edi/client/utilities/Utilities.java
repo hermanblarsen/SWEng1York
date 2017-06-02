@@ -61,7 +61,13 @@ public class Utilities {
      * @author Amrik Sadhra
      */
     public static String cssGen(String presentationID, String moduleName, int slideID, int elementID, int fontSize, String font, String fontColour, String bgColor, String borderColour, int borderSize, boolean hasBorder) {
-        File cssFilePath = new File(PRESENTATIONS_PATH + File.separator + moduleName + File.separator + presentationID + "/CSS/" + "Slide" + slideID + "Element" + elementID + "format.css");
+        File cssFilePath;
+
+        if(moduleName.equals("Temp")) {
+            cssFilePath = new File(TEMP_PATH + presentationID + File.separator + "CSS/" + "Slide" + slideID + "Element" + elementID + "format.css");
+        } else {
+            cssFilePath = new File(PRESENTATIONS_PATH + File.separator + moduleName + File.separator + presentationID + "/CSS/" + "Slide" + slideID + "Element" + elementID + "format.css");
+        }
 
         if (!cssFilePath.exists()) cssFilePath.getParentFile().mkdirs(); //Create directory structure if not present yet
 

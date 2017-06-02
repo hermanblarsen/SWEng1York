@@ -39,7 +39,6 @@ public abstract class SlideElement {
 
 
     protected EdiManager ediManager;
-
     protected float duration = -1;
     protected int slideID; //Needed for CSS generation, CSS filename needs this to identify what to apply
 

@@ -12,7 +12,6 @@ import com.i2lp.edi.server.packets.Module;
 import com.i2lp.edi.server.packets.PresentationMetadata;
 import com.sun.javafx.scene.control.skin.DatePickerSkin;
 import javafx.application.Application;
-import javafx.application.Platform;
 import javafx.geometry.*;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -50,7 +49,6 @@ import java.util.Comparator;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static com.i2lp.edi.client.Constants.PRESENTATIONS_PATH;
-import static com.i2lp.edi.client.utilities.Utilities.removeFileExtension;
 import static javafx.scene.layout.BorderPane.setAlignment;
 
 
@@ -1424,7 +1422,7 @@ public abstract class Dashboard extends Application {
         Button addButton = new Button("Add");
         addButton.getStyleClass().setAll("btn", "btn-success");
         addButton.setOnAction(event1 -> {
-            ediManager.getPresentationLibraryManager().uploadPresentation(xmlLocation.get().getAbsolutePath(), removeFileExtension(xmlLocation.get().getName()), modulesCombo.getValue().getModuleID());
+            ediManager.getPresentationLibraryManager().uploadPresentation(xmlLocation.get().getAbsolutePath(), modulesCombo.getValue().getModuleID());
             addToServerStage.close();
         });
         addToServerGridPane.add(addButton, 0, 3);
