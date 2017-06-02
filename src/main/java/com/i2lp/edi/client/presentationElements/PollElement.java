@@ -80,8 +80,6 @@ public class PollElement extends InteractiveElement {
         questionPane.setTranslateY(slideHeight * yPosition);
 
         getCoreNode().addEventHandler(MouseEvent.MOUSE_CLICKED, evt -> {
-            System.out.println("BA: "+ buttonActive);
-            System.out.println("EA: "+elementActive);
             if (this.isElementActive() == false && this.isButtonActive() == false) {
                 performOnClickAction();
             }
@@ -151,7 +149,6 @@ public class PollElement extends InteractiveElement {
             questionPane.setBody(startBox);
         }
         questionPane.setVisible(visibility);
-        //getCoreNode().addEventFilter(MouseEvent.MOUSE_CLICKED, event -> performOnClickAction());
     }
 
     @Override
@@ -176,7 +173,6 @@ public class PollElement extends InteractiveElement {
                                 evt -> {
                                     i.set(i.get() - 1);
                                     //double percentage = ((i.get()/timeLimit)*100);
-                                    //System.out.println("Test "+percentage);
                                     countdownTile.setMaxValue(newTimeLimit);
                                     countdownTile.setValue(i.get());
 
@@ -273,33 +269,24 @@ public class PollElement extends InteractiveElement {
         answerOutputTile.setRadialChartData(chartDataArray);
         questionPane.setBody(answerOutputTile);
 
-        answerOutputTile.addEventHandler(MouseEvent.MOUSE_CLICKED,evt->{
-            if(cm != null){
-                cm.hide();
-            }
-            cm = new ContextMenu();
+        if(ediManager.getPresentationManager().getTeacherSession() != null) {
+            answerOutputTile.addEventHandler(MouseEvent.MOUSE_CLICKED,evt->{
+                if(cm != null){
+                    cm.hide();
+                }
+                cm = new ContextMenu();
 
 
-            if(evt.getButton() == MouseButton.SECONDARY){
-                MenuItem reset = new MenuItem("Reset Element");
-                reset.addEventHandler(MouseEvent.MOUSE_CLICKED,event->{
-                        System.out.println("ELEMENT RESET!");
-
-                });
-                reset.addEventHandler(MouseEvent.MOUSE_ENTERED,event->{
-                    System.out.println("POOP");
-                    //elementActive = true;
-                });
-                reset.addEventHandler(MouseEvent.MOUSE_EXITED,event->{
-                    System.out.println("poop2");
-                    //elementActive = false;
-                });
-                cm.getItems().add(reset);
-                cm.show(this.getCoreNode(),evt.getScreenX(),evt.getScreenY());
-            }
-        });
-
-
+                if(evt.getButton() == MouseButton.SECONDARY){
+                    MenuItem reset = new MenuItem("Reset Element");
+                    reset.setOnAction(event->{
+                        ediManager.getPresentationManager().getTeacherSession().resetInteractiveElement(this);
+                    });
+                    cm.getItems().add(reset);
+                    cm.show(this.getCoreNode(),evt.getScreenX(),evt.getScreenY());
+                }
+            });
+        }
     }
 
     public String getQuestion() {

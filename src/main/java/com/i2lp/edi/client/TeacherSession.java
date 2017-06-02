@@ -76,7 +76,8 @@ public class TeacherSession {
 
         //Find interactive elementRecord with correct ID so we can retrieve its interactive_element_id PK:
         for (InteractiveElementRecord interactiveElementRecord : interactiveElementRecords) {
-            if ((interactiveElementRecord.getXml_element_id() == interactiveElement.getElementID())&&(interactiveElement.getSlideID() == interactiveElementRecord.getSlide_number())) {
+            if ((interactiveElementRecord.getXml_element_id() == interactiveElement.getElementID())
+                    && (interactiveElement.getSlideID() == interactiveElementRecord.getSlide_number())) {
                 liveElementRecord = interactiveElementRecord;
                 break;
             }
@@ -211,6 +212,16 @@ public class TeacherSession {
                     //Send test response
                     ediManager.getSocketClient().addInteractionToInteractiveElement(ediManager.getUserData().getUserID(), interactiveElementRecord.getInteractive_element_id(), data);
                 }
+            }
+        }
+    }
+
+    public void resetInteractiveElement(InteractiveElement toReset) {
+        //Find interactive elementRecord with correct ID so we can retrieve its interactive_element_id PK:
+        for (InteractiveElementRecord interactiveElementRecord : interactiveElementRecords) {
+            if ((interactiveElementRecord.getXml_element_id() == toReset.getElementID())
+                    && (toReset.getSlideID() == interactiveElementRecord.getSlide_number())) {
+                ediManager.getSocketClient().resetInteractionsForInteractiveElement(interactiveElementRecord.getInteractive_element_id());
             }
         }
     }
