@@ -972,19 +972,11 @@ public abstract class PresentationManager {
             if (teacherSession != null) {
                 teacherSession.endSession();
                 teacherSession = null;
-
             }
         } else if (this instanceof PresentationManagerStudent) {
             if (studentSession != null) {
                 studentSession.endSession();
                 studentSession = null;
-            }
-        }
-
-        //Reset EdiManager presentation manager reference to null
-        if (ediManager != null) {
-            if (ediManager.getPresentationLibraryManager() != null) {
-                ediManager.getPresentationLibraryManager().updatePresentations(); //Update presentation information
             }
         }
         presentationStage.close();

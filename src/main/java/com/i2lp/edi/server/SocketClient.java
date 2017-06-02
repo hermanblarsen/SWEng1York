@@ -154,12 +154,12 @@ public class SocketClient {
 
                 case "presentations":
                     //Update presentation list if no presentation manager is open
-                    if ((ediManager.getPresentationManager().getStudentSession() == null)||(ediManager.getPresentationManager().getTeacherSession() == null)) {
-                        if (ediManager.getPresentationLibraryManager() != null) {
-                            ediManager.getPresentationLibraryManager().updatePresentations(); //Update presentation information
-                        }
-                    }
                     if (ediManager.getPresentationManager() != null) {//If there is a presentation
+                        if ((ediManager.getPresentationManager().getStudentSession() == null)||(ediManager.getPresentationManager().getTeacherSession() == null)) {
+                            if (ediManager.getPresentationLibraryManager() != null) {
+                                ediManager.getPresentationLibraryManager().updatePresentations(); //Update presentation information
+                            }
+                        }
                         if (ediManager.getPresentationManager().getStudentSession() != null) {//that is live and am a student
                             if (ediManager.getPresentationManager().getStudentSession().isLinked()) {
                                 ediManager.getPresentationManager().getStudentSession().synchroniseWithTeacher();
