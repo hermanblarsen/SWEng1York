@@ -138,9 +138,9 @@ public abstract class Dashboard extends Application {
 
         ediManager.getPresentationLibraryManager().getUserModuleList();
 
-        dashboardStage.show();
-
         goToState(DashboardState.TOP_LEVEL);
+
+        dashboardStage.show();
     }
 
     public void goToState(DashboardState state) {

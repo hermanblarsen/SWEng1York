@@ -70,6 +70,13 @@ public abstract class SlideElement {
         }
     }
 
+    public void addCoreNodeToSlide() {
+        if (!onCanvas) {
+            onCanvas = true;
+            slideCanvas.getChildren().add(getCoreNode());
+        }
+    }
+
     //Empty interface for tagging our actual slide elements
     public void renderElement(int animationType) {
         //Added to the canvas at render time, as otherwise negates use of VisibleSet
@@ -79,10 +86,7 @@ public abstract class SlideElement {
             logger.error("Tried to set slide internalCanvas before Element constructor was called!");
         } else {
             //Ensure we only add an element to the Canvas once.
-            if (!onCanvas) {
-                onCanvas = true;
-                slideCanvas.getChildren().add(getCoreNode());
-            }
+            addCoreNodeToSlide();
             doClassSpecificRender();
         }
 

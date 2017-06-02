@@ -884,8 +884,6 @@ public abstract class PresentationManager {
             }
         }
 
-        //Sort by Layer
-        Slide.sortElementsByLayer(slideToAdvance.getVisibleSlideElementList());
         logger.info("Current Sequence is " + slideToAdvance.getCurrentSequenceNumber());
         //Fire animations
         for (SlideElement elementToAnimate : slideToAdvance.getVisibleSlideElementList()) {
@@ -900,6 +898,15 @@ public abstract class PresentationManager {
                 }
                 elementToAnimate.renderElement(Animation.EXIT_ANIMATION); //Exit Sequence
             }
+        }
+
+        //Sort by Layer
+        Slide.sortElementsByLayer(slideToAdvance.getVisibleSlideElementList());
+        for (SlideElement slideElement : slideToAdvance.getVisibleSlideElementList()) {
+            slideElement.removeElement();
+        }
+        for (SlideElement slideElement : slideToAdvance.getVisibleSlideElementList()) {
+            slideElement.addCoreNodeToSlide();
         }
 
         if (slideToAdvance.getCurrentSequenceNumber() == slideToAdvance.getMaxSequenceNumber())
