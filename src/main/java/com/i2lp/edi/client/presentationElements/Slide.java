@@ -65,6 +65,10 @@ public class Slide extends Pane {
 
     }
 
+    public SlideElement getElementWithID(int id){
+        return slideElementList.stream().filter(item->item.getElementID() == id).findFirst().get();
+    }
+
     public void moveElementToIndex(int index) {
 
     }
