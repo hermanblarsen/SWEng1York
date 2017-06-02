@@ -20,9 +20,6 @@ public class Slide extends Pane {
     protected List<SlideElement> slideElementList;
     protected List<SlideElement> visibleSlideElementList;
     protected List<TextElement> textElementList = new ArrayList<>();
-
-
-
     protected List<InteractiveElement> interactiveElementList = new ArrayList<>();
 
     private ArrayList<WritableImage> slideDrawings;

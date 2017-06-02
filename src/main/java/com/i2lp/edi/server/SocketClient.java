@@ -20,6 +20,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -93,7 +94,7 @@ public class SocketClient {
         }
 
         socket.on(Socket.EVENT_CONNECT, args -> {
-            Platform.runLater(() ->{
+            Platform.runLater(() -> {
                 ediManager.getLoginDialog().changeGuiPostConnection();
             });
             logger.info("Client successfully connected to Edi Server");
@@ -468,19 +469,16 @@ public class SocketClient {
 
     private void sendInteractiveElementsToServer(Presentation presentation, int presentationId) {
         //Presentation successfully uploaded, send the details of the interactive elements to the DB.
-        for (Slide slides : presentation.getSlideList())
-            for (SlideElement element : slides.getSlideElementList()) {
-                if (element instanceof InteractiveElement) {
-                    ArrayList<InteractiveElement> interactiveElements = new ArrayList<>();
-                    interactiveElements.add((InteractiveElement) element);
-                    setInteractiveElementsForPresentation(
-                            interactiveElements,
-                            presentationId,//Pres ID
-                            slides.getSlideID()//Slide Number
-                    );
-                    logger.info("Adding interactive elements from slide " + slides.getSlideID() + " Presentation: " + presentationId);
-                }
+        for (Slide slides : presentation.getSlideList()) {
+            if(!presentation.getSlideList().isEmpty()) {
+                setInteractiveElementsForPresentation(
+                        slides.getInteractiveElementList(),
+                        presentationId,//Pres ID
+                        slides.getSlideID()//Slide Number
+                );
+                logger.info("Adding interactive elements from slide " + slides.getSlideID() + " Presentation: " + presentationId);
             }
+        }
         logger.info("Finished uploading interactive elements");
     }
 
@@ -668,7 +666,7 @@ public class SocketClient {
         return toReturn;
     }
 
-    public boolean setInteractiveElementsForPresentation(ArrayList<InteractiveElement> elements, int presentationID, int slideNumber) {
+    public boolean setInteractiveElementsForPresentation(List<InteractiveElement> elements, int presentationID, int slideNumber) {
         boolean statementSuccess = false;
         try (PGConnection connection = (PGConnection) dataSource.getConnection()) {
             for (InteractiveElement element : elements) {
@@ -1017,7 +1015,7 @@ public class SocketClient {
         return statementSuccess;
     }
 
-    public ArrayList<PresentationStatisticsRecord> getPresentationStatistics(int presentationID){
+    public ArrayList<PresentationStatisticsRecord> getPresentationStatistics(int presentationID) {
         ArrayList<PresentationStatisticsRecord> statisticEntries = new ArrayList<>();
 
         try (PGConnection connection = (PGConnection) dataSource.getConnection()) {

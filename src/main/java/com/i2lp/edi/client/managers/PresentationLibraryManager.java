@@ -1,5 +1,6 @@
 package com.i2lp.edi.client.managers;
 
+import com.i2lp.edi.client.ModuleFolder;
 import com.i2lp.edi.client.presentationElements.Presentation;
 import com.i2lp.edi.client.utilities.ParserXML;
 import com.i2lp.edi.client.utilities.Utilities;
@@ -20,7 +21,6 @@ import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.util.ArrayList;
-import java.util.List;
 
 import static com.i2lp.edi.client.Constants.*;
 import static com.i2lp.edi.client.utilities.Utilities.getFilesInFolder;
@@ -35,8 +35,8 @@ public class PresentationLibraryManager {
 
     private Logger logger = LoggerFactory.getLogger(PresentationLibraryManager.class);
 
-    private ArrayList<String> localPresentationListString; //Stores locally available DocumentIDs
-    private ArrayList<String> remotePresentationListString; //Stores server DocumentIDs
+    private ArrayList<ModuleFolder> localPresentationListModuleFolder; //Stores locally available DocumentIDs
+    private ArrayList<ModuleFolder> remotePresentationListModuleFolder; //Stores server DocumentIDs
     private ArrayList<Module> userModuleList;
     private ArrayList<PresentationMetadata> localPresentationList; //Stores PresentationMetadata locally for current user
     private ArrayList<PresentationMetadata> remotePresentationList; //Stores PresentationMetadata on server for current user
@@ -53,11 +53,12 @@ public class PresentationLibraryManager {
 
     /**
      * Get list of modules that has been retrieved by server
+     *
      * @return List of modules
      */
     public ArrayList<Module> getUserModuleList() {
         logger.info("--- User Registered Modules ---");
-        for(Module module : userModuleList){
+        for (Module module : userModuleList) {
             logger.info("ID: " + module.getModule_id() + " Subject: " + module.getSubjectName());
         }
         return userModuleList;
@@ -67,33 +68,54 @@ public class PresentationLibraryManager {
      * Update local presentation list with all available on server. Called whenever a presentation is added or goes live.
      */
     @SuppressWarnings("unchecked")
-    public void updatePresentations(){
+    public void updatePresentations() {
         //Update list of modules for User for UI
         userModuleList = ediManager.getSocketClient().getModulesForUser(ediManager.getUserData().getUserID());
         //Work out what we presentations are available locally, what are available remotely.
-        localPresentationListString = getLocalPresentationListString();
+        localPresentationListModuleFolder = getLocalPresentationListModuleFolder();
         remotePresentationList = getRemotePresentationList();
-        remotePresentationListString = getRemotePresentationStringList(remotePresentationList); //Get strings of documentIds to work out missing presentations
+        remotePresentationListModuleFolder = getRemotePresentationStringList(remotePresentationList); //Get strings of documentIds to work out missing presentations
 
         //Get difference between server thumbnails and client thumbnails
-        List difference = new ArrayList(remotePresentationListString);
-        //difference.removeAll(localPresentationListString);
+        ArrayList<ModuleFolder> difference = new ArrayList<>();
 
-        // If no difference between client and server, don't download anything
-        if (difference.size() == 0) {
-            updateLocalData();
-            return;
-        } else {
-            ArrayList<PresentationMetadata> downloadList = new ArrayList<>();
+        boolean exists = false;
 
+        for (ModuleFolder moduleFolderRemote : remotePresentationListModuleFolder) {
+            for (ModuleFolder moduleFolderLocal : localPresentationListModuleFolder) {
+                if (moduleFolderLocal.getModuleName().equals(moduleFolderRemote.getModuleName())) { //If we have the module folder
+                    exists = true;
+                    ArrayList<String> differenceInModule = moduleFolderRemote.getPresentations();
+                    differenceInModule.removeAll(moduleFolderLocal.getPresentations());
+                    if (!differenceInModule.isEmpty()) {
+                        difference.add(new ModuleFolder(moduleFolderLocal.getModuleName(), differenceInModule));
+                    }
+                } else {
+                    exists = false;
+                }
+            }
+            if (!exists) {
+                difference.add(moduleFolderRemote);
+            }
+        }
 
-            for (String missingPresentationDocumentID : (ArrayList<String>) difference) {
+        ArrayList<PresentationMetadata> downloadList = new ArrayList<>();
+
+        for (ModuleFolder moduleFolder : difference) {
+            for (String presentation : moduleFolder.getPresentations()) {
                 for (PresentationMetadata remotePresentation : remotePresentationList) {//Search remote list for missing documentID
-                    if (remotePresentation.getDocumentID().equals(missingPresentationDocumentID)) {
+                    if ((remotePresentation.getDocumentID().equals(presentation)) && (remotePresentation.getModuleName().equals(moduleFolder.getModuleName()))) {
                         downloadList.add(remotePresentation); //Add missing presentation to download list
                     }
                 }
             }
+        }
+
+        // If no difference between client and server, don't download anything
+        if (downloadList.size() == 0) {
+            updateLocalData();
+            return;
+        } else {
             downloadMissingPresentations(downloadList);
             updateLocalPresentationList(remotePresentationList);//Metadata now matches that available on server after download, so set.
 
@@ -104,10 +126,10 @@ public class PresentationLibraryManager {
     /**
      * Make local data match remote data after sync, and update UI.
      */
-    private void updateLocalData(){
+    private void updateLocalData() {
         updateLocalPresentationList(remotePresentationList); //Metadata matches that available on server, so set.
         //If dashboard created, update the dashboard UI
-        if(ediManager.getDashboard() != null){
+        if (ediManager.getDashboard() != null) {
             Platform.runLater(() -> ediManager.getDashboard().updateAvailablePresentations());
         }
     }
@@ -130,7 +152,7 @@ public class PresentationLibraryManager {
     private void updateLocalPresentationList(ArrayList<PresentationMetadata> remoteList) {
         //TODO: Modify to use Module names read from folder if in offline mode
         //Update metadata with correct module name if no download occurs.
-        for(PresentationMetadata presentationMetadata : remoteList){
+        for (PresentationMetadata presentationMetadata : remoteList) {
             presentationMetadata.setModuleName(getModuleNameForPresentation(presentationMetadata));
         }
         this.localPresentationList = remoteList;
@@ -154,7 +176,7 @@ public class PresentationLibraryManager {
         if (!tempDir.exists()) tempDir.mkdirs(); //Create directory structure if not present yet
         if (!presDir.exists()) presDir.mkdirs();
 
-        int i=1;
+        int i = 1;
         for (PresentationMetadata toDownload : downloadList) {
             logger.info("Downloading presentation from " + toDownload.getXml_url());
             ediManager.getLoadingScreen().updateDownloadState(i);
@@ -171,18 +193,15 @@ public class PresentationLibraryManager {
             }
             logger.info("Unzipping " + toDownload.getXml_url() + ", " + i + " / " + downloadList.size());
 
-            //Set Module name for presentation
-            toDownload.setModuleName(getModuleNameForPresentation(toDownload));
-
             ZipUtils.unzipPresentation(tempDir.getAbsolutePath() + File.separator + toDownload.getDocumentID() + ".zip", presDir.getAbsolutePath() + File.separator + toDownload.getModuleName() + File.separator + toDownload.getDocumentID());
             i++;
         }
         ediManager.getLoadingScreen().exitPresDownloadingState();
     }
 
-    private String getModuleNameForPresentation(PresentationMetadata toRetrieveModuleName){
-        for(Module module : userModuleList){
-            if(toRetrieveModuleName.getModule_id() == module.getModule_id()){
+    private String getModuleNameForPresentation(PresentationMetadata toRetrieveModuleName) {
+        for (Module module : userModuleList) {
+            if (toRetrieveModuleName.getModule_id() == module.getModule_id()) {
                 return module.getModule_name();
             }
         }
@@ -191,35 +210,55 @@ public class PresentationLibraryManager {
         return "MISSING";
     }
 
+    private ArrayList<PresentationMetadata> getRemotePresentationList() {
+        ArrayList<PresentationMetadata> remotePresentationList = socketClient.getPresentationsForUser(ediManager.getUserData().getUserID());
+        for (PresentationMetadata presentation : remotePresentationList) {
+            presentation.setModuleName(getModuleNameForPresentation(presentation));
+        }
 
-    private ArrayList<String> getLocalPresentationListString() {
-        ArrayList<String> localListOfPresentations = new ArrayList<>();
+        return remotePresentationList;
+    }
+
+    private ArrayList<ModuleFolder> getLocalPresentationListModuleFolder() {
+        ArrayList<ModuleFolder> localListOfPresentations = new ArrayList<>();
+
         //Get list of Modules
         ArrayList<String> moduleFolders = getFilesInFolder(PRESENTATIONS_PATH);
 
         //For every module, get presentations inside
-        for(String moduleFolder : moduleFolders){
-            localListOfPresentations.addAll(getFilesInFolder(PRESENTATIONS_PATH + File.separator + moduleFolder));
+        for (String moduleFolder : moduleFolders) {
+            localListOfPresentations.add(new ModuleFolder(moduleFolder, getFilesInFolder(PRESENTATIONS_PATH + File.separator + moduleFolder)));
         }
+
         //Assume folder names are DocumentID for now, else have to fire up parser to get them
         return localListOfPresentations;
     }
 
-    private ArrayList<PresentationMetadata> getRemotePresentationList() {
-        return socketClient.getPresentationsForUser(ediManager.getUserData().getUserID());
-    }
+    private ArrayList<ModuleFolder> getRemotePresentationStringList(ArrayList<PresentationMetadata> remotePresentationList) {
+        ArrayList<ModuleFolder> remotePresentationDocumentIDs = new ArrayList<>();
 
-    private ArrayList<String> getRemotePresentationStringList(ArrayList<PresentationMetadata> remotePresentationList) {
-        ArrayList<String> remotePresentationDocumentIDs = new ArrayList<>();
+        for (Module module : userModuleList) {
 
-        for (PresentationMetadata toParse : remotePresentationList) {
-            remotePresentationDocumentIDs.add(toParse.getDocumentID());
+            if (!getRemotePresentationsWithModuleName(remotePresentationList, module).isEmpty()) {
+                remotePresentationDocumentIDs.add(getRemotePresentationsWithModuleName(remotePresentationList, module));
+            }
         }
 
         return remotePresentationDocumentIDs;
     }
 
-    public boolean removePresentation(int presentationID){
+    public ModuleFolder getRemotePresentationsWithModuleName(ArrayList<PresentationMetadata> remotePresentationList, Module module) {
+        ModuleFolder remotePresentationsWithModuleName = new ModuleFolder(module.getModule_name());
+
+        for (PresentationMetadata presentation : remotePresentationList) {
+            if (presentation.getModuleName().equals(module.getModule_name()))
+                remotePresentationsWithModuleName.addPresentation(presentation.getDocumentID());
+        }
+
+        return remotePresentationsWithModuleName;
+    }
+
+    public boolean removePresentation(int presentationID) {
         boolean status = false;
         String return_status;
         return_status = socketClient.removePresentationFromModule(presentationID);
@@ -233,7 +272,7 @@ public class PresentationLibraryManager {
         ParserXML parserXML = new ParserXML(fileToUpload);
         Presentation presentation = parserXML.parsePresentation();
         //Generate thumbnails for Slides.
-        ThumbnailGenerationManager.generateSlideThumbnails( presentation,false);
+        ThumbnailGenerationManager.generateSlideThumbnails(presentation, false);
 
         try {
             FileUtils.copyFile(new File(fileToUpload), new File(TEMP_PATH + presentation.getDocumentID() + File.separator + presentation.getDocumentID() + ".xml"));

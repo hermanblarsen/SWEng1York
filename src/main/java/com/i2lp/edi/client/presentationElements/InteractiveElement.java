@@ -6,7 +6,7 @@ package com.i2lp.edi.client.presentationElements;
 
 public abstract class InteractiveElement extends SlideElement {
     public static final String POLL = "poll";
-    public static final String WORD_CLOUD = "wordCloud";
+    public static final String WORD_CLOUD = "wordcloud";
 
     protected int timeLimit; //TODO get from server
 
