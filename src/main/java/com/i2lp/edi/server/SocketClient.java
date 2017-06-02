@@ -1156,10 +1156,10 @@ public class SocketClient {
                 status = rs.getString(1);
             }
 
-            if (status.equals("success")) {
+            if (status.contains("success")) {
                 statementSuccess = true;
-                logger.info("Successfully added interaction to interactive element.");
-            } else logger.error("Unable to reset interactive elements' interactions for presentation with ID: " + presentationID);
+                logger.info(status);
+            } else logger.error("Unable to reset interactive elements' interactions for presentation with ID: " + presentationID + " " + status);
 
             statement.close();
         } catch (Exception e) {
