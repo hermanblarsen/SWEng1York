@@ -16,7 +16,6 @@ public class PresentationMetadata {
     private int current_slide_number;
     private String xml_url;
     private boolean live;
-    private String subjectName;
     private Timestamp go_live_timestamp;
     private String moduleName;
 
@@ -29,7 +28,6 @@ public class PresentationMetadata {
         this.current_slide_number = current_slide_number;
         this.xml_url = xml_url;
         this.live = live;
-        this.subjectName = "Subject " + module_id;
         this.go_live_timestamp = go_live_timestamp;
     }
 
@@ -60,8 +58,6 @@ public class PresentationMetadata {
         return xml_url;
     }
 
-    public String getSubjectName() { return subjectName; }
-
     public boolean getLive() { return live; }
 
     public void setLive(boolean live) {
@@ -70,7 +66,13 @@ public class PresentationMetadata {
 
     public int getModule_id() { return module_id; }
 
-    public void setGoLiveTimestamp(LocalDateTime goLiveTimeDateTime) { go_live_timestamp = Timestamp.valueOf(goLiveTimeDateTime); }
+    public void setGoLiveTimestamp(LocalDateTime goLiveTimeDateTime) {
+        if (goLiveTimeDateTime != null) {
+            go_live_timestamp = Timestamp.valueOf(goLiveTimeDateTime);
+        } else {
+            go_live_timestamp = null;
+        }
+    }
 
     public Timestamp getGoLiveTimestamp() { return go_live_timestamp; }
 

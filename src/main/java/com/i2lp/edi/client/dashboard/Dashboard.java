@@ -30,6 +30,7 @@ import javafx.stage.Popup;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 import org.apache.commons.validator.UrlValidator;
+import org.controlsfx.control.textfield.CustomTextField;
 import org.kordamp.bootstrapfx.scene.layout.Panel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -84,18 +85,17 @@ public abstract class Dashboard extends Application {
     protected boolean isWelcomeTextHidden = false;
     private DashboardState currentState;
     private Text noMatchesSubject, noMatchesPres;
-    private VBox constantControlsVBox, removableControlsVBox, controlsContainerVBox;
+    private VBox controlsVBox;
     private ScrollPane leftPanelScroll;
-    private Panel searchPanel, subjectFilterPanel, presSortPanel, moduleSortPanel, subjectSortPanel;
+    private Panel subjectFilterPanel, presSortPanel, moduleSortPanel, subjectSortPanel;
     private DashModule selectedModule;
     private VBox rightPanelVBox;
     private ScrollPane rightPanelScroll;
     private LocalDate selectedDate;
     private ScrollPane presentationsScrollPane;
 
-    protected TextField searchField;
+    protected CustomTextField searchField;
     protected Button selectAllButton;
-    protected ArrayList<Button> subjectButtons;
     protected ArrayList<CheckBox> subjectCheckboxes;
     protected ArrayList<Subject> filterSubjects;
     private ArrayList<PresSchedulePanel> schedulePanels;
@@ -104,7 +104,6 @@ public abstract class Dashboard extends Application {
     protected FileChooser fileChooser;
     protected MenuBar menuBar;
     protected Popup aboutPopup;
-    private Text welcomeText;
     protected Node calendarNode;
     protected DatePicker calendar;
     protected DateTimePicker dateTimePicker;
@@ -143,6 +142,7 @@ public abstract class Dashboard extends Application {
         ediManager.getPresentationLibraryManager().getUserModuleList();
 
         goToState(DashboardState.TOP_LEVEL);
+        setupBorderTop();
 
         dashboardStage.show();
     }
@@ -160,26 +160,25 @@ public abstract class Dashboard extends Application {
             setSelectedPreviewPanel(selectedPresPanel, false);
         }
 
-        displayBorderTop(state);
         displayBorderCenter(state);
         displayBorderLeft(state); //This has to be called after displayBorderCenter()
         displayBorderRight(state);
     }
 
-    private void displayBorderTop(DashboardState state) {
+    private void setupBorderTop() {
         HBox topPanel = new HBox(10);
-        topPanel.setPadding(new Insets(15, 12, 15, 12));
+        topPanel.setPadding(new Insets(0, 12, 0, 12));
+        topPanel.setAlignment(Pos.CENTER);
         topPanel.setStyle("-fx-background-color: #34495e;");
+        topPanel.setPrefHeight(20);
+        topPanel.setMaxHeight(HBox.USE_PREF_SIZE);
+        topPanel.setMaxHeight(HBox.USE_PREF_SIZE);
 
-        Text platformTitle = new Text("Edi");
-        platformTitle.getStyleClass().setAll("h3");
-        platformTitle.setFill(Color.WHITESMOKE);
+        ImageView uoyLogo = new ImageView(new Image("file:projectResources/icons/UOY-Logo-Long-White.png", 300, Double.MAX_VALUE, true, true));
 
-        HBox platformTitleHBox = new HBox(10);
-        platformTitleHBox.setAlignment(Pos.CENTER);
-        platformTitleHBox.getChildren().add(platformTitle);
-
-        HBox openAddButtonsHBox = new HBox(10);
+        HBox logoHBox = new HBox();
+        logoHBox.setAlignment(Pos.CENTER);
+        logoHBox.getChildren().add(uoyLogo);
 
         fileChooser = new FileChooser();
         FileChooser.ExtensionFilter xmlExtensionFilter =
@@ -207,21 +206,15 @@ public abstract class Dashboard extends Application {
             menu.getItems().addAll(local, online);
             menu.show(openPresButton, Side.BOTTOM, 0, 0);
         });
+        topPanel.getChildren().add(openPresButton);
 
-        openAddButtonsHBox.getChildren().add(openPresButton);
-        topPanel.getChildren().add(openAddButtonsHBox);
+        topPanel.getChildren().add(logoHBox);
+        HBox.setHgrow(logoHBox, Priority.ALWAYS);
 
-        topPanel.getChildren().add(platformTitleHBox);
-        HBox.setHgrow(platformTitleHBox, Priority.ALWAYS);
-
-        switch (state) {
-            case TOP_LEVEL:
-            case MODULE:
-            case SEARCH_IN_MODULE:
-            case SEARCH_ALL:
-            default:
-                //Do nothing
-        }
+        searchField = new CustomTextField();
+        searchField.setRight(new ImageView("file:projectResources/icons/searchIcon.png"));
+        searchField.textProperty().addListener(observable -> search(searchField.getText()));
+        topPanel.getChildren().add(searchField);
 
         border.setTop(topPanel);
     }
@@ -297,7 +290,7 @@ public abstract class Dashboard extends Application {
                     textVBox.getChildren().add(welcomeHeader);
                     VBox.setMargin(welcomeHeader, new Insets(5, 0, 5, 0));
 
-                    welcomeText = new Text("Hello, " + ediManager.getUserData().getFirstName() +
+                    Text welcomeText = new Text("Hello, " + ediManager.getUserData().getFirstName() +
                             ". You have " + getNumOfScheduledPresOnDate(LocalDate.now()) +
                             " presentations on schedule today.");
                     textVBox.getChildren().add(welcomeText);
@@ -338,9 +331,7 @@ public abstract class Dashboard extends Application {
             case SEARCH_IN_MODULE:
                 Button backButton = new Button("Back");
                 backButton.getStyleClass().setAll("btn", "btn-default");
-                backButton.setOnAction(event -> {
-                    goToState(DashboardState.TOP_LEVEL);
-                });
+                backButton.setOnAction(event -> goToState(DashboardState.TOP_LEVEL));
                 Text moduleText = new Text(selectedModule.getSubject().getSubjectName() + " -> " + selectedModule.getModuleName());
                 moduleText.getStyleClass().setAll("h4");
                 Region dummy = new Region();
@@ -363,21 +354,9 @@ public abstract class Dashboard extends Application {
     }
 
     private void displayBorderLeft(DashboardState state) {
-        //Setup VBox for all panels
-        if (controlsContainerVBox == null) {
-            controlsContainerVBox = new VBox(8);
-        }
-
-        if (constantControlsVBox == null) {
-            constantControlsVBox = new VBox(8);
-            constantControlsVBox.setPadding(new Insets(10, 10, 0, 10));
-            controlsContainerVBox.getChildren().add(constantControlsVBox);
-        }
-
-        if (removableControlsVBox == null) {
-            removableControlsVBox = new VBox(8);
-            removableControlsVBox.setPadding(new Insets(0, 10, 10, 10));
-            controlsContainerVBox.getChildren().add(removableControlsVBox);
+        if (controlsVBox == null) {
+            controlsVBox = new VBox(8);
+            controlsVBox.setPadding(new Insets(10));
         }
 
         if (leftPanelScroll == null) {
@@ -385,27 +364,13 @@ public abstract class Dashboard extends Application {
             leftPanelScroll.setHbarPolicy(ScrollBarPolicy.NEVER);
             leftPanelScroll.setVbarPolicy(ScrollBarPolicy.NEVER);
             leftPanelScroll.getStyleClass().add("edge-to-edge");
-            leftPanelScroll.setContent(controlsContainerVBox);
+            leftPanelScroll.setContent(controlsVBox);
             leftPanelScroll.setFitToWidth(true);
             leftPanelScroll.setMaxWidth(LEFT_PANEL_WIDTH);
             border.setLeft(leftPanelScroll);
         }
 
         Insets panelInsets = new Insets(5);
-
-        //Setup search panel
-        if (searchPanel == null) {
-            searchPanel = new Panel();
-            searchPanel.getStyleClass().add("panel-primary");
-            if (searchField == null) {
-                searchField = new TextField();
-                searchField.textProperty().addListener(observable -> search(searchField.getText()));
-            }
-            searchPanel.setCenter(searchField);
-            BorderPane.setMargin(searchField, panelInsets);
-
-            constantControlsVBox.getChildren().add(searchPanel);
-        }
 
         if (subjectFilterPanel == null) {
             subjectCheckboxes = new ArrayList<>();
@@ -537,20 +502,17 @@ public abstract class Dashboard extends Application {
 
         switch (state) {
             case TOP_LEVEL:
-                searchPanel.setText("Search");
-                removableControlsVBox.getChildren().clear();
-                removableControlsVBox.getChildren().addAll(subjectFilterPanel, subjectSortPanel, moduleSortPanel);
+                controlsVBox.getChildren().clear();
+                controlsVBox.getChildren().addAll(subjectFilterPanel, subjectSortPanel, moduleSortPanel);
                 break;
             case MODULE:
             case SEARCH_IN_MODULE:
-                searchPanel.setText("Search in " + selectedModule.getModuleName());
-                removableControlsVBox.getChildren().clear();
-                removableControlsVBox.getChildren().add(presSortPanel);
+                controlsVBox.getChildren().clear();
+                controlsVBox.getChildren().add(presSortPanel);
                 break;
             case SEARCH_ALL:
-                searchPanel.setText("Search");
-                removableControlsVBox.getChildren().clear();
-                removableControlsVBox.getChildren().addAll(subjectFilterPanel, subjectSortPanel, moduleSortPanel, presSortPanel);
+                controlsVBox.getChildren().clear();
+                controlsVBox.getChildren().addAll(subjectFilterPanel, subjectSortPanel, moduleSortPanel, presSortPanel);
                 break;
 
             default:
@@ -615,7 +577,7 @@ public abstract class Dashboard extends Application {
         calendar.setDayCellFactory(dayCellFactory);
         DatePickerSkin calendarSkin = new DatePickerSkin(calendar);
         calendarNode = calendarSkin.getPopupContent();
-        calendarNode.setStyle("-fx-font-size: 8.5px;");
+        calendarNode.setStyle("-fx-font-size: 8px;");
         calendarNode.setEffect(null);
 
         switch (state) {
@@ -837,6 +799,13 @@ public abstract class Dashboard extends Application {
                         MenuItem schedule = new MenuItem("Schedule");
                         schedule.setOnAction(scheduleEvent -> showScheduler(presentationPanel, event.getScreenX(), event.getScreenY()));
                         cMenu.getItems().add(schedule);
+
+                        MenuItem unschedule = new MenuItem("Unschedule");
+                        unschedule.setOnAction(unscheduleEvent -> {
+                            presentationPanel.getPresentation().setGoLiveDate(null);
+                            ediManager.getSocketClient().setPresentationGoLive(presentationPanel.getPresentation().getPresentationMetadata().getPresentationID(), "0");
+                        });
+                        cMenu.getItems().add(unschedule);
 
                         MenuItem delete = new MenuItem("Delete");
                         delete.setOnAction(deleteEvent -> deletePresentation(presentationPanel));
@@ -1328,6 +1297,7 @@ public abstract class Dashboard extends Application {
         detailsPane.add(descriptionLabel, 0, 4);
 
         Text description = new Text(presentation.getDescription());
+        description.setFill(descriptionLabel.getTextFill());
         StackPane descriptionPane = new StackPane(description);
         descriptionPane.setPadding(new Insets(5));
         descriptionPane.setAlignment(Pos.TOP_LEFT);
@@ -1380,6 +1350,7 @@ public abstract class Dashboard extends Application {
         detailsPane.add(descriptionLabel, 0, 2);
 
         Text description = new Text(module.getModuleDescription());
+        description.setFill(descriptionLabel.getTextFill());
         StackPane descriptionPane = new StackPane(description);
         descriptionPane.setPadding(new Insets(5));
         descriptionPane.setAlignment(Pos.TOP_LEFT);

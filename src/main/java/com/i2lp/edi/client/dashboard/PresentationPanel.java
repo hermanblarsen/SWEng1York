@@ -3,17 +3,12 @@ package com.i2lp.edi.client.dashboard;
 import com.i2lp.edi.client.presentationElements.Presentation;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
-import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
-import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
-import javafx.scene.paint.Color;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,6 +36,10 @@ public class PresentationPanel extends PreviewPanel {
         getDisplayPanel().widthProperty().addListener(observable -> titleLabel.setPrefWidth(getDisplayPanel().getWidth() - MARGIN_FOR_LIVE_ICON));
         getDisplayPanel().setHeading(titleLabel);
         this.setPrefWidth(MAX_PRES_PREVIEW_WIDTH + MARGIN_AROUND_PRES_PREVIEW);
+
+        if(presentation.getPresentationMetadata().getPresentationID() == 94) {
+            int i = 0;
+        }
 
         isLive = presentation.getPresentationMetadata().getLive();
         presentation.getModule().getModulePanel().updateIsLive();
