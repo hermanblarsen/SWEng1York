@@ -912,16 +912,28 @@ public class SocketClient {
         boolean statementSuccess = false;
 
         try (PGConnection connection = (PGConnection) dataSource.getConnection()) {
-            PreparedStatement statement =
-                    connection.prepareStatement("UPDATE interactive_elements " +
-                            "SET live = ?, response_interval = ? " +
-                            "WHERE interactive_element_id = ? AND presentation_id = ?;");
+            PreparedStatement statement= null;
+            if(isLive) {
+                statement =
+                        connection.prepareStatement("UPDATE interactive_elements " +
+                                "SET live = ?, response_interval = ? " +
+                                "WHERE interactive_element_id = ? AND presentation_id = ?;");
 
-            //Fill prepared statements to avoid SQL injection
-            statement.setBoolean(1, isLive);
-            statement.setTime(2, new Time(Instant.now().toEpochMilli()));
-            statement.setInt(3, interactiveElementID);
-            statement.setInt(4, presentationID);
+                //Fill prepared statements to avoid SQL injection
+                statement.setBoolean(1, isLive);
+                statement.setTime(2, new Time(Instant.now().toEpochMilli()));
+                statement.setInt(3, interactiveElementID);
+                statement.setInt(4, presentationID);
+            }else {
+                statement =
+                        connection.prepareStatement("UPDATE interactive_elements " +
+                                "SET live = ? WHERE interactive_element_id = ? AND presentation_id = ?;");
+
+                //Fill prepared statements to avoid SQL injection
+                statement.setBoolean(1, isLive);
+                statement.setInt(2, interactiveElementID);
+                statement.setInt(3, presentationID);
+            }
 
             //Call stored procedure on database
             statementSuccess = statement.execute();
