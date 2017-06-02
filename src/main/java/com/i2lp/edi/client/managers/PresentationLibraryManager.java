@@ -2,6 +2,7 @@ package com.i2lp.edi.client.managers;
 
 import com.i2lp.edi.client.presentationElements.Presentation;
 import com.i2lp.edi.client.utilities.ParserXML;
+import com.i2lp.edi.client.utilities.Utilities;
 import com.i2lp.edi.client.utilities.ZipUtils;
 import com.i2lp.edi.server.SocketClient;
 import com.i2lp.edi.server.packets.Module;
@@ -76,7 +77,7 @@ public class PresentationLibraryManager {
 
         //Get difference between server thumbnails and client thumbnails
         List difference = new ArrayList(remotePresentationListString);
-        difference.removeAll(localPresentationListString);
+        //difference.removeAll(localPresentationListString);
 
         // If no difference between client and server, don't download anything
         if (difference.size() == 0) {
@@ -280,7 +281,7 @@ public class PresentationLibraryManager {
                     logger.info("The presentation has uploaded successfully. Awaiting server-side processing.");
                     socketClient.alertServerToUpload(presentation.getDocumentID(), moduleID, presentation); //Tell server a new file has arrived
                     new File(zipPath).delete(); //Clean up zip after upload
-                    new File(TEMP_PATH + presentation.getDocumentID()).delete();
+                    Utilities.deleteDirectory(new File(TEMP_PATH + presentation.getDocumentID()));
                 }
             } catch (IOException e) {
                 logger.error("Error uploading presentation data to Edi Server! ", e);
