@@ -14,7 +14,6 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
@@ -25,8 +24,6 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 
 import java.io.File;
-import java.util.Timer;
-import java.util.TimerTask;
 
 /**
  * Created by Koen on 11/04/2017.
@@ -69,7 +66,7 @@ public class VideoElement extends SlideElement{
         mediaPane.setTranslateX(slideWidth * xPosition);
         mediaPane.setTranslateY(slideHeight * yPosition);
         //System.out.println("CURRENT PATH: "+ media.getSource());
-        if(autoplay && !started) {
+        if(autoplay && !started && !isForceMute) {
             mediaPlayer.play();
             started = true;
         }
@@ -80,8 +77,8 @@ public class VideoElement extends SlideElement{
                     performOnClickAction();
                 }
             });
-        if(isThumbnailGen){
-            mediaPlayer.stop();
+        if(isForceMute){
+            mediaPlayer.setVolume(0);
         }
         getCoreNode().setPickOnBounds(false);
 
@@ -380,7 +377,11 @@ public class VideoElement extends SlideElement{
         volumeSlider.addEventHandler(MouseEvent.MOUSE_EXITED,evt->{
             controlActive = false;
         });
-        volumeSlider.valueProperty().addListener((observable) -> mediaPlayer.setVolume(volumeSlider.getValue()));
+        volumeSlider.valueProperty().addListener((observable) -> {
+            if (!isForceMute) {
+                mediaPlayer.setVolume(volumeSlider.getValue());
+            }
+        });
         //mediaBar.getChildren().add(volumeSlider);
 
         //Fullscreen Button

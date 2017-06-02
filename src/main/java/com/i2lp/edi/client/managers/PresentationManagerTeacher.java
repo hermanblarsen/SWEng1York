@@ -362,58 +362,62 @@ public class PresentationManagerTeacher extends PresentationManager {
 
     @Override
     protected VBox addQuestionQueueControls() {
-        if (newQuestionList != null) {
-            questionNumberLabel = new Label(Integer.toString(newQuestionList.size()));
-        } else {
-            questionNumberLabel = new Label("0");
-        }
-        questionNumberLabel.setMouseTransparent(true);
-        questionNumberLabel.getStyleClass().add("b");
-
-        ImageView questionBase = new ImageView(new Image("file:projectResources/icons/empty_icon.png", DEFAULT_BUTTON_WIDTH, DEFAULT_BUTTON_HEIGHT, true, true));
-        ImageView questionIcon = makeCustomButton("file:projectResources/icons/Question_Filled.png", event -> {
-            if (!questionQueueActive) {
-                loadSpecificFeatures();
-                questionQueueActive = true;
-
+        if (presentationSession != null) {
+            if (newQuestionList != null) {
+                questionNumberLabel = new Label(Integer.toString(newQuestionList.size()));
             } else {
-                loadSpecificFeatures();
-                questionQueueActive = false;
+                questionNumberLabel = new Label("0");
             }
-        });
-        questionIcon.setOpacity(0);
-        questionIcon.addEventHandler(MouseEvent.MOUSE_ENTERED, event -> {
-            if (!mouseDown) {
-                controlsFadeIn(questionIcon);
-                controlsFadeOut(questionNumberLabel);
-                isMouseOverControls = true;
-                setCursorState(CursorState.DEFAULT);
-            }
-        });
-        questionIcon.addEventHandler(MouseEvent.MOUSE_EXITED, event -> {
-            controlsFadeOut(questionIcon);
-            controlsFadeIn(questionNumberLabel);
-            hideControlsTimed(presControls);
-            hideControlsTimed(drawControls);
-            isMouseOverControls = false;
-        });
+            questionNumberLabel.setMouseTransparent(true);
+            questionNumberLabel.getStyleClass().add("b");
 
-        StackPane questionQueueButton = new StackPane(questionBase, questionIcon, questionNumberLabel);
-        questionQueueButton.addEventHandler(MouseEvent.MOUSE_ENTERED, event -> {
-            if (!mouseDown) {
-                isMouseOverControls = true;
-                setCursorState(CursorState.DEFAULT);
-            }
-        });
-        questionQueueButton.addEventHandler(MouseEvent.MOUSE_EXITED, event -> isMouseOverControls = false);
+            ImageView questionBase = new ImageView(new Image("file:projectResources/icons/empty_icon.png", DEFAULT_BUTTON_WIDTH, DEFAULT_BUTTON_HEIGHT, true, true));
+            ImageView questionIcon = makeCustomButton("file:projectResources/icons/Question_Filled.png", event -> {
+                if (!questionQueueActive) {
+                    loadSpecificFeatures();
+                    questionQueueActive = true;
 
-        VBox contentVBox = new VBox();
-        contentVBox.setAlignment(Pos.TOP_CENTER);
-        contentVBox.setPadding(new Insets(5));
+                } else {
+                    loadSpecificFeatures();
+                    questionQueueActive = false;
+                }
+            });
+            questionIcon.setOpacity(0);
+            questionIcon.addEventHandler(MouseEvent.MOUSE_ENTERED, event -> {
+                if (!mouseDown) {
+                    controlsFadeIn(questionIcon);
+                    controlsFadeOut(questionNumberLabel);
+                    isMouseOverControls = true;
+                    setCursorState(CursorState.DEFAULT);
+                }
+            });
+            questionIcon.addEventHandler(MouseEvent.MOUSE_EXITED, event -> {
+                controlsFadeOut(questionIcon);
+                controlsFadeIn(questionNumberLabel);
+                hideControlsTimed(presControls);
+                hideControlsTimed(drawControls);
+                isMouseOverControls = false;
+            });
 
-        contentVBox.getChildren().add(questionQueueButton);
+            StackPane questionQueueButton = new StackPane(questionBase, questionIcon, questionNumberLabel);
+            questionQueueButton.addEventHandler(MouseEvent.MOUSE_ENTERED, event -> {
+                if (!mouseDown) {
+                    isMouseOverControls = true;
+                    setCursorState(CursorState.DEFAULT);
+                }
+            });
+            questionQueueButton.addEventHandler(MouseEvent.MOUSE_EXITED, event -> isMouseOverControls = false);
 
-        return contentVBox;
+            VBox contentVBox = new VBox();
+            contentVBox.setAlignment(Pos.TOP_CENTER);
+            contentVBox.setPadding(new Insets(5));
+
+            contentVBox.getChildren().add(questionQueueButton);
+
+            return contentVBox;
+        } else {
+            return new VBox();
+        }
     }
 
     protected void controlsFadeIn(Node controls) {

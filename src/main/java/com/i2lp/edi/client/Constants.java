@@ -66,9 +66,6 @@ public class Constants {
     /* ELEMENT RENDERING CONSTANTS */
     public static final int TEXT_ELEMENT_ZOOM_FACTOR = 2;
 
-    /* GUI CONSTANTS */
-    public static final String WELCOME_TEXT = "We can put some welcome text.";
-
     /* THUMBNAIL RENDER CONSTANTS */
     public static final int THUMBNAIL_GEN_WIDTH = 320;
     public static final int THUMBNAIL_GEN_HEIGHT = 240;

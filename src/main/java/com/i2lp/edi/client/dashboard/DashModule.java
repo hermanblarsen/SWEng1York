@@ -20,6 +20,7 @@ public class DashModule {
     private final Time timeLastUpdated;
     private final Timestamp timeCreated;
     private final ArrayList<Presentation> presentations;
+    private ModulePanel modulePanel;
 
     public DashModule(Module module, Subject subject) {
         moduleName = module.getModule_name();
@@ -64,4 +65,8 @@ public class DashModule {
     public Time getTimeLastUpdated() { return timeLastUpdated; }
 
     public Timestamp getTimeCreated() { return timeCreated; }
+
+    public void setModulePanel(ModulePanel panel) { this.modulePanel = panel; }
+
+    public ModulePanel getModulePanel() { return  modulePanel; }
 }

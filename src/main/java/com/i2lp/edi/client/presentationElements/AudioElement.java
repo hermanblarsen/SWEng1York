@@ -304,8 +304,12 @@ public class AudioElement extends SlideElement{
                 mediaPlayer.seek(startTime);
                 mediaPlayer.setStartTime(startTime);
                 mediaPlayer.setStopTime(endTime);
-                mediaPlayer.setVolume(volume);
-                if (isAutoPlay) {
+                if (!isForceMute) {
+                    mediaPlayer.setVolume(volume);
+                } else {
+                    mediaPlayer.setVolume(0);
+                }
+                if (isAutoPlay && !isForceMute) {
                     startAudio();
                 }
             });
@@ -317,10 +321,11 @@ public class AudioElement extends SlideElement{
             if (isAutoPlay) {
                 startAudio();
             }
+        }
 
-            if (isThumbnailGen) {
-                mediaPlayer.stop();
-            }
+        if (isForceMute) {
+            pauseAudio();
+            mediaPlayer.setVolume(0);
         }
     }
 
@@ -667,7 +672,7 @@ public class AudioElement extends SlideElement{
         if ( (volume >= 0) && (volume <= 1)){
             this.volume = volume;
 
-            if (mediaPlayer != null) {
+            if (mediaPlayer != null && !isForceMute) {
                 mediaPlayer.setVolume(volume);
             }
         } else {

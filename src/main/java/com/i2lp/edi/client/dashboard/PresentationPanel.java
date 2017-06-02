@@ -43,6 +43,7 @@ public class PresentationPanel extends PreviewPanel {
         this.setPrefWidth(MAX_PRES_PREVIEW_WIDTH + MARGIN_AROUND_PRES_PREVIEW);
 
         isLive = presentation.getPresentationMetadata().getLive();
+        presentation.getModule().getModulePanel().updateIsLive();
 
         double previewWidth = MAX_PRES_PREVIEW_WIDTH;
 
@@ -52,7 +53,7 @@ public class PresentationPanel extends PreviewPanel {
         ImageView preview = getPresentation().getSlidePreview(0, previewWidth);
         StackPane bodyPane = new StackPane(preview);
         getDisplayPanel().setBody(bodyPane);
-        getDisplayPanel().setFooter(new Label("Subject: " + presentation.getSubject().getSubjectName()));
+        getDisplayPanel().setFooter(new Label("Tags: " + presentation.getTags()));
 
         liveIcon = new ImageView(new Image("file:projectResources/icons/live_icon.png"));
         StackPane.setAlignment(liveIcon, Pos.TOP_RIGHT);
@@ -86,6 +87,7 @@ public class PresentationPanel extends PreviewPanel {
         presentation.getPresentationMetadata().setLive(live);
         isLive = live;
         updateVisibility();
+        presentation.getModule().getModulePanel().updateIsLive();
     }
 
     @Override

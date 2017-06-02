@@ -4,10 +4,7 @@ import com.i2lp.edi.client.PresentationSession;
 import com.i2lp.edi.client.StudentSession;
 import com.i2lp.edi.client.animation.Animation;
 import com.i2lp.edi.client.exceptions.SequenceNotFoundException;
-import com.i2lp.edi.client.presentationElements.InteractiveElement;
-import com.i2lp.edi.client.presentationElements.Presentation;
-import com.i2lp.edi.client.presentationElements.Slide;
-import com.i2lp.edi.client.presentationElements.SlideElement;
+import com.i2lp.edi.client.presentationElements.*;
 import com.i2lp.edi.client.presentationViewerElements.CommentPanel;
 import com.i2lp.edi.client.presentationViewerElements.DrawPane;
 import com.i2lp.edi.client.utilities.CursorState;
@@ -64,8 +61,8 @@ public abstract class PresentationManager {
 
     /* -------------- LIVE SESSION OBJECTS ----------------*/
     protected final EdiManager ediManager;
-    private PresentationSession presentationSession;
-    private StudentSession studentSession;
+    protected PresentationSession presentationSession;
+    protected StudentSession studentSession;
     //Interactive Element list for linking to ServerSide data
     private ArrayList<InteractiveElement> interactiveElementList = new ArrayList<>();
 
@@ -162,9 +159,6 @@ public abstract class PresentationManager {
         controlsPane = new BorderPane();
         controlsPane.setPickOnBounds(false);
         displayPane.setPickOnBounds(false);
-        presControls = addPresentationControls();
-        drawControls = addDrawControls();
-        questionQueueControls = addQuestionQueueControls();
     }
 
     /**
@@ -221,6 +215,14 @@ public abstract class PresentationManager {
         scene = new Scene(sceneBox, slideWidth, slideHeight); //1000x600
         scene.getStylesheets().add("bootstrapfx.css");
 
+        setupLinkButton(); //Link button has to be initialised before live session begins
+
+        beginLiveSession();//Start the live session before the presentation starts!
+
+        presControls = addPresentationControls(); //Setup all controls after live session begins as they depend on online/offline state
+        drawControls = addDrawControls();
+        questionQueueControls = addQuestionQueueControls();
+
         //Listeners for moving through presentation
         addKeyboardListeners();
         addMouseListeners();
@@ -233,8 +235,6 @@ public abstract class PresentationManager {
         commentPanel.setSlide(this.presentationElement.getCurrentSlide()); //Required for comments to work.
 
         displayCurrentSlide();
-
-        beginLiveSession();//Start the live session before the presentation starts!
 
         if (presentationElement.isAutoplayPresentation()) {
             autoPlay();
@@ -544,19 +544,6 @@ public abstract class PresentationManager {
             }
         });
 
-
-        String linkIconURL = "file:projectResources/icons/lock.png";
-
-        linkButton = makeCustomButton(linkIconURL, evt -> {
-            if (studentSession != null) {
-                if (studentSession.isLinked()) {
-                    studentSession.setPresentationLink(false);
-                } else {
-                    studentSession.setPresentationLink(true);
-                }
-            }
-        });
-
         ImageView commentButton = makeCustomButton("file:projectResources/icons/SB_Filled.png", event -> {
             try {
                 toggleCommentsWindow();
@@ -594,10 +581,21 @@ public abstract class PresentationManager {
         this.progressBar.setMinSize(200, 10);
         progressBar.getChildren().addAll(this.progressBar, slideNumber);
         if (this instanceof PresentationManagerStudent) {
-            presControls.getChildren().addAll(backButton, nextButton, fullScreenButton, linkButton, specificFeats, commentButton, drawButton, visibilityButton, progressBar);
-        } else {
-            presControls.getChildren().addAll(backButton, nextButton, fullScreenButton, specificFeats, commentButton, drawButton, visibilityButton, progressBar);
+            presControls.getChildren().addAll(backButton, nextButton, fullScreenButton);
 
+            if (studentSession != null) {
+                presControls.getChildren().addAll(linkButton, specificFeats);
+            }
+
+            presControls.getChildren().addAll(commentButton, drawButton, visibilityButton, progressBar);
+        } else {
+            presControls.getChildren().addAll(backButton, nextButton, fullScreenButton);
+
+            if (presentationSession != null) {
+                presControls.getChildren().add(specificFeats);
+            }
+
+            presControls.getChildren().addAll(commentButton, drawButton, visibilityButton, progressBar);
         }
         addMouseHandlersToControls(presControls);
 
@@ -605,6 +603,20 @@ public abstract class PresentationManager {
         presControls.setAlignment(Pos.BOTTOM_LEFT);
 
         return presControls;
+    }
+
+    private void setupLinkButton() {
+        String linkIconURL = "file:projectResources/icons/lock.png";
+
+        linkButton = makeCustomButton(linkIconURL, evt -> {
+            if (studentSession != null) {
+                if (studentSession.isLinked()) {
+                    studentSession.setPresentationLink(false);
+                } else {
+                    studentSession.setPresentationLink(true);
+                }
+            }
+        });
     }
 
     protected ImageView makeCustomButton(String iconURL, EventHandler<MouseEvent> mouseClickedEventHandler) {
@@ -878,8 +890,14 @@ public abstract class PresentationManager {
         //Fire animations
         for (SlideElement elementToAnimate : slideToAdvance.getVisibleSlideElementList()) {
             if (elementToAnimate.getStartSequence() == slideToAdvance.getCurrentSequenceNumber()) {
+                if (((elementToAnimate instanceof AudioElement || elementToAnimate instanceof VideoElement) && studentSession != null) || this instanceof ThumbnailGenerationManager) {
+                    elementToAnimate.setForceMute(true);
+                }
                 elementToAnimate.renderElement(Animation.ENTRY_ANIMATION); //Entry Sequence
             } else if (elementToAnimate.getEndSequence() == slideToAdvance.getCurrentSequenceNumber()) {
+                if (((elementToAnimate instanceof AudioElement || elementToAnimate instanceof VideoElement) && studentSession != null) || this instanceof ThumbnailGenerationManager) {
+                    elementToAnimate.setForceMute(true);
+                }
                 elementToAnimate.renderElement(Animation.EXIT_ANIMATION); //Exit Sequence
             }
         }

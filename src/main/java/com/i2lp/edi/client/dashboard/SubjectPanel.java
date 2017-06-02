@@ -28,11 +28,11 @@ public class SubjectPanel extends PreviewPanel {
     private static final double SCROLL_BUTTON_SIZE = 15;
     private static final long SCROLL_RATE = 20;
     private static final double SCROLL_INCREMENT_PX = 15;
-    private static double SPACING = 5;
+    private static final double SPACING = 5;
     private final Subject subject;
     private ArrayList<ModulePanel> modulePanels;
     private HBox modulePanelsHBox;
-    private Text title;
+    private Text numOfModules;
     private StackPane leftStackPane, rightStackPane;
     private ScrollPane centerScroll;
     private BorderPane borderPane;
@@ -43,11 +43,19 @@ public class SubjectPanel extends PreviewPanel {
         this.subject = subject;
         modulePanelsHBox = new HBox(SPACING);
         modulePanels = new ArrayList<>();
-        BorderPane.setMargin(modulePanelsHBox, new Insets(5));
 
-        title = new Text(subject.getSubjectName());
+        Text title = new Text(subject.getSubjectName());
         title.getStyleClass().setAll("h4");
         BorderPane.setMargin(title, new Insets(5));
+
+        numOfModules = new Text();
+        numOfModules.getStyleClass().setAll("h5", "italics");
+        numOfModules.setFill(Color.GRAY);
+
+        HBox textHBox = new HBox(2);
+        textHBox.setAlignment(Pos.CENTER_LEFT);
+        textHBox.getChildren().addAll(title, numOfModules);
+        BorderPane.setMargin(textHBox, new Insets(5));
 
         Region backgroundRegion = new Region();
         backgroundRegion.setBackground(new Background(new BackgroundFill(Color.WHITE, null, null)));
@@ -59,12 +67,8 @@ public class SubjectPanel extends PreviewPanel {
         centerScroll.setVbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         centerScroll.getStyleClass().add("edge-to-edge");
         centerScroll.setContent(stackPane);
-        centerScroll.widthProperty().addListener((observable, oldValue, newValue) -> {
-            backgroundRegion.setPrefWidth(newValue.doubleValue());
-        });
-        centerScroll.heightProperty().addListener((observable, oldValue, newValue) -> {
-            backgroundRegion.setPrefHeight(newValue.doubleValue());
-        });
+        centerScroll.widthProperty().addListener((observable, oldValue, newValue) -> backgroundRegion.setPrefWidth(newValue.doubleValue()));
+        centerScroll.heightProperty().addListener((observable, oldValue, newValue) -> backgroundRegion.setPrefHeight(newValue.doubleValue()));
 
         borderPane = new BorderPane();
         borderPane.setCenter(centerScroll);
@@ -85,7 +89,7 @@ public class SubjectPanel extends PreviewPanel {
             }
         });
 
-        getDisplayPanel().setTop(title);
+        getDisplayPanel().setTop(textHBox);
         getDisplayPanel().setCenter(borderPane);
     }
 
@@ -136,18 +140,41 @@ public class SubjectPanel extends PreviewPanel {
 
     public void addModulePanel(ModulePanel panel) {
         modulePanels.add(panel);
-        title.setText(getSubject().getSubjectName() + " (" + modulePanels.size() + " modules)");
+        panel.setSubjectPanel(this);
+        numOfModules.setText(" (" + modulePanels.size() + " modules)");
     }
 
     public ArrayList<ModulePanel> getModulePanels() { return modulePanels; }
 
     public void updateScrollControls() {
-        if(centerScroll.getWidth() < modulePanelsHBox.getWidth()) {
-            borderPane.setLeft(leftStackPane);
-            borderPane.setRight(rightStackPane);
+        double scrollWidth = centerScroll.getWidth();
+        double totalWidth = getTotalModulesWidth();
+        if(scrollWidth != 0 && scrollWidth < totalWidth) {
+            Platform.runLater(() -> { //TODO: without runLater() stackPanes are positioned incorrectly. Seems to be caused by areaX and areaY being zero in BorderPane.layoutChildren()
+                borderPane.setLeft(leftStackPane);
+                borderPane.setRight(rightStackPane);
+            });
         } else {
             borderPane.setLeft(null);
             borderPane.setRight(null);
         }
+    }
+
+    private double getTotalModulesWidth() {
+        double width = 0;
+        for (int i = 0; i < modulePanels.size(); i++) {
+            width += ModulePanel.WIDTH;
+            width += SPACING;
+        }
+
+        if(modulePanels.size() != 0) {
+            width -= SPACING;
+        }
+
+        return width;
+    }
+
+    public void layoutBorderPane() {
+        borderPane.layout();
     }
 }

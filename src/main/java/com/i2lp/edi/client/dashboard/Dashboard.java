@@ -105,6 +105,7 @@ public abstract class Dashboard extends Application {
     protected FileChooser fileChooser;
     protected MenuBar menuBar;
     protected Popup aboutPopup;
+    private Text welcomeText;
 
     @Override
     public void start(Stage dashboardStage) {
@@ -137,9 +138,9 @@ public abstract class Dashboard extends Application {
 
         ediManager.getPresentationLibraryManager().getUserModuleList();
 
-        goToState(DashboardState.TOP_LEVEL);
-
         dashboardStage.show();
+
+        goToState(DashboardState.TOP_LEVEL);
     }
 
     public void goToState(DashboardState state) {
@@ -166,7 +167,7 @@ public abstract class Dashboard extends Application {
         topPanel.setPadding(new Insets(15, 12, 15, 12));
         topPanel.setStyle("-fx-background-color: #34495e;");
 
-        Text platformTitle = new Text("Integrated Interactive Learning Platform");
+        Text platformTitle = new Text("Edi");
         platformTitle.getStyleClass().setAll("h3");
         platformTitle.setFill(Color.WHITESMOKE);
 
@@ -206,13 +207,6 @@ public abstract class Dashboard extends Application {
         openAddButtonsHBox.getChildren().add(openPresButton);
         topPanel.getChildren().add(openAddButtonsHBox);
 
-        if (this instanceof TeacherDashboard) {
-            Button addToServerButton = new Button("Add pres to server");
-            addToServerButton.getStyleClass().setAll("btn", "btn-success");
-            addToServerButton.setOnAction(event -> showAddPresToServer());
-            topPanel.getChildren().add(addToServerButton);
-        }
-
         topPanel.getChildren().add(platformTitleHBox);
         HBox.setHgrow(platformTitleHBox, Priority.ALWAYS);
 
@@ -250,12 +244,12 @@ public abstract class Dashboard extends Application {
             }
         });
 
-        ScrollPane modulesScrollPane = new ScrollPane();
-        modulesScrollPane.setContent(subjectPanelsVBox);
-        modulesScrollPane.setHbarPolicy(ScrollBarPolicy.NEVER);
-        modulesScrollPane.setVbarPolicy(ScrollBarPolicy.NEVER);
-        modulesScrollPane.setFitToWidth(true);
-        modulesScrollPane.getStyleClass().add("edge-to-edge");
+        ScrollPane subjectsScrollPane = new ScrollPane();
+        subjectsScrollPane.setContent(subjectPanelsVBox);
+        subjectsScrollPane.setHbarPolicy(ScrollBarPolicy.NEVER);
+        subjectsScrollPane.setVbarPolicy(ScrollBarPolicy.NEVER);
+        subjectsScrollPane.setFitToWidth(true);
+        subjectsScrollPane.getStyleClass().add("edge-to-edge");
 
         ScrollPane presentationsScrollPane = new ScrollPane();
         presentationsScrollPane.setContent(presentationPanelsFlowPane);
@@ -294,24 +288,25 @@ public abstract class Dashboard extends Application {
 
                     textStackPane.getChildren().addAll(textPanel, closeTextButton);
 
-                    Text welcomeText = new Text("Welcome to Edi");
-                    welcomeText.getStyleClass().setAll("h3");
+                    Text welcomeHeader = new Text("Welcome to Edi");
+                    welcomeHeader.getStyleClass().setAll("h3");
+                    textVBox.getChildren().add(welcomeHeader);
+                    VBox.setMargin(welcomeHeader, new Insets(5, 0, 5, 0));
+
+                    welcomeText = new Text("Hello, " + ediManager.getUserData().getFirstName() +
+                            ". You have " + getNumOfScheduledPresOnDate(LocalDate.now()) +
+                            " presentations on schedule today.");
                     textVBox.getChildren().add(welcomeText);
                     VBox.setMargin(welcomeText, new Insets(5, 0, 5, 0));
-
-                    Text updateText = new Text(Constants.WELCOME_TEXT);
-                    updateText.getStyleClass().setAll("h6", "text-justify");
-                    textVBox.getChildren().add(updateText);
-                    VBox.setMargin(updateText, new Insets(5, 0, 5, 0));
 
                     vbox.getChildren().add(textStackPane);
                 }
 
-                vbox.getChildren().add(modulesScrollPane);
+                vbox.getChildren().add(subjectsScrollPane);
                 border.setCenter(vbox);
 
                 filterBy(filterSubjects);
-                Platform.runLater(() -> updateModuleScrollControls());
+                updateModuleScrollControls();
                 break;
 
             case SEARCH_ALL:
@@ -334,7 +329,7 @@ public abstract class Dashboard extends Application {
                 border.setCenter(searchScrollPane);
 
                 filterBy(filterSubjects);
-                Platform.runLater(() -> updateModuleScrollControls());
+                updateModuleScrollControls();
                 break;
 
             case MODULE:
@@ -615,7 +610,7 @@ public abstract class Dashboard extends Application {
         calendar.setDayCellFactory(dayCellFactory);
         DatePickerSkin calendarSkin = new DatePickerSkin(calendar);
         Node calendarNode = calendarSkin.getPopupContent();
-        calendarNode.setStyle("-fx-font-size: 8.9px;");
+        calendarNode.setStyle("-fx-font-size: 8.5px;");
         calendarNode.setEffect(null);
 
         switch (state) {
@@ -652,10 +647,6 @@ public abstract class Dashboard extends Application {
             default:
                 //Do nothing
         }
-    }
-
-    private void addUserPanel() {
-        //TODO: add a pane with user info to the top of the left panel
     }
 
     public void updateAvailablePresentations() {
@@ -706,7 +697,7 @@ public abstract class Dashboard extends Application {
         setupModulePanels();
         setupPresentationPanels();
         setupSchedulePanels();
-        Platform.runLater(() -> updateModuleScrollControls());
+        updateModuleScrollControls();
 
         if (currentState != null) {
             if (currentState == DashboardState.SEARCH_ALL || currentState == DashboardState.TOP_LEVEL) {
@@ -897,6 +888,22 @@ public abstract class Dashboard extends Application {
         }
     }
 
+    private int getNumOfScheduledPresOnDate(LocalDate date) {
+        int count = 0;
+
+        for (Presentation presentation : availablePresentations) {
+            try {
+                if (presentation.getGoLiveDateTime().toLocalDate().isEqual(date)) {
+                    count++;
+                }
+            } catch (NullPointerException e) {
+                //Presentation has no set goLive date. Do nothing
+            }
+        }
+
+        return count;
+    }
+
     private void setLive(PresentationPanel presPanel, boolean live) {
         if (!live && presPanel.isLive()) {
             presPanel.setLive(false);
@@ -975,8 +982,9 @@ public abstract class Dashboard extends Application {
         MenuItem openRemote = new MenuItem(OPEN_REMOTE_PRES_CAPTION);
         openRemote.setOnAction(event -> showOpenRemotePres(""));
         openPresMenu.getItems().addAll(openLocal, openRemote);
-
-        Menu editMenu = new Menu("Administration");
+        MenuItem upload = new MenuItem("Upload presentation to server");
+        upload.setOnAction(event -> showAddPresToServer());
+        fileMenu.getItems().add(upload);
 
         Menu viewMenu = new Menu("View");
         MenuItem showWelcomeMessage = new MenuItem("Show Welcome Message");
@@ -991,7 +999,7 @@ public abstract class Dashboard extends Application {
         aboutMenuItem.setOnAction(event -> showAboutWindow());
         helpMenu.getItems().add(aboutMenuItem);
 
-        menuBar.getMenus().addAll(fileMenu, editMenu, viewMenu, helpMenu);
+        menuBar.getMenus().addAll(fileMenu, viewMenu, helpMenu);
 
         return menuBar;
     }
@@ -1380,7 +1388,6 @@ public abstract class Dashboard extends Application {
         }
 
         addToServerStage = new Stage();
-        //addToServerStage.setResizable(false);
         addToServerStage.resizableProperty().setValue(Boolean.FALSE);
         GridPane addToServerGridPane = new GridPane();
         addToServerGridPane.setAlignment(Pos.CENTER);
@@ -1399,14 +1406,6 @@ public abstract class Dashboard extends Application {
         selectXML.setOnAction(event1 -> {
             File file = fileChooser.showOpenDialog(addToServerStage);
             if (file != null) {
-                ParserXML parser = new ParserXML(file.getPath());
-                Presentation presentation = parser.parsePresentation();
-                StackPane previewPane = new StackPane();
-                previewPane.setPadding(new Insets(10));
-                rootPane.setBottom(previewPane);
-                ImageView presPreview = presentation.getSlidePreview(0, Constants.THUMBNAIL_WIDTH);
-                previewPane.getChildren().add(presPreview);
-                addToServerStage.setHeight(200 + presPreview.getImage().getHeight());
                 xmlLocation.set(file);
             }
         });
