@@ -825,7 +825,8 @@ public abstract class Dashboard extends Application {
 
                         MenuItem resetInteractions = new MenuItem("Reset interaction data");
                         resetInteractions.setOnAction(resetEvent -> {
-                            //TODO: tie this to server
+                            ediManager.getSocketClient().resetInteractionsForPresentation(this.selectedPresPanel.
+                                    getPresentation().getPresentationMetadata().getPresentationID());
                         });
                         cMenu.getItems().add(resetInteractions);
 
