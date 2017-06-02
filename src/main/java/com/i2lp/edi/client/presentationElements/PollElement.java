@@ -59,16 +59,6 @@ public class PollElement extends InteractiveElement {
     }
 
     @Override
-    public void sendDataToServer() {
-
-    }
-
-    @Override
-    public void receiveDataFromServer() {
-
-    }
-
-    @Override
     public void doClassSpecificRender() {
         if (xSize == 0 || ySize == 0) {
             questionPane.setPrefHeight(slideHeight);

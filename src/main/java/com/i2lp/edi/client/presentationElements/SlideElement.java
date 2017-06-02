@@ -40,6 +40,9 @@ public abstract class SlideElement {
 
     protected EdiManager ediManager;
     protected float duration = -1;
+
+
+
     protected int slideID; //Needed for CSS generation, CSS filename needs this to identify what to apply
 
     protected String presentationID; //Needed for CSS generation
@@ -453,5 +456,9 @@ public abstract class SlideElement {
 
     public Animation getEndAnimation() {
         return endAnimation;
+    }
+
+    public int getSlideID() {
+        return slideID;
     }
 }

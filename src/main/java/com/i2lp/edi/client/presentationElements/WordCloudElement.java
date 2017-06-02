@@ -65,16 +65,6 @@ public class WordCloudElement extends InteractiveElement {
     protected TextField words;
 
     @Override
-    public void sendDataToServer() {
-
-    }
-
-    @Override
-    public void receiveDataFromServer() {
-
-    }
-
-    @Override
     public void doClassSpecificRender() {
         if (xSize == 0 || ySize == 0) {
             wordCloudPanel.setPrefHeight(slideHeight);
