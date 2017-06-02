@@ -83,7 +83,7 @@ public class ThumbnailGenerationManager extends PresentationManager {
 
     public static void generateSlideThumbnails(Presentation presentation, boolean savePresentationToPdf) {
         ThumbnailGenerationManager slideGenController = new ThumbnailGenerationManager(null);
-        slideGenController.openPresentation(presentation, savePresentationToPdf);
+        slideGenController.openPresentation(presentation, true);
         slideGenController.generateSlideThumbNail(slideGenController, savePresentationToPdf);
         if (savePresentationToPdf) slideGenController.savePresentationToPdf();
     }

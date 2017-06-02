@@ -106,8 +106,8 @@ public class WordCloudElement extends InteractiveElement {
             start_Task.addEventHandler(MouseEvent.MOUSE_CLICKED,evt->{
                 wordCloudPanel.getChildren().remove(start_Task);
                 setUpWordCloudData(new Time(Instant.now().toEpochMilli()));
-                if(ediManager.getPresentationManager().getPresentationSession() != null) {
-                    ediManager.getPresentationManager().getPresentationSession().beginInteraction(this, true);
+                if(ediManager.getPresentationManager().getTeacherSession() != null) {
+                    ediManager.getPresentationManager().getTeacherSession().beginInteraction(this, true);
                 }
             });
             start_Task.addEventHandler(MouseEvent.MOUSE_ENTERED,evt->{

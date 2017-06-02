@@ -24,8 +24,8 @@ import java.util.TimerTask;
 /**
  * Created by amriksadhra on 27/05/2017.
  */
-public class PresentationSession {
-    private Logger logger = LoggerFactory.getLogger(PresentationSession.class);
+public class TeacherSession {
+    private Logger logger = LoggerFactory.getLogger(TeacherSession.class);
     private EdiManager ediManager;
     private Presentation activePresentation;
 
@@ -43,7 +43,7 @@ public class PresentationSession {
     ArrayList<Duration> slideTimes;
     private Instant slideStart;//The time at which the current slide started.
 
-    public PresentationSession(EdiManager ediManager) {
+    public TeacherSession(EdiManager ediManager) {
         this.ediManager = ediManager;
         this.activePresentation = ediManager.getPresentationManager().getPresentationElement();
         this.interactiveElementsInPresentation = ediManager.getPresentationManager().getInteractiveElementList();
@@ -134,8 +134,6 @@ public class PresentationSession {
     }
 
     public void endSession() {
-        gatherUserStatistics();
-
         endDate = new Date();
         logger.info("Live Presentation session ending. Presentation lasted " + (int) ((endDate.getTime() - startDate.getTime()) / 1000) + " seconds.");
 
@@ -143,15 +141,6 @@ public class PresentationSession {
         ediManager.getPresentationManager().getPresentationElement().getPresentationMetadata().setLive(false);
         ediManager.getSocketClient().setPresentationLive(activePresentation.getPresentationMetadata().getPresentationID(), false);
         ediManager.getSocketClient().setCurrentSlideAndSequenceForPresentation(activePresentation.getPresentationMetadata().getPresentationID(), 0, 0);
-    }
-
-    private void gatherUserStatistics() {
-        //Perform a master query over the Interactions table for a specific users interactions
-        //Count Number of responses
-        //Generate ArrayList of UserStatistics
-
-        //For Presentation
-
     }
 
     public ArrayList<User> getActiveUsers() {

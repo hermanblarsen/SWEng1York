@@ -1,6 +1,6 @@
 package com.i2lp.edi.client.managers;
 
-import com.i2lp.edi.client.PresentationSession;
+import com.i2lp.edi.client.TeacherSession;
 import com.i2lp.edi.client.StudentSession;
 import com.i2lp.edi.client.animation.Animation;
 import com.i2lp.edi.client.exceptions.SequenceNotFoundException;
@@ -61,7 +61,7 @@ public abstract class PresentationManager {
 
     /* -------------- LIVE SESSION OBJECTS ----------------*/
     protected final EdiManager ediManager;
-    protected PresentationSession presentationSession;
+    protected TeacherSession teacherSession;
     protected StudentSession studentSession;
     //Interactive Element list for linking to ServerSide data
     private ArrayList<InteractiveElement> interactiveElementList = new ArrayList<>();
@@ -249,9 +249,9 @@ public abstract class PresentationManager {
 
     private void beginLiveSession() {
         if (presentationElement.getPresentationMetadata() != null) {//If not local presentation
-            if (presentationElement.getPresentationMetadata().getLive()) {//If we are live, start up a PresentationSession in which to track connectivity data
+            if (presentationElement.getPresentationMetadata().getLive()) {//If we are live, start up a TeacherSession in which to track connectivity data
                 if (this instanceof PresentationManagerTeacher) {
-                    presentationSession = new PresentationSession(ediManager);
+                    teacherSession = new TeacherSession(ediManager);
                 } else if (this instanceof PresentationManagerStudent) {
                     studentSession = new StudentSession(ediManager);
                 }
@@ -263,8 +263,8 @@ public abstract class PresentationManager {
         return studentSession;
     }
 
-    public PresentationSession getPresentationSession() {
-        return presentationSession;
+    public TeacherSession getTeacherSession() {
+        return teacherSession;
     }
 
     private void addKeyboardListeners() {
@@ -441,8 +441,8 @@ public abstract class PresentationManager {
         if (presentationStatus == Presentation.SLIDE_CHANGE || presentationStatus == Presentation.PRESENTATION_FINISH || presentationStatus == Presentation.PRESENTATION_START || presentationStatus == Presentation.SLIDE_LAST_ELEMENT || presentationStatus == Presentation.SAME_SLIDE) {
             if ((presentationStatus == Presentation.SLIDE_CHANGE) || (presentationStatus == Presentation.SAME_SLIDE) || (presentationStatus == Presentation.SLIDE_LAST_ELEMENT)) {
                 if (presentationStatus == Presentation.SLIDE_CHANGE) logger.info("Changing Slides");
-                if (getPresentationSession() != null) {//If in live hosting session
-                    getPresentationSession().synchroniseSlides();
+                if (getTeacherSession() != null) {//If in live hosting session
+                    getTeacherSession().synchroniseSlides();
                 }
             } else if (presentationStatus == Presentation.PRESENTATION_START) {
                 logger.info("At Presentation start");
@@ -591,7 +591,7 @@ public abstract class PresentationManager {
         } else {
             presControls.getChildren().addAll(backButton, nextButton, fullScreenButton);
 
-            if (presentationSession != null) {
+            if (teacherSession != null) {
                 presControls.getChildren().add(specificFeats);
             }
 
@@ -894,7 +894,7 @@ public abstract class PresentationManager {
                     elementToAnimate.setForceMute(true);
                 }
                 elementToAnimate.renderElement(Animation.ENTRY_ANIMATION); //Entry Sequence
-            } else if (elementToAnimate.getEndSequence() == slideToAdvance.getCurrentSequenceNumber()) {
+            } else if ((elementToAnimate.getEndSequence() == slideToAdvance.getCurrentSequenceNumber())&&(!isThumbnailGen)) {
                 if (((elementToAnimate instanceof AudioElement || elementToAnimate instanceof VideoElement) && studentSession != null) || this instanceof ThumbnailGenerationManager) {
                     elementToAnimate.setForceMute(true);
                 }
@@ -969,9 +969,9 @@ public abstract class PresentationManager {
      */
     public void close() {
         if (this instanceof PresentationManagerTeacher) {
-            if (presentationSession != null) {
-                presentationSession.endSession();
-                presentationSession = null;
+            if (teacherSession != null) {
+                teacherSession.endSession();
+                teacherSession = null;
             }
         } else if (this instanceof PresentationManagerStudent) {
             if (studentSession != null) {

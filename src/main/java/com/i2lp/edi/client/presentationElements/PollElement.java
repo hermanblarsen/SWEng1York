@@ -143,8 +143,8 @@ public class PollElement extends InteractiveElement {
             startTimer.getStyleClass().setAll("btn", "btn-default");
             startTimer.addEventHandler(MouseEvent.MOUSE_CLICKED, evt -> {
                 setUpPollData();
-                if (ediManager.getPresentationManager().getPresentationSession() != null) {
-                    ediManager.getPresentationManager().getPresentationSession().beginInteraction(this, true);
+                if (ediManager.getPresentationManager().getTeacherSession() != null) {
+                    ediManager.getPresentationManager().getTeacherSession().beginInteraction(this, true);
                 }
             });
             startTimer.addEventHandler(MouseEvent.MOUSE_ENTERED, evt -> {

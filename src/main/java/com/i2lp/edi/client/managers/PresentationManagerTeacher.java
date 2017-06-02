@@ -89,8 +89,8 @@ public class PresentationManagerTeacher extends PresentationManager {
             });
 
         }
-        if(getPresentationSession() != null) {
-            newQuestionList = getPresentationSession().getQuestionQueue();
+        if(getTeacherSession() != null) {
+            newQuestionList = getTeacherSession().getQuestionQueue();
         }
         if(newQuestionList == null){
             System.out.println("NULL QUESTION");
@@ -143,13 +143,13 @@ public class PresentationManagerTeacher extends PresentationManager {
     protected ArrayList<Student> generateStudentList(){
         int numberOfStudents = 0;
         if(presentationElement.getPresentationMetadata().getLive()) {
-            if(getPresentationSession().getActiveUsers() != null) {
-                numberOfStudents = getPresentationSession().getActiveUsers().size();
+            if(getTeacherSession().getActiveUsers() != null) {
+                numberOfStudents = getTeacherSession().getActiveUsers().size();
             }
         }
         ArrayList<Student> studentList = new ArrayList<>();
         for(int i = 0;i<numberOfStudents;i++){
-            String studentName = getPresentationSession().getActiveUsers().get(i).getFirstName()+" "+getPresentationSession().getActiveUsers().get(i).getSecondName();
+            String studentName = getTeacherSession().getActiveUsers().get(i).getFirstName()+" "+ getTeacherSession().getActiveUsers().get(i).getSecondName();
             Student newStudent = new Student(studentName,10,true);//Todo add interaction stuff once it is ready
             studentList.add(newStudent);
         }
@@ -389,7 +389,7 @@ public class PresentationManagerTeacher extends PresentationManager {
 
     @Override
     protected VBox addQuestionQueueControls() {
-        if (presentationSession != null) {
+        if (teacherSession != null) {
             if (newQuestionList != null) {
                 questionNumberLabel = new Label(Integer.toString(newQuestionList.size()));
             } else {

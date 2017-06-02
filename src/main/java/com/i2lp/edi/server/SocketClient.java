@@ -129,8 +129,8 @@ public class SocketClient {
             switch ((String) tableToUpdate) {
                 case "interactions":
                     if (ediManager.getPresentationManager() != null) {//If in a presentation
-                        if (ediManager.getPresentationManager().getPresentationSession() != null) {//That a teacher is holding that is live
-                            ediManager.getPresentationManager().getPresentationSession().setInteractionsForPresentation(getInteractionsForPresentation(ediManager.getPresentationManager().getPresentationElement().getPresentationMetadata().getPresentationID()));
+                        if (ediManager.getPresentationManager().getTeacherSession() != null) {//That a teacher is holding that is live
+                            ediManager.getPresentationManager().getTeacherSession().setInteractionsForPresentation(getInteractionsForPresentation(ediManager.getPresentationManager().getPresentationElement().getPresentationMetadata().getPresentationID()));
                         }
                     }
                     break;
@@ -145,9 +145,9 @@ public class SocketClient {
 
                 case "users":
                     if (ediManager.getPresentationManager() != null) {
-                        if (ediManager.getPresentationManager().getPresentationSession() != null) {//If in a live session as a teacher
+                        if (ediManager.getPresentationManager().getTeacherSession() != null) {//If in a live session as a teacher
                             logger.info("Updating active user list for live presentation.");
-                            ediManager.getPresentationManager().getPresentationSession().setActiveUsers(getPresentationActiveUsers(ediManager.getPresentationManager().getPresentationElement().getPresentationMetadata().getPresentationID()));//Update list of active users in that presentation
+                            ediManager.getPresentationManager().getTeacherSession().setActiveUsers(getPresentationActiveUsers(ediManager.getPresentationManager().getPresentationElement().getPresentationMetadata().getPresentationID()));//Update list of active users in that presentation
                         }
                     }
                     break;
@@ -184,8 +184,8 @@ public class SocketClient {
 
                 case "questions":
                     if (ediManager.getPresentationManager() != null) {//If in a presentationforeign
-                        if (ediManager.getPresentationManager().getPresentationSession() != null) { //a teacher in a live presentation
-                            ediManager.getPresentationManager().getPresentationSession().setQuestionQueue(ediManager.getSocketClient().getQuestionsForPresentation(ediManager.getPresentationManager().getPresentationElement().getPresentationMetadata().getPresentationID())); //Update the question queue in the session
+                        if (ediManager.getPresentationManager().getTeacherSession() != null) { //a teacher in a live presentation
+                            ediManager.getPresentationManager().getTeacherSession().setQuestionQueue(ediManager.getSocketClient().getQuestionsForPresentation(ediManager.getPresentationManager().getPresentationElement().getPresentationMetadata().getPresentationID())); //Update the question queue in the session
 
                         }
                     }
@@ -513,7 +513,11 @@ public class SocketClient {
         try (PGConnection connection = (PGConnection) dataSource.getConnection()) {
             PreparedStatement statement = connection.prepareStatement("UPDATE presentations SET go_live_timestamp=? WHERE presentation_id=?");
 
-            statement.setString(1, goLiveDate);
+            if(goLiveDate.equals("0")){
+                statement.setNull(1, 0);
+            } else {
+                statement.setString(1, goLiveDate);
+            }
             statement.setInt(2, presentationId);
 
             //Call Query on database
