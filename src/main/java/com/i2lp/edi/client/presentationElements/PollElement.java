@@ -198,7 +198,6 @@ public class PollElement extends InteractiveElement {
     private HBox setUpQuestions() {
         setUpQuestionList(answers);
         answerButton = new ToggleButton[possibleAnswers.size()];
-        chartDataArray = new ChartData[possibleAnswers.size()];
         final ToggleGroup group = new ToggleGroup();
         HBox answerSelection = new HBox();
         //answerSelection.setMaxWidth(slideCanvas.getMaxWidth());
@@ -234,17 +233,22 @@ public class PollElement extends InteractiveElement {
     }
 
     public void displayDone() {
+        double testShit[] = new double[possibleAnswers.size()];
+        chartDataArray = new ChartData[possibleAnswers.size()];
         questionPane.getChildren().remove(questionPane.getBody());
         for (int i = 0; i < possibleAnswers.size(); i++) {
             chartDataArray[i] = new ChartData(possibleAnswers.get(i), 0);
             chartDataArray[i].setColor(assignBarColour(i));
         }
 
-        for (int i = 0; i < pollOutput.size(); i++) {
-            int resultValue = Integer.parseInt(pollOutput.get(i));
-            chartDataArray[resultValue].setValue(chartDataArray[resultValue].getValue() + 1);
+        for(int i=0; i<pollOutput.size();i++){
+            testShit[Integer.parseInt(pollOutput.get(i))]++;
         }
-        //chartDataArray[setValue].setValue(chartDataArray[setValue].getValue()+1);
+
+        for(int i=0; i<possibleAnswers.size();i++){
+            chartDataArray[i].setValue(testShit[i]);
+        }
+
         answerOutputTile.setRadialChartData(chartDataArray);
         questionPane.setBody(answerOutputTile);
     }
