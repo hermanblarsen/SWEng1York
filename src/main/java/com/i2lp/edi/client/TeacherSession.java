@@ -95,7 +95,6 @@ public class TeacherSession {
         Timer responseWindow = new Timer();
         InteractiveElementRecord finalLiveElement = liveElementRecord;
         //Start countdown timer, then perform render of results
-        //TODO: Modify to enable live modification of Polls
         responseWindow.schedule(new TimerTask() {
             @Override
             public void run() {
@@ -136,7 +135,6 @@ public class TeacherSession {
     public void endSession() {
         endDate = new Date();
         logger.info("Live Presentation session ending. Presentation lasted " + (int) ((endDate.getTime() - startDate.getTime()) / 1000) + " seconds.");
-
         //Update Presentation record to offline
         ediManager.getPresentationManager().getPresentationElement().getPresentationMetadata().setLive(false);
         ediManager.getSocketClient().setPresentationLive(activePresentation.getPresentationMetadata().getPresentationID(), false);

@@ -154,7 +154,7 @@ public class SocketClient {
 
                 case "presentations":
                     //Update presentation list if no presentation manager is open
-                    if (ediManager.getPresentationManager() == null) {
+                    if ((ediManager.getPresentationManager().getStudentSession() == null)||(ediManager.getPresentationManager().getTeacherSession() == null)) {
                         if (ediManager.getPresentationLibraryManager() != null) {
                             ediManager.getPresentationLibraryManager().updatePresentations(); //Update presentation information
                         }

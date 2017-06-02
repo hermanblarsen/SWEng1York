@@ -68,17 +68,19 @@ public class StudentSession {
     }
 
     public void endSession() {
-        sendUserStatistics();
         //Set active presentation for user to null (no active presentation)
         ediManager.getSocketClient().setUserActivePresentation(0, ediManager.getUserData().getUserID());
 
         endDate = new Date();
         logger.info("Live Presentation session ending. Presentation lasted " + (int) ((endDate.getTime() - startDate.getTime()) / 1000) + " seconds.");
 
+        //Update Presentation record to offline
+        ediManager.getSocketClient().setPresentationLive(activePresentation.getPresentationMetadata().getPresentationID(), false);
+        ediManager.getSocketClient().setCurrentSlideAndSequenceForPresentation(activePresentation.getPresentationMetadata().getPresentationID(), 0, 0);
+
         //Submit the slide times to the DB:
         if (ediManager.getPresentationManager() != null) {
             ediManager.getSocketClient().sendPresentationStatistics(ediManager.getPresentationManager().getPresentationElement().getPresentationMetadata().getPresentationID(), ediManager.getUserData().getUserID(), slideTimes);
-
         }
     }
 
@@ -196,13 +198,6 @@ public class StudentSession {
     public void teacherLeft() {
         logger.info("Teacher has left the session.");
     }
-
-
-    //TODO: Go through slide time data and add as interactions to database
-    public void sendUserStatistics() {
-
-    }
-
 
     private void addSlideTimeListener() {
         //Initialise the array with eough space for all of the slides. and set the time on ach slide to 0

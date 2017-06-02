@@ -972,10 +972,12 @@ public abstract class PresentationManager {
             if (teacherSession != null) {
                 teacherSession.endSession();
                 teacherSession = null;
+
             }
         } else if (this instanceof PresentationManagerStudent) {
             if (studentSession != null) {
                 studentSession.endSession();
+                studentSession = null;
             }
         }
 
@@ -983,11 +985,12 @@ public abstract class PresentationManager {
         if (ediManager != null) {
             if (ediManager.getPresentationLibraryManager() != null) {
                 ediManager.getPresentationLibraryManager().updatePresentations(); //Update presentation information
-                ediManager.setPresentationManager(null);
             }
         }
         presentationStage.close();
     }
+
+
 
     protected void displayCurrentSlide() {
         displayPane.getChildren().clear();
