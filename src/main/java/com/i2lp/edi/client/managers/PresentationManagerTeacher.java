@@ -38,6 +38,7 @@ import java.util.Objects;
 public class PresentationManagerTeacher extends PresentationManager {
     protected boolean questionClicked = false;
     protected boolean toolkitOpen = false;
+    protected boolean test = false;
     protected String setText;
     protected List<Student> studentList;
     protected Stage teacherToolKit;
@@ -55,6 +56,7 @@ public class PresentationManagerTeacher extends PresentationManager {
     private Region backgroundRegion;
     private Tab studentStats;
     private Label questionNumberLabel;
+    private int questionID;
     //private Timestamp openTime;
 
     public PresentationManagerTeacher(EdiManager ediManager) {
@@ -67,6 +69,22 @@ public class PresentationManagerTeacher extends PresentationManager {
                 @Override
                 public void run() {
                     displayPane.getChildren().remove(slidePane);
+                    if(!test) {
+                    lab = new Label(slides[questionID].getText());
+                    slidePane.getChildren().removeAll(backgroundRegion, lab);
+                    lab.setFont(new Font("Helvetica", 50));
+                    lab.setTextFill(Color.WHITE);
+                    lab.setWrapText(true);
+                    setText = lab.getText();
+                    slidePane.setPrefSize(slideWidth, slideHeight);
+
+                        System.out.println("Button "+questionID+" Pressed");
+                        slidePane.getChildren().addAll(backgroundRegion, lab);
+                        displayPane.getChildren().addAll(slidePane);
+                    }else{
+                        test = false;
+                    }
+                    questionClicked = true;
                 }
             });
 
@@ -113,6 +131,9 @@ public class PresentationManagerTeacher extends PresentationManager {
             teacherToolKit.show();
             tp.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
             toolkitOpen = true;
+
+            backgroundRegion = new Region();
+            backgroundRegion.setBackground(new Background(new BackgroundFill(Color.web("#34495e"), null, null)));
 
             teacherToolKit.addEventHandler(WindowEvent.WINDOW_CLOSE_REQUEST, evt -> toolkitOpen = false);
         }
@@ -171,8 +192,9 @@ public class PresentationManagerTeacher extends PresentationManager {
             slides[i] = new Panel(questions.get(i).getQuestion_data());
 //            Image answered = new Image("file:projectResources/icons/Tick.png",50,50,true,true);
 //            ImageView answeredView = new ImageView(answered);
-//            final int j= i;
+            final int j= i;
 //            answeredView.addEventHandler(MouseEvent.MOUSE_CLICKED, evt->{
+//                test = true;
 //                displayPane.getChildren().remove(slidePane);
 //                slidePane.getChildren().removeAll(backgroundRegion, lab);
 //                buttonActive = true;
@@ -180,7 +202,6 @@ public class PresentationManagerTeacher extends PresentationManager {
 //                Label questionComplete = new Label("Question Answered!");
 //                logger.info("Question: "+j+" Answered");
 //                slides[j].setBody(questionComplete);
-//                buttonActive = false;
 //            });
 //            answeredView.addEventHandler(MouseEvent.MOUSE_ENTERED,evt->{
 //                buttonActive = true;
@@ -194,15 +215,16 @@ public class PresentationManagerTeacher extends PresentationManager {
             slides[i].setPickOnBounds(false);
             fp.getChildren().add(slides[i]);
 
-            backgroundRegion = new Region();
-            backgroundRegion.setBackground(new Background(new BackgroundFill(Color.web("#34495e"), null, null)));
+            //backgroundRegion = new Region();
+            //backgroundRegion.setBackground(new Background(new BackgroundFill(Color.web("#34495e"), null, null)));
             setText = new String();
             final int val = i;
             slides[i].addEventHandler(MouseEvent.MOUSE_CLICKED, evt -> {
-                lab = new Label(slides[val].getText());
-                if(!buttonActive) {
+
+                if(!test) {
                     if (!questionClicked) {
                         displayPane.getChildren().remove(slidePane);
+                        lab = new Label(slides[val].getText());
                         slidePane.getChildren().removeAll(backgroundRegion, lab);
                         lab.setFont(new Font("Helvetica", 50));
                         lab.setTextFill(Color.WHITE);
@@ -213,6 +235,7 @@ public class PresentationManagerTeacher extends PresentationManager {
                             System.out.println("Button "+val+" Pressed");
                             slidePane.getChildren().addAll(backgroundRegion, lab);
                             displayPane.getChildren().addAll(slidePane);
+                            questionID = val;
                         }
                         questionClicked = true;
                     } else {
@@ -233,6 +256,7 @@ public class PresentationManagerTeacher extends PresentationManager {
                             if(!buttonActive) {
                                 slidePane.getChildren().addAll(backgroundRegion, lab);
                                 displayPane.getChildren().addAll(slidePane);
+                                questionID = val;
                             }
                             questionClicked = true;
                         }
