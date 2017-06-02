@@ -10,10 +10,7 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.*;
 import org.testfx.api.FxToolkit;
 import org.testfx.framework.junit.ApplicationTest;
 
@@ -40,6 +37,7 @@ public class DrawPaneTest extends ApplicationTest {
             System.out.println("Skipping test requiring graphics on circle.ci (CI server is headless)");
             return;
         }
+
         StackPane stackPane = new StackPane();
         myDrawPane = new DrawPane(stackPane);
         Scene scene = new Scene(stackPane,600,600);
@@ -52,6 +50,9 @@ public class DrawPaneTest extends ApplicationTest {
 
     @Before
     public void setUp() {
+        //Ignores the test if the build is run from circle (headless) environment
+        Assume.assumeTrue(!IS_CIRCLE_BUILD);
+
         isEraserMode = myDrawPane.isEraserMode();
     }
 
