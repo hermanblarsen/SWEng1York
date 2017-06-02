@@ -2,12 +2,16 @@ package com.i2lp.edi.client.managers;
 
 
 import com.i2lp.edi.client.dashboard.Dashboard;
+import com.i2lp.edi.client.dashboard.PresDownloadLoadingScreen;
 import com.i2lp.edi.client.dashboard.StudentDashboard;
 import com.i2lp.edi.client.dashboard.TeacherDashboard;
 import com.i2lp.edi.client.login.Login;
 import com.i2lp.edi.server.SocketClient;
 import com.i2lp.edi.server.packets.User;
 import javafx.application.Application;
+import javafx.scene.Scene;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,6 +32,7 @@ public class EdiManager extends Application {
     private Dashboard dashboard;
     protected SocketClient socketClient;
     protected User userData; //Store currently logged in users data
+    private PresDownloadLoadingScreen loadingScreen;
     private boolean offline = false;
     private boolean loggedIn = false;
 
@@ -94,11 +99,15 @@ public class EdiManager extends Application {
         logger.debug("Login succeeded");
         loggedIn = true;
 
-        Stage dashboardStage = new Stage();
+        loadingScreen = new PresDownloadLoadingScreen(  );
+        Stage downloadStage = new Stage();
+        //downloadStage.initOwner(dashboardStage); //TODO: this could prevent a symbol appearing on the taskbar
+        loadingScreen.start(downloadStage);
 
         setUserData(userData); //User data is now available throughout Edi
         this.presentationLibraryManager = new PresentationLibraryManager(this);
 
+        Stage dashboardStage = new Stage();
 
         //Additional com.i2lp.edi.client.login stuff
         if (isTeacher) {
@@ -152,4 +161,6 @@ public class EdiManager extends Application {
     public boolean isLoggedIn() {
         return loggedIn;
     }
+
+    public PresDownloadLoadingScreen getLoadingScreen() { return loadingScreen; }
 }
