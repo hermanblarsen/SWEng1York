@@ -18,7 +18,10 @@ import java.net.URISyntaxException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Time;
 import java.time.Duration;
+import java.time.Instant;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.*;
@@ -734,7 +737,8 @@ public class SocketClient {
         boolean statementSuccess = false;
         try (PGConnection connection = (PGConnection) dataSource.getConnection()) {
             for (InteractiveElement element : elements) {
-                PreparedStatement statement = connection.prepareStatement("SELECT * FROM public.sp_add_and_replace_interactive_element(?,?,?,?,?,?)");
+                PreparedStatement statement =
+                        connection.prepareStatement("SELECT * FROM public.sp_add_and_replace_interactive_element(?,?,?,?,?,?)");
 
                 statement.setInt(1, element.getElementID());
                 statement.setInt(2, presentationID);
@@ -909,12 +913,16 @@ public class SocketClient {
         boolean statementSuccess = false;
 
         try (PGConnection connection = (PGConnection) dataSource.getConnection()) {
-            PreparedStatement statement = connection.prepareStatement("UPDATE interactive_elements SET live = ? WHERE interactive_element_id = ? AND presentation_id = ?;");
+            PreparedStatement statement =
+                    connection.prepareStatement("UPDATE interactive_elements " +
+                            "SET live = ?, response_interval = ? " +
+                            "WHERE interactive_element_id = ? AND presentation_id = ?;");
 
             //Fill prepared statements to avoid SQL injection
             statement.setBoolean(1, isLive);
-            statement.setInt(2, interactiveElementID);
-            statement.setInt(3, presentationID);
+            statement.setTime(2, new Time(Instant.now().toEpochMilli()));
+            statement.setInt(3, interactiveElementID);
+            statement.setInt(4, presentationID);
 
             //Call stored procedure on database
             statementSuccess = statement.execute();
