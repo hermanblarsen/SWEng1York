@@ -2,6 +2,7 @@ package com.i2lp.edi.client.presentationElements;
 
 
 import com.i2lp.edi.client.dashboard.DashModule;
+import com.i2lp.edi.client.dashboard.PresentationPanel;
 import com.i2lp.edi.client.dashboard.Subject;
 import com.i2lp.edi.client.utilities.Theme;
 import com.i2lp.edi.server.packets.*;
@@ -54,6 +55,7 @@ public class Presentation extends Pane {
     private boolean autoplayMedia;
 
     private DashModule module; //DashModule to which this presentation belongs
+    private PresentationPanel presPanel;
 
     private int groupFormat;
 
@@ -496,4 +498,17 @@ public class Presentation extends Pane {
     public LocalDateTime getGoLiveDateTime() { return goLiveDateTime; }
 
     public boolean hasThumbnails() { return hasThumbnails; }
+
+    public void setPresPanel(PresentationPanel presPanel) { this.presPanel = presPanel; }
+
+    public void setLive(boolean isLive) {
+        this.presentationMetadata.setLive(isLive);
+        if (presPanel != null) {
+            if (presPanel.isLive() != isLive) {
+                presPanel.setLive(isLive);
+            }
+        }
+    }
+
+    public boolean isLive() { return this.presentationMetadata.getLive(); }
 }

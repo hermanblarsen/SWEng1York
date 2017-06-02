@@ -1497,7 +1497,7 @@ public abstract class Dashboard extends Application {
         addToServerGridPane.setHgap(10);
         addToServerGridPane.setVgap(5);
         addToServerGridPane.setPadding(new Insets(10));
-        Scene addToServerScene = new Scene(rootPane, THUMBNAIL_WIDTH + 20, 200);
+        Scene addToServerScene = new Scene(rootPane, 250, 200);
         addToServerScene.getStylesheets().add("bootstrapfx.css");
 
         Label filename = new Label("No file selected");

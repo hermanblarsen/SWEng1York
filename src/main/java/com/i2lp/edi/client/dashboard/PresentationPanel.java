@@ -88,9 +88,11 @@ public class PresentationPanel extends PreviewPanel {
     public boolean isLive() { return isLive; }
 
     public void setLive(boolean live) {
-        presentation.getPresentationMetadata().setLive(live);
         isLive = live;
         updateVisibility();
+        if (presentation.isLive() != live) {
+            presentation.setLive(live);
+        }
         presentation.getModule().getModulePanel().updateIsLive();
     }
 
