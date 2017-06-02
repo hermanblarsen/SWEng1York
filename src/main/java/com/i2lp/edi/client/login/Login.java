@@ -1,7 +1,13 @@
 package com.i2lp.edi.client.login;
 
 import com.i2lp.edi.client.Constants;
+import com.i2lp.edi.client.dashboard.StudentDashboard;
+import com.i2lp.edi.client.dashboard.TeacherDashboard;
 import com.i2lp.edi.client.managers.EdiManager;
+import com.i2lp.edi.client.managers.PresentationManagerStudent;
+import com.i2lp.edi.client.managers.PresentationManagerTeacher;
+import com.i2lp.edi.client.presentationElements.Presentation;
+import com.i2lp.edi.client.utilities.ParserXML;
 import com.i2lp.edi.server.SocketClient;
 import com.i2lp.edi.server.packets.User;
 import com.i2lp.edi.server.packets.UserAuth;
@@ -21,9 +27,12 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.File;
 
 import static com.i2lp.edi.client.Constants.BASE_PATH;
 import static com.i2lp.edi.client.Constants.remoteServerAddress;
@@ -108,9 +117,6 @@ public class Login extends Application {
         gridPane.add(sceneTitle, 0, 0, 2, 1);
         GridPane.setHalignment(sceneTitle, HPos.CENTER);
 
-        Background labelBackground = new Background(new BackgroundFill(Color.LIGHTGRAY,
-               new CornerRadii(3, false), new Insets(0,0,0,0)));
-
         usernameField = new TextField();
         usernameField.setText("Teacher");
         gridPane.add(usernameField, 1, 2);
@@ -145,11 +151,7 @@ public class Login extends Application {
         loginButton.disableProperty().addListener((observable, oldValue, newValue) -> {
             loginButton.setDisable(attemptingLogin);
         });
-        loginButton.setOnAction((ActionEvent event) -> {
-            changeGuiLoggingIn();
-            if (!offline) login();
-            else ;//TODO decide what to do if offline
-        });
+        loginButton.setOnAction((ActionEvent event) -> openPresInOfflineMode());
         gridPane.add(loginButton, 0, 5, 2, 1);
 
         GridPane.setHalignment(loginButton, HPos.CENTER);
@@ -165,6 +167,11 @@ public class Login extends Application {
 
     public void changeGuiPostConnection() {
         loginButton.setText("Login");
+        loginButton.setOnAction((ActionEvent event) -> {
+            changeGuiLoggingIn();
+            if (!offline) login();
+            else ;//TODO decide what to do if offline
+        });
         gridPane.getChildren().remove(loadingImage);
 
         messageLabel.setText("");
@@ -237,8 +244,7 @@ public class Login extends Application {
             //TODO add colour events and stuff here to notify user of unsuccessful login.
         }
     }
-
-
+    
     public void serverConnect() {
         if (!offline) {
             //Connect to edi server
@@ -278,5 +284,25 @@ public class Login extends Application {
         }
     }
 
+    private void openPresInOfflineMode() {
+        FileChooser fileChooser = new FileChooser();
+        FileChooser.ExtensionFilter xmlExtensionFilter =
+                new FileChooser.ExtensionFilter("XML Presentations (*.XML)", "*.xml", "*.XML");
+        fileChooser.getExtensionFilters().add(xmlExtensionFilter);
+        fileChooser.setSelectedExtensionFilter(xmlExtensionFilter);
+        fileChooser.setInitialDirectory(new File("projectResources/sampleFiles/xml"));
+        //fileChooser.setInitialDirectory(new File(System.getProperty("user.home"))); //TODO reinstate when tested
+        fileChooser.setTitle("Open Presentation");
 
+        File file = fileChooser.showOpenDialog(loginStage);
+        if (file != null) {
+            ParserXML parserXML = new ParserXML(file.getPath());
+            Presentation presentation = parserXML.parsePresentation();
+
+            PresentationManagerStudent presentationManager = new PresentationManagerStudent(ediManager);
+
+            ediManager.setPresentationManager(presentationManager);
+            presentationManager.openPresentation(presentation, false);
+        } else logger.info("No presentation was selected");
+    }
 }

@@ -33,6 +33,7 @@ public class Presentation extends Pane {
     private int currentSlideNumber;
     private String documentFilePath;
     private LocalDateTime goLiveDateTime;
+    private boolean hasThumbnails = true;
 
     //From Schema
     private String documentID;
@@ -444,13 +445,13 @@ public class Presentation extends Pane {
         if (thumbnailFile.exists()) {
             try {
                 preview = new ImageView("file:" + PRESENTATIONS_PATH + File.separator + getModule().getModuleName() + File.separator + getDocumentID() + "/Thumbnails/" + "slide" + slideNumber + "_thumbnail.png");
-                Rectangle2D viewport = new Rectangle2D(0, 0, THUMBNAIL_WIDTH, THUMBNAIL_WIDTH/getDocumentAspectRatio());
-                preview.setViewport(viewport);
             } catch (NullPointerException | IllegalArgumentException e) {
                 logger.debug("Couldn't open thumbnail" + thumbnailFile.toString());
+                hasThumbnails = false;
                 preview = new ImageView("file:projectResources/icons/emptyThumbnail.png");
             }
         } else {
+            hasThumbnails = false;
             preview = new ImageView("file:projectResources/icons/emptyThumbnail.png");
         }
 
@@ -493,4 +494,6 @@ public class Presentation extends Pane {
     }
 
     public LocalDateTime getGoLiveDateTime() { return goLiveDateTime; }
+
+    public boolean hasThumbnails() { return hasThumbnails; }
 }

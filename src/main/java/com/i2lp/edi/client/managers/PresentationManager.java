@@ -979,8 +979,10 @@ public abstract class PresentationManager {
 
         //Reset EdiManager presentation manager reference to null
         if (ediManager != null) {
-            ediManager.getPresentationLibraryManager().updatePresentations(); //Update presentation information
-            ediManager.setPresentationManager(null);
+            if (ediManager.getPresentationLibraryManager() != null) {
+                ediManager.getPresentationLibraryManager().updatePresentations(); //Update presentation information
+                ediManager.setPresentationManager(null);
+            }
         }
         presentationStage.close();
     }

@@ -130,7 +130,9 @@ public class EdiManager extends Application {
             presentationManager.close();
         }
         logger.info("Closing client-side networking ports.");
-        socketClient.closeAll();
+        if (socketClient != null) {
+            socketClient.closeAll();
+        }
     }
 
     public void setPresentationManager(PresentationManager presentationManager) {

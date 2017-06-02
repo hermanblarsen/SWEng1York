@@ -51,6 +51,10 @@ public class PresentationPanel extends PreviewPanel {
             previewWidth = presentation.getDocumentAspectRatio() * MAX_PRES_PREVIEW_HEIGHT;
 
         ImageView preview = getPresentation().getSlidePreview(0, previewWidth);
+        if (!getPresentation().hasThumbnails()) {
+            preview.setFitWidth(MAX_PRES_PREVIEW_WIDTH);
+        }
+
         StackPane bodyPane = new StackPane(preview);
         getDisplayPanel().setBody(bodyPane);
         getDisplayPanel().setFooter(new Label("Tags: " + presentation.getTags()));

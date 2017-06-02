@@ -568,6 +568,9 @@ public abstract class Dashboard extends Application {
             rightPanelScroll.setHbarPolicy(ScrollBarPolicy.NEVER);
             rightPanelScroll.setVbarPolicy(ScrollBarPolicy.NEVER);
             rightPanelScroll.getStyleClass().add("edge-to-edge");
+            rightPanelScroll.setFitToWidth(true);
+            rightPanelScroll.setPrefWidth(RIGHT_PANEL_WIDTH + 20);
+            rightPanelScroll.setMaxWidth(ScrollPane.USE_PREF_SIZE);
             rightPanelScroll.setContent(rightPanelVBox);
             border.setRight(rightPanelScroll);
         }
@@ -631,7 +634,8 @@ public abstract class Dashboard extends Application {
                         vbox.setAlignment(Pos.CENTER);
                         vbox.setPadding(new Insets(5));
 
-                        vbox.getChildren().add(selectedPresPanel.getPresentation().getSlidePreview(i, RIGHT_PANEL_WIDTH - 10));
+                        StackPane previewPane = new StackPane(selectedPresPanel.getPresentation().getSlidePreview(i, RIGHT_PANEL_WIDTH - 10));
+                        vbox.getChildren().add(previewPane);
                         vbox.getChildren().add(new Label(Integer.toString(i + 1)));
                         vbox.setStyle("-fx-background-color: #ffffff");
                         rightPanelVBox.getChildren().add(vbox);
