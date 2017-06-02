@@ -47,11 +47,9 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.Stack;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static com.i2lp.edi.client.Constants.PRESENTATIONS_PATH;
-import static com.i2lp.edi.client.Constants.THUMBNAIL_WIDTH;
 import static javafx.scene.layout.BorderPane.setAlignment;
 
 
@@ -932,19 +930,8 @@ public abstract class Dashboard extends Application {
     private void setLive(PresentationPanel presPanel, boolean live) {
         if (!live && presPanel.isLive()) {
             presPanel.setLive(false);
-            if (ediManager.getSocketClient().setPresentationLive(presPanel.getPresentation().getPresentationMetadata().getPresentationID(), false)) {
-                //TODO: Stub for successful go offline
-            } else {
-                //TODO: Stub for unsuccessful go offline
-            }
         } else if (live && !presPanel.isLive()) {
             presPanel.setLive(true);
-            //Update server database to indicate presentation is Live
-            if (ediManager.getSocketClient().setPresentationLive(presPanel.getPresentation().getPresentationMetadata().getPresentationID(), true)) {
-                //TODO: Stub for successful go live
-            } else {
-                //TODO: Stub for unsuccessful go live
-            }
         }
     }
 

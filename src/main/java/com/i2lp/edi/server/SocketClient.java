@@ -21,7 +21,6 @@ import java.sql.SQLException;
 import java.sql.Time;
 import java.time.Duration;
 import java.time.Instant;
-import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.*;
@@ -631,7 +630,7 @@ public class SocketClient {
             logger.error("Unable to connect to PostgreSQL on port 5432. PJDBC dump:", e);
         }
 
-        return statementSuccess;
+        return !statementSuccess;
     }
 
     public ArrayList<User> getPresentationActiveUsers(int presentationID) {
@@ -1121,7 +1120,39 @@ public class SocketClient {
         return statisticEntries;
     }
 
+    //TODO: ----- REVISIT THIS SOON -------
    /* public boolean resetInteractionsForPresentation(int presentationID){
+        boolean statementSuccess = false;
 
+        //Attempt to add a user using stored procedure
+        try (PGConnection connection = (PGConnection) dataSource.getConnection()) {
+
+            PreparedStatement statement = connection.prepareStatement("SELECT * FROM public.sp_addinteraction_to_interactiveelemnt(?,?,?);");
+
+            //Fill prepared statements to avoid SQL injection
+            statement.setInt(1, userID);
+            statement.setInt(2, interactiveElementID);
+            statement.setString(3, interactionData);
+
+            //Call stored procedure on database
+            ResultSet rs = statement.executeQuery();
+
+            String status = "failure";
+
+            while (rs.next()) {
+                status = rs.getString(1);
+            }
+
+            if (status.equals("success")) {
+                statementSuccess = true;
+                logger.info("Successfully added interaction to interactive element.");
+            } else logger.error("Unable to add interaction: " + status);
+
+            statement.close();
+        } catch (Exception e) {
+            logger.error("Unable to connect to PostgreSQL on port 5432. PJDBC dump:", e);
+        }
+
+        return statementSuccess;
     }*/
 }

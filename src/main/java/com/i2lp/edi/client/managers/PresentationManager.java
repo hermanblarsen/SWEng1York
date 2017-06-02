@@ -217,6 +217,7 @@ public abstract class PresentationManager {
 
         setupLinkButton(); //Link button has to be initialised before live session begins
 
+
         beginLiveSession();//Start the live session before the presentation starts!
 
         presControls = addPresentationControls(); //Setup all controls after live session begins as they depend on online/offline state
@@ -970,6 +971,7 @@ public abstract class PresentationManager {
         if (this instanceof PresentationManagerTeacher) {
             if (presentationSession != null) {
                 presentationSession.endSession();
+                presentationSession = null;
             }
         } else if (this instanceof PresentationManagerStudent) {
             if (studentSession != null) {

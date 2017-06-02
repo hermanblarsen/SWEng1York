@@ -9,8 +9,6 @@ public class InteractiveElementRecord {
     int interactive_element_id;//The unique id
     int presentation_id;
     String interactive_element_data;
-
-
     int xml_element_id;
     public String getType() {
         return type;
@@ -18,6 +16,8 @@ public class InteractiveElementRecord {
     String type;
     boolean isLive;
     Time response_interval;
+
+
     int slide_number;
 
     public InteractiveElementRecord(int interactive_element_id,
@@ -55,5 +55,8 @@ public class InteractiveElementRecord {
         return xml_element_id;
     }
 
+    public int getSlide_number() {
+        return slide_number;
+    }
 
 }

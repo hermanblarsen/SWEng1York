@@ -48,6 +48,13 @@ public class PresentationSession {
         this.activePresentation = ediManager.getPresentationManager().getPresentationElement();
         this.interactiveElementsInPresentation = ediManager.getPresentationManager().getInteractiveElementList();
 
+        //Update server database to indicate presentation is Live
+        if (!ediManager.getSocketClient().setPresentationLive(activePresentation.getPresentationMetadata().getPresentationID(), true)) {
+            logger.error("Unable to go live in presentation. Possible connectivity issues.");
+            ediManager.getPresentationManager().getPresentationElement().getPresentationMetadata().setLive(false);
+            return;
+        }
+
         //Update database with slide number and start sequence of 0
         ediManager.getSocketClient().setCurrentSlideAndSequenceForPresentation(activePresentation.getPresentationMetadata().getPresentationID(), 0, 0);
 
@@ -68,12 +75,12 @@ public class PresentationSession {
         ArrayList<String> elementInteractions = new ArrayList<>();
 
         //Find interactive elementRecord with correct ID so we can retrieve its interactive_element_id PK:
-        //TODO: Modify stored procedures to only use PresentationID and interactive_pres_id in place of PK so can remove this loop
         for (InteractiveElementRecord interactiveElementRecord : interactiveElementRecords) {
-            if (interactiveElementRecord.getXml_element_id() == interactiveElement.getElementID()) {
+            //TODO: CHECK ON SLIDE NUMBER
+          /*  if ((interactiveElementRecord.getXml_element_id() == interactiveElement.getElementID())&&()) {
                 liveElementRecord = interactiveElementRecord;
                 break;
-            }
+            }*/
         }
 
         //If couldn't find the interactive element in database that matches the XML interactive element, throw an error and return
@@ -134,6 +141,7 @@ public class PresentationSession {
         logger.info("Live Presentation session ending. Presentation lasted " + (int) ((endDate.getTime() - startDate.getTime()) / 1000) + " seconds.");
 
         //Update Presentation record to offline
+        ediManager.getPresentationManager().getPresentationElement().getPresentationMetadata().setLive(false);
         ediManager.getSocketClient().setPresentationLive(activePresentation.getPresentationMetadata().getPresentationID(), false);
         ediManager.getSocketClient().setCurrentSlideAndSequenceForPresentation(activePresentation.getPresentationMetadata().getPresentationID(), 0, 0);
     }
