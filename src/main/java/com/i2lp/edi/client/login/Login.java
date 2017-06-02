@@ -79,7 +79,6 @@ public class Login extends Application {
         //TODO: Mode switching code depending on online/offline functionality
         if (!offline) {
             serverConnect();
-            changeGuiPostConnection();
         } else {
             //TODO do something while offline!
         }
@@ -164,7 +163,7 @@ public class Login extends Application {
         GridPane.setHalignment(messageLabel, HPos.CENTER);
     }
 
-    private void changeGuiPostConnection() {
+    public void changeGuiPostConnection() {
         loginButton.setText("Login");
         gridPane.getChildren().remove(loadingImage);
 

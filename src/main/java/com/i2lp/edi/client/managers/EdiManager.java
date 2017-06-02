@@ -9,9 +9,6 @@ import com.i2lp.edi.client.login.Login;
 import com.i2lp.edi.server.SocketClient;
 import com.i2lp.edi.server.packets.User;
 import javafx.application.Application;
-import javafx.scene.Scene;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +22,8 @@ import java.net.Socket;
  */
 public class EdiManager extends Application {
     Logger logger = LoggerFactory.getLogger(EdiManager.class);
+
+
     protected Login loginDialog;
 
     private PresentationManager presentationManager;
@@ -137,6 +136,11 @@ public class EdiManager extends Application {
     public void setPresentationManager(PresentationManager presentationManager) {
         this.presentationManager = presentationManager;
     }
+
+    public Login getLoginDialog() {
+        return loginDialog;
+    }
+
 
     public PresentationManager getPresentationManager() {
         return this.presentationManager;

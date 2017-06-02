@@ -830,7 +830,7 @@ public abstract class PresentationManager {
         }
         presentationToAdvance.setCurrentSlide(presentationToAdvance.getSlideList().get(currentSlideNumber));
 
-        if ((presentationToAdvance.getCurrentSlide().getCurrentSequenceNumber() == 0) && (currentSlideNumber != 0) && (!(presentationToAdvance.getSlide(currentSlideNumber).getSlideElementList().size() == 0)))
+        if ((presentationToAdvance.getCurrentSlide().getCurrentSequenceNumber() == 0) && (currentSlideNumber != 0)&&(!(presentationToAdvance.getSlide(currentSlideNumber).getSlideElementList().size() == 0)))
             slideAdvance(presentationToAdvance, direction);
 
         if (commentPanel != null) commentPanel.setSlide(this.presentationElement.getCurrentSlide());
@@ -863,6 +863,7 @@ public abstract class PresentationManager {
 
                 for (SlideElement toCheckVisible : checkInVisibleSet) {
                     if (slideToAdvance.getVisibleSlideElementList().contains(toCheckVisible)) {
+                        slideToAdvance.getVisibleSlideElementList().remove(toCheckVisible);
                         toCheckVisible.removeElement();
                     }
                 }

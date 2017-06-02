@@ -8,6 +8,7 @@ import com.impossibl.postgres.api.jdbc.PGConnection;
 import com.impossibl.postgres.jdbc.PGDataSource;
 import io.socket.client.IO;
 import io.socket.client.Socket;
+import javafx.application.Platform;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -83,13 +84,20 @@ public class SocketClient {
         //Alert tester that connection is being attempted
         logger.info("Client: Attempting Connection to " + serverIPAddress);
 
+
         try {
             socket = IO.socket(serverIPAddress);
+            socket.io().reconnectionAttempts(10);
         } catch (URISyntaxException e) {
             logger.error("Couldn't create client port: May be in use by other program!");
         }
 
-        socket.on(Socket.EVENT_CONNECT, args -> logger.info("Client successfully connected to Edi Server"));
+        socket.on(Socket.EVENT_CONNECT, args -> {
+            Platform.runLater(() ->{
+                ediManager.getLoginDialog().changeGuiPostConnection();
+            });
+            logger.info("Client successfully connected to Edi Server");
+        });
 
 
         socket.on("DB_Update", args -> {
