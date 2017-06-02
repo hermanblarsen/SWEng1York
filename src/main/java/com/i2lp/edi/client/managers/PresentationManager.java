@@ -1,7 +1,7 @@
 package com.i2lp.edi.client.managers;
 
-import com.i2lp.edi.client.TeacherSession;
 import com.i2lp.edi.client.StudentSession;
+import com.i2lp.edi.client.TeacherSession;
 import com.i2lp.edi.client.animation.Animation;
 import com.i2lp.edi.client.exceptions.SequenceNotFoundException;
 import com.i2lp.edi.client.presentationElements.*;
@@ -272,20 +272,21 @@ public abstract class PresentationManager {
             if (!isCommentPanelVisible && !isEmbeddedBrowserOpen && !wordCloudActive) {
                 if (keyEvent.getCode().equals(KeyCode.ENTER) ||
                         keyEvent.getCode().equals(KeyCode.SPACE) ||
-                        keyEvent.getCode().equals(KeyCode.PAGE_UP) ||
+                        keyEvent.getCode().equals(KeyCode.PAGE_DOWN) ||
                         keyEvent.getCode().equals(KeyCode.RIGHT) ||
                         keyEvent.getCode().equals(KeyCode.UP)) {
                     controlPresentation(Slide.SLIDE_FORWARD);
                 } else if (keyEvent.getCode().equals(KeyCode.LEFT) ||
                         keyEvent.getCode().equals(KeyCode.BACK_SPACE) ||
-                        keyEvent.getCode().equals(KeyCode.PAGE_DOWN) ||
+                        keyEvent.getCode().equals(KeyCode.PAGE_UP) ||
                         keyEvent.getCode().equals(KeyCode.DOWN)) {
                     controlPresentation(Slide.SLIDE_BACKWARD);
                 } else if (keyEvent.getCode().equals(KeyCode.F5)) {
                     toggleFullscreen();
                 } else if (keyEvent.getCode().equals(KeyCode.ESCAPE) && isFullscreen) {
                     setFullscreen(false);
-                } else if (keyEvent.getCode().equals(KeyCode.B)) {
+                } else if (keyEvent.getCode().equals(KeyCode.B) ||
+                        keyEvent.getCode().equals(KeyCode.PERIOD)) {
                     if (isShowBlack) {
                         isShowBlack = false;
                     } else {

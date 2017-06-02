@@ -136,7 +136,6 @@ public class TeacherSession {
         endDate = new Date();
         logger.info("Live Presentation session ending. Presentation lasted " + (int) ((endDate.getTime() - startDate.getTime()) / 1000) + " seconds.");
         //Update Presentation record to offline
-        ediManager.getPresentationManager().getPresentationElement().getPresentationMetadata().setLive(false);
         ediManager.getSocketClient().setPresentationLive(activePresentation.getPresentationMetadata().getPresentationID(), false);
         ediManager.getSocketClient().setCurrentSlideAndSequenceForPresentation(activePresentation.getPresentationMetadata().getPresentationID(), 0, 0);
     }

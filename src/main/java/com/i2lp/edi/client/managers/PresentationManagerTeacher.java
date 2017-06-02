@@ -39,6 +39,7 @@ public class PresentationManagerTeacher extends PresentationManager {
     protected boolean questionClicked = false;
     protected boolean toolkitOpen = false;
     protected boolean test = false;
+    protected boolean firstRun = false;
     protected String setText;
     protected List<Student> studentList;
     protected Stage teacherToolKit;
@@ -64,7 +65,7 @@ public class PresentationManagerTeacher extends PresentationManager {
     }
 
     private void setListOfQuestions(){
-        if(slidePane != null){
+        if(slidePane != null && !firstRun){
             Platform.runLater(new Runnable() {
                 @Override
                 public void run() {
@@ -77,12 +78,13 @@ public class PresentationManagerTeacher extends PresentationManager {
                     lab.setWrapText(true);
                     setText = lab.getText();
                     slidePane.setPrefSize(slideWidth, slideHeight);
+                    System.out.println("Button "+questionID+" Pressed");
+                    slidePane.getChildren().addAll(backgroundRegion, lab);
+                    displayPane.getChildren().addAll(slidePane);
 
-                        System.out.println("Button "+questionID+" Pressed");
-                        slidePane.getChildren().addAll(backgroundRegion, lab);
-                        displayPane.getChildren().addAll(slidePane);
                     }else{
                         test = false;
+                        firstRun = false;
                     }
                     questionClicked = true;
                 }
@@ -105,6 +107,7 @@ public class PresentationManagerTeacher extends PresentationManager {
     protected void loadSpecificFeatures() {
         if (!toolkitOpen) {
             teacherToolKit = new Stage();
+
             teacherToolKit.initStyle(StageStyle.UTILITY);
             teacherToolKit.initOwner(presentationStage);
             teacherToolKit.setTitle("Teacher toolkit");
@@ -112,6 +115,7 @@ public class PresentationManagerTeacher extends PresentationManager {
             tp.setStyle("-fx-background-color: #34495e");
             scene = new Scene(tp, 450, 450);
             scene.getStylesheets().add("bootstrapfx.css");
+            firstRun = true;
             questions = new Tab();
             questions.setText("Question Queue");
             //questionList = new ArrayList<String>();
