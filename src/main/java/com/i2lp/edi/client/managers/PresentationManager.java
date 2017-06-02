@@ -189,8 +189,8 @@ public abstract class PresentationManager {
         }
     }
 
-    public ArrayList<InteractiveElement> getInteractiveElementList(){
-        if(interactiveElementList.isEmpty()) logger.error("Interactive element list not set yet");
+    public ArrayList<InteractiveElement> getInteractiveElementList() {
+        if (interactiveElementList.isEmpty()) logger.error("Interactive element list not set yet");
         return interactiveElementList;
     }
 
@@ -548,7 +548,7 @@ public abstract class PresentationManager {
             try {
                 toggleCommentsWindow();
             } catch (NullPointerException e) {
-            //Exception occasionally thrown by JavaFX's HTML editor for unknown reasons. No handling needed - do nothing.
+                //Exception occasionally thrown by JavaFX's HTML editor for unknown reasons. No handling needed - do nothing.
             }
         });
 
@@ -566,7 +566,6 @@ public abstract class PresentationManager {
             visibilityIconURL = "file:projectResources/icons/eyeHidden.png";
         else
             visibilityIconURL = "file:projectResources/icons/eyeVisible.png";
-
 
 
         visibilityButton = makeCustomButton(visibilityIconURL, event -> {
@@ -797,7 +796,7 @@ public abstract class PresentationManager {
                         //Update MainUI panes when changing slides to account for new Slide root pane.
                         displayCurrentSlide();
                     }
-                    notifySlideChangeListener(currentSlideNumber-1, currentSlideNumber);
+                    notifySlideChangeListener(currentSlideNumber - 1, currentSlideNumber);
                 } else if (changeStatus == Slide.SLIDE_PRE_CHANGE) {
                     //Useful state for Thumbnail generation
                     presentationStatus = Presentation.SLIDE_LAST_ELEMENT;
@@ -824,14 +823,14 @@ public abstract class PresentationManager {
 
                     //Update MainUI panes when changing slides to account for new Slide root pane.
                     displayCurrentSlide();
-                    notifySlideChangeListener(currentSlideNumber+1, currentSlideNumber);
+                    notifySlideChangeListener(currentSlideNumber + 1, currentSlideNumber);
                 }
 
             }
         }
         presentationToAdvance.setCurrentSlide(presentationToAdvance.getSlideList().get(currentSlideNumber));
 
-        if ((presentationToAdvance.getCurrentSlide().getCurrentSequenceNumber() == 0) && (currentSlideNumber != 0))
+        if ((presentationToAdvance.getCurrentSlide().getCurrentSequenceNumber() == 0) && (currentSlideNumber != 0) && (!(presentationToAdvance.getSlide(currentSlideNumber).getSlideElementList().size() == 0)))
             slideAdvance(presentationToAdvance, direction);
 
         if (commentPanel != null) commentPanel.setSlide(this.presentationElement.getCurrentSlide());
@@ -852,11 +851,12 @@ public abstract class PresentationManager {
                         slideToAdvance.getVisibleSlideElementList().add(toCheckVisible);
                     }
                 }
+
             } catch (SequenceNotFoundException e) {
                 logger.warn("Failed to find Element with Sequence number of " + slideToAdvance.getCurrentSequenceNumber() + " in slideElementList.");
             }
             currentSequenceNumber++;
-            notifySequenceChangeListeners(currentSequenceNumber-1, currentSequenceNumber);//Notify any sequence number listeners that there has been a change
+            notifySequenceChangeListeners(currentSequenceNumber - 1, currentSequenceNumber);//Notify any sequence number listeners that there has been a change
         } else if ((slideToAdvance.getCurrentSequenceNumber() > 1) && (direction == Slide.SLIDE_BACKWARD)) {  //If we're going backwards and still elements left
             try {
                 checkInVisibleSet = Slide.searchForSequenceElement(slideToAdvance.getSlideElementList(), slideToAdvance.getCurrentSequenceNumber());
@@ -871,7 +871,7 @@ public abstract class PresentationManager {
             }
             slideToAdvance.setCurrentSequenceNumber(slideToAdvance.getCurrentSequenceNumber() - 1);
             currentSequenceNumber--;
-            notifySequenceChangeListeners(currentSequenceNumber+1, currentSequenceNumber);//Notify any sequence number listeners that there has been a change
+            notifySequenceChangeListeners(currentSequenceNumber + 1, currentSequenceNumber);//Notify any sequence number listeners that there has been a change
         } else {
             //If we're at limit of sequence number, alert calling method that we need to move to next/previous slide dependent on direction and reset sequence number
             switch (direction) {
@@ -970,7 +970,7 @@ public abstract class PresentationManager {
         }
 
         //Reset EdiManager presentation manager reference to null
-        if(ediManager != null){
+        if (ediManager != null) {
             ediManager.getPresentationLibraryManager().updatePresentations(); //Update presentation information
             ediManager.setPresentationManager(null);
         }
@@ -1063,7 +1063,7 @@ public abstract class PresentationManager {
      * @author Amrik Sadhra
      */
     public boolean goToSlide(int targetSlideNumber) {
-        if(targetSlideNumber == currentSlideNumber) return true;
+        if (targetSlideNumber == currentSlideNumber) return true;
         //If target slide invalid, do nothing and log warning
         if ((targetSlideNumber < 0) || (targetSlideNumber > presentationElement.getMaxSlideNumber())) {
             logger.warn("Target slide number lies outside that which is available in this presentation. ");
@@ -1086,20 +1086,20 @@ public abstract class PresentationManager {
         return true;
     }
 
-    public void goToSlideID(int targetSlideID){
+    public void goToSlideID(int targetSlideID) {
         int slideID = 0;
         int slideNumber = 0;
         boolean slideFound = false;
-        for(int i = 0; i< presentationElement.getMaxSlideNumber();i++){
-            slideID  = presentationElement.getSlideList().get(i).getSlideID();
-            if(slideID == targetSlideID){
+        for (int i = 0; i < presentationElement.getMaxSlideNumber(); i++) {
+            slideID = presentationElement.getSlideList().get(i).getSlideID();
+            if (slideID == targetSlideID) {
                 slideNumber = i;
                 slideFound = true;
                 break;
             }
         }
-        if(slideFound){
-            logger.info("Going to slide with ID: "+slideID);
+        if (slideFound) {
+            logger.info("Going to slide with ID: " + slideID);
             goToSlide(slideNumber);
         }
     }
@@ -1222,16 +1222,16 @@ public abstract class PresentationManager {
     //Slide Changed Event:
     CopyOnWriteArrayList<SimpleChangeListener> slideChangeListeners = new CopyOnWriteArrayList<>();
 
-    public void addSlideChangeListener(SimpleChangeListener listener){
+    public void addSlideChangeListener(SimpleChangeListener listener) {
         slideChangeListeners.add(listener);
     }
 
-    public void removeSlideChangeListener(SimpleChangeListener listener){
+    public void removeSlideChangeListener(SimpleChangeListener listener) {
         slideChangeListeners.remove(listener);
     }
 
-    public void notifySlideChangeListener(int oldVal, int newVal){
-        for(SimpleChangeListener listener: slideChangeListeners){
+    public void notifySlideChangeListener(int oldVal, int newVal) {
+        for (SimpleChangeListener listener : slideChangeListeners) {
             listener.changed(oldVal, newVal);
         }
     }
