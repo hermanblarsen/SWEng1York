@@ -157,6 +157,8 @@ public class PresentationLibraryManager {
      */
     private void downloadMissingPresentations(ArrayList<PresentationMetadata> downloadList) {
         logger.info("Edi is missing " + downloadList.size() + " presentations. Attempting to download.");
+        ediManager.getLoadingScreen().goToPresDownloadingState();
+        ediManager.getLoadingScreen().setNumOfMissingPres(downloadList.size());
 
         File tempDir = new File(TEMP_PATH);
         File presDir = new File(PRESENTATIONS_PATH);
@@ -168,6 +170,7 @@ public class PresentationLibraryManager {
         int i=1;
         for (PresentationMetadata toDownload : downloadList) {
             logger.info("Downloading presentation from " + toDownload.getXml_url());
+            ediManager.getLoadingScreen().updateDownloadState(i);
             try {
                 URL website = new URL(toDownload.getXml_url());
                 ReadableByteChannel rbc = Channels.newChannel(website.openStream());
@@ -187,6 +190,7 @@ public class PresentationLibraryManager {
             ZipUtils.unzipPresentation(tempDir.getAbsolutePath() + File.separator + toDownload.getDocumentID() + ".zip", presDir.getAbsolutePath() + File.separator + toDownload.getModuleName() + File.separator + toDownload.getDocumentID());
             i++;
         }
+        ediManager.getLoadingScreen().exitPresDownloadingState();
     }
 
     private String getModuleNameForPresentation(PresentationMetadata toRetrieveModuleName){

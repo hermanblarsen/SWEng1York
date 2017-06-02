@@ -93,6 +93,7 @@ public abstract class Dashboard extends Application {
     private ScrollPane rightPanelScroll;
     private DatePicker calendar;
     private LocalDate selectedDate;
+    private ScrollPane presentationsScrollPane;
 
     protected TextField searchField;
     protected Button selectAllButton;
@@ -251,7 +252,7 @@ public abstract class Dashboard extends Application {
         subjectsScrollPane.setFitToWidth(true);
         subjectsScrollPane.getStyleClass().add("edge-to-edge");
 
-        ScrollPane presentationsScrollPane = new ScrollPane();
+        presentationsScrollPane = new ScrollPane();
         presentationsScrollPane.setContent(presentationPanelsFlowPane);
         presentationsScrollPane.setHbarPolicy(ScrollBarPolicy.NEVER);
         presentationsScrollPane.setVbarPolicy(ScrollBarPolicy.NEVER);
@@ -578,7 +579,7 @@ public abstract class Dashboard extends Application {
         schedulePanel.setMaxWidth(RIGHT_PANEL_WIDTH);
 
         calendar = new DatePicker(LocalDate.now());
-        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("E, dd LLLL");
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("E, dd.MM.YYYY");
         schedulePanel.setText("Schedule for " + selectedDate.format(dtf));
         calendar.setOnAction(event -> {
             updateSchedulePanels();
@@ -610,7 +611,7 @@ public abstract class Dashboard extends Application {
         calendar.setDayCellFactory(dayCellFactory);
         DatePickerSkin calendarSkin = new DatePickerSkin(calendar);
         Node calendarNode = calendarSkin.getPopupContent();
-        calendarNode.setStyle("-fx-font-size: 8.5px;");
+        calendarNode.setStyle("-fx-font-size: 8px;");
         calendarNode.setEffect(null);
 
         switch (state) {
@@ -863,6 +864,9 @@ public abstract class Dashboard extends Application {
                     setSelectedPreviewPanel(presPanel, true);
                     selectedModule = presPanel.getPresentation().getModule();
                     goToState(DashboardState.MODULE);
+                    double panelY = presPanel.getLayoutY();
+                    double flowpaneHeight = presentationPanelsFlowPane.getHeight();
+                    presentationsScrollPane.setVvalue(panelY/flowpaneHeight);
                 });
             }
         }
