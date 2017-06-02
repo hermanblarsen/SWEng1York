@@ -1,21 +1,19 @@
 package com.i2lp.edi.client.dashboard;
 
-import javafx.application.Platform;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.value.ObservableValue;
+import javafx.animation.FadeTransition;
 import javafx.collections.ListChangeListener;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.control.*;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
+import javafx.util.Duration;
 
-import javax.swing.event.ChangeListener;
 import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -34,8 +32,9 @@ public class SubjectPanel extends PreviewPanel {
     private HBox modulePanelsHBox;
     private Text numOfModules;
     private StackPane leftStackPane, rightStackPane;
+    private BorderPane arrowOverlay;
     private ScrollPane centerScroll;
-    private BorderPane borderPane;
+    private StackPane rootPane;
     private Timer scrollTimer;
 
     public SubjectPanel(Subject subject, Pane parentPane) {
@@ -70,16 +69,17 @@ public class SubjectPanel extends PreviewPanel {
         centerScroll.widthProperty().addListener((observable, oldValue, newValue) -> backgroundRegion.setPrefWidth(newValue.doubleValue()));
         centerScroll.heightProperty().addListener((observable, oldValue, newValue) -> backgroundRegion.setPrefHeight(newValue.doubleValue()));
 
-        borderPane = new BorderPane();
-        borderPane.setCenter(centerScroll);
+        arrowOverlay = new BorderPane();
+        arrowOverlay.setOpacity(0);
+        arrowOverlay.setPickOnBounds(false);
+        rootPane = new StackPane(centerScroll, arrowOverlay);
 
         ImageView leftButton = new ImageView(new Image("file:projectResources/icons/arrow-left.png", SCROLL_BUTTON_SIZE, SCROLL_BUTTON_SIZE, true, true));
         ImageView rightButton = new ImageView(new Image("file:projectResources/icons/arrow-right.png", SCROLL_BUTTON_SIZE, SCROLL_BUTTON_SIZE, true, true));
         leftStackPane = setupScrollButton(leftButton, -1);
         rightStackPane = setupScrollButton(rightButton, 1);
-
-
-        centerScroll.widthProperty().addListener(observable -> updateScrollControls());
+        arrowOverlay.setRight(rightStackPane);
+        arrowOverlay.setLeft(leftStackPane);
 
         modulePanelsHBox.getChildren().addListener((ListChangeListener<? super Node>) observable -> {
             if(modulePanelsHBox.getChildren().size() == 0) {
@@ -89,8 +89,26 @@ public class SubjectPanel extends PreviewPanel {
             }
         });
 
+        this.addEventFilter(MouseEvent.ANY, event -> {
+            if (event.getEventType().equals(MouseEvent.MOUSE_ENTERED)) {
+                double scrollWidth = centerScroll.getWidth();
+                double totalWidth = getTotalModulesWidth();
+                if(scrollWidth != 0 && scrollWidth < totalWidth) {
+                    FadeTransition ft0 = new FadeTransition(Duration.millis(500), arrowOverlay);
+                    ft0.setFromValue(arrowOverlay.getOpacity());
+                    ft0.setToValue(1.0);
+                    ft0.play();
+                }
+            } else if (event.getEventType().equals(MouseEvent.MOUSE_EXITED)) {
+                FadeTransition ft0 = new FadeTransition(Duration.millis(500), arrowOverlay);
+                ft0.setFromValue(arrowOverlay.getOpacity());
+                ft0.setToValue(0.0);
+                ft0.play();
+            }
+        });
+
         getDisplayPanel().setTop(textHBox);
-        getDisplayPanel().setCenter(borderPane);
+        getDisplayPanel().setCenter(rootPane);
     }
 
     private StackPane setupScrollButton(ImageView icon, int direction) {
@@ -145,21 +163,6 @@ public class SubjectPanel extends PreviewPanel {
     }
 
     public ArrayList<ModulePanel> getModulePanels() { return modulePanels; }
-
-    public void updateScrollControls() {
-        double scrollWidth = centerScroll.getWidth();
-        double totalWidth = getTotalModulesWidth();
-        if(scrollWidth != 0 && scrollWidth < totalWidth) {
-            Platform.runLater(() -> { //TODO: without runLater() stackPanes are positioned incorrectly. Seems to be caused by areaX and areaY being zero in BorderPane.layoutChildren()
-                borderPane.setLeft(leftStackPane);
-                borderPane.setRight(rightStackPane);
-            });
-        } else {
-            borderPane.setLeft(null);
-            borderPane.setRight(null);
-        }
-    }
-
     private double getTotalModulesWidth() {
         double width = 0;
         for (int i = 0; i < modulePanels.size(); i++) {
@@ -172,9 +175,5 @@ public class SubjectPanel extends PreviewPanel {
         }
 
         return width;
-    }
-
-    public void layoutBorderPane() {
-        borderPane.layout();
     }
 }

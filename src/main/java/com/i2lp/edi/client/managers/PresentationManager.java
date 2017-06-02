@@ -150,7 +150,6 @@ public abstract class PresentationManager {
         sceneBox.getChildren().add(displayPane);
         VBox.setVgrow(displayPane, Priority.ALWAYS);
         displayPane.setBackground(new Background(new BackgroundFill(Color.BLACK, null, null)));
-        displayPane.setAlignment(Pos.CENTER);
         blackRegion = new Region();
         blackRegion.setBackground(new Background(new BackgroundFill(Color.BLACK, null, null)));
         drawPane = new DrawPane(displayPane);
