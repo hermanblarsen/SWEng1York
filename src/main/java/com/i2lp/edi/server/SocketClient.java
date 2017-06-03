@@ -163,9 +163,12 @@ public class SocketClient {
                         if (ediManager.getPresentationLibraryManager() != null) {
                             ediManager.getPresentationLibraryManager().updatePresentations(); //Update presentation information
                         }
-                    } else if (ediManager.getPresentationManager().getStudentSession() != null) {//that is live and am a student
-                        if (ediManager.getPresentationManager().getStudentSession().isLinked()) {
-                            ediManager.getPresentationManager().getStudentSession().synchroniseWithTeacher();
+                    }
+                    if (ediManager.getPresentationManager() != null) {
+                        if (ediManager.getPresentationManager().getStudentSession() != null) {//that is live and am a student
+                            if (ediManager.getPresentationManager().getStudentSession().isLinked()) {
+                                ediManager.getPresentationManager().getStudentSession().synchroniseWithTeacher();
+                            }
                         }
                     }
                     break;
@@ -378,9 +381,10 @@ public class SocketClient {
         }
 
         //Spinlock method until the server has responded, and changed the value of the success variable (user id not equal to 0)
-        while (loginSuccessFinal.get().getUserID() == NO_RESPONSE){
+        while (loginSuccessFinal.get().getUserID() == NO_RESPONSE) {
             logger.trace("JVM optimises out empty while loops, hence this.. Waiting for server response.");
-            if(currentThread().isInterrupted()) break; //This thread was left dangling. Check for interruption from JVM Shutdown and use to escape while loop
+            if (currentThread().isInterrupted())
+                break; //This thread was left dangling. Check for interruption from JVM Shutdown and use to escape while loop
         }
 
         //Return the UserData
@@ -889,10 +893,10 @@ public class SocketClient {
 
         try (PGConnection connection = (PGConnection) dataSource.getConnection()) {
             PreparedStatement statement;
-        	if(retrieveAnswered) {
-                 statement = connection.prepareStatement( "SELECT * FROM QUESTIONS WHERE presentation_id = ?" );
+            if (retrieveAnswered) {
+                statement = connection.prepareStatement("SELECT * FROM QUESTIONS WHERE presentation_id = ?");
             } else {
-                 statement = connection.prepareStatement( "SELECT * FROM QUESTIONS WHERE presentation_id = ? AND time_answered IS NULL" );
+                statement = connection.prepareStatement("SELECT * FROM QUESTIONS WHERE presentation_id = ? AND time_answered IS NULL");
             }
 
             //Fill prepared statements to avoid SQL injection

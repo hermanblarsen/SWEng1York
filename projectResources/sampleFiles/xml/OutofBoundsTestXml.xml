@@ -202,7 +202,7 @@
 				</animation>
 			</image>
 
-			<image elementid ="2" layer="3" visibility="true" startsequence="3" endsequence="3">
+			<image elementid ="2" layer="3" visibility="true" startsequence="3">
 				<xposition>0.3</xposition>
 				<yposition>0.3</yposition>
 				<xsize>0.5</xsize>

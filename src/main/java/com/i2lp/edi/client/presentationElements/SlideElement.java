@@ -183,6 +183,9 @@ public abstract class SlideElement {
     }
 
     public int getEndSequence() {
+        if(endSequence == 0){
+            endSequence = startSequence;
+        }
         return endSequence;
     }
 

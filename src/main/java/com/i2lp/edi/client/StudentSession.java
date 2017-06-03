@@ -200,7 +200,7 @@ public class StudentSession {
     }
 
     private void addSlideTimeListener() {
-        //Initialise the array with eough space for all of the slides. and set the time on ach slide to 0
+        //Initialise the array with enough space for all of the slides. and set the time on ach slide to 0
         slideTimes = new ArrayList<>();
         int numberOfSlides = ediManager.getPresentationManager().getPresentationElement().getMaxSlideNumber();
         for (int i = 0; i <= numberOfSlides; i++) {

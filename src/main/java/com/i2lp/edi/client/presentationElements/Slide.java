@@ -31,7 +31,6 @@ public class Slide extends Pane {
     public static final int SLIDE_FORWARD = 1;
     public static final int SLIDE_BACKWARD = 2;
     public static final int SLIDE_PRE_CHANGE = 3;
-
     protected int slideID;
 
     int currentSequenceNumber = 0;

@@ -57,6 +57,8 @@ public abstract class PresentationManager {
     public static final double DEFAULT_BUTTON_WIDTH = 35;
     public static final double DEFAULT_BUTTON_HEIGHT = 35;
 
+    private boolean alone = false;
+
     Logger logger = LoggerFactory.getLogger(PresentationManager.class);
 
     /* -------------- LIVE SESSION OBJECTS ----------------*/
@@ -416,15 +418,15 @@ public abstract class PresentationManager {
         assignSizeProperties(currentSlide);
 
         for (SlideElement toResize : presentationElement.getSlide(currentSlideNumber).getVisibleSlideElementList()) {
-            if(toResize instanceof AudioElement) {
+            if (toResize instanceof AudioElement) {
                 ((AudioElement) toResize).setAutoPlayOverridden(true);
-            } else if(toResize instanceof VideoElement) {
+            } else if (toResize instanceof VideoElement) {
                 ((VideoElement) toResize).setAutoPlayOverridden(true);
             }
             toResize.doClassSpecificRender();
-            if(toResize instanceof AudioElement) {
+            if (toResize instanceof AudioElement) {
                 ((AudioElement) toResize).setAutoPlayOverridden(false);
-            } else if(toResize instanceof VideoElement) {
+            } else if (toResize instanceof VideoElement) {
                 ((VideoElement) toResize).setAutoPlayOverridden(false);
             }
         }
@@ -447,6 +449,8 @@ public abstract class PresentationManager {
         if (presentationStatus == Presentation.SLIDE_CHANGE || presentationStatus == Presentation.PRESENTATION_FINISH || presentationStatus == Presentation.PRESENTATION_START || presentationStatus == Presentation.SLIDE_LAST_ELEMENT || presentationStatus == Presentation.SAME_SLIDE) {
             if ((presentationStatus == Presentation.SLIDE_CHANGE) || (presentationStatus == Presentation.SAME_SLIDE) || (presentationStatus == Presentation.SLIDE_LAST_ELEMENT)) {
                 if (presentationStatus == Presentation.SLIDE_CHANGE) logger.info("Changing Slides");
+                if (presentationStatus == Presentation.SLIDE_LAST_ELEMENT) logger.info("On last element in slide");
+
                 if (getTeacherSession() != null) {//If in live hosting session
                     getTeacherSession().synchroniseSlides();
                 }
@@ -458,8 +462,6 @@ public abstract class PresentationManager {
                     isEndPresentation = true;
                     displayCurrentSlide();
                 }
-            } else if (presentationStatus == Presentation.SLIDE_LAST_ELEMENT) {
-                logger.info("On last element in slide");
             }
         }
 
@@ -786,6 +788,7 @@ public abstract class PresentationManager {
     public int slideAdvance(Presentation presentationToAdvance, int direction) {
         int presentationStatus = Presentation.SAME_SLIDE;
         int changeStatus;
+
         if (direction == Slide.SLIDE_FORWARD) {
             //If we're not at end of presentation
             if (currentSlideNumber < presentationToAdvance.getMaxSlideNumber()) {
@@ -844,8 +847,10 @@ public abstract class PresentationManager {
 
     public int elementAdvance(Slide slideToAdvance, int direction) {
         ArrayList<SlideElement> checkInVisibleSet;
+
         //If we're going forwards and not through all sequences in slide set
-        if ((slideToAdvance.getCurrentSequenceNumber() < slideToAdvance.getMaxSequenceNumber()) && (direction == Slide.SLIDE_FORWARD)) {
+        if (alone || ((slideToAdvance.getCurrentSequenceNumber() < slideToAdvance.getMaxSequenceNumber()) && (direction == Slide.SLIDE_FORWARD))) {
+            alone = false;
             slideToAdvance.setCurrentSequenceNumber(slideToAdvance.getCurrentSequenceNumber() + 1);
             //Search for elements with matching start sequence or end sequence in visible set. If they're not in there, add them.
             try {
@@ -863,6 +868,7 @@ public abstract class PresentationManager {
             currentSequenceNumber++;
             notifySequenceChangeListeners(currentSequenceNumber - 1, currentSequenceNumber);//Notify any sequence number listeners that there has been a change
         } else if ((slideToAdvance.getCurrentSequenceNumber() > 1) && (direction == Slide.SLIDE_BACKWARD)) {  //If we're going backwards and still elements left
+
             try {
                 checkInVisibleSet = Slide.searchForSequenceElement(slideToAdvance.getSlideElementList(), slideToAdvance.getCurrentSequenceNumber());
 
@@ -877,8 +883,8 @@ public abstract class PresentationManager {
             } catch (SequenceNotFoundException e) {
                 logger.warn("Failed to find Element with Sequence number of " + slideToAdvance.getCurrentSequenceNumber() + " in slideElementList.");
             }
-            slideToAdvance.setCurrentSequenceNumber(slideToAdvance.getCurrentSequenceNumber() - 1);
             currentSequenceNumber--;
+            slideToAdvance.setCurrentSequenceNumber(slideToAdvance.getCurrentSequenceNumber() - 1);
             notifySequenceChangeListeners(currentSequenceNumber + 1, currentSequenceNumber);//Notify any sequence number listeners that there has been a change
         } else {
             //If we're at limit of sequence number, alert calling method that we need to move to next/previous slide dependent on direction and reset sequence number
@@ -900,7 +906,7 @@ public abstract class PresentationManager {
                     elementToAnimate.setForceMute(true);
                 }
                 elementToAnimate.renderElement(Animation.ENTRY_ANIMATION); //Entry Sequence
-            } else if ((elementToAnimate.getEndSequence() == slideToAdvance.getCurrentSequenceNumber()) && (!(this instanceof  ThumbnailGenerationManager))) {
+            } else if ((elementToAnimate.getEndSequence() == slideToAdvance.getCurrentSequenceNumber()) && (!(this instanceof ThumbnailGenerationManager))) {
                 if (((elementToAnimate instanceof AudioElement || elementToAnimate instanceof VideoElement) && studentSession != null) || this instanceof ThumbnailGenerationManager) {
                     elementToAnimate.setForceMute(true);
                 }
@@ -980,7 +986,7 @@ public abstract class PresentationManager {
      */
     public void close() {
         //Reset sequence numbers for presentation
-        for(Slide slide : presentationElement.getSlideList()){
+        for (Slide slide : presentationElement.getSlideList()) {
             slide.setCurrentSequenceNumber(0);
         }
 
@@ -995,8 +1001,13 @@ public abstract class PresentationManager {
                 studentSession = null;
             }
         }
-        if(ediManager != null) ediManager.setPresentationManager(null);
-        presentationStage.close();
+
+        if (ediManager != null) {
+            if (ediManager.getPresentationManager() != null) {
+                ediManager.setPresentationManager(null);
+                presentationStage.close();
+            }
+        }
     }
 
 

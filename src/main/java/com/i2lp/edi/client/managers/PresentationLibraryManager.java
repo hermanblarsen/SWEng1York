@@ -287,7 +287,7 @@ public class PresentationLibraryManager {
             @Override
             protected Object call() throws Exception {
                 try {
-                    Thread.sleep(2000); //Wait for thumbnails to be generated TODO: replace with checker for numFiles (y)
+                    Thread.sleep(3000); //Wait for thumbnails to be generated TODO: replace with checker for numFiles (y)
                     new ZipUtils(TEMP_PATH + presentation.getDocumentID(), zipPath);
                     return null;
                 } catch (InterruptedException e) {
@@ -297,7 +297,7 @@ public class PresentationLibraryManager {
             }
         };
         Thread zipThread = new Thread(zipCreationTask);
-        zipThread.start();
+        //zipThread.start();
 
         Thread uploadThread = new Thread(() -> { //Make upload async to avoid blocking main thread
             FTPClient ftpClient = new FTPClient();

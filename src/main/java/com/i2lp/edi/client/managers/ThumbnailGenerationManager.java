@@ -42,7 +42,9 @@ public class ThumbnailGenerationManager extends PresentationManager {
     private static Logger logger = LoggerFactory.getLogger(ThumbnailGenerationManager.class);
     private File thumbnailFile;
 
-    public ThumbnailGenerationManager(EdiManager ediManager) { super(ediManager); }
+    public ThumbnailGenerationManager(EdiManager ediManager) {
+        super(ediManager);
+    }
 
     public void openPresentation(Presentation presentation, boolean printToggle) {
         this.presentationElement = presentation;
@@ -99,18 +101,10 @@ public class ThumbnailGenerationManager extends PresentationManager {
             }
         } else {
             thumbnailFile = new File(PRESENTATIONS_PATH + File.separator + presentation.getModule().getModuleName() + File.separator + this.presentationElement.getDocumentID() + "/Print/" + "slide" + (slideGenController.currentSlideNumber) + "_thumbnail.png");
-
         }
+
         if (!thumbnailFile.exists()) {
             thumbnailFile.getParentFile().mkdirs(); //Create directory structure if not present yet
-        } else {
-            if (slideGenController.slideAdvance(presentation, Slide.SLIDE_FORWARD) == Presentation.PRESENTATION_FINISH) {
-                logger.info("Done generating thumbnails for presentation " + presentation.getDocumentID());
-                slideGenController.close();
-            } else {
-                generateSlideThumbNail(slideGenController, savePresentationToPdf);
-            }
-            return;
         }
 
         //Move to end of current slide so all elements are visible in snapshot.
@@ -118,7 +112,6 @@ public class ThumbnailGenerationManager extends PresentationManager {
         while (moveStatus != Presentation.SLIDE_LAST_ELEMENT){
             moveStatus = slideGenController.slideAdvance(presentation, Slide.SLIDE_FORWARD);
             if(moveStatus == Presentation.PRESENTATION_FINISH){
-                logger.info("Done generating thumbnails for presentation " + presentation.getDocumentID());
                 break;
             }
         }
@@ -172,7 +165,7 @@ public class ThumbnailGenerationManager extends PresentationManager {
                 //Write the snapshot to the chosen file
                 ImageIO.write(SwingFXUtils.fromFXImage(thumbnail, null), "png", thumbnailFile);
                 //Advance to next slide, and generate next Slide Thumbnail
-                if ((finalMoveStatus == Presentation.PRESENTATION_FINISH)||(slideGenController.slideAdvance(presentation, Slide.SLIDE_FORWARD) == Presentation.PRESENTATION_FINISH)) {
+                if (finalMoveStatus == Presentation.PRESENTATION_FINISH) {
                     logger.info("Done generating thumbnails for presentation " + presentation.getDocumentID());
                     slideGenController.close();
                 } else {
@@ -233,11 +226,11 @@ public class ThumbnailGenerationManager extends PresentationManager {
 //                        contents.transform(Matrix.getRotateInstance(Math.toRadians(90), 0, 0));
 //                        contents.transform(Matrix.getTranslateInstance(-tx, -ty));
                         //contents.drawImage(imageObject, -115, 135, PDRectangle.A4.getHeight() - 30, PDRectangle.A4.getWidth() - 30);
-                        float imageWidth = imageObject.getWidth()*0.25f;
-                        float imageHeight = imageWidth*presentation.getDocumentAspectRatio();
+                        float imageWidth = imageObject.getWidth() * (0.5f);
+                        float imageHeight = imageObject.getHeight() * (0.5f);
                         PDRectangle mediaBox = page.getMediaBox();
                         //contents.drawImage(imageObject,72,page.getCropBox().getUpperRightY(),imageHeight,imageWidth);
-                        contents.drawImage(imageObject,72,mediaBox.getHeight()-(72*5),imageHeight,imageWidth);
+                        contents.drawImage(imageObject, 72 / 2, mediaBox.getHeight() - (72 * 8), imageHeight, imageWidth);
                         contents.close();
                     } catch (IOException e) {
                         e.printStackTrace();

@@ -5,8 +5,7 @@ import com.i2lp.edi.client.dashboard.DashModule;
 import com.i2lp.edi.client.dashboard.PresentationPanel;
 import com.i2lp.edi.client.dashboard.Subject;
 import com.i2lp.edi.client.utilities.Theme;
-import com.i2lp.edi.server.packets.*;
-import javafx.geometry.Rectangle2D;
+import com.i2lp.edi.server.packets.PresentationMetadata;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import javafx.util.Duration;
@@ -19,7 +18,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.i2lp.edi.client.Constants.PRESENTATIONS_PATH;
-import static com.i2lp.edi.client.Constants.THUMBNAIL_WIDTH;
 
 /**
  * Created by habl on 23/02/2017.
@@ -64,6 +62,7 @@ public class Presentation extends Pane {
     public static final int SLIDE_CHANGE = 2;
     public static final int SAME_SLIDE = 3;
     public static final int SLIDE_LAST_ELEMENT = 4;
+    public static final int SLIDE_LAST_ELEMENT_ALONE = 5;
 
     private List<Slide> slideList;
 
