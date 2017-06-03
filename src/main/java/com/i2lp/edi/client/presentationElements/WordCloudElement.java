@@ -17,13 +17,16 @@ import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -64,6 +67,7 @@ public class WordCloudElement extends InteractiveElement {
     protected float wordCloudHeight=0.25f;
     protected float wordCloudWidth=0.25f;
     protected boolean buttonActive = false;
+    private ContextMenu cm;
 
     protected Button sendWord;
     protected TextField words;
@@ -139,7 +143,6 @@ public class WordCloudElement extends InteractiveElement {
         LocalTime startTimeNew = startTime.toLocalTime();
         int timeDifference = currentTime.getSecond()-startTimeNew.getSecond();
         //Time timeDifference = new Time(currentTime.toInstant().getEpochSecond()-startTime.toInstant().getEpochSecond());
-        System.out.println("TD: "+timeDifference);
         int newTimeLimit = Math.round(timeLimit-timeDifference);
         remainingTime = new Label("Time Remaining: " + (newTimeLimit));
         final IntegerProperty i = new SimpleIntegerProperty(newTimeLimit);
@@ -267,7 +270,7 @@ public class WordCloudElement extends InteractiveElement {
             float rad = (xSize*(float)slideWidth)/2;
             wc.setBackground(new CircleBackground(Math.round(rad)));
         }
-        wc.setColorPalette(new ColorPalette(Color.ORANGE,Color.GREEN,Color.cyan));
+        wc.setColorPalette(new ColorPalette(Color.ORANGE, Color.GREEN,Color.cyan));
         wc.setFontScalar(new SqrtFontScalar(10,40));
         wc.build(wordFrequencies);
 
@@ -282,16 +285,39 @@ public class WordCloudElement extends InteractiveElement {
 
         ImageView iv = new ImageView(wordCloud);
 
-        Button reset = new Button("Reset");
-        reset.getStyleClass().setAll("btn","btn-default");
-
         VBox wordCloudBox  = new VBox();
-        wordCloudBox.getChildren().addAll(reset,iv);
+        wordCloudBox.getChildren().addAll(iv);
         wordCloudPanel.setBody(iv);
 
-        reset.addEventHandler(MouseEvent.MOUSE_CLICKED,evt->{
+        if(ediManager.getPresentationManager().getTeacherSession() != null){
+            wordCloudPanel.addEventFilter(MouseEvent.MOUSE_CLICKED, event->{
+                //wordCloudPanel.addEventHandler(MouseEvent.MOUSE_CLICKED,evt->{
+                    if(cm != null){
+                        cm.hide();
+                    }
+                    cm = new ContextMenu();
 
-        });
+                    if(event.getButton() == MouseButton.SECONDARY){
+                        MenuItem reset = new MenuItem("Reset Element");
+                        reset.setOnAction(event1->{
+                            ediManager.getPresentationManager().getTeacherSession().resetInteractiveElement(this);
+                            slideCanvas.getChildren().remove(this.getCoreNode());
+                            setupElement();
+                            doClassSpecificRender();
+                            slideCanvas.getChildren().add(wordCloudPanel);
+                        });
+                        cm.getItems().add(reset);
+                        cm.show(this.getCoreNode(),event.getScreenX(),event.getScreenY());
+
+
+                    }
+                //});
+                event.consume();
+            });
+
+
+        }
+
     }
 
     public int getTimeLimit() {

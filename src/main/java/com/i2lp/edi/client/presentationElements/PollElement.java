@@ -22,11 +22,13 @@ import javafx.scene.paint.Color;
 import javafx.util.Duration;
 import org.kordamp.bootstrapfx.scene.layout.Panel;
 
+import java.beans.EventHandler;
 import java.sql.Time;
 import java.time.Instant;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 /**
  * Created by Koen on 06/04/2017.
@@ -267,6 +269,7 @@ public class PollElement extends InteractiveElement {
         questionPane.setBody(answerOutputTile);
 
         if(ediManager.getPresentationManager().getTeacherSession() != null) {
+
             answerOutputTile.addEventHandler(MouseEvent.MOUSE_CLICKED,evt->{
                 if(cm != null){
                     cm.hide();
@@ -278,6 +281,11 @@ public class PollElement extends InteractiveElement {
                     MenuItem reset = new MenuItem("Reset Element");
                     reset.setOnAction(event->{
                         ediManager.getPresentationManager().getTeacherSession().resetInteractiveElement(this);
+                        slideCanvas.getChildren().remove(this.getCoreNode());
+                        timerStart = false;
+                        setupElement();
+                        doClassSpecificRender();
+                        slideCanvas.getChildren().add(this.getCoreNode());
                     });
                     cm.getItems().add(reset);
                     cm.show(this.getCoreNode(),evt.getScreenX(),evt.getScreenY());

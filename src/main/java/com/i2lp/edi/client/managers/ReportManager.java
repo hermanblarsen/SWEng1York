@@ -241,7 +241,6 @@ public class ReportManager {
         ArrayList<Node> wordclouds = new ArrayList<>(  );
 
         File wordcloudPath = new File(PRESENTATIONS_PATH+"/" +presentation.getDocumentID()+"/Wordclouds/");
-        System.out.println(wordcloudPath.toString());
         if(wordcloudPath.exists()){
             logger.info( "Retrieving wordclouds." );
             String[] ext = {"png"};

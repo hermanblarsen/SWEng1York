@@ -78,13 +78,10 @@ public class PresentationManagerTeacher extends PresentationManager {
                     lab.setWrapText(true);
                     setText = lab.getText();
                     slidePane.setPrefSize(slideWidth, slideHeight);
-                    System.out.println("Button "+questionID+" Pressed");
                     slidePane.getChildren().addAll(backgroundRegion, lab);
                     displayPane.getChildren().addAll(slidePane);
-
                     }else{
                         test = false;
-                        firstRun = false;
                     }
                     questionClicked = true;
                 }
@@ -95,7 +92,6 @@ public class PresentationManagerTeacher extends PresentationManager {
             newQuestionList = getTeacherSession().getQuestionQueue();
         }
         if(newQuestionList == null){
-            System.out.println("NULL QUESTION");
             newQuestionList = new ArrayList<>();
         }
         for(Question question : newQuestionList){
@@ -179,7 +175,6 @@ public class PresentationManagerTeacher extends PresentationManager {
     }
 
     private void setUpQuestionList(List<Question> questions){
-        //System.out.println(questions.size());
         slides = new Panel[questions.size()];
         slidePane = new StackPane();
         slidePane.setPickOnBounds(false);
@@ -235,7 +230,6 @@ public class PresentationManagerTeacher extends PresentationManager {
                         setText = lab.getText();
                         slidePane.setPrefSize(slideWidth, slideHeight);
                         if(!buttonActive) {
-                            System.out.println("Button "+val+" Pressed");
                             slidePane.getChildren().addAll(backgroundRegion, lab);
                             displayPane.getChildren().addAll(slidePane);
                             questionID = val;
@@ -243,13 +237,11 @@ public class PresentationManagerTeacher extends PresentationManager {
                         questionClicked = true;
                     } else {
                         if (Objects.equals(lab.getText(), setText)) {
-                            System.out.println("Button "+val+" Pressed");
                             slidePane.getChildren().removeAll(backgroundRegion, lab);
                             displayPane.getChildren().remove(slidePane);
 
                             questionClicked = false;
                         } else {
-                            System.out.println("Button "+val+" Pressed");
                             displayPane.getChildren().remove(slidePane);
                             slidePane.getChildren().removeAll(backgroundRegion, lab);
                             lab.setFont(new Font("Helvetica", 50));
@@ -354,7 +346,6 @@ public class PresentationManagerTeacher extends PresentationManager {
             slides[i].setMinWidth(400);
 
             double questionPercentage = (studentList.get(i).getQuestionsAnswered() / (double) numberOfTestQuestions);
-            System.out.println(questionPercentage);
             if (questionPercentage < 0.25) {
                 slides[i].setStyle("-fx-background-color: red");
             } else if (questionPercentage < 0.5) {
