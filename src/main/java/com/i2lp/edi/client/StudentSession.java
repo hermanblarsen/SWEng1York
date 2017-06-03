@@ -170,15 +170,15 @@ public class StudentSession {
         }
     }
 
+    @SuppressWarnings("Duplicates")
     public void sendResponse(InteractiveElement elementForResponse, String data) {
         //Search for interactive element to respond to
         for (InteractiveElementRecord interactiveElementRecord : interactiveElementsToRespondRecord) {
-            if (elementForResponse.getElementID() == interactiveElementRecord.getXml_element_id()) {
-                if (elementForResponse.getElementID() == interactiveElementRecord.getXml_element_id()) {
-                    logger.info("Interactive Element: " + elementForResponse.getElementID() + " of type: " + interactiveElementRecord.getType() + " is now live." + "You have " + elementForResponse.getTimeLimit() + " seconds to respond.");
-                    //Send test response
-                    ediManager.getSocketClient().addInteractionToInteractiveElement(ediManager.getUserData().getUserID(), interactiveElementRecord.getInteractive_element_id(), data);
-                }
+            if ((interactiveElementRecord.getXml_element_id() == elementForResponse.getElementID())
+                    && (elementForResponse.getSlideID() == interactiveElementRecord.getSlide_number())) {
+                logger.info("Interactive Element: " + elementForResponse.getElementID() + " of type: " + interactiveElementRecord.getType() + " is now live." + "You have " + elementForResponse.getTimeLimit() + " seconds to respond.");
+                //Send test response
+                ediManager.getSocketClient().addInteractionToInteractiveElement(ediManager.getUserData().getUserID(), interactiveElementRecord.getInteractive_element_id(), data);
             }
         }
     }
