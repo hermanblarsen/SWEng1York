@@ -125,10 +125,7 @@ public abstract class PresentationManager {
         presentationStage.getIcons().add(ediLogoSmall);
         presentationStage.setMinWidth(STAGE_MIN_WIDTH);
         presentationStage.setMinHeight(STAGE_MIN_HEIGHT);
-        presentationStage.setOnCloseRequest(event -> {
-            destroyAllElements();
-            close();
-        });
+        presentationStage.setOnCloseRequest(event -> doCloseSequence());
 
         sceneBox = new VBox();
         sceneBox.addEventHandler(MouseEvent.MOUSE_PRESSED, event -> {
@@ -421,7 +418,17 @@ public abstract class PresentationManager {
         assignSizeProperties(currentSlide);
 
         for (SlideElement toResize : presentationElement.getSlide(currentSlideNumber).getVisibleSlideElementList()) {
+            if(toResize instanceof AudioElement) {
+                ((AudioElement) toResize).setAutoPlayOverridden(true);
+            } else if(toResize instanceof VideoElement) {
+                ((VideoElement) toResize).setAutoPlayOverridden(true);
+            }
             toResize.doClassSpecificRender();
+            if(toResize instanceof AudioElement) {
+                ((AudioElement) toResize).setAutoPlayOverridden(false);
+            } else if(toResize instanceof VideoElement) {
+                ((VideoElement) toResize).setAutoPlayOverridden(false);
+            }
         }
 
         drawPane.setMaxSize(slideWidth, slideHeight);
@@ -536,12 +543,10 @@ public abstract class PresentationManager {
             specificFeatsIconURL = "file:projectResources/icons/TeacherToolKit.png";
         }
         ImageView specificFeats = makeCustomButton(specificFeatsIconURL, event -> {
+            loadSpecificFeatures();
             if (!questionQueueActive) {
-                loadSpecificFeatures();
                 questionQueueActive = true;
-
             } else {
-                loadSpecificFeatures();
                 questionQueueActive = false;
             }
         });
@@ -965,6 +970,11 @@ public abstract class PresentationManager {
             controlPresentation(Slide.SLIDE_FORWARD);
             autoPlay();
         }
+    }
+
+    protected void doCloseSequence() {
+        destroyAllElements();
+        close();
     }
 
     /**

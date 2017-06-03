@@ -109,7 +109,7 @@ public class PresentationManagerTeacher extends PresentationManager {
             teacherToolKit = new Stage();
 
             teacherToolKit.initStyle(StageStyle.UTILITY);
-            teacherToolKit.initOwner(presentationStage);
+            //teacherToolKit.initOwner(presentationStage);
             teacherToolKit.setTitle("Teacher toolkit");
             TabPane tp = new TabPane();
             tp.setStyle("-fx-background-color: #34495e");
@@ -480,6 +480,14 @@ public class PresentationManagerTeacher extends PresentationManager {
                 }
             }
         });
+    }
+
+    @Override
+    protected void doCloseSequence() {
+        if (teacherToolKit != null) {
+            teacherToolKit.close();
+        }
+        super.doCloseSequence();
     }
 
     private class Student {

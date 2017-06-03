@@ -50,6 +50,7 @@ public class VideoElement extends SlideElement{
     protected boolean controlActive = false;
     protected ImageView playPauseButton;
     protected Stage videoFullscreenStage;
+    protected boolean isAutoPlayOverridden = false;
 
 
     @Override
@@ -66,7 +67,7 @@ public class VideoElement extends SlideElement{
         mediaPane.setTranslateX(slideWidth * xPosition);
         mediaPane.setTranslateY(slideHeight * yPosition);
         //System.out.println("CURRENT PATH: "+ media.getSource());
-        if(autoplay && !started && !isForceMute) {
+        if(autoplay && !started && !isForceMute && !isAutoPlayOverridden) {
             mediaPlayer.play();
             started = true;
         }
@@ -217,6 +218,8 @@ public class VideoElement extends SlideElement{
     public void setAutoplay(boolean autoPlay) {
         this.autoplay = autoPlay;
     }
+
+    public void setAutoPlayOverridden(boolean autoPlayOverridden) { isAutoPlayOverridden = autoPlayOverridden; }
 
     public boolean isFullscreen() {
         return fullscreen;
