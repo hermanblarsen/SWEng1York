@@ -95,7 +95,7 @@ public abstract class Dashboard extends Application {
     private ScrollPane presentationsScrollPane;
 
     protected CustomTextField searchField;
-    protected Button selectAllButton;
+    protected Button showAllButton;
     protected ArrayList<CheckBox> subjectCheckboxes;
     protected ArrayList<Subject> filterSubjects;
     private ArrayList<PresSchedulePanel> schedulePanels;
@@ -117,9 +117,7 @@ public abstract class Dashboard extends Application {
         dashboardStage.setTitle("Edi");
         Image ediLogoSmall = new Image("file:projectResources/logos/ediLogo32x32.png");
         dashboardStage.getIcons().add(ediLogoSmall);
-        dashboardStage.setOnCloseRequest(event -> {
-            ediManager.stop();
-        });
+        dashboardStage.setOnCloseRequest(event -> ediManager.stop());
         dashboardStage.setMinWidth(800);
         dashboardStage.setMinHeight(600);
 
@@ -291,7 +289,7 @@ public abstract class Dashboard extends Application {
                     VBox.setMargin(welcomeHeader, new Insets(5, 0, 5, 0));
 
                     Text welcomeText = new Text("Hello, " + ediManager.getUserData().getFirstName() +
-                            ". You have " + getNumOfScheduledPresOnDate(LocalDate.now()) +
+                            "! You have " + getNumOfScheduledPresOnDate(LocalDate.now()) +
                             " presentations on schedule today.");
                     textVBox.getChildren().add(welcomeText);
                     VBox.setMargin(welcomeText, new Insets(5, 0, 5, 0));
@@ -377,15 +375,15 @@ public abstract class Dashboard extends Application {
 
             //Setup filtering panel
             VBox subjectsVBox = new VBox();
-            subjectsVBox.setPadding(new Insets(3, 0, 3, 0));
+            subjectsVBox.setPadding(new Insets(0, 0, 3, 0));
             subjectsVBox.setSpacing(3);
             subjectsVBox.setStyle("-fx-background-color: #ffffff;");
 
-            selectAllButton = new Button("Select all");
-            selectAllButton.getStyleClass().setAll("btn", "btn-success");
-            selectAllButton.setMaxWidth(Double.MAX_VALUE);
-            selectAllButton.setAlignment(Pos.CENTER);
-            selectAllButton.setOnAction(event -> {
+            showAllButton = new Button("Select all");
+            showAllButton.getStyleClass().setAll("btn", "btn-success");
+            showAllButton.setMaxWidth(Double.MAX_VALUE);
+            showAllButton.setAlignment(Pos.CENTER);
+            showAllButton.setOnAction(event -> {
                 boolean allSelected = true;
 
                 for (CheckBox checkBox : subjectCheckboxes) {
@@ -400,18 +398,18 @@ public abstract class Dashboard extends Application {
                         checkBox.setSelected(false);
                     }
 
-                    selectAllButton.setText("Select all");
+                    showAllButton.setText("Select all");
                 } else {
                     for (CheckBox checkBox : subjectCheckboxes) {
                         checkBox.setSelected(true);
                     }
 
-                    selectAllButton.setText("Deselect all");
+                    showAllButton.setText("Deselect all");
                 }
 
                 filterBy(null);
             });
-            subjectsVBox.getChildren().add(selectAllButton);
+            subjectsVBox.getChildren().add(showAllButton);
 
             //Sort subjects alphabetically without affecting the displayed subjects
             ArrayList<Subject> subjectsForButtons = (ArrayList<Subject>) availableSubjects.clone();
@@ -440,13 +438,14 @@ public abstract class Dashboard extends Application {
                     }
 
                     if (allSelected) {
-                        selectAllButton.setText("Deselect all");
+                        showAllButton.setText("Deselect all");
                     } else {
-                        selectAllButton.setText("Select all");
+                        showAllButton.setText("Select all");
                     }
 
                     filterBy(filterSubjects);
                 });
+                subjectCheckBox.setPadding(new Insets(1));
                 subjectCheckboxes.add(subjectCheckBox);
                 subjectsVBox.getChildren().add(subjectCheckBox);
             }
@@ -544,12 +543,12 @@ public abstract class Dashboard extends Application {
         schedulePanel.getStyleClass().add("panel-primary");
         schedulePanel.setMaxWidth(RIGHT_PANEL_WIDTH);
 
-        calendar = new DatePicker(LocalDate.now());
+        calendar = new DatePicker(selectedDate);
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("E, dd.MM.YYYY");
         schedulePanel.setText("Schedule for " + selectedDate.format(dtf));
         calendar.setOnAction(event -> {
-            updateSchedulePanels();
             selectedDate = calendar.getValue();
+            updateSchedulePanels();
             schedulePanel.setText("Schedule for " + selectedDate.format(dtf));
         });
         final Callback<DatePicker, DateCell> dayCellFactory =
@@ -686,6 +685,9 @@ public abstract class Dashboard extends Application {
             for (SubjectPanel panel : subjectPanels) {
                 setSelectedPreviewPanel(ModulePanel.findInArray(selectedModulePanel.getModule().getModuleID(), panel.getModulePanels()), true);
             }
+        }
+        if (searchField != null) {
+            search(searchField.getText());
         }
     }
 
@@ -843,7 +845,9 @@ public abstract class Dashboard extends Application {
             schedulePanels.clear();
         }
 
-        scheduleVBox = new VBox();
+        if (scheduleVBox == null) {
+            scheduleVBox = new VBox();
+        }
 
         for (PresentationPanel presPanel : presentationPanels) {
             if (presPanel.getPresentation().getGoLiveDateTime() != null) {
@@ -869,14 +873,8 @@ public abstract class Dashboard extends Application {
         for (PresSchedulePanel schedulePanel : schedulePanels) {
             schedulePanel.setFiltered(true);
 
-            if (calendar != null) {
-                if (calendar.getValue().isEqual(schedulePanel.getGoLiveDateTime().toLocalDate())) {
-                    schedulePanel.setFiltered(false);
-                }
-            } else {
-                if (LocalDate.now().isEqual(schedulePanel.getGoLiveDateTime().toLocalDate())) {
-                    schedulePanel.setFiltered(false);
-                }
+            if (selectedDate.isEqual(schedulePanel.getGoLiveDateTime().toLocalDate())) {
+                schedulePanel.setFiltered(false);
             }
         }
     }

@@ -68,6 +68,7 @@ public class WordCloudElement extends InteractiveElement {
     protected float wordCloudWidth=0.25f;
     protected boolean buttonActive = false;
     private ContextMenu cm;
+    private ImageView iv;
 
     protected Button sendWord;
     protected TextField words;
@@ -82,6 +83,15 @@ public class WordCloudElement extends InteractiveElement {
             wordCloudPanel.setPrefWidth(slideWidth * xSize);
         }
 
+        if(iv != null){
+            if (xSize == 0 || ySize == 0) {
+                iv.setFitHeight(slideHeight);
+                iv.setFitWidth(slideWidth);
+            } else {
+                iv.setFitHeight(slideHeight * ySize);
+                iv.setFitWidth(slideWidth * xSize);
+            }
+        }
         wordCloudPanel.setTranslateX(slideWidth * xPosition);
         wordCloudPanel.setTranslateY(slideHeight * yPosition);
 
@@ -281,9 +291,9 @@ public class WordCloudElement extends InteractiveElement {
         }
         wc.writeToFile(PRESENTATIONS_PATH+"/" + presentationID+"/Wordclouds/"+pathName+".png");
 
-        Image wordCloud = new Image("file:" + PRESENTATIONS_PATH +"/"+ presentationID+"/Wordclouds/"+pathName+".png",xSize,ySize,true,true);
+        Image wordCloud = new Image("file:" + PRESENTATIONS_PATH +"/"+ presentationID+"/Wordclouds/"+pathName+".png",xSize*slideWidth,ySize*slideHeight,true,true);
 
-        ImageView iv = new ImageView(wordCloud);
+        iv = new ImageView(wordCloud);
 
         VBox wordCloudBox  = new VBox();
         wordCloudBox.getChildren().addAll(iv);

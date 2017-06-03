@@ -13,6 +13,8 @@ public enum PresSortKey {
     TITLE_ZA,
     SUBJECT_AZ,
     SUBJECT_ZA,
+    TIME_SCHEDULED_ASC,
+    TIME_SCHEDULED_DESC,
     AUTHOR_AZ,
     AUTHOR_ZA;
 
@@ -27,6 +29,10 @@ public enum PresSortKey {
                 return "Subject A-Z";
             case "SUBJECT_ZA":
                 return "Subject Z-A";
+            case "TIME_SCHEDULED_ASC":
+                return "Time scheduled ascending";
+            case "TIME_SCHEDULED_DESC":
+                return "Time scheduled descending";
             case "AUTHOR_AZ":
                 return "Author A-Z";
             case "AUTHOR_ZA":
@@ -41,6 +47,8 @@ public enum PresSortKey {
         list.add(TITLE_ZA);
         list.add(SUBJECT_AZ);
         list.add(SUBJECT_ZA);
+        list.add(TIME_SCHEDULED_ASC);
+        list.add(TIME_SCHEDULED_DESC);
         list.add(AUTHOR_AZ);
         list.add(AUTHOR_ZA);
     }
@@ -56,6 +64,16 @@ public enum PresSortKey {
                     return pres1.getSubject().getSubjectName().compareToIgnoreCase(pres2.getSubject().getSubjectName());
                 case SUBJECT_ZA:
                     return -pres1.getSubject().getSubjectName().compareToIgnoreCase(pres2.getSubject().getSubjectName());
+                case TIME_SCHEDULED_ASC:
+                    if (pres1.getGoLiveDateTime() != null && pres2.getGoLiveDateTime() != null) {
+                        return pres1.getGoLiveDateTime().compareTo(pres2.getGoLiveDateTime());
+                    } else if (pres1.getGoLiveDateTime() == null) {
+                        return -1;
+                    } else {
+                        return 1;
+                    }
+                case TIME_SCHEDULED_DESC:
+                    return 0;
                 case AUTHOR_AZ:
                     return pres1.getAuthor().compareToIgnoreCase(pres2.getAuthor());
                 case AUTHOR_ZA:

@@ -338,9 +338,7 @@ public class PresentationManagerTeacher extends PresentationManager {
             if (studentList.get(i).isOnline()) {
                 numberOnline++;
             }
-            Label tasksCompleted = new Label("Completed " + studentList.get(i).getQuestionsAnswered() + "/" + numberOfTestQuestions);
             VBox studentDetails = new VBox();
-            studentDetails.getChildren().addAll(tasksCompleted);
             slides[i].setBody(studentDetails);
             //slides[i].getStyleClass().add("panel-primary");
             slides[i].setMinWidth(400);
@@ -360,16 +358,7 @@ public class PresentationManagerTeacher extends PresentationManager {
             }
         }
 
-        Panel generalStats = new Panel("General Stats");
-        generalStats.getStyleClass().add("panel-primary");
-        Label online = new Label("Students Online: " + numberOnline);
-        int numberOffline = studentList.size() - numberOnline;
-        Label offline = new Label("Students Offline: " + numberOffline);
-        VBox stats = new VBox();
-        stats.getChildren().addAll(online, offline);
-        generalStats.setBody(stats);
-        generalStats.setMinWidth(400);
-        fp.getChildren().add(generalStats);
+        
         for (int i = 0; i < studentList.size(); i++) {
             fp.getChildren().add(slides[i]);
         }

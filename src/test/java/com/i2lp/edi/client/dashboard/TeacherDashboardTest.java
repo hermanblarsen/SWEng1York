@@ -6,13 +6,13 @@ import javafx.scene.input.KeyCode;
 import javafx.stage.Stage;
 import org.junit.Assume;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.time.LocalDateTime;
 
 import static com.i2lp.edi.client.Constants.IS_CIRCLE_BUILD;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Created by Luke on 30/05/2017.
@@ -39,7 +39,7 @@ public class TeacherDashboardTest extends DashboardTest{
         Assume.assumeTrue(!IS_CIRCLE_BUILD);
 
         searchField = myDashboard.searchField;
-        showAllButton = myDashboard.selectAllButton;
+        showAllButton = myDashboard.showAllButton;
         subjectCheckboxes = myDashboard.subjectCheckboxes;
         openPresButton = myDashboard.openPresButton;
         fileChooser = myDashboard.fileChooser;
