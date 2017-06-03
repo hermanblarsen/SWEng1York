@@ -159,9 +159,17 @@ public class SocketClient {
                         if (ediManager.getPresentationLibraryManager() != null) {
                             ediManager.getPresentationLibraryManager().updatePresentations(); //Update presentation information
                         }
-                    } else if ((ediManager.getPresentationManager().getStudentSession() == null) || (ediManager.getPresentationManager().getTeacherSession() == null)) {
-                        if (ediManager.getPresentationLibraryManager() != null) {
-                            ediManager.getPresentationLibraryManager().updatePresentations(); //Update presentation information
+                    } else if ((ediManager.getPresentationManager().getTeacherSession() == null)) {
+                        if (ediManager.getUserData().getUserType().equals("teacher")) {
+                            if (ediManager.getPresentationLibraryManager() != null) {
+                                ediManager.getPresentationLibraryManager().updatePresentations(); //Update presentation information
+                            }
+                        }
+                    } else if ((ediManager.getPresentationManager().getStudentSession() == null)) {
+                        if (ediManager.getUserData().getUserType().equals("student")) {
+                            if (ediManager.getPresentationLibraryManager() != null) {
+                                ediManager.getPresentationLibraryManager().updatePresentations(); //Update presentation information
+                            }
                         }
                     }
                     if (ediManager.getPresentationManager() != null) {

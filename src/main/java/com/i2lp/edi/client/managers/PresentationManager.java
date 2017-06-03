@@ -1002,7 +1002,9 @@ public abstract class PresentationManager {
             }
         }
 
+
         if (ediManager != null) {
+            ediManager.getPresentationLibraryManager().updatePresentations(); //Update presentation information
             if (ediManager.getPresentationManager() != null) {
                 ediManager.setPresentationManager(null);
                 presentationStage.close();

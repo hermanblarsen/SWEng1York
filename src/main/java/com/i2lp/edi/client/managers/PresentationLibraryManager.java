@@ -297,7 +297,7 @@ public class PresentationLibraryManager {
             }
         };
         Thread zipThread = new Thread(zipCreationTask);
-        //zipThread.start();
+        zipThread.start();
 
         Thread uploadThread = new Thread(() -> { //Make upload async to avoid blocking main thread
             FTPClient ftpClient = new FTPClient();
