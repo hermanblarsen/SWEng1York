@@ -8,10 +8,7 @@ public abstract class InteractiveElement extends SlideElement {
     public static final String POLL = "poll";
     public static final String WORD_CLOUD = "wordcloud";
 
-    protected int timeLimit; //TODO get from server
-
-    public abstract void sendDataToServer();
-    public abstract void receiveDataFromServer();
+    protected int timeLimit;
 
     public boolean isElementActive() {
         return elementActive;

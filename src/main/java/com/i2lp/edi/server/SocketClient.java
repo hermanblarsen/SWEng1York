@@ -27,6 +27,7 @@ import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static com.i2lp.edi.client.Constants.*;
+import static java.lang.Thread.currentThread;
 
 /**
  * Created by amriksadhra on 20/03/2017.
@@ -377,8 +378,9 @@ public class SocketClient {
         }
 
         //Spinlock method until the server has responded, and changed the value of the success variable (user id not equal to 0)
-        while (loginSuccessFinal.get().getUserID() == NO_RESPONSE) {
+        while (loginSuccessFinal.get().getUserID() == NO_RESPONSE){
             logger.trace("JVM optimises out empty while loops, hence this.. Waiting for server response.");
+            if(currentThread().isInterrupted()) break; //This thread was left dangling. Check for interruption from JVM Shutdown and use to escape while loop
         }
 
         //Return the UserData

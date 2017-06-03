@@ -294,16 +294,6 @@ public class WordCloudElement extends InteractiveElement {
         });
     }
 
-    @Override
-    public void sendDataToServer() {
-
-    }
-
-    @Override
-    public void receiveDataFromServer() {
-
-    }
-
     public int getTimeLimit() {
         return timeLimit;
     }

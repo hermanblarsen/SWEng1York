@@ -418,14 +418,4 @@ public class PollElement extends InteractiveElement {
         return buttonActive;
     }
 
-
-    @Override
-    public void sendDataToServer() {
-
-    }
-
-    @Override
-    public void receiveDataFromServer() {
-
-    }
 }

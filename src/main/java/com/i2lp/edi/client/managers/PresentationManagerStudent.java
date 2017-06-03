@@ -100,7 +100,6 @@ public class PresentationManagerStudent extends PresentationManager {
         Image tick = new Image("file:projectResources/icons/Tick.png", 30, 30, true, true);
         ImageView tickPanel = new ImageView(tick);
         tickPanel.addEventHandler(MouseEvent.MOUSE_CLICKED, evt -> {
-            //TODO: Add length limiting to questions
             if (ta.getText().length() <= MAX_QUESTION_LENGTH) {
                 if (!ta.getText().isEmpty()) {
                     getStudentSession().addQuestionToQueue(ta.getText());

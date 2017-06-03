@@ -56,10 +56,6 @@ public class CommentPanel extends Panel {
     }
 
     private HBox controlPanel() { //TODO delete if not used for question que tabs or something
-//        submitButton = new Button("Submit To Lecturer"); //TODO What will this submit?,
-//                                                // TODO) BUT maybe a very similar thing can be implemented for question que
-//        submitButton.getStyleClass().setAll("btn", "btn-default");
-
         HBox controlBox = new HBox();
         controlBox.setStyle("-fx-background-color: #34495e;");
         controlBox.setPadding(new Insets(5, 12, 5, 12));

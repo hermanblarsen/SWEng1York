@@ -93,7 +93,6 @@ public abstract class SlideElement {
         }
 
         if (!(this instanceof AudioElement)) {
-            //TODO: Trigger shared refresh
             switch (animationType) {
                 case Animation.NO_ANIMATION: //No animation (click)
                     logger.info("No animation");

@@ -150,11 +150,6 @@ public class PresentationLibraryManager {
      * @param remoteList Server side presentation metadata list
      */
     private void updateLocalPresentationList(ArrayList<PresentationMetadata> remoteList) {
-        //TODO: Modify to use Module names read from folder if in offline mode
-        //Update metadata with correct module name if no download occurs.
-        for (PresentationMetadata presentationMetadata : remoteList) {
-            presentationMetadata.setModuleName(getModuleNameForPresentation(presentationMetadata));
-        }
         this.localPresentationList = remoteList;
     }
 

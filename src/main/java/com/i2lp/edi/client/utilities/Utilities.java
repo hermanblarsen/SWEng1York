@@ -221,7 +221,7 @@ public class Utilities {
         if (!folder.exists()) folder.mkdirs(); //Create directory structure if not present yet
 
 
-        if(path.contains(".DS_Store")){//TODO: HACK HACK HACK
+        if(path.contains(".DS_Store")){
             return new ArrayList<>();
         }
 
