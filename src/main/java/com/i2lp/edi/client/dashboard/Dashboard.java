@@ -830,7 +830,7 @@ public abstract class Dashboard extends Application {
                         delete.setOnAction(deleteEvent -> deletePresentation(presentationPanel));
                         cMenu.getItems().add(delete);
 
-                        MenuItem print = new MenuItem("Print");
+                        MenuItem print = new MenuItem("Generate PDF");
                         print.setOnAction(printEvent -> printPresentation(presentationPanel.getPresentation()));
                         cMenu.getItems().add(print);
 

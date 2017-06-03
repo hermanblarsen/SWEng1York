@@ -15,6 +15,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
@@ -397,8 +398,11 @@ public abstract class SlideElement {
             }
         });
 
-        exitButton.setOnMouseClicked(event -> closeEmbeddedBrowser());
-
+        //exitButton.setOnMouseClicked(event -> closeEmbeddedBrowser());
+        exitButton.addEventFilter(MouseEvent.MOUSE_CLICKED,event->{
+            closeEmbeddedBrowser();
+            event.consume();
+        });
         //Add things to the toolbar
         browserToolbar.getChildren().add(exitButton);
         browserToolbar.getChildren().add(backButton);
