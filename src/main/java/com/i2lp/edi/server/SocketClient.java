@@ -187,7 +187,7 @@ public class SocketClient {
                 case "questions":
                     if (ediManager.getPresentationManager() != null) {//If in a presentationforeign
                         if (ediManager.getPresentationManager().getTeacherSession() != null) { //a teacher in a live presentation
-                            ediManager.getPresentationManager().getTeacherSession().setQuestionQueue(ediManager.getSocketClient().getQuestionsForPresentation(ediManager.getPresentationManager().getPresentationElement().getPresentationMetadata().getPresentationID())); //Update the question queue in the session
+                            ediManager.getPresentationManager().getTeacherSession().setQuestionQueue(ediManager.getSocketClient().getQuestionsForPresentation(ediManager.getPresentationManager().getPresentationElement().getPresentationMetadata().getPresentationID(), false)); //Update the question queue in the session
 
                         }
                     }
@@ -302,9 +302,9 @@ public class SocketClient {
                         rs.getString("email_address"),
                         rs.getString("user_type")
                 );
-                logger.error("Retrieved User " + userId);
+                logger.info("Retrieved User " + userId);
             } else {
-                logger.info("Failed to retrieve user with Id " + userId);
+                logger.error("Failed to retrieve user with Id " + userId);
             }
 
             statement.close();
@@ -884,11 +884,16 @@ public class SocketClient {
         return statementSuccess;
     }
 
-    public ArrayList<Question> getQuestionsForPresentation(int presentationID) {
+    public ArrayList<Question> getQuestionsForPresentation(int presentationID, boolean retrieveAnswered) {
         ArrayList<Question> activeQuestions = new ArrayList<>();
 
         try (PGConnection connection = (PGConnection) dataSource.getConnection()) {
-            PreparedStatement statement = connection.prepareStatement("SELECT * FROM QUESTIONS WHERE presentation_id = ? AND time_answered IS NULL;");
+            PreparedStatement statement;
+        	if(retrieveAnswered) {
+                 statement = connection.prepareStatement( "SELECT * FROM QUESTIONS WHERE presentation_id = ?" );
+            } else {
+                 statement = connection.prepareStatement( "SELECT * FROM QUESTIONS WHERE presentation_id = ? AND time_answered IS NULL" );
+            }
 
             //Fill prepared statements to avoid SQL injection
             statement.setInt(1, presentationID);

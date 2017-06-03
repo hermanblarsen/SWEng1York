@@ -56,7 +56,7 @@ public class ReportManager {
         SocketClient sock = ediManager.getSocketClient();
         int presentationId = presentation.getPresentationMetadata().getPresentationID();
 
-        questionQueueQuestions = sock.getQuestionsForPresentation(presentationId);
+        questionQueueQuestions = sock.getQuestionsForPresentation(presentationId, true);
         presentationStatistics = sock.getPresentationStatistics(presentationId);
 	    interactions = sock.getInteractionsForPresentation(presentationId);
 	    interactiveElementsData = sock.getInteractiveElementsForPresentation(presentationId);
@@ -188,7 +188,7 @@ public class ReportManager {
             slideTimesHeader.getColumns().add(column);
         }
 
-        //Populate the table: (Process each statistics record intto a StudentSlideTime and add it to a list)
+        //Populate the table: (Process each statistics record into a StudentSlideTime and add it to a list)
         ObservableList<StudentSlideTimes> slideTimesTableData = FXCollections.observableArrayList();
         for (PresentationStatisticsRecord record : presentationStatistics){
             slideTimesTableData.add(
@@ -223,14 +223,17 @@ public class ReportManager {
 
         // Format the responses ready for the bar chart.
         for (int i=0; i<possibleAnswers.size(); i++){
-            pollResults.add(new BarChartItem(possibleAnswers.get(i), resultsTally[i], Tile.BLUE));
+            pollResults.add(new BarChartItem(possibleAnswers.get(i), presentationStatistics.size(), Tile.BLUE));
         }
 
         Tile pollPanel = TileBuilder.create()
                 .skinType(Tile.SkinType.BAR_CHART)
                 .prefSize(750,250)
                 .title(question)
+                .minValue(0)
+                .maxValue( presentationStatistics.size() )
                 .barChartItems(pollResults)
+                .maxMeasuredValueVisible(true)
                 .decimals(0)
                 .build();
 
@@ -277,32 +280,34 @@ public class ReportManager {
         stage.setTitle("Questions");
         ScrollPane sp = new ScrollPane();
         stage.setScene(new Scene(sp,450,450));
-        FlowPane fp = new FlowPane();
-        fp.setPrefWrapLength(100);
-        fp.setPadding(new Insets(5,0,5,0));
-        fp.setVgap(4);
-        fp.setHgap(4);
-        fp.setStyle("-fx-background-color: whitesmoke");
-        sp.setStyle("-fx-background-color: whitesmoke");
 
-        Panel[] slides = new Panel[questionQueueQuestions.size()];
+        TableView questionsTable = new TableView(  );
 
-        for(int i = 0;i<questionQueueQuestions.size();i++){
-            slides[i] = new Panel();
-            Label question = new Label(questionQueueQuestions.get(i).getQuestion_data());
-            question.setWrapText(true);
-            question.setTextFill(Color.WHITE);
-            //Label timeWaited = new Label("Time waited "+questions.get(i).getTimeWaited()+" minutes");
-           // timeWaited.setTextFill(Color.WHITE);
-            //timeWaited.setWrapText(true);
-            VBox slideBox = new VBox();
-            slideBox.getChildren().addAll(question);
-            slides[i].setStyle("-fx-background-color: #34495e");
-            slides[i].setBody(slideBox);
-            slides[i].setMinWidth(430);
-            fp.getChildren().add(slides[i]);
-        }
-        sp.setContent(fp);
+        TableColumn<Question, String> question = new TableColumn( "Question" );
+        question.setCellValueFactory( data -> {
+
+            return new ReadOnlyObjectWrapper<>(data.getValue().getQuestion_data() );
+        } );
+        questionsTable.getColumns().add(question);
+
+        TableColumn<Question, Integer> slide = new TableColumn( "Asked on Slide" );
+        slide.setCellValueFactory( data-> new ReadOnlyObjectWrapper<>( data.getValue().getSlide_number()+1 ) );
+        questionsTable.getColumns().add( slide );
+
+        TableColumn<Question, String> wasAnswered= new TableColumn<>( "Answered?" );
+        wasAnswered.setCellValueFactory( data-> new ReadOnlyObjectWrapper<>( data.getValue().getTime_answered()==null ? "No" : "Yes") );
+        questionsTable.getColumns().add(wasAnswered);
+
+        //Add the Question data to the table:
+        questionsTable.setItems( FXCollections.observableArrayList(questionQueueQuestions) );
+
+        //Table Formatting
+        questionsTable.setEditable( false );
+        questionsTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+
+        sp.setFitToWidth( true );
+        sp.setFitToHeight( true );
+        sp.setContent(questionsTable);
         stage.show();
     }
 
@@ -345,33 +350,6 @@ public class ReportManager {
 
         sp.setContent(fp);
         stage.show();
-    }
-
-    // Classes
-    private class Questions{
-        private String question;
-        private int timeWaited;
-
-        public Questions(String question, int timeWaited) {
-            this.question =question;
-            this.timeWaited = timeWaited;
-        }
-
-        public String getQuestion() {
-            return question;
-        }
-
-        public void setQuestion(String question) {
-            this.question = question;
-        }
-
-        public int getTimeWaited() {
-            return timeWaited;
-        }
-
-        public void setTimeWaited(int timeWaited) {
-            this.timeWaited = timeWaited;
-        }
     }
 
     private class Students{

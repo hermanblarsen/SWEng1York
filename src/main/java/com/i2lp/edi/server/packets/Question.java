@@ -15,6 +15,7 @@ public class Question {
     private int slide_number;
 
 
+
     public Question(int question_id, int user_id, int presentation_id, Timestamp time_created, Timestamp time_answered, String question_data, int slide_number) {
         this.question_id = question_id;
         this.user_id = user_id;
@@ -38,4 +39,11 @@ public class Question {
         return time_created;
     }
 
+    public int getSlide_number() {
+        return slide_number;
+    }
+
+    public Timestamp getTime_answered() {
+        return time_answered;
+    }
 }
