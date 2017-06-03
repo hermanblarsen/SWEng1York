@@ -114,8 +114,15 @@ public class ThumbnailGenerationManager extends PresentationManager {
             return;
         }
 
-        //Move to end of current slide so all elements are visible in snapshot
-        while (slideGenController.slideAdvance(presentation, Slide.SLIDE_FORWARD) != Presentation.SLIDE_LAST_ELEMENT);
+        //Move to end of current slide so all elements are visible in snapshot.
+        int moveStatus = Presentation.SAME_SLIDE;
+        while (moveStatus != Presentation.SLIDE_LAST_ELEMENT){
+            moveStatus = slideGenController.slideAdvance(presentation, Slide.SLIDE_FORWARD);
+            if(moveStatus == Presentation.PRESENTATION_FINISH){
+                logger.info("Done generating thumbnails for presentation " + presentation.getDocumentID());
+                break;
+            }
+        }
 
         //If we're in last element of slide, take snapshot
         displayCurrentSlide();
@@ -153,6 +160,7 @@ public class ThumbnailGenerationManager extends PresentationManager {
         webviewRenderCheckThread.start();
 
         //When webviews rendered, can take snapshot
+        int finalMoveStatus = moveStatus;
         webviewRenderChecker.setOnSucceeded(event ->
         {
             logger.info("Generating thumbnail file for " + presentation.getDocumentID() + " Slide " + (slideGenController.currentSlideNumber) + " at " + thumbnailFile.getAbsolutePath());
@@ -166,7 +174,7 @@ public class ThumbnailGenerationManager extends PresentationManager {
                 //Write the snapshot to the chosen file
                 ImageIO.write(SwingFXUtils.fromFXImage(thumbnail, null), "png", thumbnailFile);
                 //Advance to next slide, and generate next Slide Thumbnail
-                if (slideGenController.slideAdvance(presentation, Slide.SLIDE_FORWARD) == Presentation.PRESENTATION_FINISH) {
+                if ((finalMoveStatus == Presentation.PRESENTATION_FINISH)||(slideGenController.slideAdvance(presentation, Slide.SLIDE_FORWARD) == Presentation.PRESENTATION_FINISH)) {
                     logger.info("Done generating thumbnails for presentation " + presentation.getDocumentID());
                     slideGenController.close();
                 } else {

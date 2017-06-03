@@ -263,7 +263,7 @@ public class PresentationLibraryManager {
         String return_status;
         return_status = socketClient.removePresentationFromModule(presentationID);
 
-        if (return_status.contains("Success")) status = true;
+        if (return_status.contains("success")) status = true;
 
         return status;
     }

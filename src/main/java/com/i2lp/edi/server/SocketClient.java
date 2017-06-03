@@ -154,16 +154,17 @@ public class SocketClient {
 
                 case "presentations":
                     //Update presentation list if no presentation manager is open
-                    if (ediManager.getPresentationManager() != null) {//If there is a presentation
-                        if ((ediManager.getPresentationManager().getStudentSession() == null)||(ediManager.getPresentationManager().getTeacherSession() == null)) {
-                            if (ediManager.getPresentationLibraryManager() != null) {
-                                ediManager.getPresentationLibraryManager().updatePresentations(); //Update presentation information
-                            }
+                    if (ediManager.getPresentationManager() == null) {
+                        if (ediManager.getPresentationLibraryManager() != null) {
+                            ediManager.getPresentationLibraryManager().updatePresentations(); //Update presentation information
                         }
-                        if (ediManager.getPresentationManager().getStudentSession() != null) {//that is live and am a student
-                            if (ediManager.getPresentationManager().getStudentSession().isLinked()) {
-                                ediManager.getPresentationManager().getStudentSession().synchroniseWithTeacher();
-                            }
+                    } else if ((ediManager.getPresentationManager().getStudentSession() == null) || (ediManager.getPresentationManager().getTeacherSession() == null)) {
+                        if (ediManager.getPresentationLibraryManager() != null) {
+                            ediManager.getPresentationLibraryManager().updatePresentations(); //Update presentation information
+                        }
+                    } else if (ediManager.getPresentationManager().getStudentSession() != null) {//that is live and am a student
+                        if (ediManager.getPresentationManager().getStudentSession().isLinked()) {
+                            ediManager.getPresentationManager().getStudentSession().synchroniseWithTeacher();
                         }
                     }
                     break;
@@ -265,7 +266,7 @@ public class SocketClient {
 
             //Handle results
             while (rs.next()) {
-            	associatedUsers.add(getUser(rs.getInt("user_id")));
+                associatedUsers.add(getUser(rs.getInt("user_id")));
             }
 
             if (associatedUsers.size() == 0) {
@@ -281,7 +282,7 @@ public class SocketClient {
     }
 
     //Gets most of a User entry (Doesn't get password or salt)
-    public User getUser(int userId){
+    public User getUser(int userId) {
         User retrievedUser = null;
 
         try (PGConnection connection = (PGConnection) dataSource.getConnection()) {
@@ -513,7 +514,7 @@ public class SocketClient {
         try (PGConnection connection = (PGConnection) dataSource.getConnection()) {
             PreparedStatement statement = connection.prepareStatement("UPDATE presentations SET go_live_timestamp=? WHERE presentation_id=?");
 
-            if(goLiveDate.equals("0")){
+            if (goLiveDate.equals("0")) {
                 statement.setNull(1, 0);
             } else {
                 statement.setString(1, goLiveDate);
@@ -540,7 +541,7 @@ public class SocketClient {
     private void sendInteractiveElementsToServer(Presentation presentation, int presentationId) {
         //Presentation successfully uploaded, send the details of the interactive elements to the DB.
         for (Slide slides : presentation.getSlideList()) {
-            if(!presentation.getSlideList().isEmpty()) {
+            if (!slides.getInteractiveElementList().isEmpty()) {
                 setInteractiveElementsForPresentation(
                         slides.getInteractiveElementList(),
                         presentationId,//Pres ID
@@ -916,8 +917,8 @@ public class SocketClient {
         boolean statementSuccess = false;
 
         try (PGConnection connection = (PGConnection) dataSource.getConnection()) {
-            PreparedStatement statement= null;
-            if(isLive) {
+            PreparedStatement statement = null;
+            if (isLive) {
                 statement =
                         connection.prepareStatement("UPDATE interactive_elements " +
                                 "SET live = ?, response_interval = ? " +
@@ -928,7 +929,7 @@ public class SocketClient {
                 statement.setTime(2, new Time(Instant.now().toEpochMilli()));
                 statement.setInt(3, interactiveElementID);
                 statement.setInt(4, presentationID);
-            }else {
+            } else {
                 statement =
                         connection.prepareStatement("UPDATE interactive_elements " +
                                 "SET live = ? WHERE interactive_element_id = ? AND presentation_id = ?;");
@@ -1140,10 +1141,11 @@ public class SocketClient {
      * Resets all free components tied to an interactive element, setting the
      * interactive elements non-live, and deleting all interactions linked
      * to the element
+     *
      * @param interactiveElementID the PK of presentation
      * @return true successful
      */
-    public boolean resetInteractionsForInteractiveElement(int interactiveElementID){
+    public boolean resetInteractionsForInteractiveElement(int interactiveElementID) {
         boolean statementSuccess = false;
 
         //Attempt to add a user using stored procedure
@@ -1166,7 +1168,8 @@ public class SocketClient {
             if (status.contains("success")) {
                 statementSuccess = true;
                 logger.info("Successfully removed interactions from interactive element.");
-            } else logger.error("Unable to reset interactions for interactive element with ID: " + interactiveElementID);
+            } else
+                logger.error("Unable to reset interactions for interactive element with ID: " + interactiveElementID);
 
             statement.close();
         } catch (Exception e) {
@@ -1179,10 +1182,11 @@ public class SocketClient {
      * Resets all free components tied to a presentation, setting the presentation
      * and any interactive elements non-live, and deleting all interactions with
      * the presentation.
+     *
      * @param presentationID the PK of presentation
      * @return true successful
      */
-    public boolean resetInteractionsForPresentation(int presentationID){
+    public boolean resetInteractionsForPresentation(int presentationID) {
         boolean statementSuccess = false;
 
         //Attempt to add a user using stored procedure
@@ -1205,7 +1209,8 @@ public class SocketClient {
             if (status.contains("success")) {
                 statementSuccess = true;
                 logger.info(status);
-            } else logger.error("Unable to reset interactive elements' interactions for presentation with ID: " + presentationID + " " + status);
+            } else
+                logger.error("Unable to reset interactive elements' interactions for presentation with ID: " + presentationID + " " + status);
 
             statement.close();
         } catch (Exception e) {
