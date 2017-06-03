@@ -233,11 +233,11 @@ public class ThumbnailGenerationManager extends PresentationManager {
 //                        contents.transform(Matrix.getRotateInstance(Math.toRadians(90), 0, 0));
 //                        contents.transform(Matrix.getTranslateInstance(-tx, -ty));
                         //contents.drawImage(imageObject, -115, 135, PDRectangle.A4.getHeight() - 30, PDRectangle.A4.getWidth() - 30);
-                        float imageWidth = imageObject.getWidth()*(0.5f);
-                        float imageHeight = imageObject.getHeight()*(0.5f);
+                        float imageWidth = imageObject.getWidth()*0.25f;
+                        float imageHeight = imageWidth*presentation.getDocumentAspectRatio();
                         PDRectangle mediaBox = page.getMediaBox();
                         //contents.drawImage(imageObject,72,page.getCropBox().getUpperRightY(),imageHeight,imageWidth);
-                        contents.drawImage(imageObject,72/2,mediaBox.getHeight()-(72*8),imageHeight,imageWidth);
+                        contents.drawImage(imageObject,72,mediaBox.getHeight()-(72*5),imageHeight,imageWidth);
                         contents.close();
                     } catch (IOException e) {
                         e.printStackTrace();
