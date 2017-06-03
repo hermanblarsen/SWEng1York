@@ -193,7 +193,9 @@ public class PresentationManagerTeacher extends PresentationManager {
         slides = new Panel[questions.size()];
         slidePane = new StackPane();
         slidePane.setPickOnBounds(false);
-        sp.setContent(null);
+        if(sp != null) {
+            sp.setContent(null);
+        }
         fp = new FlowPane();
         fp.setPrefWrapLength(100);
         fp.setMaxWidth(Double.MAX_VALUE);
@@ -211,22 +213,30 @@ public class PresentationManagerTeacher extends PresentationManager {
             Image answered = new Image("file:projectResources/icons/Tick.png",50,50,true,true);
             ImageView answeredView = new ImageView(answered);
 
-            answeredView.addEventHandler(MouseEvent.MOUSE_CLICKED, evt->{
+            answeredView.addEventFilter(MouseEvent.MOUSE_CLICKED,evt->{
                 test = true;
-                displayPane.getChildren().remove(slidePane);
-                slidePane.getChildren().removeAll(backgroundRegion, lab);
-                buttonActive = true;
-                ediManager.getSocketClient().answerQuestionInQuestionQueue(questions.get(0).getQuestion_id());
+                if(lab.getText() == slides[j].getText()) {
+                    displayPane.getChildren().remove(slidePane);
+                    slidePane.getChildren().removeAll(backgroundRegion, lab);
+                }
+                //buttonActive = true;
+                ediManager.getSocketClient().answerQuestionInQuestionQueue(questions.get(j).getQuestion_id());
                 Label questionComplete = new Label("Question Answered!");
                 logger.info("Question: "+j+" Answered");
                 slides[j].setBody(questionComplete);
+                evt.consume();
             });
-            answeredView.addEventHandler(MouseEvent.MOUSE_ENTERED,evt->{
-                buttonActive = true;
-            });
-            answeredView.addEventHandler(MouseEvent.MOUSE_EXITED,evt->{
-                buttonActive = false;
-            });
+
+//            answeredView.addEventHandler(MouseEvent.MOUSE_CLICKED, evt->{
+//
+//
+//            });
+//            answeredView.addEventHandler(MouseEvent.MOUSE_ENTERED,evt->{
+//                buttonActive = true;
+//            });
+//            answeredView.addEventHandler(MouseEvent.MOUSE_EXITED,evt->{
+//                buttonActive = false;
+//            });
             slides[i].setBody(answeredView);
             //slides[i].getStyleClass().add("panel-primary");
 
@@ -234,7 +244,7 @@ public class PresentationManagerTeacher extends PresentationManager {
             final int val = i;
             slides[i].addEventHandler(MouseEvent.MOUSE_CLICKED, evt -> {
 
-                if(!test) {
+                //if(!test) {
                     if (!questionClicked) {
                         displayPane.getChildren().remove(slidePane);
                         lab = new Label(slides[val].getText());
@@ -271,19 +281,21 @@ public class PresentationManagerTeacher extends PresentationManager {
                             questionClicked = true;
                         }
                     }
-                }
+                //}
             });
             presentationStage.addEventHandler(MouseEvent.MOUSE_CLICKED, evt->{
                 displayPane.getChildren().remove(slidePane);
                 slidePane.getChildren().removeAll(backgroundRegion, lab);
                 questionClicked = false;
             });
-            teacherToolKitStage.addEventHandler(WindowEvent.WINDOW_CLOSE_REQUEST, evt -> {
-                displayPane.getChildren().remove(slidePane);
-                slidePane.getChildren().removeAll(backgroundRegion, lab);
-                questionClicked = false;
+            if(teacherToolKitStage != null) {
+                teacherToolKitStage.addEventHandler(WindowEvent.WINDOW_CLOSE_REQUEST, evt -> {
+                    displayPane.getChildren().remove(slidePane);
+                    slidePane.getChildren().removeAll(backgroundRegion, lab);
+                    questionClicked = false;
 
-            });
+                });
+            }
 
             Date date = new Date();
             long time = date.getTime();
@@ -350,9 +362,9 @@ public class PresentationManagerTeacher extends PresentationManager {
 
         for (int i = 0; i < studentList.size(); i++) {
             slides[i] = new Panel(studentList.get(i).getName());
-            VBox studentDetails = new VBox();
-            slides[i].setBody(studentDetails);
-            //slides[i].getStyleClass().add("panel-primary");
+//            VBox studentDetails = new VBox();
+//            slides[i].setBody(studentDetails);
+//            //slides[i].getStyleClass().add("panel-primary");
             slides[i].setMinWidth(400);
 
             double questionPercentage = (studentList.get(i).getQuestionsAnswered() / (double) numberOfTestQuestions);
