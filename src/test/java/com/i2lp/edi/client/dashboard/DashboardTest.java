@@ -11,7 +11,6 @@ import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseButton;
-import javafx.scene.layout.BorderPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.junit.*;
@@ -19,7 +18,6 @@ import org.testfx.api.FxToolkit;
 import org.testfx.framework.junit.ApplicationTest;
 
 import java.io.File;
-import java.time.LocalDateTime;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.concurrent.TimeoutException;
@@ -68,7 +66,7 @@ public abstract class DashboardTest extends ApplicationTest {
         Assume.assumeTrue(!IS_CIRCLE_BUILD);
 
         searchField = myDashboard.searchField;
-        showAllButton = myDashboard.selectAllButton;
+        showAllButton = myDashboard.showAllButton;
         subjectCheckboxes = myDashboard.subjectCheckboxes;
         openPresButton = myDashboard.openPresButton;
         fileChooser = myDashboard.fileChooser;

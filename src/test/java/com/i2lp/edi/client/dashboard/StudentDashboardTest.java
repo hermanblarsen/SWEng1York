@@ -5,7 +5,6 @@ import com.i2lp.edi.server.packets.User;
 import javafx.stage.Stage;
 import org.junit.Assume;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import static com.i2lp.edi.client.Constants.IS_CIRCLE_BUILD;
@@ -36,7 +35,7 @@ public class StudentDashboardTest extends DashboardTest{
         Assume.assumeTrue(!IS_CIRCLE_BUILD);
 
         searchField = myDashboard.searchField;
-        showAllButton = myDashboard.selectAllButton;
+        showAllButton = myDashboard.showAllButton;
         subjectCheckboxes = myDashboard.subjectCheckboxes;
         openPresButton = myDashboard.openPresButton;
         fileChooser = myDashboard.fileChooser;
