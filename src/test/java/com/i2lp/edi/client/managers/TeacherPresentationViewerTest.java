@@ -2,7 +2,6 @@ package com.i2lp.edi.client.managers;
 
 import com.i2lp.edi.client.utilities.ParserXML;
 import com.i2lp.edi.server.packets.PresentationMetadata;
-import javafx.application.Platform;
 import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
 import org.junit.Assume;
@@ -10,10 +9,9 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import java.io.File;
-
 import static com.i2lp.edi.client.Constants.IS_CIRCLE_BUILD;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Created by Luke on 30/05/2017.
@@ -63,8 +61,8 @@ public class TeacherPresentationViewerTest extends PresentationViewerTest {
     @Ignore //TODO @Luke Find way to test online features
     @Test
     public void testTeacherToolkitCreation() {
-        assertEquals(null, ((PresentationManagerTeacher) myPresentationManager).teacherToolKit);
+        assertEquals(null, ((PresentationManagerTeacher) myPresentationManager).teacherToolKitStage);
         clickOn(toolkitButton);
-        assertTrue(((PresentationManagerTeacher) myPresentationManager).teacherToolKit.isShowing());
+        assertTrue(((PresentationManagerTeacher) myPresentationManager).teacherToolKitStage.isShowing());
     }
 }

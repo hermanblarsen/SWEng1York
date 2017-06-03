@@ -94,11 +94,14 @@ public abstract class Dashboard extends Application {
     private ScrollPane rightPanelScroll;
     private LocalDate selectedDate;
     private ScrollPane presentationsScrollPane;
+    private ScrollPane subjectsScrollPane;
+    private VBox centerVBox;
+    private VBox subjectCheckboxesVBox;
 
     protected CustomTextField searchField;
     protected Button showAllButton;
     protected ArrayList<CheckBox> subjectCheckboxes;
-    protected ArrayList<Subject> filterSubjects;
+    protected ArrayList<String> filterSubjects;
     private ArrayList<PresSchedulePanel> schedulePanels;
     private VBox scheduleVBox;
     protected Button openPresButton;
@@ -219,46 +222,48 @@ public abstract class Dashboard extends Application {
     }
 
     private void displayBorderCenter(DashboardState state) {
-        VBox vbox = new VBox(5);
-        vbox.setPadding(new Insets(10));
-        vbox.setAlignment(Pos.TOP_CENTER);
-        vbox.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
-            switch (currentState) {
-                case TOP_LEVEL:
-                    setSelectedPreviewPanel(selectedModulePanel, false);
-                    break;
-                case MODULE:
-                case SEARCH_IN_MODULE:
-                    setSelectedPreviewPanel(selectedPresPanel, false);
-                    break;
-                case SEARCH_ALL:
-                    setSelectedPreviewPanel(selectedPresPanel, false);
-                    setSelectedPreviewPanel(selectedModulePanel, false);
-                    break;
-                default:
-                    //do nothing
-            }
-        });
+        if (centerVBox == null) {
+            centerVBox = new VBox(5);
+            centerVBox.setPadding(new Insets(10));
+            centerVBox.setAlignment(Pos.TOP_CENTER);
+            centerVBox.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
+                switch (currentState) {
+                    case TOP_LEVEL:
+                        setSelectedPreviewPanel(selectedModulePanel, false);
+                        break;
+                    case MODULE:
+                    case SEARCH_IN_MODULE:
+                        setSelectedPreviewPanel(selectedPresPanel, false);
+                        break;
+                    case SEARCH_ALL:
+                        setSelectedPreviewPanel(selectedPresPanel, false);
+                        setSelectedPreviewPanel(selectedModulePanel, false);
+                        break;
+                    default:
+                        //do nothing
+                }
+            });
+        } else {
+            centerVBox.getChildren().clear();
+        }
 
-        ScrollPane subjectsScrollPane = new ScrollPane();
-        subjectsScrollPane.setContent(subjectPanelsVBox);
-        subjectsScrollPane.setHbarPolicy(ScrollBarPolicy.NEVER);
-        subjectsScrollPane.setVbarPolicy(ScrollBarPolicy.NEVER);
-        subjectsScrollPane.setFitToWidth(true);
-        subjectsScrollPane.getStyleClass().add("edge-to-edge");
+        if (subjectsScrollPane == null) {
+            subjectsScrollPane = new ScrollPane();
+            subjectsScrollPane.setContent(subjectPanelsVBox);
+            subjectsScrollPane.setHbarPolicy(ScrollBarPolicy.NEVER);
+            subjectsScrollPane.setVbarPolicy(ScrollBarPolicy.NEVER);
+            subjectsScrollPane.setFitToWidth(true);
+            subjectsScrollPane.getStyleClass().add("edge-to-edge");
+        }
 
-        presentationsScrollPane = new ScrollPane();
-        presentationsScrollPane.setContent(presentationPanelsFlowPane);
-        presentationsScrollPane.setHbarPolicy(ScrollBarPolicy.NEVER);
-        presentationsScrollPane.setVbarPolicy(ScrollBarPolicy.NEVER);
-        presentationsScrollPane.setFitToWidth(true);
-        presentationsScrollPane.getStyleClass().add("edge-to-edge");
-
-        presentationPanelsFlowPane.setPadding(new Insets(5, 0, 5, 0));
-        presentationPanelsFlowPane.setVgap(4);
-        presentationPanelsFlowPane.setHgap(4);
-        presentationPanelsFlowPane.getStyleClass().add("edge-to-edge");
-        presentationPanelsFlowPane.setAlignment(Pos.TOP_CENTER);
+        if (presentationsScrollPane == null) {
+            presentationsScrollPane = new ScrollPane();
+            presentationsScrollPane.setContent(presentationPanelsFlowPane);
+            presentationsScrollPane.setHbarPolicy(ScrollBarPolicy.NEVER);
+            presentationsScrollPane.setVbarPolicy(ScrollBarPolicy.NEVER);
+            presentationsScrollPane.setFitToWidth(true);
+            presentationsScrollPane.getStyleClass().add("edge-to-edge");
+        }
 
         switch (state) {
             case TOP_LEVEL:
@@ -275,7 +280,7 @@ public abstract class Dashboard extends Application {
                     closeWelcomeButton.getStyleClass().setAll("btn", "btn-default");
                     closeWelcomeButton.setOnAction(event -> {
                         isWelcomeTextHidden = true;
-                        vbox.getChildren().remove(welcomePane);
+                        centerVBox.getChildren().remove(welcomePane);
                     });
                     closeWelcomeButton.setStyle("-fx-font-size: 10px; -fx-min-width: 0; -fx-padding: 6px 6px 6px 6px;");
 
@@ -295,11 +300,11 @@ public abstract class Dashboard extends Application {
                     textVBox.getChildren().add(welcomeText);
                     VBox.setMargin(welcomeText, new Insets(5, 0, 5, 0));
 
-                    vbox.getChildren().add(welcomePane);
+                    centerVBox.getChildren().add(welcomePane);
                 }
 
-                vbox.getChildren().add(subjectsScrollPane);
-                border.setCenter(vbox);
+                centerVBox.getChildren().add(subjectsScrollPane);
+                border.setCenter(centerVBox);
 
                 filterBy(filterSubjects);
                 break;
@@ -312,10 +317,10 @@ public abstract class Dashboard extends Application {
                 presentationsText.getStyleClass().setAll("h4");
                 VBox.setMargin(presentationsText, new Insets(10, 0, 0, 0));
 
-                vbox.getChildren().addAll(modulesText, subjectPanelsVBox, presentationsText, presentationPanelsFlowPane);
+                centerVBox.getChildren().addAll(modulesText, subjectPanelsVBox, presentationsText, presentationPanelsFlowPane);
 
                 ScrollPane searchScrollPane = new ScrollPane();
-                searchScrollPane.setContent(vbox);
+                searchScrollPane.setContent(centerVBox);
                 searchScrollPane.setHbarPolicy(ScrollBarPolicy.NEVER);
                 searchScrollPane.setVbarPolicy(ScrollBarPolicy.NEVER);
                 searchScrollPane.setFitToWidth(true);
@@ -357,8 +362,8 @@ public abstract class Dashboard extends Application {
                 moduleNameHBox.setPadding(new Insets(5, 0, 5, 0));
                 moduleNameHBox.getChildren().addAll(backButton, spacer1, subjectText, arrow, moduleText, spacer2, dummy);
 
-                vbox.getChildren().addAll(moduleNameHBox, presentationsScrollPane);
-                border.setCenter(vbox);
+                centerVBox.getChildren().addAll(moduleNameHBox, presentationsScrollPane);
+                border.setCenter(centerVBox);
 
                 filterBy(selectedModule);
                 break;
@@ -388,12 +393,9 @@ public abstract class Dashboard extends Application {
         Insets panelInsets = new Insets(5);
 
         if (subjectFilterPanel == null) {
-            subjectCheckboxes = new ArrayList<>();
-
             //Setup filtering panel
-            VBox subjectsVBox = new VBox();
-            subjectsVBox.setPadding(new Insets(0, 0, 3, 0));
-            subjectsVBox.setSpacing(3);
+
+            VBox subjectsVBox = new VBox(3);
             subjectsVBox.setStyle("-fx-background-color: #ffffff;");
 
             showAllButton = new Button("Select all");
@@ -428,44 +430,9 @@ public abstract class Dashboard extends Application {
             });
             subjectsVBox.getChildren().add(showAllButton);
 
-            //Sort subjects alphabetically without affecting the displayed subjects
-            ArrayList<Subject> subjectsForButtons = (ArrayList<Subject>) availableSubjects.clone();
-            subjectsForButtons.sort((s1, s2) -> SubjectSortKey.NAME_AZ.compare(s1, s2));
+            updateSubjectCheckBoxes();
 
-            for (Subject subject : subjectsForButtons) {
-                CheckBox subjectCheckBox = new CheckBox(subject.getSubjectName());
-                subjectCheckBox.selectedProperty().addListener(change -> {
-                    if (filterSubjects == null) {
-                        filterSubjects = new ArrayList<>();
-                    }
-
-                    if (subjectCheckBox.isSelected() && !filterSubjects.contains(subject)) {
-                        filterSubjects.add(subject);
-                    } else if (!subjectCheckBox.isSelected() && filterSubjects.contains(subject)) {
-                        filterSubjects.remove(subject);
-                    }
-
-                    boolean allSelected = true;
-
-                    for (CheckBox checkBox : subjectCheckboxes) {
-                        if (!checkBox.isSelected()) {
-                            allSelected = false;
-                            break;
-                        }
-                    }
-
-                    if (allSelected) {
-                        showAllButton.setText("Deselect all");
-                    } else {
-                        showAllButton.setText("Select all");
-                    }
-
-                    filterBy(filterSubjects);
-                });
-                subjectCheckBox.setPadding(new Insets(1));
-                subjectCheckboxes.add(subjectCheckBox);
-                subjectsVBox.getChildren().add(subjectCheckBox);
-            }
+            subjectsVBox.getChildren().add(subjectCheckboxesVBox);
 
             subjectFilterPanel = new Panel("Filter by subject:");
             subjectFilterPanel.getStyleClass().add("panel-primary");
@@ -686,6 +653,7 @@ public abstract class Dashboard extends Application {
         setupModulePanels();
         setupPresentationPanels();
         setupSchedulePanels();
+        updateSubjectCheckBoxes();
 
         if (currentState != null) {
             if (currentState == DashboardState.SEARCH_ALL || currentState == DashboardState.TOP_LEVEL) {
@@ -774,6 +742,11 @@ public abstract class Dashboard extends Application {
 
         if (presentationPanelsFlowPane == null) {
             presentationPanelsFlowPane = new FlowPane(Orientation.HORIZONTAL);
+            presentationPanelsFlowPane.setPadding(new Insets(5, 0, 5, 0));
+            presentationPanelsFlowPane.setVgap(4);
+            presentationPanelsFlowPane.setHgap(4);
+            presentationPanelsFlowPane.getStyleClass().add("edge-to-edge");
+            presentationPanelsFlowPane.setAlignment(Pos.TOP_CENTER);
         } else {
             presentationPanelsFlowPane.getChildren().clear();
         }
@@ -804,17 +777,6 @@ public abstract class Dashboard extends Application {
                         });
                         cMenu.getItems().add(openAndGoLive);
 
-                        MenuItem resetInteractions = new MenuItem("Reset interaction data");
-                        resetInteractions.setOnAction(resetEvent -> {
-                            ediManager.getSocketClient().resetInteractionsForPresentation(this.selectedPresPanel.
-                                    getPresentation().getPresentationMetadata().getPresentationID());
-                        });
-                        cMenu.getItems().add(resetInteractions);
-
-                        MenuItem edit = new MenuItem("Edit");
-                        edit.setOnAction(editEvent -> showPresentationEditor(presentationPanel.getPresentation().getPath()));
-                        cMenu.getItems().add(edit);
-
                         MenuItem schedule = new MenuItem("Schedule");
                         schedule.setOnAction(scheduleEvent -> showScheduler(presentationPanel, event.getScreenX(), event.getScreenY()));
                         cMenu.getItems().add(schedule);
@@ -825,10 +787,6 @@ public abstract class Dashboard extends Application {
                             ediManager.getSocketClient().setPresentationGoLive(presentationPanel.getPresentation().getPresentationMetadata().getPresentationID(), "0");
                         });
                         cMenu.getItems().add(unschedule);
-
-                        MenuItem delete = new MenuItem("Delete");
-                        delete.setOnAction(deleteEvent -> deletePresentation(presentationPanel));
-                        cMenu.getItems().add(delete);
 
                         MenuItem print = new MenuItem("Generate PDF");
                         print.setOnAction(printEvent -> printPresentation(presentationPanel.getPresentation()));
@@ -842,6 +800,20 @@ public abstract class Dashboard extends Application {
                         details.setOnAction(detailsEvent -> showDetailsWindow(presentationPanel.getPresentation()));
                         cMenu.getItems().add(details);
 
+                        MenuItem edit = new MenuItem("Edit");
+                        edit.setOnAction(editEvent -> showPresentationEditor(presentationPanel.getPresentation().getPath()));
+                        cMenu.getItems().add(edit);
+
+                        MenuItem resetInteractions = new MenuItem("Reset interaction data");
+                        resetInteractions.setOnAction(resetEvent -> {
+                            ediManager.getSocketClient().resetInteractionsForPresentation(this.selectedPresPanel.
+                                    getPresentation().getPresentationMetadata().getPresentationID());
+                        });
+                        cMenu.getItems().add(resetInteractions);
+
+                        MenuItem delete = new MenuItem("Delete");
+                        delete.setOnAction(deleteEvent -> deletePresentation(presentationPanel));
+                        cMenu.getItems().add(delete);
                     }
                     cMenu.show(dashboardStage, event.getScreenX(), event.getScreenY());
                 }
@@ -850,8 +822,9 @@ public abstract class Dashboard extends Application {
             presentationPanels.add(presentationPanel);
         }
 
-        if (presSortCombo != null)
+        if (presSortCombo != null) {
             sortPresentations(presSortCombo.getValue());
+        }
 
     }
 
@@ -892,6 +865,60 @@ public abstract class Dashboard extends Application {
 
             if (selectedDate.isEqual(schedulePanel.getGoLiveDateTime().toLocalDate())) {
                 schedulePanel.setFiltered(false);
+            }
+        }
+    }
+
+    private void updateSubjectCheckBoxes() {
+        if (subjectCheckboxesVBox == null) {
+            subjectCheckboxesVBox = new VBox(3);
+            subjectCheckboxesVBox.setPadding(new Insets(0, 0, 3, 0));
+            subjectCheckboxesVBox.setStyle("-fx-background-color: #ffffff;");
+        } else {
+            subjectCheckboxesVBox.getChildren().clear();
+        }
+
+        //Sort subjects alphabetically without affecting the displayed subjects
+        ArrayList<Subject> subjectsForButtons = (ArrayList<Subject>) availableSubjects.clone();
+        subjectsForButtons.sort((s1, s2) -> SubjectSortKey.NAME_AZ.compare(s1, s2));
+
+        subjectCheckboxes = new ArrayList<>();
+
+        if (filterSubjects == null) {
+            filterSubjects = new ArrayList<>();
+        }
+
+        for (Subject subject : subjectsForButtons) {
+            CheckBox subjectCheckBox = new CheckBox(subject.getSubjectName());
+            subjectCheckBox.selectedProperty().addListener(change -> {
+                if (subjectCheckBox.isSelected() && !filterSubjects.contains(subject.getSubjectName())) {
+                    filterSubjects.add(subject.getSubjectName());
+                } else if (!subjectCheckBox.isSelected() && filterSubjects.contains(subject.getSubjectName())) {
+                    filterSubjects.remove(subject.getSubjectName());
+                }
+
+                boolean allSelected = true;
+
+                for (CheckBox checkBox : subjectCheckboxes) {
+                    if (!checkBox.isSelected()) {
+                        allSelected = false;
+                        break;
+                    }
+                }
+
+                if (allSelected) {
+                    showAllButton.setText("Deselect all");
+                } else {
+                    showAllButton.setText("Select all");
+                }
+
+                filterBy(filterSubjects);
+            });
+            subjectCheckBox.setPadding(new Insets(1));
+            subjectCheckboxes.add(subjectCheckBox);
+            subjectCheckboxesVBox.getChildren().add(subjectCheckBox);
+            if (filterSubjects.contains(subject.getSubjectName())) {
+                subjectCheckBox.setSelected(true);
             }
         }
     }
@@ -1107,24 +1134,24 @@ public abstract class Dashboard extends Application {
         if (filter != null) {
             if (filter instanceof ArrayList) {
                 if (((ArrayList) filter).size() != 0) {
-                    if (((ArrayList) filter).get(0) instanceof Subject) {
+                    if (((ArrayList) filter).get(0) instanceof String) {
                         setAllFiltering(true);
 
-                        ArrayList<Subject> filterSubjects = (ArrayList<Subject>) filter;
+                        ArrayList<String> filterSubjects = (ArrayList<String>) filter;
 
-                        for (Subject subject : filterSubjects) {
+                        for (String subjectName : filterSubjects) {
                             for (PresentationPanel panel : presentationPanels) {
-                                if (subject.getSubjectName().equals(panel.getPresentation().getSubject().getSubjectName()))
+                                if (subjectName.equals(panel.getPresentation().getSubject().getSubjectName()))
                                     panel.setFiltered(false);
                             }
 
                             for (SubjectPanel subjectPanel : subjectPanels) {
                                 for (ModulePanel modulePanel : subjectPanel.getModulePanels()) {
-                                    if (subject.getSubjectName().equals(modulePanel.getModule().getSubject().getSubjectName()))
+                                    if (subjectName.equals(modulePanel.getModule().getSubject().getSubjectName()))
                                         modulePanel.setFiltered(false);
                                 }
 
-                                if (subject.getSubjectName().equals(subjectPanel.getSubject().getSubjectName()))
+                                if (subjectName.equals(subjectPanel.getSubject().getSubjectName()))
                                     subjectPanel.setFiltered(false);
                             }
                         }

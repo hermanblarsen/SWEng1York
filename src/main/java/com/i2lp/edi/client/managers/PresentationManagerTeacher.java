@@ -44,9 +44,9 @@ public class PresentationManagerTeacher extends PresentationManager {
     protected boolean firstRun = false;
     protected String setText;
     protected List<Student> studentList;
-    protected Stage teacherToolKit;
+    protected Stage teacherToolKitStage;
+    private Double toolKitStageX, toolKitStageY;
     private int numberOfTestQuestions = 10;
-    private int numberOnline = 0;
     private ArrayList<Question> newQuestionList;
     private boolean buttonActive = false;
     private Tab questions;
@@ -104,10 +104,15 @@ public class PresentationManagerTeacher extends PresentationManager {
     @Override
     protected void loadSpecificFeatures() {
         if (!toolkitOpen) {
-            teacherToolKit = new Stage();
-
-            teacherToolKit.initStyle(StageStyle.UTILITY);
-            teacherToolKit.setTitle("Teacher toolkit");
+            teacherToolKitStage = new Stage();
+            if (toolKitStageX != null) {
+                teacherToolKitStage.setX(toolKitStageX);
+            }
+            if (toolKitStageY != null) {
+                teacherToolKitStage.setY(toolKitStageY);
+            }
+            teacherToolKitStage.initStyle(StageStyle.UTILITY);
+            teacherToolKitStage.setTitle("Teacher toolkit");
             TabPane tp = new TabPane();
             tp.setStyle("-fx-background-color: #34495e");
             Scene toolkitScene = new Scene(tp, 450, 450);
@@ -123,7 +128,7 @@ public class PresentationManagerTeacher extends PresentationManager {
             setListOfQuestions();
             //questionList = generateQuestions();
             questions.setContent(questionQueueFunction(newQuestionList));
-            
+
             tp.getTabs().add(questions);
 
             studentStats = new Tab();
@@ -132,15 +137,20 @@ public class PresentationManagerTeacher extends PresentationManager {
             studentStats.setContent(studentStats(studentList));
             tp.getTabs().add(studentStats);
 
-            teacherToolKit.setScene(toolkitScene);
-            teacherToolKit.show();
+            teacherToolKitStage.setScene(toolkitScene);
+            teacherToolKitStage.show();
             tp.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
             toolkitOpen = true;
 
             backgroundRegion = new Region();
             backgroundRegion.setBackground(new Background(new BackgroundFill(Color.web("#34495e"), null, null)));
 
-            teacherToolKit.addEventHandler(WindowEvent.WINDOW_CLOSE_REQUEST, evt -> toolkitOpen = false);
+            teacherToolKitStage.addEventHandler(WindowEvent.WINDOW_CLOSE_REQUEST, evt -> toolkitOpen = false);
+        } else {
+            toolKitStageX = teacherToolKitStage.getX();
+            toolKitStageY = teacherToolKitStage.getY();
+            teacherToolKitStage.close();
+            toolkitOpen = false;
         }
 
     }
@@ -268,7 +278,7 @@ public class PresentationManagerTeacher extends PresentationManager {
                 slidePane.getChildren().removeAll(backgroundRegion, lab);
                 questionClicked = false;
             });
-            teacherToolKit.addEventHandler(WindowEvent.WINDOW_CLOSE_REQUEST, evt -> {
+            teacherToolKitStage.addEventHandler(WindowEvent.WINDOW_CLOSE_REQUEST, evt -> {
                 displayPane.getChildren().remove(slidePane);
                 slidePane.getChildren().removeAll(backgroundRegion, lab);
                 questionClicked = false;
@@ -340,9 +350,6 @@ public class PresentationManagerTeacher extends PresentationManager {
 
         for (int i = 0; i < studentList.size(); i++) {
             slides[i] = new Panel(studentList.get(i).getName());
-            if (studentList.get(i).isOnline()) {
-                numberOnline++;
-            }
             VBox studentDetails = new VBox();
             slides[i].setBody(studentDetails);
             //slides[i].getStyleClass().add("panel-primary");
@@ -460,7 +467,7 @@ public class PresentationManagerTeacher extends PresentationManager {
         Platform.runLater(new Runnable() {
             @Override
             public void run() {
-                if(teacherToolKit != null) {
+                if(teacherToolKitStage != null) {
                     setUpStudentList(studentList);
                 }
             }
@@ -469,8 +476,8 @@ public class PresentationManagerTeacher extends PresentationManager {
 
     @Override
     protected void doCloseSequence() {
-        if (teacherToolKit != null) {
-            teacherToolKit.close();
+        if (teacherToolKitStage != null) {
+            teacherToolKitStage.close();
         }
         super.doCloseSequence();
     }
