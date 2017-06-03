@@ -6,6 +6,7 @@ import com.i2lp.edi.client.presentationElements.SlideElement;
 import com.i2lp.edi.client.presentationElements.WordCloudElement;
 import com.i2lp.edi.server.SocketClient;
 import com.i2lp.edi.server.packets.*;
+import com.sun.javafx.scene.control.skin.TableHeaderRow;
 import eu.hansolo.tilesfx.Tile;
 import eu.hansolo.tilesfx.TileBuilder;
 import eu.hansolo.tilesfx.skins.BarChartItem;
@@ -15,6 +16,7 @@ import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
@@ -23,6 +25,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import org.kordamp.bootstrapfx.scene.layout.Panel;
 import org.slf4j.Logger;
@@ -158,29 +161,8 @@ public class ReportManager {
 
 
         //Wordcloud Element
-        File wordcloudPath = new File(PRESENTATIONS_PATH+"/" +presentation.getDocumentID()+"/Wordclouds/");
-        System.out.println(wordcloudPath.toString());
-        if(wordcloudPath.exists()){
-            System.out.println("TEST");
-            String[] ext = {"png"};
-            FilenameFilter imageFilter = (dir, name) -> {
-                for (final String ext1 : ext) {
-                    if (name.endsWith("." + ext1)) {
-                        return true;
-                    }
-                }
-                return false;
-            };
+        reportPane.getChildren().addAll(generateWordCloudTile());
 
-            for(File f: wordcloudPath.listFiles(imageFilter)){
-                System.out.println(f.getAbsolutePath());
-                Image wordCloud = new Image("file:" + f.getAbsolutePath());
-                ImageView wordCloudImage = new ImageView(wordCloud);
-                wordCloudImage.prefWidth(750);
-                wordCloudImage.setPreserveRatio(true);
-                reportPane.getChildren().add(wordCloudImage);
-            }
-        }
     }
 
     private TableView generateSlideTimesTable(Presentation presentation, ArrayList<PresentationStatisticsRecord> presentationStatistics){
@@ -193,13 +175,17 @@ public class ReportManager {
         studentColumn.setCellValueFactory(data -> data.getValue().studentNameProperty());
         slideTimeTable.getColumns().add(studentColumn);
 
+        //Slide Times column
+        TableColumn<StudentSlideTimes, String> slideTimesHeader = new TableColumn<>( "Time spent on each slide (Seconds)" );
+        slideTimeTable.getColumns().addAll( slideTimesHeader );
+
         for(int i=0; i < presentation.getMaxSlideNumber(); i++){
             //Generate columns
             TableColumn<StudentSlideTimes, Integer> column= new TableColumn(Integer.toString(i+1));
             final int columnIndex = i;
             column.setCellValueFactory(data -> data.getValue().getSlideTime(columnIndex));
             slideTimeColumns.add(column);
-            slideTimeTable.getColumns().add(column);
+            slideTimesHeader.getColumns().add(column);
         }
 
         //Populate the table: (Process each statistics record intto a StudentSlideTime and add it to a list)
@@ -212,8 +198,16 @@ public class ReportManager {
             );
         }
 
+        //Disable column reordering :
+        slideTimeTable.skinProperty().addListener((obs, oldSkin, newSkin) -> {
+            final TableHeaderRow header = (TableHeaderRow) slideTimeTable.lookup("TableHeaderRow");
+            header.reorderingProperty().addListener((o, oldVal, newVal) -> header.setReordering(false));
+        });
+
         slideTimeTable.setItems(slideTimesTableData);
         slideTimeTable.setPrefWidth(750);
+        slideTimeTable.setEditable( false );
+        slideTimeTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
         return slideTimeTable;
     }
@@ -243,7 +237,43 @@ public class ReportManager {
         return pollPanel;
     }
 
-    public void showQuestions(ArrayList<Question> questionQueueQuestions){
+    private ArrayList<Node> generateWordCloudTile(){
+        ArrayList<Node> wordclouds = new ArrayList<>(  );
+
+        File wordcloudPath = new File(PRESENTATIONS_PATH+"/" +presentation.getDocumentID()+"/Wordclouds/");
+        System.out.println(wordcloudPath.toString());
+        if(wordcloudPath.exists()){
+            logger.info( "Retrieving wordclouds." );
+            String[] ext = {"png"};
+            FilenameFilter imageFilter = (dir, name) -> {
+                for (final String ext1 : ext) {
+                    if (name.endsWith("." + ext1)) {
+                        return true;
+                    }
+                }
+                return false;
+            };
+
+            for(File f: wordcloudPath.listFiles(imageFilter)){
+                VBox wordcloudTile = new VBox(  );
+                Text title = new Text("A Wordcloud");
+
+                logger.info("Adding wordcloud at " + f.getAbsolutePath());
+                Image wordCloud = new Image("file:" + f.getAbsolutePath());
+                ImageView wordCloudImage = new ImageView(wordCloud);
+
+                wordCloudImage.setPreserveRatio(true);
+                wordCloudImage.setFitWidth( 750 );
+                wordcloudTile.setMaxWidth( 750 );
+
+                wordcloudTile.getChildren().addAll( title, wordCloudImage );
+                wordclouds.add(wordcloudTile);
+            }
+        }
+        return wordclouds;
+    }
+
+    private void showQuestions(ArrayList<Question> questionQueueQuestions){
         Stage stage = new Stage();
         stage.setTitle("Questions");
         ScrollPane sp = new ScrollPane();
@@ -277,7 +307,7 @@ public class ReportManager {
         stage.show();
     }
 
-    public void showStudents(){
+    private void showStudents(){
         Stage stage = new Stage();
         stage.setTitle("Students");
         ScrollPane sp = new ScrollPane();
