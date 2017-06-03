@@ -85,7 +85,7 @@ public class ThumbnailGenerationManager extends PresentationManager {
         ThumbnailGenerationManager slideGenController = new ThumbnailGenerationManager(null);
         slideGenController.openPresentation(presentation, true);
         slideGenController.generateSlideThumbNail(slideGenController, savePresentationToPdf);
-        if (savePresentationToPdf) slideGenController.savePresentationToPdf();
+        if (savePresentationToPdf) slideGenController.savePresentationToPdf(slideGenController);
     }
 
     public void generateSlideThumbNail(ThumbnailGenerationManager slideGenController, boolean savePresentationToPdf) {
@@ -178,22 +178,19 @@ public class ThumbnailGenerationManager extends PresentationManager {
         });
     }
 
-    private void savePresentationToPdf() {
+    private void savePresentationToPdf(ThumbnailGenerationManager slideGenController) {
         PDDocument doc = new PDDocument();
+        Presentation presentation = slideGenController.presentationElement;
 
-
-        File path = new File(PRESENTATIONS_PATH + this.presentationElement.getDocumentID() + "/Print/");
-        File pathPDF = new File(PRESENTATIONS_PATH + this.presentationElement.getDocumentID() + "/Print/" + "/pdf/");
-        if (!pathPDF.exists()) {
-            pathPDF.mkdir();
-        }
+        File path = new File(PRESENTATIONS_PATH + File.separator + presentation.getModule().getModuleName() + File.separator + this.presentationElement.getDocumentID() + "/Print/");
 
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Save PDF");
         fileChooser.setInitialFileName(presentationElement.getDocumentID());
-        Stage testStage = new Stage();
+        Stage saveStage = new Stage();
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PDF", "*.pdf"));
-        File pdfPath = fileChooser.showSaveDialog(testStage);
+
+        File pdfPath = fileChooser.showSaveDialog(saveStage);
 
 
         if (pdfPath == null) {
@@ -219,17 +216,22 @@ public class ThumbnailGenerationManager extends PresentationManager {
                     try {
                         logger.info("Slide Image Generation Path: " + f.getAbsolutePath().toString());
                         PDPage page = new PDPage(PDRectangle.A4);
-                        page.setRotation(90);
+//                        page.setRotation(90);
                         doc.addPage(page);
                         PDImageXObject imageObject = PDImageXObject.createFromFile(f.getAbsolutePath(), doc);
                         PDPageContentStream contents = new PDPageContentStream(doc, page);
-                        PDRectangle cropBox = page.getCropBox();
-                        float tx = ((cropBox.getLowerLeftX() + cropBox.getUpperRightX()) / 2);
-                        float ty = ((cropBox.getLowerLeftY() + cropBox.getUpperRightY()) / 2);
-                        contents.transform(Matrix.getTranslateInstance(tx, ty));
-                        contents.transform(Matrix.getRotateInstance(Math.toRadians(90), 0, 0));
-                        contents.transform(Matrix.getTranslateInstance(-tx, -ty));
-                        contents.drawImage(imageObject, -115, 135, PDRectangle.A4.getHeight() - 30, PDRectangle.A4.getWidth() - 30);
+//                        PDRectangle cropBox = page.getCropBox();
+//                        float tx = ((cropBox.getLowerLeftX() + cropBox.getUpperRightX()) / 2);
+//                        float ty = ((cropBox.getLowerLeftY() + cropBox.getUpperRightY()) / 2);
+//                        contents.transform(Matrix.getTranslateInstance(tx, ty));
+//                        contents.transform(Matrix.getRotateInstance(Math.toRadians(90), 0, 0));
+//                        contents.transform(Matrix.getTranslateInstance(-tx, -ty));
+                        //contents.drawImage(imageObject, -115, 135, PDRectangle.A4.getHeight() - 30, PDRectangle.A4.getWidth() - 30);
+                        float imageWidth = imageObject.getWidth()*(0.5f);
+                        float imageHeight = imageObject.getHeight()*(0.5f);
+                        PDRectangle mediaBox = page.getMediaBox();
+                        //contents.drawImage(imageObject,72,page.getCropBox().getUpperRightY(),imageHeight,imageWidth);
+                        contents.drawImage(imageObject,72/2,mediaBox.getHeight()-(72*8),imageHeight,imageWidth);
                         contents.close();
                     } catch (IOException e) {
                         e.printStackTrace();
