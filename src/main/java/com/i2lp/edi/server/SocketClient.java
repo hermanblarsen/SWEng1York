@@ -496,7 +496,6 @@ public class SocketClient {
             logger.info("Added " + presentationName + " presentation with the following ID " + objects[0]);
             if (Integer.parseInt((String) objects[0]) != -1) {
                 logger.info("Adding interactive elements to DB");
-                sendInteractiveElementsToServer(presentation, Integer.parseInt((String) objects[0]));//Update the interactive_elements table for the new presentation
                 if (presentationId != -1) {
                     logger.info("Adding interactive elements to DB");
                     sendInteractiveElementsToServer(presentation, Integer.parseInt((String) objects[0]));//Update the interactive_elements table for the new presentation
