@@ -219,9 +219,9 @@ public class WordCloudElement extends InteractiveElement {
         sendWord.setAlignment(Pos.CENTER);
         sendWord.addEventHandler(MouseEvent.MOUSE_CLICKED,evt->{
             if((ediManager.getPresentationManager().getTeacherSession()) != null){
-                ediManager.getPresentationManager().getTeacherSession().sendResponse(this, words.getText());
+                ediManager.getPresentationManager().getTeacherSession().sendResponse(this, words.getText().toLowerCase());
             } else if((ediManager.getPresentationManager().getStudentSession() != null)){
-                ediManager.getPresentationManager().getStudentSession().sendResponse(this, words.getText());
+                ediManager.getPresentationManager().getStudentSession().sendResponse(this, words.getText().toLowerCase());
             }
            words.clear();
         });
