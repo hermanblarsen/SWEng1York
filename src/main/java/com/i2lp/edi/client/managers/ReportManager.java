@@ -25,6 +25,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import org.kordamp.bootstrapfx.scene.layout.Panel;
@@ -34,6 +35,9 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.IntStream;
 
 import static com.i2lp.edi.client.Constants.PRESENTATIONS_PATH;
 
@@ -64,7 +68,8 @@ public class ReportManager {
         		item.getUserID(),
 		        new Students(
         		    item,
-				        (int) interactions.stream().filter( interaction->interaction.getUser_id() == item.getUserID()).count() )
+                    (int) interactions.stream().filter( interaction->interaction.getUser_id() == item.getUserID()).count()
+                )
         ));
 
 
@@ -88,6 +93,7 @@ public class ReportManager {
         scrollWrapper.setFitToWidth(true);
         scrollWrapper.setContent(reportPane);
         reportPane.setPadding(new Insets(10,10,10,10));
+        reportPane.setVgap(10);
         stage.setScene(new Scene(scrollWrapper,780,1000));
         stage.setResizable(false);
         stage.show();
@@ -115,7 +121,10 @@ public class ReportManager {
                 .build();
 
         //Participation Tile
-	    int averageParticipation = students.values().stream().filter( i->i.getWasPresent() ).mapToInt( i->i.getParticipation() ).sum()/(totalParticipatingStudents*interactiveElementsData.size());
+        int averageParticipation = 0;
+        if(totalParticipatingStudents != 0) {
+            averageParticipation = students.values().stream().filter(i -> i.getWasPresent()).mapToInt(i -> i.getParticipation()).sum() / (totalParticipatingStudents * interactiveElementsData.size());
+        }
         Tile presentationParticipation = TileBuilder.create()
                 .skinType(Tile.SkinType.CIRCULAR_PROGRESS)
                 .prefSize(250,250)
@@ -223,7 +232,7 @@ public class ReportManager {
 
         // Format the responses ready for the bar chart.
         for (int i=0; i<possibleAnswers.size(); i++){
-            pollResults.add(new BarChartItem(possibleAnswers.get(i), presentationStatistics.size(), Tile.BLUE));
+            pollResults.add(new BarChartItem(possibleAnswers.get(i), resultsTally[i]/0.9D, Tile.BLUE));
         }
 
         Tile pollPanel = TileBuilder.create()
@@ -231,7 +240,7 @@ public class ReportManager {
                 .prefSize(750,250)
                 .title(question)
                 .minValue(0)
-                .maxValue( presentationStatistics.size() )
+                .maxValue(IntStream.of(resultsTally).sum())
                 .barChartItems(pollResults)
                 .maxMeasuredValueVisible(true)
                 .decimals(0)
@@ -255,18 +264,34 @@ public class ReportManager {
                 }
                 return false;
             };
-
             for(File f: wordcloudPath.listFiles(imageFilter)){
                 VBox wordcloudTile = new VBox(  );
-                Text title = new Text("A Wordcloud");
+                Text title = new Text();
 
                 logger.info("Adding wordcloud at " + f.getAbsolutePath());
+
+                Pattern pattern = Pattern.compile(".*_(\\d+)_(\\d+).png");
+                Matcher matcher = pattern.matcher(f.getAbsolutePath());
+                if(matcher.matches()) {
+                    int slide = Integer.parseInt(matcher.group(1));
+                    int elementid = Integer.parseInt(matcher.group(2));
+                    logger.info("Wordcloud is at slide " + slide + " Element " + elementid);
+                    title.setText(((WordCloudElement) presentation.getSlide(slide-1).getElementWithID(elementid)).getQuestion());
+                } else {
+                    title.setText("A Wordcloud");
+                }
+                title.setFont(Font.font(28));
+                title.setFill(Color.WHITE);
+                title.setX(10);
+
+
                 Image wordCloud = new Image("file:" + f.getAbsolutePath());
                 ImageView wordCloudImage = new ImageView(wordCloud);
 
                 wordCloudImage.setPreserveRatio(true);
                 wordCloudImage.setFitWidth( 750 );
                 wordcloudTile.setMaxWidth( 750 );
+                wordcloudTile.setStyle("-fx-background-color: #2a2a2a;-fx-background-radius: 5px;");
 
                 wordcloudTile.getChildren().addAll( title, wordCloudImage );
                 wordclouds.add(wordcloudTile);
@@ -409,41 +434,6 @@ public class ReportManager {
 
         public boolean getWasPresent() {
             return wasPresent;
-        }
-    }
-
-    private class PollQuestions{
-        private String task;
-        private int numberOfQuestions;
-        private ArrayList<Integer> pollOutPut;
-
-        public PollQuestions(String task, int numberOfQuestions) {
-            this.task = task;
-            this.numberOfQuestions = numberOfQuestions;
-        }
-
-        public ArrayList generatePollResults(){
-            pollOutPut = new ArrayList<>();
-            for(int i = 0; i<numberOfQuestions; i++){
-                pollOutPut.add((int)(Math.random()*10));
-            }
-            return pollOutPut;
-        }
-
-        public String getTask() {
-            return task;
-        }
-
-        public void setTask(String task) {
-            this.task = task;
-        }
-
-        public int getNumberOfQuestions() {
-            return numberOfQuestions;
-        }
-
-        public void setNumberOfQuestions(int numberOfQuestions) {
-            this.numberOfQuestions = numberOfQuestions;
         }
     }
 

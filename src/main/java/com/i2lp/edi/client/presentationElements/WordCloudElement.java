@@ -284,7 +284,7 @@ public class WordCloudElement extends InteractiveElement {
         wc.setFontScalar(new SqrtFontScalar(10,40));
         wc.build(wordFrequencies);
 
-        String pathName = presentationID+Integer.toString(slideID);
+        String pathName = presentationID+"_"+Integer.toString(slideID)+"_"+Integer.toString(elementID);
         File wordcloudPath = new File(PRESENTATIONS_PATH+"/" +presentationID+"/Wordclouds/"+pathName+".png");
         if (!wordcloudPath.exists()) {
             wordcloudPath.getParentFile().mkdirs(); //Create directory structure if not present yet
@@ -377,4 +377,6 @@ public class WordCloudElement extends InteractiveElement {
     public void setySize(float ySize) {
         this.ySize = ySize;
     }
+
+
 }
