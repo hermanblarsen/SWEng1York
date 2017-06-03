@@ -1,5 +1,8 @@
 package com.i2lp.edi.client.testparser;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
 /**
@@ -11,10 +14,11 @@ public class TestData {
     private int numTests;
     private int numFailures;
     private int numErrors;
+    private int numSkipped;
 
     private Double successRate;
 
-    public TestData(Date testDate, String commitHash, Integer numTests, Integer numFailures, Integer numErrors, Double successRate) {
+    public TestData(Date testDate, String commitHash, Integer numTests, Integer numFailures, Integer numErrors, Integer numSkipped, Double successRate) {
         this.testDate = testDate;
         this.commitHash = commitHash;
         this.numTests = numTests;
@@ -54,6 +58,8 @@ public class TestData {
     }
 
     public String toString(){
-        return commitHash + ", " + testDate.toString() + ", " + numTests + ", " + numFailures + ", " + numErrors + ", " + successRate;
+        LocalDateTime ldt = LocalDateTime.ofInstant(testDate.toInstant(), ZoneId.systemDefault());
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/uuuu HH:mm:ss");
+        return commitHash + ";" + ldt.format(dtf) + ";" + numTests + ";" + numFailures + ";" + numErrors + ";" + numSkipped;
     }
 }

@@ -18,7 +18,9 @@ public class TestParser {
             TestData testData = getCommitHashAndDateTime(testFile.getName());
             String htmlContent = getHTMLContent(testFile.getPath());
             testData = getTestData(testData, htmlContent);
-            testDatas.add(testData);
+            if (testData != null) {
+                testDatas.add(testData);
+            }
         }
 
         writeTestDataToCSV(testDatas, path + File.separator + "TestData.csv");
@@ -29,7 +31,7 @@ public class TestParser {
 
         try {
             fileWriter = new FileWriter(filePath);
-            fileWriter.append("commitHash,testDate,numTests,numFailures,numErrors,successRate" + "\n");
+            fileWriter.append("commitHash;testTime;numTests;numFailures;numErrors;numSkipped;successRate" + "\n");
             for (TestData testData : testDataArrayList) {
                 fileWriter.append(testData.toString() + "\n");
             }
@@ -63,11 +65,15 @@ public class TestParser {
         }
         scanner.close();
 
-        return new TestData(toAppend.getTestDate(), toAppend.getCommitHash(), testValues[0].intValue(), testValues[1].intValue(), testValues[2].intValue(), testValues[4]);
+        if (testValues[0] != 0) {
+            return new TestData(toAppend.getTestDate(), toAppend.getCommitHash(), testValues[0].intValue(), testValues[1].intValue(), testValues[2].intValue(), testValues[3].intValue(), testValues[4]);
+        } else {
+            return null;
+        }
     }
 
     private static TestData getCommitHashAndDateTime(String fileName) {
-        Date testDate = new Date(Integer.parseInt(fileName.substring(0, 4)),
+        Date testDate = new Date(Integer.parseInt(fileName.substring(0, 4)) - 1900,
                 Integer.parseInt(fileName.substring(5, 7)) - 1,
                 Integer.parseInt(fileName.substring(8, 10)),
                 Integer.parseInt(fileName.substring(12, 14)),

@@ -32,8 +32,7 @@ public class PresentationPanel extends PreviewPanel {
     public PresentationPanel(Presentation presentation, Pane parentPane) {
         super(parentPane);
         this.presentation = presentation;
-        getDisplayPanel().setText("Title: " + this.presentation.getDocumentTitle());
-        Label titleLabel = new Label("Title: " + this.getPresentation().getDocumentTitle());
+        Label titleLabel = new Label(this.getPresentation().getDocumentTitle());
         getDisplayPanel().widthProperty().addListener(observable -> titleLabel.setPrefWidth(getDisplayPanel().getWidth() - MARGIN_FOR_LIVE_ICON));
         getDisplayPanel().setHeading(titleLabel);
         this.setPrefWidth(MAX_PRES_PREVIEW_WIDTH + MARGIN_AROUND_PRES_PREVIEW);
