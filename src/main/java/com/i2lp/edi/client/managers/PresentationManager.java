@@ -971,6 +971,11 @@ public abstract class PresentationManager {
      * Shutdown the presentation manager cleanly. End Teacher/Student Session
      */
     public void close() {
+        //Reset sequence numbers for presentation
+        for(Slide slide : presentationElement.getSlideList()){
+            slide.setCurrentSequenceNumber(0);
+        }
+
         if (this instanceof PresentationManagerTeacher) {
             if (teacherSession != null) {
                 teacherSession.endSession();
