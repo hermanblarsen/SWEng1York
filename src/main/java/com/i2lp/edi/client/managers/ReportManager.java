@@ -125,9 +125,9 @@ public class ReportManager {
                 .build();
 
         //Participation Tile
-        int averageParticipation = 0;
+        double averageParticipation = 0;
         if(totalParticipatingStudents != 0) {
-            averageParticipation = students.values().stream().filter(i -> i.getWasPresent()).mapToInt(i -> i.getParticipation()).sum() / (totalParticipatingStudents * interactiveElementsData.size());
+            averageParticipation = students.entrySet().stream().filter(i -> i.getValue().getWasPresent()).mapToInt(i -> i.getValue().getParticipation()).sum() / ((double)totalParticipatingStudents * interactiveElementsData.size());
         }
         Tile presentationParticipation = TileBuilder.create()
                 .skinType(Tile.SkinType.CIRCULAR_PROGRESS)
