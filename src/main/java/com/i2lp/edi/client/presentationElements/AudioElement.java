@@ -47,6 +47,10 @@ public class AudioElement extends SlideElement{
      */
     protected Boolean isAutoPlay;
     /**
+     * If auto-play should be overridden
+     */
+    protected Boolean isAutoPlayOverridden;
+    /**
      * If audio is currently mute.
      */
     protected Boolean isMute;
@@ -138,6 +142,7 @@ public class AudioElement extends SlideElement{
         this.isLoop = false;
         this.isPlaying = false;
         this.isAutoPlay = false;
+        this.isAutoPlayOverridden = false;
         this.isMute = false;
         this.volume = 0.5f;
         this.currentTime = this.startTime;
@@ -318,7 +323,7 @@ public class AudioElement extends SlideElement{
             mediaView.setMediaPlayer(mediaPlayer);
 
         } else {
-            if (isAutoPlay) {
+            if (isAutoPlay && !isAutoPlayOverridden) {
                 startAudio();
             }
         }
@@ -837,5 +842,9 @@ public class AudioElement extends SlideElement{
 
         mediaPlayer = new MediaPlayer(media);
         mediaMarkers = media.getMarkers();
+    }
+
+    public void setAutoPlayOverridden(Boolean autoPlayOverridden) {
+        isAutoPlayOverridden = autoPlayOverridden;
     }
 }
