@@ -35,6 +35,9 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.IntStream;
@@ -50,7 +53,7 @@ public class ReportManager {
     ArrayList<PresentationStatisticsRecord> presentationStatistics;
     ArrayList<InteractionRecord> interactions;
     ArrayList<InteractiveElementRecord> interactiveElementsData;
-    HashMap<Integer, Students> students = new HashMap<>();
+    HashMap<Integer, User> students = new HashMap<>();
     private int totalParticipatingStudents = 0;
 
     EdiManager ediManager;
@@ -66,9 +69,10 @@ public class ReportManager {
 	    interactiveElementsData = sock.getInteractiveElementsForPresentation(presentationId);
         sock.getStudentsForModule(presentation.getPresentationMetadata().getModule_id()).forEach(item -> students.put(
         		item.getUserID(),
-		        new Students(
+		        new User(
         		    item,
-                    (int) interactions.stream().filter( interaction->interaction.getUser_id() == item.getUserID()).count()
+                        (int)interactions.stream().filter(interaction->interaction.getUser_id()== item.getUserID()).filter(distinctByKey(i->i.getInteractive_element_id())).count(
+                )
                 )
         ));
 
@@ -338,7 +342,7 @@ public class ReportManager {
 
     private void showStudents(){
         Stage stage = new Stage();
-        stage.setTitle("Students");
+        stage.setTitle("User");
         ScrollPane sp = new ScrollPane();
         stage.setScene(new Scene(sp,450,450));
         FlowPane fp = new FlowPane();
@@ -351,8 +355,8 @@ public class ReportManager {
 
         Panel[] slides = new Panel[students.size()];
 
-        for (Map.Entry<Integer, Students> entry : students.entrySet()){
-            Students student = entry.getValue();
+        students.forEach((key, student)->{
+            if (!student.isTeacher){
             Panel studentParticipationPanel = new Panel();
 
             Label studentName = new Label(student.getFullName());
@@ -371,29 +375,31 @@ public class ReportManager {
             studentParticipationPanel.setBody(slideBox);
             studentParticipationPanel.setMinWidth(430);
             fp.getChildren().add(studentParticipationPanel);
-        }
+        }});
 
         sp.setContent(fp);
         stage.show();
     }
 
-    private class Students{
+    private class User {
         int userId;
         private String firstName;
         private String lastName;
         private int participation;//Number of interactiv elements the student participated in.
 		private boolean wasPresent = false;
+		private boolean isTeacher = false;
 
-        public Students(int userId, String firstName, String lastName, int participation) {
+        public User(int userId, String firstName, String lastName, int participation, boolean isTeacher) {
             this.userId = userId;
             this.firstName = firstName;
             this.lastName = lastName;
             this.participation = participation;
+            this.isTeacher = isTeacher;
         }
 
         //Initialise Student from their db record.
-        public Students(User userRecord, int participation){
-            this(userRecord.getUserID(), userRecord.getFirstName(), userRecord.getSecondName(), participation);
+        public User(com.i2lp.edi.server.packets.User userRecord, int participation){
+            this(userRecord.getUserID(), userRecord.getFirstName(), userRecord.getSecondName(), participation, userRecord.isTeacher());
         }
 
         public String getFirstName() {
@@ -435,8 +441,16 @@ public class ReportManager {
         public boolean getWasPresent() {
             return wasPresent;
         }
+
+        public boolean isTeacher() {
+            return isTeacher;
+        }
     }
 
+    public static <T> Predicate<T> distinctByKey(Function<? super T,Object> keyExtractor) {
+        Map<Object,Boolean> seen = new ConcurrentHashMap<>();
+        return t -> seen.putIfAbsent(keyExtractor.apply(t), Boolean.TRUE) == null;
+    }
     //Class for the slide timing table's structure.
     private class StudentSlideTimes{
         private ArrayList<ObservableValue<Integer>> slideTimes = new ArrayList<>();

@@ -94,4 +94,7 @@ public class User {
         this.teacher = teacher;
     }
 
+    public boolean isTeacher() {
+        return teacher;
+    }
 }
