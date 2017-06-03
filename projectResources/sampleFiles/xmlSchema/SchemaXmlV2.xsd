@@ -58,6 +58,7 @@
               <element name="fontcolour" type="string"/>
               <element name="graphicscolour" type="string"/>
               <element name="autoplaymedia" type="boolean"/>
+              <element name="autoplaypresentation" type="boolean"/>
             </type>
           </element>
           <element name="slide">

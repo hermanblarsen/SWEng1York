@@ -317,14 +317,14 @@ public abstract class PresentationManager {
                 MenuItem firstSequence = new MenuItem("First sequence");
                 firstSequence.setOnAction(firstEvent -> {
                     while (slideAdvance(presentationElement, Slide.SLIDE_BACKWARD) != Presentation.PRESENTATION_START) ;
-                    slideProgress(presentationElement);
+                    slideProgress();
                 });
                 cMenu.getItems().add(firstSequence);
 
                 MenuItem lastSequence = new MenuItem("Last sequence");
                 lastSequence.setOnAction(lastEvent -> {
                     while (slideAdvance(presentationElement, Slide.SLIDE_FORWARD) != Presentation.PRESENTATION_FINISH) ;
-                    slideProgress(presentationElement);
+                    slideProgress();
                 });
                 cMenu.getItems().add(lastSequence);
 
@@ -465,7 +465,7 @@ public abstract class PresentationManager {
             }
         }
 
-        slideProgress(presentationElement);
+        slideProgress();
     }
 
     //protected abstract void questionQueueFunction();
@@ -763,25 +763,23 @@ public abstract class PresentationManager {
         ft0.play();
     }
 
-    protected void slideProgress(Presentation presentation) {
-        //Calculate the total number of sequences in the presentation
-        int sequenceNumberMax = 0;
-        for (Slide slide : presentation.getSlideList()) {
-            sequenceNumberMax += slide.getMaxSequenceNumber();
-            sequenceNumberMax++;
+    protected void slideProgress() {
+        int totalSlideNumber = 0;
+        boolean finalSlideReached = false;
+        for (Slide slide : presentationElement.getSlideList()) {
+            totalSlideNumber++;
         }
-
-        //Make sure the current sequence doesn't go out of bounds
-        if (currentSequenceNumber >= sequenceNumberMax) currentSequenceNumber = sequenceNumberMax;
-        if (currentSequenceNumber <= 0) currentSequenceNumber = 0;
-
-        //Calculate progress
-        double slideProgress = (float) (currentSequenceNumber) / sequenceNumberMax;
+        double slideProgress;
+        if(!isEndPresentation) {
+            slideProgress = (float) (currentSlideNumber) / totalSlideNumber;
+        }else{
+            slideProgress = (float) (currentSlideNumber+1) / totalSlideNumber;
+        }
         progressBar.setProgress(slideProgress);
 
         //Make sure currentSlideNumber doesn't overflow and reset text in progressbar
         int slideNumber = currentSlideNumber + 1;
-        int slideNumberMax = presentation.getSlideList().size();
+        int slideNumberMax = presentationElement.getSlideList().size();
         this.slideNumber.setText("Slide " + slideNumber + " of " + slideNumberMax);
     }
 
@@ -1117,7 +1115,7 @@ public abstract class PresentationManager {
         }
 
         //Update progress bar
-        slideProgress(presentationElement);
+        slideProgress();
 
         return true;
     }

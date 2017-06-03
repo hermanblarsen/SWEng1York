@@ -38,11 +38,11 @@ public class Constants {
     /* XML Input validation */
     //Valid Fonts taken from https://www.w3schools.com/cssref/css_websafe_fonts.asp
     public static final String[] VALID_FONTS= {
+            "Verdana, Geneva, sans-serif",
             "Arial, Helvetica, sans-serif",
             "\"Courier New\", Courier, monospace",
             "\"Comic Sans MS\", cursive, sans-serif",
             "\"Lucida Console\", Monaco, monospace",
-            "Verdana, Geneva, sans-serif",
             "\"Trebuchet MS\", Helvetica, sans-serif",
             "Tahoma, Geneva, sans-serif",
             "\"Lucida Sans Unicode\", \"Lucida Grande\", sans-serif",

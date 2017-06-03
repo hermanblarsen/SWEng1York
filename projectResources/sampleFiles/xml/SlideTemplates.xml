@@ -1,6 +1,6 @@
 <document documentid="SalesPresentationAnotherOne">
 	<documentdetails>
-		<title>Sales Presentation</title>
+		<title>Slide Templates</title>
 		<author>Herman Larsen</author>
 		<version>1.0</version>
 		<documentaspectratio>1.33</documentaspectratio>
@@ -11,11 +11,12 @@
 	<slideshow>
 		<defaults>
 			<bgcolour>#b7e0ffFF</bgcolour>
-			<font>"Verdana, Geneva, sans-serif"</font>
+			<font>Verdana, Geneva, sans-serif</font>
 			<fontsize>20</fontsize>
 			<fontcolour>#000000FF</fontcolour>
 			<graphicscolour>#2ecc71FF</graphicscolour>
 			<autoplaymedia>false</autoplaymedia>
+            <autoplaypresentation>false</autoplaypresentation>
 		</defaults>
 
         <!-- brackets       &lt;&gt; &lt;/&gt;       -->
@@ -34,7 +35,7 @@
         <!--Title Slide-->
         <slide slideid="1">
             <!--Title-->
-            <text elementid ="0" layer="9" startsequence="1" endsequence= "1" duration="-1">
+            <text elementid ="0" layer="9" startsequence="1"  duration="-1">
                 <textcontent>
                     &lt;p&gt;&lt;center&gt;Title&lt;/center&gt;&lt;/p&gt;
                 </textcontent>
@@ -44,7 +45,7 @@
             </text>
 
             <!--SubTitle-->
-            <text elementid ="1" layer="9" startsequence="1"  endsequence="1" duration="-1">
+            <text elementid ="1" layer="9" startsequence="1"  duration="-1">
                 <textcontent>
                     &lt;p&gt;&lt;center&gt;Subtitle&lt;/center&gt;&lt;/p&gt;
                 </textcontent>
@@ -60,7 +61,7 @@
         <!--Normal Text Slide-->
 		<slide slideid="2">
             <!--Title-->
-            <text elementid ="0" layer="10" startsequence="1" endsequence="1" duration="-1">
+            <text elementid ="0" layer="10" startsequence="1"  duration="-1">
                 <textcontent>
                     &lt;p&gt;&lt;center&gt;Text Slide&lt;/center&gt;&lt;/p&gt;
                 </textcontent>
@@ -69,7 +70,7 @@
                 <xsize>0.6</xsize>          <ysize>0.15</ysize>
             </text>
 
-            <text elementid ="1" layer="1" startsequence="1" endsequence="1" duration="-1">
+            <text elementid ="1" layer="1" startsequence="1"  duration="-1">
                 <textcontent>
                     &lt;p align="left"&gt;
                         This is a paragraph
@@ -83,7 +84,7 @@
                 </textcontent>
 				<xposition>0.1</xposition>  <yposition>0.3</yposition>
 				<xsize>0.8</xsize>          <ysize>0.6</ysize>
-                <onclickaction>none</onclickaction><onclickinfo></onclickinfo>
+                <onclickaction></onclickaction><onclickinfo></onclickinfo>
             </text>
         </slide>
 
@@ -91,7 +92,7 @@
         <!--Split Text Slide-->
         <slide slideid="3">
             <!--Title-->
-            <text elementid ="0" layer="10" startsequence="1"  endsequence="1" duration="-1">
+            <text elementid ="0" layer="10" startsequence="1" duration="-1">
                 <textcontent>
                     &lt;p&gt;&lt;center&gt;Text Slide&lt;/center&gt;&lt;/p&gt;
                 </textcontent>
@@ -100,7 +101,7 @@
                 <xsize>0.6</xsize>          <ysize>0.15</ysize>
             </text>
 
-            <text elementid ="1" layer="1" startsequence="1" endsequence="1" duration="-1">
+            <text elementid ="1" layer="1" startsequence="1" duration="-1">
                 <textcontent>
                     &lt;p align="left"&gt;
                     This is a paragraph
@@ -114,10 +115,10 @@
                 </textcontent>
                 <xposition>0.1</xposition>  <yposition>0.3</yposition>
                 <xsize>0.38</xsize>          <ysize>0.6</ysize>
-                <onclickaction>none</onclickaction><onclickinfo></onclickinfo>
+                <onclickaction></onclickaction><onclickinfo></onclickinfo>
             </text>
 
-            <text elementid ="2" layer="1" startsequence="1"  endsequence="1" duration="-1">
+            <text elementid ="2" layer="1" startsequence="1" duration="-1">
                 <textcontent>
                     &lt;p align="left"&gt;
                     This is a paragraph
@@ -131,7 +132,7 @@
                 </textcontent>
                 <xposition>0.52</xposition>  <yposition>0.3</yposition>
                 <xsize>0.38</xsize>          <ysize>0.6</ysize>
-                <onclickaction>none</onclickaction><onclickinfo></onclickinfo>
+                <onclickaction></onclickaction><onclickinfo></onclickinfo>
             </text>
         </slide>
 

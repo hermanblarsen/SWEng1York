@@ -37,9 +37,6 @@ public class PresentationPanel extends PreviewPanel {
         getDisplayPanel().setHeading(titleLabel);
         this.setPrefWidth(MAX_PRES_PREVIEW_WIDTH + MARGIN_AROUND_PRES_PREVIEW);
 
-        if(presentation.getPresentationMetadata().getPresentationID() == 94) {
-            int i = 0;
-        }
 
         isLive = presentation.getPresentationMetadata().getLive();
         presentation.getModule().getModulePanel().updateIsLive();

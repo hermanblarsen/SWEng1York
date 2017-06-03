@@ -28,10 +28,7 @@ import javafx.util.Duration;
 import org.kordamp.bootstrapfx.scene.layout.Panel;
 
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 
 /**
@@ -121,6 +118,16 @@ public class PresentationManagerTeacher extends PresentationManager {
                 Event.fireEvent(scene, event.copyFor(event.getSource(), scene));
                 event.consume();
             });
+
+            Timer toolkitTimer = new Timer();
+            TimerTask toolkitUpdateTask = new TimerTask() {
+                @Override
+                public void run() {
+                    updateQuestionList();
+                    updateStudentList();
+                }
+            };
+            toolkitTimer.schedule(toolkitUpdateTask, 5000, 10000);
             firstRun = true;
             questions = new Tab();
             questions.setText("Question Queue");

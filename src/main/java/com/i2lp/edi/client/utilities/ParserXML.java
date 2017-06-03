@@ -229,6 +229,9 @@ public class ParserXML {
                         case "autoplaymedia":
                             myPresentation.setAutoplayMedia(Boolean.valueOf(elementContent));
                             break;
+                        case "autoplaypresentation":
+                            myPresentation.setAutoplayPresentation(Boolean.valueOf(elementContent));
+                            break;
                         default:
                             logger.warn("Default or Theme Element Not Recognised! Name: " + elementName +
                                     ", Value: " + elementContent + ", and XML-Type: " + defaultsElementNode.getNodeType());
