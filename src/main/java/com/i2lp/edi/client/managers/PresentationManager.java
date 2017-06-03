@@ -996,7 +996,7 @@ public abstract class PresentationManager {
                 studentSession = null;
             }
         }
-        ediManager.setPresentationManager(null);
+        if(ediManager != null) ediManager.setPresentationManager(null);
         presentationStage.close();
     }
 
