@@ -5,6 +5,7 @@ import com.i2lp.edi.client.utilities.CursorState;
 import com.i2lp.edi.server.packets.Question;
 import javafx.animation.FadeTransition;
 import javafx.application.Platform;
+import javafx.event.Event;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -15,6 +16,7 @@ import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
@@ -105,12 +107,15 @@ public class PresentationManagerTeacher extends PresentationManager {
             teacherToolKit = new Stage();
 
             teacherToolKit.initStyle(StageStyle.UTILITY);
-            //teacherToolKit.initOwner(presentationStage);
             teacherToolKit.setTitle("Teacher toolkit");
             TabPane tp = new TabPane();
             tp.setStyle("-fx-background-color: #34495e");
-            scene = new Scene(tp, 450, 450);
-            scene.getStylesheets().add("bootstrapfx.css");
+            Scene toolkitScene = new Scene(tp, 450, 450);
+            toolkitScene.getStylesheets().add("bootstrapfx.css");
+            toolkitScene.addEventFilter(KeyEvent.ANY, event -> {
+                Event.fireEvent(scene, event.copyFor(event.getSource(), scene));
+                event.consume();
+            });
             firstRun = true;
             questions = new Tab();
             questions.setText("Question Queue");
@@ -127,7 +132,7 @@ public class PresentationManagerTeacher extends PresentationManager {
             studentStats.setContent(studentStats(studentList));
             tp.getTabs().add(studentStats);
 
-            teacherToolKit.setScene(scene);
+            teacherToolKit.setScene(toolkitScene);
             teacherToolKit.show();
             tp.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
             toolkitOpen = true;

@@ -12,6 +12,7 @@ import com.i2lp.edi.server.packets.Module;
 import com.i2lp.edi.server.packets.PresentationMetadata;
 import com.sun.javafx.scene.control.skin.DatePickerSkin;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.geometry.*;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -329,18 +330,34 @@ public abstract class Dashboard extends Application {
             case SEARCH_IN_MODULE:
                 Button backButton = new Button("Back");
                 backButton.getStyleClass().setAll("btn", "btn-default");
+                backButton.setAlignment(Pos.CENTER);
                 backButton.setOnAction(event -> goToState(DashboardState.TOP_LEVEL));
-                Text moduleText = new Text(selectedModule.getSubject().getSubjectName() + " -> " + selectedModule.getModuleName());
-                moduleText.getStyleClass().setAll("h4");
-                Region dummy = new Region();
-                backButton.widthProperty().addListener(observable -> dummy.setPrefWidth(backButton.getWidth()));
-                BorderPane borderPane = new BorderPane();
-                borderPane.setPadding(new Insets(5, 0, 5, 0));
-                borderPane.setLeft(backButton);
-                borderPane.setRight(dummy);
-                borderPane.setCenter(moduleText);
 
-                vbox.getChildren().addAll(borderPane, presentationsScrollPane);
+                Region spacer1 = new Region();
+                HBox.setHgrow(spacer1, Priority.ALWAYS);
+
+                Text subjectText = new Text(selectedModule.getSubject().getSubjectName());
+                subjectText.getStyleClass().setAll("h4");
+
+                ImageView arrow = new ImageView("file:projectResources/icons/dashboard-arrow-right.png");
+                HBox.setMargin(arrow, new Insets(0, 5, 0, 5));
+
+                Text moduleText = new Text(selectedModule.getModuleName());
+                moduleText.getStyleClass().setAll("h4");
+
+                Region spacer2 = new Region();
+                HBox.setHgrow(spacer2, Priority.ALWAYS);
+
+                Region dummy = new Region();
+                dummy.setPrefWidth(80);
+                Platform.runLater(() -> dummy.setPrefWidth(backButton.getWidth()));
+
+                HBox moduleNameHBox = new HBox(5);
+                moduleNameHBox.setAlignment(Pos.CENTER);
+                moduleNameHBox.setPadding(new Insets(5, 0, 5, 0));
+                moduleNameHBox.getChildren().addAll(backButton, spacer1, subjectText, arrow, moduleText, spacer2, dummy);
+
+                vbox.getChildren().addAll(moduleNameHBox, presentationsScrollPane);
                 border.setCenter(vbox);
 
                 filterBy(selectedModule);

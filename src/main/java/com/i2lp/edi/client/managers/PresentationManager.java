@@ -72,7 +72,6 @@ public abstract class PresentationManager {
     protected VBox sceneBox;
     protected Presentation presentationElement;
     protected ProgressBar progressBar;
-    private double slideProgress;
     protected Label slideNumber;
     protected Boolean isFullscreen = false;
     //protected Boolean buttonsRemoved = false;
@@ -776,7 +775,7 @@ public abstract class PresentationManager {
         if (currentSequenceNumber <= 0) currentSequenceNumber = 0;
 
         //Calculate progress
-        slideProgress = (float) (currentSequenceNumber) / sequenceNumberMax;
+        double slideProgress = (float) (currentSequenceNumber) / sequenceNumberMax;
         progressBar.setProgress(slideProgress);
 
         //Make sure currentSlideNumber doesn't overflow and reset text in progressbar

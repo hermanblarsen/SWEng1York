@@ -79,8 +79,8 @@ public class PresentationManagerStudent extends PresentationManager {
         questionQueueStage.setTitle("Send a Question");
         BorderPane border = new BorderPane();
         border.setStyle("-fx-background-color: #34495e");
-        scene = new Scene(border, 450, 450);
-        scene.getStylesheets().add("bootstrapfx.css");
+        Scene questionScene = new Scene(border, 450, 450);
+        questionScene.getStylesheets().add("bootstrapfx.css");
         Label title = new Label("Send a question to the question queue");
         border.setPadding(new Insets(0, 10, 10, 10));
         title.setPadding(new Insets(10, 0, 10, 0));
@@ -118,7 +118,7 @@ public class PresentationManagerStudent extends PresentationManager {
         controlBox.setMaxWidth(Double.MAX_VALUE);
         controlBox.getChildren().addAll(tickPanel, crossPanel);
         border.setBottom(controlBox);
-        questionQueueStage.setScene(scene);
+        questionQueueStage.setScene(questionScene);
         questionQueueStage.show();
     }
 }

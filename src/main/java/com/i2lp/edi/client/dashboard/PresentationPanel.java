@@ -12,6 +12,7 @@ import javafx.scene.layout.StackPane;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
 
@@ -62,12 +63,17 @@ public class PresentationPanel extends PreviewPanel {
         StackPane.setAlignment(liveIcon, Pos.TOP_RIGHT);
         StackPane.setMargin(liveIcon, new Insets(2, 4, 2, 4));
 
+        String scheduledForString = "";
+        if (getPresentation().getGoLiveDateTime() != null) {
+            DateTimeFormatter dtf = DateTimeFormatter.ofPattern("E, dd.MM.YYYY HH:mm");
+            scheduledForString = "Scheduled for: " + getPresentation().getGoLiveDateTime().format(dtf) + "\n";
+        }
+
         Tooltip tooltip = new Tooltip("Title: " + getPresentation().getDocumentTitle() + "\n" +
                                         "Author: " + getPresentation().getAuthor() + "\n" +
                                         "Subject: " + getPresentation().getSubject().getSubjectName() + "\n" +
-                                        "Description: " + getPresentation().getDescription() + "\n" +
-                                        "Tags: " + getPresentation().getTags() + "\n" +
-                                        "pres_id: " + getPresentation().getPresentationMetadata().getPresentationID());
+                                        scheduledForString +
+                                        "Tags: " + getPresentation().getTags() + "\n");
         Tooltip.install(this, tooltip);
     }
 
