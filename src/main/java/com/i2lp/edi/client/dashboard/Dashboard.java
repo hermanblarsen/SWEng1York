@@ -529,6 +529,7 @@ public abstract class Dashboard extends Application {
         calendar = new DatePicker(selectedDate);
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("E, dd.MM.YYYY");
         schedulePanel.setText("Schedule for " + selectedDate.format(dtf));
+        calendar.setShowWeekNumbers(false);
         calendar.setOnAction(event -> {
             selectedDate = calendar.getValue();
             updateSchedulePanels();
