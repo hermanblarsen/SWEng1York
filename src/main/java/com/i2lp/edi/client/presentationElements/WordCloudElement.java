@@ -127,6 +127,8 @@ public class WordCloudElement extends InteractiveElement {
 //            Button start_Task = new Button("Start");
             Image startWordCloudTask = new Image("file:projectResources/icons/startWC.png");
             startWordCloud = new ImageView(startWordCloudTask);
+            startWordCloud.setPreserveRatio(true);
+            startWordCloud.setSmooth(true);
             HBox startBox = new HBox();
             startBox.setAlignment(Pos.CENTER);
             startBox.getChildren().add(startWordCloud);

@@ -12,7 +12,6 @@ import com.i2lp.edi.server.packets.Module;
 import com.i2lp.edi.server.packets.PresentationMetadata;
 import com.sun.javafx.scene.control.skin.DatePickerSkin;
 import javafx.application.Application;
-import javafx.application.Platform;
 import javafx.geometry.*;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -51,7 +50,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static com.i2lp.edi.client.Constants.BASE_PATH;
 import static com.i2lp.edi.client.Constants.PRESENTATIONS_PATH;
 import static javafx.scene.layout.BorderPane.setAlignment;
 
@@ -188,7 +186,8 @@ public abstract class Dashboard extends Application {
                 new FileChooser.ExtensionFilter("XML Presentations (*.XML)", "*.xml", "*.XML");
         fileChooser.getExtensionFilters().add(xmlExtensionFilter);
         fileChooser.setSelectedExtensionFilter(xmlExtensionFilter);
-        fileChooser.setInitialDirectory(new File(BASE_PATH));
+        fileChooser.setInitialDirectory(new File("projectResources/sampleFiles/xml"));
+        //fileChooser.setInitialDirectory(new File(BASE_PATH));
         fileChooser.setTitle("Open Presentation");
 
         openPresButton = new Button("Open Presentation", new ImageView(new Image("file:projectResources/icons/arrow-down.png", 10, 10, true, true)));
@@ -353,7 +352,7 @@ public abstract class Dashboard extends Application {
 
                 Region dummy = new Region();
                 dummy.setPrefWidth(80);
-                Platform.runLater(() -> dummy.setPrefWidth(backButton.getWidth()));
+                //Platform.runLater(() -> dummy.setPrefWidth(backButton.getWidth()));
 
                 HBox moduleNameHBox = new HBox(5);
                 moduleNameHBox.setAlignment(Pos.CENTER);
@@ -991,14 +990,14 @@ public abstract class Dashboard extends Application {
 
     private void deletePresentation(PresentationPanel previewPanel) {
         Presentation presentationToDelete = previewPanel.getPresentation();
-
         //Try to remove the presentation from the server
         boolean successful_removal = ediManager.getPresentationLibraryManager().removePresentation(presentationToDelete.getPresentationMetadata().getPresentationID());
 
         if (successful_removal) {
             updateAvailablePresentations();
-            presentationPanelsFlowPane.getChildren().remove(previewPanel);
         } else logger.warn("Presentation Could not be removed");
+
+        setSelectedPreviewPanel(previewPanel, false);
     }
 
     private MenuBar addMenuBar() {
@@ -1543,8 +1542,13 @@ public abstract class Dashboard extends Application {
         addButton.setAlignment(Pos.CENTER);
         addButton.getStyleClass().setAll("btn", "btn-success");
         addButton.setOnAction(event1 -> {
-            ediManager.getPresentationLibraryManager().uploadPresentation(xmlLocation.get().getAbsolutePath(), modulesCombo.getValue().getModuleID());
-            addToServerStage.close();
+            try {
+                ediManager.getPresentationLibraryManager().uploadPresentation(xmlLocation.get().getAbsolutePath(), modulesCombo.getValue().getModuleID());
+                addToServerStage.close();
+            } catch (NullPointerException e) {
+                //Will be thrown if the user has not selected a file
+                //Do nothing
+            }
         });
         addToServerGridPane.add(addButton, 0, 7);
         GridPane.setConstraints(addButton, 0, 7, 1, 1, HPos.CENTER, VPos.CENTER);
