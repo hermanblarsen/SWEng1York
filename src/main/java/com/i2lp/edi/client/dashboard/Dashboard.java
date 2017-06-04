@@ -51,6 +51,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.concurrent.atomic.AtomicReference;
 
+import static com.i2lp.edi.client.Constants.BASE_PATH;
 import static com.i2lp.edi.client.Constants.PRESENTATIONS_PATH;
 import static javafx.scene.layout.BorderPane.setAlignment;
 
@@ -187,8 +188,7 @@ public abstract class Dashboard extends Application {
                 new FileChooser.ExtensionFilter("XML Presentations (*.XML)", "*.xml", "*.XML");
         fileChooser.getExtensionFilters().add(xmlExtensionFilter);
         fileChooser.setSelectedExtensionFilter(xmlExtensionFilter);
-        fileChooser.setInitialDirectory(new File("projectResources/sampleFiles/xml"));
-        //fileChooser.setInitialDirectory(new File(System.getProperty("user.home"))); //TODO reinstate when tested
+        fileChooser.setInitialDirectory(new File(BASE_PATH));
         fileChooser.setTitle("Open Presentation");
 
         openPresButton = new Button("Open Presentation", new ImageView(new Image("file:projectResources/icons/arrow-down.png", 10, 10, true, true)));
