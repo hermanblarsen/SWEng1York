@@ -1,0 +1,175 @@
+<document documentid="Digital101">
+	<documentdetails>
+		<title>Digital Electronics Introdution</title>
+		<author>Dr. Herman Larsen</author>
+		<version>1.0</version>
+		<documentaspectratio>1.33</documentaspectratio>
+		<description>A brief introduction to digital electronics</description>
+		<tags>demo,presentation,digital</tags>
+		<groupformat>2</groupformat>
+	</documentdetails>
+	<slideshow>
+		<defaults>
+			<bgcolour>#b7e0ffFF</bgcolour>
+			<font>Verdana, Geneva, sans-serif</font>
+			<fontsize>20</fontsize>
+			<fontcolour>#000000FF</fontcolour>
+			<graphicscolour>#2ecc71FF</graphicscolour>
+			<autoplaymedia>false</autoplaymedia>
+			<autoplaypresentation>false</autoplaypresentation>
+		</defaults>
+
+        <!-- brackets       &lt;&gt; &lt;/&gt;       -->
+        <!-- paragraph       &lt;p align="left"&gt; &lt;/p&gt;       -->
+        <!-- paragraph       &lt;p align="right center justify"&gt; &lt;/&gt;       -->
+
+        <!--italic          &lt;i&gt; &lt;/i&gt;     -->
+        <!--bold            &lt;b&gt; &lt;/b&gt;     -->
+        <!--list            &lt;ul&gt;
+                                &lt;li&gt; &lt;/li&gt;
+                                &lt;li&gt; &lt;/li&gt;
+                            &lt;/ul&gt;    -->
+        <!--illegals        &lt; &gt; &amp; &apos; &quot;     -->
+
+
+        <!--Title Slide-->
+        <slide slideid="1">
+            <!--Title-->
+            <text elementid ="0" layer="9" startsequence="1">
+                <textcontent>
+                    &lt;p&gt;&lt;center&gt;Digital Electronics&lt;/center&gt;&lt;/p&gt;
+                </textcontent>
+                <fontsize>50</fontsize>
+                <xposition>0.2</xposition>  <yposition>0.3</yposition>
+                <xsize>0.6</xsize>          <ysize>0.2</ysize>
+            </text>
+
+            <!--SubTitle-->
+            <text elementid ="1" layer="9" startsequence="1" >
+                <textcontent>
+                    &lt;p&gt;&lt;center&gt;Introduction to Digital Logic&lt;/center&gt;&lt;/p&gt;
+                </textcontent>
+                <fontcolour>#3e3e3eFF</fontcolour>
+                <fontsize>40</fontsize>
+                <xposition>0.2</xposition>  <yposition>0.55</yposition>
+                <xsize>0.6</xsize>          <ysize>0.15</ysize>
+            </text>
+
+        </slide>
+
+
+        <!--Normal Text Slide-->
+		<slide slideid="2">
+            <wordcloud elementid ="0" layer="1"  startsequence="1" >
+                <question>Enter names of digital circuit components</question>
+                <timelimit>15</timelimit>
+                <xposition>0</xposition>  <yposition>0</yposition>
+                <xsize>0.95</xsize>          <ysize>1</ysize>
+            </wordcloud>
+        </slide>
+
+
+        <!--Split Text Slide-->
+        <slide slideid="3">
+            <!--Title-->
+            <text elementid ="0" layer="10" startsequence="1">
+                <textcontent>
+                    &lt;p&gt;&lt;center&gt;&lt;/center&gt;&lt;/p&gt;
+                </textcontent>
+                <fontsize>40</fontsize>
+                <xposition>0.2</xposition>  <yposition>0.05</yposition>
+                <xsize>0.6</xsize>          <ysize>0.15</ysize>
+            </text>
+
+            <!--Digital Gates Image-->
+            <image elementid ="2" layer="2" startsequence="2" >
+                <xposition>0</xposition> <yposition>0.2</yposition>
+                <xsize>1</xsize>          <ysize>0.8</ysize>
+                <path>projectResources/_salesPresentation/logicGates.png</path>
+                <onclickaction></onclickaction><onclickinfo></onclickinfo>
+                <opacity>1</opacity>
+                <aspectratiolock>true</aspectratiolock>
+            </image>
+
+            <!--Digital Port Image-->
+            <image elementid ="1" layer="2" startsequence="1" >
+                <xposition>0.5</xposition> <yposition>0.2</yposition>
+                <xsize>0.5</xsize>          <ysize>0.5</ysize>
+                <path>https://lh6.googleusercontent.com/3cWnQuqSVaBTH69bIoNmNB0s52ezeCF7pWUdc_bnPUtUVzDnUVWtTfmsy6XYZ53r3szzW_GDXChTaKU=w1582-h926</path>
+                <onclickaction></onclickaction><onclickinfo></onclickinfo>
+                <opacity>1</opacity>
+                <aspectratiolock>true</aspectratiolock>
+                <animation type="in">
+                    <simpletranslate startx="-0.5" starty="1.2" endx="0.5" endy="0.2" duration="1000"/>
+                </animation>
+            </image>
+        </slide>
+
+        <slide slideid="4">
+            <wordcloud elementid ="0" layer="1"  startsequence="1">
+                <question>Nice things about Vlad</question>
+                <timelimit>20</timelimit>
+            </wordcloud>
+        </slide>
+
+
+
+        <slide slideid="5">
+            <poll elementid ="0" layer="2" startsequence="1" >
+                <question>Who do you like more?</question>
+                <timelimit>15</timelimit>
+                <answers>Stuart,Adar,Martin,Tony</answers>
+            </poll>
+        </slide>
+
+        <slide slideid="6">
+            <wordcloud elementid ="0" layer="1"  startsequence="1" >
+                <question>What are key subjects related to electronics?</question>
+                <timelimit>20</timelimit>
+                <xposition>0</xposition>  <yposition>0</yposition>
+                <xsize>0.5</xsize>          <ysize>0.5</ysize>
+            </wordcloud>
+
+            <poll elementid ="1" layer="2" startsequence="2" >
+                <question>Which number is best?</question>
+                <timelimit>15</timelimit>
+                <answers>42,666,69,14, 5</answers>
+                <xposition>0.5</xposition>  <yposition>0.5</yposition>
+                <xsize>0.5</xsize>          <ysize>0.5</ysize>
+            </poll>
+        </slide>
+
+        <!--Normal Text Slide-->
+        <slide slideid="7">
+
+            <text elementid ="1" layer="1" startsequence="1"  >
+                <textcontent>
+                    &lt;p align="left"&gt;
+                    This is a paragraph
+                    &lt;ul&gt;
+                    &lt;li&gt;Test Item 1&lt;/li&gt;
+                    &lt;li&gt;Test Item 2 &lt;/li&gt;
+                    &lt;/ul&gt;
+                    This is the end of a paragraph.
+                    &lt;/p&gt;
+                    &lt;p&gt;Another!&lt;/p&gt;
+                </textcontent>
+                <xposition>0.1</xposition>  <yposition>0.3</yposition>
+                <xsize>0.8</xsize>          <ysize>0.6</ysize>
+                <onclickaction></onclickaction><onclickinfo></onclickinfo>
+            </text>
+
+            <image elementid ="2" layer="2" startsequence="2" >
+                <xposition>0.5</xposition> <yposition>0.2</yposition>
+                <xsize>0.5</xsize>          <ysize>0.5</ysize>
+                <path>projectResources/logos/ediLogo1000x1000.png</path>
+                <onclickaction></onclickaction><onclickinfo></onclickinfo>
+                <opacity>1</opacity>
+                <aspectratiolock>true</aspectratiolock>
+                <animation type="in">
+                    <simpletranslate startx="-0.5" starty="1.2" endx="0.5" endy="0.2" duration="1000"/>
+                </animation>
+            </image>
+        </slide>
+	</slideshow>
+</document>
