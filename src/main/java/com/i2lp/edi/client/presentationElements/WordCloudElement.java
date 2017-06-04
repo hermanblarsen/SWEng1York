@@ -69,7 +69,7 @@ public class WordCloudElement extends InteractiveElement {
     protected boolean buttonActive = false;
     private ContextMenu cm;
     private ImageView iv;
-
+    private ImageView startWordCloud;
     protected Button sendWord;
     protected TextField words;
 
@@ -90,6 +90,16 @@ public class WordCloudElement extends InteractiveElement {
             } else {
                 iv.setFitHeight(slideHeight * ySize);
                 iv.setFitWidth(slideWidth * xSize);
+            }
+        }
+
+        if(startWordCloud != null){
+            if (xSize == 0 || ySize == 0) {
+                startWordCloud.setFitHeight(slideHeight);
+                startWordCloud.setFitWidth(slideWidth);
+            } else {
+                startWordCloud.setFitHeight(slideHeight * ySize);
+                startWordCloud.setFitWidth(slideWidth * xSize);
             }
         }
         wordCloudPanel.setTranslateX(slideWidth * xPosition);
@@ -116,7 +126,7 @@ public class WordCloudElement extends InteractiveElement {
         if(teacher){
 //            Button start_Task = new Button("Start");
             Image startWordCloudTask = new Image("file:projectResources/icons/startWC.png");
-            ImageView startWordCloud = new ImageView(startWordCloudTask);
+            startWordCloud = new ImageView(startWordCloudTask);
             HBox startBox = new HBox();
             startBox.setAlignment(Pos.CENTER);
             startBox.getChildren().add(startWordCloud);

@@ -60,6 +60,7 @@ public class PollElement extends InteractiveElement {
     protected int setValue;
     protected Button startTimer;
     protected ContextMenu cm;
+    private ImageView startPoll;
 
     public PollElement() {
 
@@ -75,6 +76,15 @@ public class PollElement extends InteractiveElement {
             questionPane.setPrefWidth(slideWidth * xSize);
         }
 
+        if(startPoll != null){
+            if (xSize == 0 || ySize == 0) {
+                startPoll.setFitHeight(slideHeight);
+                startPoll.setFitWidth(slideWidth);
+            } else {
+                startPoll.setFitHeight(slideHeight * ySize);
+                startPoll.setFitWidth(slideWidth * xSize);
+            }
+        }
         questionPane.setTranslateX(slideWidth * xPosition);
         questionPane.setTranslateY(slideHeight * yPosition);
 
@@ -126,7 +136,7 @@ public class PollElement extends InteractiveElement {
                 .build();
         if (teacher && !timerStart) {
             Image startPollIcon = new Image("file:projectResources/icons/StartPoll.png");
-            ImageView startPoll = new ImageView(startPollIcon);
+            startPoll = new ImageView(startPollIcon);
             HBox startBox = new HBox();
             startBox.getChildren().add(startPoll);
             startBox.setAlignment(Pos.CENTER);
