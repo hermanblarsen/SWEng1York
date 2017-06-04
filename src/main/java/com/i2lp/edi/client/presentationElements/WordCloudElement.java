@@ -287,7 +287,7 @@ public class WordCloudElement extends InteractiveElement {
         }else {
             float rad = (ySize*(float)slideHeight)/2;
             wc.setBackground(new CircleBackground(Math.round(rad)));
-            wc.setBackgroundColor(new Color(26,188,156));
+            wc.setBackgroundColor(new Color(44,62,80));
         }
         wc.setColorPalette(new ColorPalette(Color.ORANGE, Color.GREEN,Color.cyan));
         wc.setFontScalar(new SqrtFontScalar(10,40));
