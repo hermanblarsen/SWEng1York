@@ -58,12 +58,12 @@ public class WordCloudElement extends InteractiveElement {
     protected int timeLimit = 30;
     protected Timeline timeline;
     protected Tile countdownTile;
-    protected boolean  writingComplete = false;
+    protected boolean writingComplete = false;
     protected String cloudShapePath = null;
-    protected float xPosition =0f;
-    protected float yPosition =0f;
-    protected float xSize =1f;
-    protected float ySize=1f;
+    protected float xPosition = 0f;
+    protected float yPosition = 0f;
+    protected float xSize = 1f;
+    protected float ySize = 1f;
     protected boolean buttonActive = false;
     private ContextMenu cm;
     private ImageView iv;
@@ -81,7 +81,7 @@ public class WordCloudElement extends InteractiveElement {
             wordCloudPanel.setPrefWidth(slideWidth * xSize);
         }
 
-        if(iv != null){
+        if (iv != null) {
             if (xSize == 0 || ySize == 0) {
                 iv.setFitHeight(slideHeight);
                 iv.setFitWidth(slideWidth);
@@ -91,7 +91,7 @@ public class WordCloudElement extends InteractiveElement {
             }
         }
 
-        if(startWordCloud != null){
+        if (startWordCloud != null) {
             if (xSize == 0 || ySize == 0) {
                 startWordCloud.setFitHeight(slideHeight);
                 startWordCloud.setFitWidth(slideWidth);
@@ -103,8 +103,8 @@ public class WordCloudElement extends InteractiveElement {
         wordCloudPanel.setTranslateX(slideWidth * xPosition);
         wordCloudPanel.setTranslateY(slideHeight * yPosition);
 
-        getCoreNode().addEventHandler(MouseEvent.MOUSE_CLICKED,evt->{
-            if(!buttonActive){
+        getCoreNode().addEventHandler(MouseEvent.MOUSE_CLICKED, evt -> {
+            if (!buttonActive) {
                 performOnClickAction();
             }
         });
@@ -121,7 +121,7 @@ public class WordCloudElement extends InteractiveElement {
         wordCloudPanel = new Panel();
         //wordCloudPanel.getStyleClass().add("panel-primary");
         wordCloudPanel.setStyle("-fx-background-color: #2a2a2a");
-        if(teacher){
+        if (teacher) {
 //            Button start_Task = new Button("Start");
             Image startWordCloudTask = new Image("file:projectResources/icons/startWC.png");
             startWordCloud = new ImageView(startWordCloudTask);
@@ -131,17 +131,17 @@ public class WordCloudElement extends InteractiveElement {
 //            start_Task.getStyleClass().setAll("btn","btn-default");
 //            start_Task.setAlignment(Pos.TOP_CENTER);
 //            //wordCloudPanel.getChildren().add(start_Task);
-            startWordCloud.addEventHandler(MouseEvent.MOUSE_CLICKED,evt->{
+            startWordCloud.addEventHandler(MouseEvent.MOUSE_CLICKED, evt -> {
                 wordCloudPanel.getChildren().remove(startBox);
                 setUpWordCloudData(new Time(Instant.now().toEpochMilli()));
-                if(ediManager.getPresentationManager().getTeacherSession() != null) {
+                if (ediManager.getPresentationManager().getTeacherSession() != null) {
                     ediManager.getPresentationManager().getTeacherSession().beginInteraction(this, true);
                 }
             });
-            startWordCloud.addEventHandler(MouseEvent.MOUSE_ENTERED,evt->{
+            startWordCloud.addEventHandler(MouseEvent.MOUSE_ENTERED, evt -> {
                 buttonActive = true;
             });
-            startWordCloud.addEventHandler(MouseEvent.MOUSE_EXITED,evt->{
+            startWordCloud.addEventHandler(MouseEvent.MOUSE_EXITED, evt -> {
                 buttonActive = false;
             });
             wordCloudPanel.setBody(startBox);
@@ -150,7 +150,7 @@ public class WordCloudElement extends InteractiveElement {
 
     }
 
-    public void setUpWordCloudData(Time startTime){
+    public void setUpWordCloudData(Time startTime) {
         this.startTime = startTime;
 
         //Start Time
@@ -159,9 +159,9 @@ public class WordCloudElement extends InteractiveElement {
         //Time currentTime = new Time(Instant.now().toEpochMilli());
         LocalTime currentTime = LocalTime.now();
         LocalTime startTimeNew = startTime.toLocalTime();
-        int timeDifference = currentTime.getSecond()-startTimeNew.getSecond();
+        int timeDifference = currentTime.getSecond() - startTimeNew.getSecond();
         //Time timeDifference = new Time(currentTime.toInstant().getEpochSecond()-startTime.toInstant().getEpochSecond());
-        int newTimeLimit = Math.round(timeLimit-timeDifference);
+        int newTimeLimit = Math.round(timeLimit - timeDifference);
         remainingTime = new Label("Time Remaining: " + (newTimeLimit));
         final IntegerProperty i = new SimpleIntegerProperty(newTimeLimit);
         timeline = new Timeline(
@@ -184,7 +184,7 @@ public class WordCloudElement extends InteractiveElement {
         });
         countdownTile = TileBuilder.create()
                 .skinType(Tile.SkinType.NUMBER)
-                .prefSize((xSize*slideWidth)/3,(ySize*slideHeight)/3)
+                .prefSize((xSize * slideWidth) / 3, (ySize * slideHeight) / 3)
                 .title("Time Limit")
                 .value(timeLimit)
                 .description("Seconds")
@@ -196,7 +196,7 @@ public class WordCloudElement extends InteractiveElement {
         Platform.runLater(new Runnable() {
             @Override
             public void run() {
-                if(countdownTile.getValue() == 0){
+                if (countdownTile.getValue() == 0) {
                     countdownTile.setValue(timeLimit);
                 }
                 Label wordCloudQuestion = new Label(question);
@@ -208,7 +208,7 @@ public class WordCloudElement extends InteractiveElement {
                 HBox dataBox = wordCloudElements();
                 dataBox.setAlignment(Pos.CENTER);
                 wordCloudBox.setAlignment(Pos.CENTER);
-                wordCloudBox.getChildren().addAll(wordCloudQuestion,countdownTile,dataBox);
+                wordCloudBox.getChildren().addAll(wordCloudQuestion, countdownTile, dataBox);
                 wordCloudPanel.setBody(wordCloudBox);
                 timeline.play();
             }
@@ -221,6 +221,20 @@ public class WordCloudElement extends InteractiveElement {
 
     }
 
+    public static String processWord(String word) {
+        StringBuilder sb = new StringBuilder();
+        //If word length less than or equal to 2, pad it
+        if (word.length() <= 2) {
+            sb.append(" ");
+            sb.append(word);
+            sb.append(" ");
+        } else {//I
+            sb.append(word.replaceAll("\\s+"," "));
+        }
+
+        return sb.toString().toLowerCase();
+    }
+
     public String getQuestion() {
         return question;
     }
@@ -229,7 +243,7 @@ public class WordCloudElement extends InteractiveElement {
         this.question = question;
     }
 
-    public HBox wordCloudElements(){
+    public HBox wordCloudElements() {
         ediManager.getPresentationManager().setWordCloudActive(true);
         HBox container = new HBox();
         words = new TextField();
@@ -238,31 +252,31 @@ public class WordCloudElement extends InteractiveElement {
         words.setAlignment(Pos.TOP_CENTER);
         sendWord = new Button("Send Word");
         sendWord.setAlignment(Pos.CENTER);
-        sendWord.addEventHandler(MouseEvent.MOUSE_CLICKED,evt->{
-            if((ediManager.getPresentationManager().getTeacherSession()) != null){
-                ediManager.getPresentationManager().getTeacherSession().sendResponse(this, words.getText().toLowerCase());
-            } else if((ediManager.getPresentationManager().getStudentSession() != null)){
-                ediManager.getPresentationManager().getStudentSession().sendResponse(this, words.getText().toLowerCase());
+        sendWord.addEventHandler(MouseEvent.MOUSE_CLICKED, evt -> {
+            if ((ediManager.getPresentationManager().getTeacherSession()) != null) {
+                ediManager.getPresentationManager().getTeacherSession().sendResponse(this, processWord(words.getText()));
+            } else if ((ediManager.getPresentationManager().getStudentSession() != null)) {
+                ediManager.getPresentationManager().getStudentSession().sendResponse(this, processWord(words.getText()));
             }
-           words.clear();
+            words.clear();
         });
-        sendWord.addEventHandler(MouseEvent.MOUSE_ENTERED,evt->{
+        sendWord.addEventHandler(MouseEvent.MOUSE_ENTERED, evt -> {
             buttonActive = true;
         });
-        sendWord.addEventHandler(MouseEvent.MOUSE_EXITED,evt->{
+        sendWord.addEventHandler(MouseEvent.MOUSE_EXITED, evt -> {
             buttonActive = false;
         });
-        words.addEventHandler(KeyEvent.KEY_PRESSED,keyEvent->{
-            if(keyEvent.getCode().equals(KeyCode.ENTER)){
-                if((ediManager.getPresentationManager().getTeacherSession()) != null){
+        words.addEventHandler(KeyEvent.KEY_PRESSED, keyEvent -> {
+            if (keyEvent.getCode().equals(KeyCode.ENTER)) {
+                if ((ediManager.getPresentationManager().getTeacherSession()) != null) {
                     ediManager.getPresentationManager().getTeacherSession().sendResponse(this, words.getText());
-                } else if((ediManager.getPresentationManager().getStudentSession() != null)){
+                } else if ((ediManager.getPresentationManager().getStudentSession() != null)) {
                     ediManager.getPresentationManager().getStudentSession().sendResponse(this, words.getText());
                 }
                 words.clear();
             }
         });
-        container.getChildren().addAll(words,sendWord);
+        container.getChildren().addAll(words, sendWord);
         return container;
     }
 
@@ -271,14 +285,14 @@ public class WordCloudElement extends InteractiveElement {
         this.wordList = wordList;
     }
 
-    public void generateWordCloud(){
+    public void generateWordCloud() {
         FrequencyAnalyzer fa = new FrequencyAnalyzer();
         List<WordFrequency> wordFrequencies = fa.load(wordList);
 
-        Dimension dimension = new Dimension((int)(xSize*slideWidth),(int)(ySize*slideHeight));
+        Dimension dimension = new Dimension((int) (xSize * slideWidth), (int) (ySize * slideHeight));
         WordCloud wc = new WordCloud(dimension, CollisionMode.PIXEL_PERFECT);
         wc.setPadding(2);
-        if(cloudShapePath != null){
+        if (cloudShapePath != null) {
             try {
                 wc.setBackground(new PixelBoundryBackground(cloudShapePath));
             } catch (IOException e) {
@@ -293,43 +307,43 @@ public class WordCloudElement extends InteractiveElement {
         wc.setFontScalar(new SqrtFontScalar(10,40));
         wc.build(wordFrequencies);
 
-        String pathName = presentationID+"_"+Integer.toString(slideID)+"_"+Integer.toString(elementID);
-        File wordcloudPath = new File(PRESENTATIONS_PATH+"/" +presentationID+"/Wordclouds/"+pathName+".png");
+        String pathName = presentationID + "_" + Integer.toString(slideID) + "_" + Integer.toString(elementID);
+        File wordcloudPath = new File(PRESENTATIONS_PATH + "/" + presentationID + "/Wordclouds/" + pathName + ".png");
         if (!wordcloudPath.exists()) {
             wordcloudPath.getParentFile().mkdirs(); //Create directory structure if not present yet
         }
-        wc.writeToFile(PRESENTATIONS_PATH+"/" + presentationID+"/Wordclouds/"+pathName+".png");
+        wc.writeToFile(PRESENTATIONS_PATH + "/" + presentationID + "/Wordclouds/" + pathName + ".png");
 
-        Image wordCloud = new Image("file:" + PRESENTATIONS_PATH +"/"+ presentationID+"/Wordclouds/"+pathName+".png",xSize*slideWidth,ySize*slideHeight,true,true);
+        Image wordCloud = new Image("file:" + PRESENTATIONS_PATH + "/" + presentationID + "/Wordclouds/" + pathName + ".png", xSize * slideWidth, ySize * slideHeight, true, true);
 
         iv = new ImageView(wordCloud);
 
-        VBox wordCloudBox  = new VBox();
+        VBox wordCloudBox = new VBox();
         wordCloudBox.getChildren().addAll(iv);
         wordCloudPanel.setBody(iv);
 
-        if(ediManager.getPresentationManager().getTeacherSession() != null){
-            wordCloudPanel.addEventFilter(MouseEvent.MOUSE_CLICKED, event->{
+        if (ediManager.getPresentationManager().getTeacherSession() != null) {
+            wordCloudPanel.addEventFilter(MouseEvent.MOUSE_CLICKED, event -> {
                 //wordCloudPanel.addEventHandler(MouseEvent.MOUSE_CLICKED,evt->{
-                    if(cm != null){
-                        cm.hide();
-                    }
-                    cm = new ContextMenu();
+                if (cm != null) {
+                    cm.hide();
+                }
+                cm = new ContextMenu();
 
-                    if(event.getButton() == MouseButton.SECONDARY){
-                        MenuItem reset = new MenuItem("Reset Element");
-                        reset.setOnAction(event1->{
-                            ediManager.getPresentationManager().getTeacherSession().resetInteractiveElement(this);
-                            slideCanvas.getChildren().remove(this.getCoreNode());
-                            setupElement();
-                            doClassSpecificRender();
-                            slideCanvas.getChildren().add(wordCloudPanel);
-                        });
-                        cm.getItems().add(reset);
-                        cm.show(this.getCoreNode(),event.getScreenX(),event.getScreenY());
+                if (event.getButton() == MouseButton.SECONDARY) {
+                    MenuItem reset = new MenuItem("Reset Element");
+                    reset.setOnAction(event1 -> {
+                        ediManager.getPresentationManager().getTeacherSession().resetInteractiveElement(this);
+                        slideCanvas.getChildren().remove(this.getCoreNode());
+                        setupElement();
+                        doClassSpecificRender();
+                        slideCanvas.getChildren().add(wordCloudPanel);
+                    });
+                    cm.getItems().add(reset);
+                    cm.show(this.getCoreNode(), event.getScreenX(), event.getScreenY());
 
 
-                    }
+                }
                 //});
                 event.consume();
             });
