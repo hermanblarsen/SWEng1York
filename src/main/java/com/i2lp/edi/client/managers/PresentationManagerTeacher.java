@@ -69,9 +69,9 @@ public class PresentationManagerTeacher extends PresentationManager {
                 @Override
                 public void run() {
                     displayPane.getChildren().remove(slidePane);
+                    slidePane.getChildren().removeAll(backgroundRegion, lab);
                     if(!test) {
                     lab = new Label(slides[questionID].getText());
-                    slidePane.getChildren().removeAll(backgroundRegion, lab);
                     lab.setFont(new Font("Helvetica", 50));
                     lab.setTextFill(Color.WHITE);
                     lab.setWrapText(true);
