@@ -48,7 +48,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public abstract class PresentationManager {
     private static final float SLIDE_SIZE_ON_OPEN = 0.5f;
     private static final int PRES_CONTROLS_HEIGHT = 40;
-    private static final int STAGE_MIN_WIDTH = 500;
+    private static final int STAGE_MIN_WIDTH = 550;
     private static final int STAGE_MIN_HEIGHT = 300;
     private static final int HIDE_CURSOR_DELAY = 2000;
     public static final int HIDE_CONTROLS_DELAY = 5000;
@@ -356,8 +356,9 @@ public abstract class PresentationManager {
         cursorHideTimer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
-                if (!mouseDown && !mouseActivityRegistered && currentCursorState.equals(CursorState.DEFAULT) && isMouseOverSlide && !isMouseOverControls)
+                if (!mouseDown && !mouseActivityRegistered && currentCursorState.equals(CursorState.DEFAULT) && isMouseOverSlide && !isMouseOverControls) {
                     setCursorState(CursorState.HIDDEN);
+                }
 
                 mouseActivityRegistered = false;
             }

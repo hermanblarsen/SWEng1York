@@ -9,6 +9,8 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
@@ -25,6 +27,7 @@ import static com.i2lp.edi.client.Constants.MAX_QUESTION_LENGTH;
 public class PresentationManagerStudent extends PresentationManager {
     protected Boolean elementClicked = false;
     protected Stage questionQueueStage;
+    private boolean isQuestionQueueVisible = false;
 
     public PresentationManagerStudent(EdiManager ediManager) {
         super(ediManager);
@@ -45,12 +48,11 @@ public class PresentationManagerStudent extends PresentationManager {
     protected VBox addQuestionQueueControls() {
         if (studentSession != null) {
             ImageView questionBase = makeCustomButton("file:projectResources/icons/Question_Filled.png", event -> {
+                loadSpecificFeatures();
                 if (!questionQueueActive) {
-                    loadSpecificFeatures();
                     questionQueueActive = true;
 
                 } else {
-                    loadSpecificFeatures();
                     questionQueueActive = false;
                 }
             });
@@ -75,51 +77,66 @@ public class PresentationManagerStudent extends PresentationManager {
     }
 
     protected void questionQueueFunction() {
-        questionQueueStage = new Stage();
-        questionQueueStage.setTitle("Send a Question");
-        BorderPane border = new BorderPane();
-        border.setStyle("-fx-background-color: #34495e");
-        Scene questionScene = new Scene(border, 450, 450);
-        questionScene.getStylesheets().add("bootstrapfx.css");
-        Label title = new Label("Send a question to the question queue");
-        border.setPadding(new Insets(0, 10, 10, 10));
-        title.setPadding(new Insets(10, 0, 10, 0));
-        title.setTextFill(Color.WHITE);
-        title.setAlignment(Pos.CENTER);
-        title.setMaxWidth(Double.MAX_VALUE);
-        border.setTop(title);
-
-
-        TextArea ta = new TextArea();
-        ta.setMaxWidth(Double.MAX_VALUE);
-        ta.setMaxHeight(Double.MAX_VALUE);
-        ta.setWrapText(true);
-        border.setCenter(ta);
-
-        //TODO: @Koen Hide this all when in offline mode/presentation not live (check through ediManager.getPresentationManager().getPresentationElement().getPresentationMetadata().isLive())
-        Image tick = new Image("file:projectResources/icons/Tick.png", 30, 30, true, true);
-        ImageView tickPanel = new ImageView(tick);
-        tickPanel.addEventHandler(MouseEvent.MOUSE_CLICKED, evt -> {
-            if (ta.getText().length() <= MAX_QUESTION_LENGTH) {
-                if (!ta.getText().isEmpty()) {
-                    getStudentSession().addQuestionToQueue(ta.getText());
-                    questionQueueStage.close();
-                }
-            } else {
-                ta.setText(ta.getText() + " \n Response is too long. Reduce length by " + (MAX_QUESTION_LENGTH -ta.getText().length()) + " characters.");
+        if (!isQuestionQueueVisible) {
+            isQuestionQueueVisible = true;
+            if (questionQueueStage == null) {
+                questionQueueStage = new Stage();
             }
-        });
+            questionQueueStage.setTitle("Send a Question");
+            BorderPane border = new BorderPane();
+            border.setStyle("-fx-background-color: #34495e");
+            Scene questionScene = new Scene(border, 450, 450);
+            questionScene.getStylesheets().add("bootstrapfx.css");
+            Label title = new Label("Send a question to the question queue");
+            border.setPadding(new Insets(0, 10, 10, 10));
+            title.setPadding(new Insets(10, 0, 10, 0));
+            title.setTextFill(Color.WHITE);
+            title.setAlignment(Pos.CENTER);
+            title.setMaxWidth(Double.MAX_VALUE);
+            border.setTop(title);
 
-        Image cross = new Image("file:projectResources/icons/cancel.png", 30, 30, true, true);
-        ImageView crossPanel = new ImageView(cross);
-        crossPanel.addEventHandler(MouseEvent.MOUSE_CLICKED, evt -> questionQueueStage.close());
 
-        HBox controlBox = new HBox();
-        controlBox.setMaxWidth(Double.MAX_VALUE);
-        controlBox.getChildren().addAll(tickPanel, crossPanel);
-        border.setBottom(controlBox);
-        questionQueueStage.setScene(questionScene);
-        questionQueueStage.show();
+            TextArea ta = new TextArea();
+            ta.setMaxWidth(Double.MAX_VALUE);
+            ta.setMaxHeight(Double.MAX_VALUE);
+            ta.setWrapText(true);
+            ta.addEventHandler(KeyEvent.KEY_TYPED, event -> {
+                if (event.getCode().equals(KeyCode.ENTER)) {
+                    closeQQ(ta);
+                }
+            });
+            border.setCenter(ta);
+
+            //TODO: @Koen Hide this all when in offline mode/presentation not live (check through ediManager.getPresentationManager().getPresentationElement().getPresentationMetadata().isLive())
+            Image tick = new Image("file:projectResources/icons/Tick.png", 30, 30, true, true);
+            ImageView tickPanel = new ImageView(tick);
+            tickPanel.addEventHandler(MouseEvent.MOUSE_CLICKED, evt -> closeQQ(ta));
+
+            Image cross = new Image("file:projectResources/icons/cancel.png", 30, 30, true, true);
+            ImageView crossPanel = new ImageView(cross);
+            crossPanel.addEventHandler(MouseEvent.MOUSE_CLICKED, evt -> questionQueueStage.close());
+
+            HBox controlBox = new HBox();
+            controlBox.setMaxWidth(Double.MAX_VALUE);
+            controlBox.getChildren().addAll(tickPanel, crossPanel);
+            border.setBottom(controlBox);
+            questionQueueStage.setScene(questionScene);
+            questionQueueStage.show();
+        } else {
+            isQuestionQueueVisible = false;
+            questionQueueStage.close();
+        }
+    }
+
+    private void closeQQ(TextArea ta) {
+        if (ta.getText().length() <= MAX_QUESTION_LENGTH) {
+            if (!ta.getText().isEmpty()) {
+                getStudentSession().addQuestionToQueue(ta.getText());
+                questionQueueStage.close();
+            }
+        } else {
+            ta.setText(ta.getText() + " \n Response is too long. Reduce length by " + (MAX_QUESTION_LENGTH -ta.getText().length()) + " characters.");
+        }
     }
 }
 
