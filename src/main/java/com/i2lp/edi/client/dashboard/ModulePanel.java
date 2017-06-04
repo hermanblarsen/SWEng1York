@@ -17,7 +17,8 @@ import java.util.ArrayList;
  */
 public class ModulePanel extends PreviewPanel {
 
-    public static final int WIDTH = 140;
+    public static final int WIDTH = 170;
+    private static final double MARGIN_FOR_LIVE_ICON = 50;
     private final DashModule module;
     private boolean isLive = false;
     private ImageView liveIcon;
@@ -32,7 +33,9 @@ public class ModulePanel extends PreviewPanel {
         getDisplayPanel().setMinWidth(Panel.USE_PREF_SIZE);
         getDisplayPanel().setMaxWidth(Panel.USE_PREF_SIZE);
 
-        getDisplayPanel().setText(module.getModuleName());
+        Label heading = new Label(module.getModuleName());
+        getDisplayPanel().setHeading(heading);
+        heading.setMaxWidth(WIDTH - MARGIN_FOR_LIVE_ICON);
         getDisplayPanel().setFooter(new Label(module.getPresentations().size() + " presentations"));
 
         liveIcon = new ImageView(new Image("file:projectResources/icons/live_icon.png"));

@@ -289,8 +289,7 @@ public class Login extends Application {
                 new FileChooser.ExtensionFilter("XML Presentations (*.XML)", "*.xml", "*.XML");
         fileChooser.getExtensionFilters().add(xmlExtensionFilter);
         fileChooser.setSelectedExtensionFilter(xmlExtensionFilter);
-        fileChooser.setInitialDirectory(new File("projectResources/sampleFiles/xml"));
-        //fileChooser.setInitialDirectory(new File(System.getProperty("user.home"))); //TODO reinstate when tested
+        fileChooser.setInitialDirectory(new File(BASE_PATH));
         fileChooser.setTitle("Open Presentation");
 
         File file = fileChooser.showOpenDialog(loginStage);

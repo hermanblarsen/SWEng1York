@@ -336,6 +336,6 @@ public class PresentationLibraryManager {
                 }
             }
         });
-        zipCreationTask.setOnSucceeded(event -> uploadThread.start());
+        //zipCreationTask.setOnSucceeded(event -> uploadThread.start());
     }
 }

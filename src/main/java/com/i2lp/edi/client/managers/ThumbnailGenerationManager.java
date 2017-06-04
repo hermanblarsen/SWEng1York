@@ -23,6 +23,7 @@ import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
+import org.apache.pdfbox.util.Matrix;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -140,7 +141,7 @@ public class ThumbnailGenerationManager extends PresentationManager {
                     }
                     logger.debug("All webviews on TextElements in slide " + (slideGenController.currentSlideNumber) + " have completed rendering.");
                     //This value may need to be upped on slower systems to ensure successful screenshot
-                    Thread.sleep(2000);
+                    Thread.sleep(100);
                     return null;
                 }
             }
@@ -188,8 +189,8 @@ public class ThumbnailGenerationManager extends PresentationManager {
 
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Save PDF");
-        File poop = new File(System.getProperty("user.home"),"Desktop");
-        fileChooser.setInitialDirectory(poop);
+        File file = new File(System.getProperty("user.home"),"Desktop");
+        fileChooser.setInitialDirectory(file);
         fileChooser.setInitialFileName(presentationElement.getDocumentID());
         Stage saveStage = new Stage();
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PDF", "*.pdf"));
@@ -220,23 +221,34 @@ public class ThumbnailGenerationManager extends PresentationManager {
                     try {
                         logger.info("Slide Image Generation Path: " + f.getAbsolutePath().toString());
                         PDPage page = new PDPage(PDRectangle.A4);
-//                        page.setRotation(90);
+                        //page.setRotation(90);
                         doc.addPage(page);
                         PDImageXObject imageObject = PDImageXObject.createFromFile(f.getAbsolutePath(), doc);
-                        PDPageContentStream contents = new PDPageContentStream(doc, page);
-//                        PDRectangle cropBox = page.getCropBox();
-//                        float tx = ((cropBox.getLowerLeftX() + cropBox.getUpperRightX()) / 2);
-//                        float ty = ((cropBox.getLowerLeftY() + cropBox.getUpperRightY()) / 2);
-//                        contents.transform(Matrix.getTranslateInstance(tx, ty));
-//                        contents.transform(Matrix.getRotateInstance(Math.toRadians(90), 0, 0));
-//                        contents.transform(Matrix.getTranslateInstance(-tx, -ty));
-                        //contents.drawImage(imageObject, -115, 135, PDRectangle.A4.getHeight() - 30, PDRectangle.A4.getWidth() - 30);
-                        float imageWidth = imageObject.getWidth() * (0.5f);
-                        float imageHeight = imageObject.getHeight() * (0.5f);
+                        PDPageContentStream contentStream = new PDPageContentStream(doc, page, PDPageContentStream.AppendMode.APPEND, false);
+                        float imageWidth = imageObject.getWidth();
+                        float imageHeight = imageObject.getHeight();
+                        float imageAspectRatio = imageWidth/imageHeight;
                         PDRectangle mediaBox = page.getMediaBox();
-                        //contents.drawImage(imageObject,72,page.getCropBox().getUpperRightY(),imageHeight,imageWidth);
-                        contents.drawImage(imageObject, 72 / 2, mediaBox.getHeight() - (72 * 8), imageHeight, imageWidth);
-                        contents.close();
+                        float margin = 10;
+                        float boxWidth = mediaBox.getWidth(); //- 2 * margin;
+                        float boxHeight = mediaBox.getHeight(); //- 2 * margin;
+                        float boxAspectRatio = boxWidth/boxHeight;
+
+                        if (imageAspectRatio > boxAspectRatio) {
+                            contentStream.drawImage(imageObject, 0, mediaBox.getHeight() - mediaBox.getWidth()/imageAspectRatio, mediaBox.getWidth(), mediaBox.getWidth()/imageAspectRatio);
+                        } else {
+                            contentStream.drawImage(imageObject, 0, mediaBox.getHeight() - mediaBox.getHeight()*imageAspectRatio, mediaBox.getHeight()*imageAspectRatio, mediaBox.getHeight());
+                        }
+
+                        //mediaBox.transform(new Matrix(0, 1, -1, 0, imageWidth, 0));
+
+
+// add the rotation using the current transformation matrix
+// including a translation of pageWidth to use the lower left corner as 0,0 reference
+                        //contentStream.transform(new Matrix(0, 1, -1, 0, imageWidth, 0));
+
+//                        contentStream.drawImage(imageObject, 0, 0, mediaBox.getWidth(), mediaBox.getHeight());
+                        contentStream.close();
                     } catch (IOException e) {
                         e.printStackTrace();
                     }

@@ -423,7 +423,6 @@ public class PresentationManagerTeacher extends PresentationManager {
                 if (!questionQueueActive) {
                     loadSpecificFeatures();
                     questionQueueActive = true;
-
                 } else {
                     loadSpecificFeatures();
                     questionQueueActive = false;
