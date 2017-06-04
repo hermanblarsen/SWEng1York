@@ -21,6 +21,7 @@ import static org.junit.Assert.*;
  * Created by Luke on 02/06/2017.
  */
 
+@Ignore
 public class AudioElementTest extends ApplicationTest {
     private AudioElement myAudioElement;
     private  PresentationManagerTeacher myPresentationManager;

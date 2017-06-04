@@ -84,7 +84,7 @@ public abstract class PresentationViewerTest extends ApplicationTest {
             sequenceNumberMax++;
         }
 
-        //progress = myPresentationManager.currentSequenceNumber / (double) sequenceNumberMax;
+        progress = (myPresentationManager.currentSequenceNumber - 1) / (double) sequenceNumberMax;
         progress = 0.0;
         assertEquals(progress, myPresentationManager.progressBar.getProgress(), 0.01);
 
@@ -94,8 +94,8 @@ public abstract class PresentationViewerTest extends ApplicationTest {
         clickOn(rightButton);
         clickOn(rightButton);
         clickOn(rightButton);
-        progress = myPresentationManager.currentSequenceNumber / (double) sequenceNumberMax;
-        assertEquals(progress, myPresentationManager.progressBar.getProgress(), 0.01);
+        progress = (myPresentationManager.currentSequenceNumber - 1) / (double) sequenceNumberMax;
+        assertEquals(progress, myPresentationManager.progressBar.getProgress(), 0.05);
     }
 
     @Test
