@@ -52,10 +52,10 @@ public class PollElement extends InteractiveElement {
     protected ToggleButton[] answerButton;
     private ChartData[] chartDataArray;
     private Color assignedColour;
-    protected float xSize = 0.8f;
-    protected float ySize = 0.8f;
-    protected float xPosition = 0.1f;
-    protected float yPosition = 0.1f;
+    protected float xSize = 1f;
+    protected float ySize = 1f;
+    protected float xPosition = 0f;
+    protected float yPosition = 0f;
     protected boolean buttonActive = false;
     protected int setValue;
     protected Button startTimer;

@@ -60,12 +60,10 @@ public class WordCloudElement extends InteractiveElement {
     protected Tile countdownTile;
     protected boolean  writingComplete = false;
     protected String cloudShapePath = null;
-    protected float xPosition =0.1f;
-    protected float yPosition =0.1f;
-    protected float xSize =0.8f;
-    protected float ySize=0.8f;
-    protected float wordCloudHeight=0.25f;
-    protected float wordCloudWidth=0.25f;
+    protected float xPosition =0f;
+    protected float yPosition =0f;
+    protected float xSize =1f;
+    protected float ySize=1f;
     protected boolean buttonActive = false;
     private ContextMenu cm;
     private ImageView iv;

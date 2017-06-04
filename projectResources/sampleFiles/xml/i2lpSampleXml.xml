@@ -133,16 +133,16 @@
 				<onclickaction>dynamicmediatoggle</onclickaction>
 				<onclickinfo>2</onclickinfo>
 				<animation type="in">
-                <pathtransition duration="1000"
-					path="M0.314,0
-						C0.621,0,0.87,0.249,0.87,0.556
-						C0.87,0.801,0.671,1,0.425,1
-						C0.229,1,0.07,0.841,0.07,0.644
-						c0-0.157,0.127-0.284,0.284-0.284
-						c0.126,0,0.228,0.102,0.228,0.228
-						C0.582,0.688,0.5,0.77,0.4,0.77
-						c-0.08,0-0.146-0.065-0.146-0.146
-						c0-0.064,0.052-0.117,0.117-0.117"/>
+                	<pathtransition duration="1000"
+						path="M0.314,0
+							C0.621,0,0.87,0.249,0.87,0.556
+							C0.87,0.801,0.671,1,0.425,1
+							C0.229,1,0.07,0.841,0.07,0.644
+							c0-0.157,0.127-0.284,0.284-0.284
+							c0.126,0,0.228,0.102,0.228,0.228
+							C0.582,0.688,0.5,0.77,0.4,0.77
+							c-0.08,0-0.146-0.065-0.146-0.146
+							c0-0.064,0.052-0.117,0.117-0.117"/>
 				</animation>
 			</graphic>
 
@@ -184,8 +184,8 @@
 				<opacity>0.3</opacity>
 				<aspectratiolock>true</aspectratiolock>
 				<elementaspectratio>1.0</elementaspectratio>
-
 			</image>
+
 			<image elementid ="1" layer="1" visibility="true" startsequence="2">
 				<xposition>0.2</xposition>
 				<yposition>0.2</yposition>
