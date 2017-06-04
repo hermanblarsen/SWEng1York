@@ -633,6 +633,9 @@ public class AudioElement extends SlideElement{
      */
     public void isAutoPlay(Boolean isAutoPlay) {
         this.isAutoPlay = isAutoPlay;
+        if (mediaPlayer != null) {
+            mediaPlayer.setAutoPlay(isAutoPlay);
+        }
     }
 
     /**

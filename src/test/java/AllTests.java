@@ -10,6 +10,9 @@ import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
 @SuiteClasses({
+        //Animation
+        com.i2lp.edi.client.animation.AnimationTest.class,
+
         //Dashboard
         com.i2lp.edi.client.dashboard.StudentDashboardTest.class,
         com.i2lp.edi.client.dashboard.TeacherDashboardTest.class,
@@ -27,6 +30,7 @@ import org.junit.runners.Suite.SuiteClasses;
 
         //PresentationElements
         com.i2lp.edi.client.presentationElements.AudioElementIntegrationTestbench.class,
+        com.i2lp.edi.client.presentationElements.AudioElementTest.class,
         com.i2lp.edi.client.presentationElements.GraphicElementTest.class,
         com.i2lp.edi.client.presentationElements.GraphicElementIntegrationTest.class,
         com.i2lp.edi.client.presentationElements.ImageElementTest.class,

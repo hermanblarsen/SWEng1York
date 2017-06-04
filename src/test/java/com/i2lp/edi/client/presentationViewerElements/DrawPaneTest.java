@@ -39,7 +39,9 @@ public class DrawPaneTest extends ApplicationTest {
         }
 
         StackPane stackPane = new StackPane();
+        stackPane.setPrefSize(600,600);
         myDrawPane = new DrawPane(stackPane);
+        myDrawPane.setPrefSize(600,600);
         Scene scene = new Scene(stackPane,600,600);
 
         stage.setTitle("Draw Pane Test");
@@ -99,7 +101,7 @@ public class DrawPaneTest extends ApplicationTest {
         assertEquals(newDrawing, myDrawPane.getSlideDrawing());
     }
 
-    @Ignore //TODO @Luke
+    @Ignore //TODO @Luke Clear assertion fails due to unknown reason
     @Test
     public void testRedraw() {
         WritableImage newDrawing = new WritableImage((int) myDrawPane.canvas.getWidth(), (int) myDrawPane.canvas.getHeight());
@@ -128,7 +130,7 @@ public class DrawPaneTest extends ApplicationTest {
 
         myDrawPane.setSlideDrawing(newDrawing);
 
-        assertEquals(newDrawing, myDrawPane.getSlideDrawing());
+        assertTrue(newDrawing.equals(myDrawPane.getSlideDrawing()));
 
         Platform.runLater(new Runnable() {
             @Override public void run() {
@@ -137,7 +139,7 @@ public class DrawPaneTest extends ApplicationTest {
         });
         sleep(500);
 
-        assertEquals(blankDrawing, myDrawPane.getSlideDrawing());
+        assertTrue(blankDrawing.equals(myDrawPane.getSlideDrawing()));
     }
 
     @After

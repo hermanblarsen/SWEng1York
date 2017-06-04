@@ -75,6 +75,7 @@ public class PollEditorPanel extends Panel {
         responseTypeChoiceBox.setValue("Open");
         responseTypeChoiceBox.setOnAction(event -> setResponseType(responseTypeChoiceBox.getValue()));
         body.add(responseTypeChoiceBox, 1, 1);
+        setResponseType("Open");
     }
 
     private void setResponseType(String responseType) {

@@ -45,9 +45,8 @@ public class LoginTest extends ApplicationTest{
             return;
         }
         ediManager = new EdiManager();
-        myLogin = new Login();
-        myLogin.setEdiManager(ediManager);
-        myLogin.start(stage);
+        //myLogin.setEdiManager(ediManager);
+        ediManager.start(stage);
         // Put the GUI in front of windows, else the robots may interact with undesirable windows
         stage.toFront();
     }
@@ -57,6 +56,7 @@ public class LoginTest extends ApplicationTest{
         //Ignores the test if the build is run from circle (headless) environment
         Assume.assumeTrue(!IS_CIRCLE_BUILD);
 
+        myLogin = ediManager.getLoginDialog();
         userNameField = myLogin.usernameField;
         passwordField = myLogin.passwordField;
         forgotPasswordButton = myLogin.forgotPasswordButton;
@@ -64,21 +64,24 @@ public class LoginTest extends ApplicationTest{
     }
 
     @Test
-    public void loginTest() {
+    public void testLogin() {
         doubleClickOn(userNameField).write("Teacher");
         doubleClickOn(passwordField).write("password");
+        sleep(2000);
 
-        //clickOn(loginButton);
+        clickOn(loginButton);
+        sleep(2000);
+        assertTrue(ediManager.isLoggedIn());
     }
 
     @Test
-    public void usernameTest() {
+    public void testUsername() {
         doubleClickOn(userNameField).write("123");
         assertEquals("123", userNameField.getText());
     }
 
     @Test
-    public void passwordTest() {
+    public void testPassword() {
         doubleClickOn(passwordField).write("123");
         assertEquals("123", passwordField.getText());
     }

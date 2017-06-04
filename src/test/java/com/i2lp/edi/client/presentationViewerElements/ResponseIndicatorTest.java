@@ -44,7 +44,7 @@ public class ResponseIndicatorTest extends ApplicationTest {
     }
 
     @Test
-    public void verifyProgressIndicator() {
+    public void testProgressIndicator() {
         Platform.runLater(new Runnable() {
             @Override public void run() {
                 myResponseIndicator.setNumberOfStudents(0);

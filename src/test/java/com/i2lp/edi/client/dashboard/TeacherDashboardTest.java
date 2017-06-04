@@ -54,7 +54,6 @@ public class TeacherDashboardTest extends DashboardTest{
         modulePanels = subjectPanels.get(0).getModulePanels();
     }
 
-    //@Ignore //TODO @Luke Dependent on first module containing at least one presentation
     @Test
     public void testSchedulePresentation() {
         doubleClickOn(subjectPanels.get(0).getModulePanels().get(0));

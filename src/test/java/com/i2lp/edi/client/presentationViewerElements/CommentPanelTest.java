@@ -21,7 +21,7 @@ import static org.junit.Assert.*;
 /**
  * Created by Luke on 29/04/2017.
  */
-//@Ignore
+
 public class CommentPanelTest extends ApplicationTest {
 
     private CommentPanel myCommentPanel;
@@ -59,7 +59,7 @@ public class CommentPanelTest extends ApplicationTest {
     }
 
     @Test
-    public void commentTest() {
+    public void testComment() {
         clickOn(myCommentPanel).write("Test 123");
 //        clickOn(saveButton);
         assertTrue(htmlEditor.getHtmlText().contains("Test 123"));
@@ -67,7 +67,7 @@ public class CommentPanelTest extends ApplicationTest {
     }
 
     @Test
-    public void reCommentTest() {
+    public void testReComment() {
         clickOn(myCommentPanel).write("Test 123");
 //        clickOn(saveButton);
         assertTrue(slide.getUserComments().contains("Test 123"));
@@ -75,9 +75,9 @@ public class CommentPanelTest extends ApplicationTest {
         assertTrue(slide.getUserComments().contains("New Test 456"));
     }
 
-    @Ignore //TODO @Luke
+    @Ignore //Probably no longer needed
     @Test
-    public void submitTest() {
+    public void testSubmit() {
         clickOn(myCommentPanel).write("Test 123");
 //        clickOn(submitButton);
         assertTrue(true);

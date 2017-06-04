@@ -40,7 +40,7 @@ public class QuestionIndicatorTest extends ApplicationTest {
     }
 
     @Test
-    public void verifyNumberOfQuestions() {
+    public void testNumberOfQuestions() {
         myQuestionIndicator.setNumberOfQuestions(-1);
         assertEquals("", numberText.getText());
 

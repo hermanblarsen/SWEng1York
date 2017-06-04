@@ -136,9 +136,9 @@ public abstract class PresentationViewerTest extends ApplicationTest {
         assertEquals(2, myPresentationManager.currentSequenceNumber);
         push(KeyCode.BACK_SPACE);
         assertEquals(1, myPresentationManager.currentSequenceNumber);
-        push(KeyCode.PAGE_UP);
-        assertEquals(2, myPresentationManager.currentSequenceNumber);
         push(KeyCode.PAGE_DOWN);
+        assertEquals(2, myPresentationManager.currentSequenceNumber);
+        push(KeyCode.PAGE_UP);
         assertEquals(1, myPresentationManager.currentSequenceNumber);
         push(KeyCode.UP);
         assertEquals(2, myPresentationManager.currentSequenceNumber);
@@ -168,8 +168,10 @@ public abstract class PresentationViewerTest extends ApplicationTest {
         assertEquals(0, myPresentationManager.currentSlideNumber);
     }
 
-    @Test //TODO @Luke Presentation elements interfere with test
+    @Test
     public void testMouseListeners() {
+        myPresentation.getSlide(1).destroyAllVisible();
+
         moveTo(0, 0);
         assertFalse(myPresentationManager.isMouseOverSlide);
         moveTo(Screen.getPrimary().getBounds().getMaxX()/2, Screen.getPrimary().getBounds().getMaxY()/2);
@@ -181,6 +183,7 @@ public abstract class PresentationViewerTest extends ApplicationTest {
         scroll(1, VerticalDirection.UP);
         assertEquals(1, myPresentationManager.currentSequenceNumber);
 
+        //TODO @Luke Not sure if needed
         //clickOn(MouseButton.PRIMARY);
         //assertEquals(2, myPresentationManager.currentSequenceNumber);
         //clickOn(MouseButton.SECONDARY);
@@ -195,9 +198,8 @@ public abstract class PresentationViewerTest extends ApplicationTest {
         moveBy(20,0);
         assertEquals(CursorState.DEFAULT, myPresentationManager.currentCursorState);
 
-        //assertFalse(myPresentationManager.cMenu.isShowing());
-        //clickOn(MouseButton.SECONDARY);
-        //assertTrue(myPresentationManager.cMenu.isShowing());
+        clickOn(MouseButton.SECONDARY);
+        assertTrue(myPresentationManager.cMenu.isShowing());
     }
 
     @After

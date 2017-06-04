@@ -12,6 +12,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.testfx.api.FxToolkit;
 import org.testfx.framework.junit.ApplicationTest;
@@ -76,16 +77,30 @@ public class PollEditorTest extends ApplicationTest {
     }
 
     @Test
-    public void testPollCreation() {
+    public void testQuestionField() {
         clickOn(questionTextField).write("Question");
+        assertEquals("Question", questionTextField.getText());
+    }
+
+    @Test
+    public void testResponseType() {
+        clickOn(responseTypeChoiceBox).clickOn(responseTypeChoiceBox.getItems().get(1));
+        assertEquals("Multiple choice", myPollEditor.responseType);
+    }
+
+    @Test
+    public void testAnswerField() {
         clickOn(responseTypeChoiceBox).clickOn(responseTypeChoiceBox.getItems().get(1));
         clickOn(answerTextFields.get(0)).write("Answer 1");
         clickOn(answerTextFields.get(1)).write("Answer 2");
-
-        assertEquals("Question", questionTextField.getText());
-        assertEquals("Multiple choice", myPollEditor.responseType);
         assertEquals("Answer 1", answerTextFields.get(0).getText());
         assertEquals("Answer 2", answerTextFields.get(1).getText());
+    }
+
+    @Test
+    public void testPollCreation() {
+        assertEquals("", questionTextField.getText());
+        assertEquals("Open", myPollEditor.responseType);
     }
 
     @After

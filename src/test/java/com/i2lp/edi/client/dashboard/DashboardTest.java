@@ -422,14 +422,14 @@ public abstract class DashboardTest extends ApplicationTest {
             assertEquals(pres.getVersion(), myDashboard.presentationManager.getPresentationElement().getVersion());
     }
 
-    @Ignore //Possibly not needed
     @Test
     public void testAboutPopup() {
         moveTo(menuBar);
         moveBy(menuBar.getLayoutX() - (int)(menuBar.getWidth() / 2.0) + 20, menuBar.getLayoutY());
         clickOn();
-        push(KeyCode.RIGHT).push(KeyCode.RIGHT).push(KeyCode.RIGHT);
-        push(KeyCode.DOWN).push(KeyCode.DOWN).push(KeyCode.ENTER);
+        push(KeyCode.RIGHT).push(KeyCode.RIGHT);
+        push(KeyCode.DOWN).push(KeyCode.DOWN);
+        push(KeyCode.ENTER);
         assertTrue(myDashboard.aboutPopup.isShowing());
     }
 
@@ -450,6 +450,7 @@ public abstract class DashboardTest extends ApplicationTest {
         assertFalse(myDashboard.isWelcomeTextHidden);
     }
 
+    @Ignore //TODO @Luke
     @Test
     public void testCalendar() {
         clickOn(myDashboard.calendarNode);

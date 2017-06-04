@@ -97,6 +97,14 @@ public class PresentationEditor {
         return statusBar;
     }
 
+    public HBox getStatusBar() {
+        return statusBar;
+    }
+
+    public Text getStatusText() {
+        return statusText;
+    }
+
     private void updateStatusBar(Status status) {
         String statusString = new String();
 

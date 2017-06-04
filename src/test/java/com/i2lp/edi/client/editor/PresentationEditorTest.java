@@ -8,6 +8,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.testfx.api.FxToolkit;
 import org.testfx.framework.junit.ApplicationTest;
@@ -65,6 +66,29 @@ public class PresentationEditorTest extends ApplicationTest {
 
     @Test
     public void testStatusBar() {
+        moveTo(menuBar);
+        moveBy(-menuBar.getWidth()/2 + 20, 0);
+        clickOn();
+        push(KeyCode.DOWN);
+        push(KeyCode.RIGHT);
+        push(KeyCode.ENTER);
+
+        PollEditorPanel pePanel = (PollEditorPanel) (vbox.getChildren().get(0));
+
+        //This is needed as the status only updates when the mouse enters the main poll panel
+        moveTo(vbox.getChildren().get(0));
+
+        assertEquals("Number of Answers: 0", myPresentationEditor.getStatusText().getText());
+
+        clickOn(pePanel.responseTypeChoiceBox).clickOn(pePanel.responseTypeChoiceBox.getItems().get(1));
+
+        moveTo(vbox.getChildren().get(0));
+        assertEquals("Number of Answers: 2", myPresentationEditor.getStatusText().getText());
+    }
+
+    @Ignore //TODO @Luke Not yet implemented
+    @Test
+    public void testSaveToXml() {
 
     }
 

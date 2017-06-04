@@ -124,9 +124,4 @@ public class GraphicElementTest extends ApplicationTest {
         assertEquals(myPolygon.isPolygon(), true);
         assertEquals(myPolygon.isClosed(), true);
     }
-
-    @Test
-    public void testVectorCreation() {
-
-    }
 }

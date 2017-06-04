@@ -9,6 +9,7 @@ import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
 import org.junit.Assume;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.File;
@@ -65,6 +66,7 @@ public class StudentPresentationViewerTest extends PresentationViewerTest {
         visibleButton = (ImageView) presControls.getChildren().get(5);
     }
 
+    @Ignore
     @Test
     public void testLink() {
         //TODO @Luke

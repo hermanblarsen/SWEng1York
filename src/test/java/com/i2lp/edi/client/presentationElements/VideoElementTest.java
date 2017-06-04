@@ -61,20 +61,20 @@ public class VideoElementTest extends ApplicationTest {
     }
 
     @Test
-    public void verifyVideoPath(){
+    public void testVideoPath(){
         File source = new File("projectResources/sampleFiles/prometheus.mp4");
         assertEquals(source.toURI().toString(), myVideoElement.getMediaPlayer().getMedia().getSource());
     }
 
     @Test
-    public void verifyStartAndEndTime(){
+    public void testStartAndEndTime(){
         assertEquals(Duration.millis(0),myVideoElement.getMediaPlayer().getStartTime());
         assertEquals(Duration.millis(300),myVideoElement.getMediaPlayer().getStopTime());
     }
 
     @Ignore //TODO Sometimes fails with no consistent reason
     @Test
-    public void verifyMediaPlayerStatus(){
+    public void testMediaPlayerStatus(){
         sleep(500);
         assertEquals(MediaPlayer.Status.PLAYING,myVideoElement.getMediaPlayer().getStatus());
         myVideoElement.getMediaPlayer().pause();
@@ -86,7 +86,7 @@ public class VideoElementTest extends ApplicationTest {
     }
 
     @Test
-    public void verifyAspectRatioLock(){
+    public void testAspectRatioLock(){
         assertEquals(true,myVideoElement.getMediaView().isPreserveRatio() );
     }
 
@@ -96,7 +96,7 @@ public class VideoElementTest extends ApplicationTest {
 //    }
 
     @Test
-    public void verifySize(){
+    public void testSize(){
         assertEquals(0.5*1000,myVideoElement.getMediaView().getFitWidth(),1e-8);
         assertEquals(0.5*1000,myVideoElement.getMediaView().getFitHeight(),1e-8);
     }
