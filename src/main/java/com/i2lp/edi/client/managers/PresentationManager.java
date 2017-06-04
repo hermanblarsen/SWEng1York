@@ -1005,9 +1005,9 @@ public abstract class PresentationManager {
             ediManager.getPresentationLibraryManager().updatePresentations(); //Update presentation information
             if (ediManager.getPresentationManager() != null) {
                 ediManager.setPresentationManager(null);
-                presentationStage.close();
             }
         }
+        presentationStage.close();
     }
 
 
@@ -1017,6 +1017,7 @@ public abstract class PresentationManager {
             Slide slide = presentationElement.getSlide(currentSlideNumber);
             slide.setBackground(new Background(new BackgroundFill(Color.valueOf(presentationElement.getTheme().getBackgroundColour()), null, null)));
             displayPane.getChildren().add(slide);
+            slideProgress();
         } else {
             Label lab = new Label("End of Presentation");
             Region bgRegion = new Region();

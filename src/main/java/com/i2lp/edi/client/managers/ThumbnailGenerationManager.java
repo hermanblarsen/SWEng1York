@@ -168,6 +168,7 @@ public class ThumbnailGenerationManager extends PresentationManager {
                 if (finalMoveStatus == Presentation.PRESENTATION_FINISH) {
                     logger.info("Done generating thumbnails for presentation " + presentation.getDocumentID());
                     slideGenController.close();
+                    return;
                 } else {
                     generateSlideThumbNail(slideGenController, savePresentationToPdf);
                 }
