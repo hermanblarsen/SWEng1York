@@ -100,9 +100,9 @@ public class PresentationManagerStudent extends PresentationManager {
             ta.setMaxWidth(Double.MAX_VALUE);
             ta.setMaxHeight(Double.MAX_VALUE);
             ta.setWrapText(true);
-            ta.addEventHandler(KeyEvent.KEY_TYPED, event -> {
+            ta.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
                 if (event.getCode().equals(KeyCode.ENTER)) {
-                    closeQQ(ta);
+                    sendQuestion(ta);
                 }
             });
             border.setCenter(ta);
@@ -110,11 +110,11 @@ public class PresentationManagerStudent extends PresentationManager {
             //TODO: @Koen Hide this all when in offline mode/presentation not live (check through ediManager.getPresentationManager().getPresentationElement().getPresentationMetadata().isLive())
             Image tick = new Image("file:projectResources/icons/Tick.png", 30, 30, true, true);
             ImageView tickPanel = new ImageView(tick);
-            tickPanel.addEventHandler(MouseEvent.MOUSE_CLICKED, evt -> closeQQ(ta));
+            tickPanel.addEventHandler(MouseEvent.MOUSE_CLICKED, evt -> sendQuestion(ta));
 
             Image cross = new Image("file:projectResources/icons/cancel.png", 30, 30, true, true);
             ImageView crossPanel = new ImageView(cross);
-            crossPanel.addEventHandler(MouseEvent.MOUSE_CLICKED, evt -> questionQueueStage.close());
+            crossPanel.addEventHandler(MouseEvent.MOUSE_CLICKED, evt -> doCloseSequence());
 
             HBox controlBox = new HBox();
             controlBox.setMaxWidth(Double.MAX_VALUE);
@@ -128,7 +128,7 @@ public class PresentationManagerStudent extends PresentationManager {
         }
     }
 
-    private void closeQQ(TextArea ta) {
+    private void sendQuestion(TextArea ta) {
         if (ta.getText().length() <= MAX_QUESTION_LENGTH) {
             if (!ta.getText().isEmpty()) {
                 getStudentSession().addQuestionToQueue(ta.getText());
@@ -137,6 +137,14 @@ public class PresentationManagerStudent extends PresentationManager {
         } else {
             ta.setText(ta.getText() + " \n Response is too long. Reduce length by " + (MAX_QUESTION_LENGTH -ta.getText().length()) + " characters.");
         }
+    }
+
+    @Override
+    protected void doCloseSequence() {
+        if (questionQueueStage != null) {
+            questionQueueStage.close();
+        }
+        super.doCloseSequence();
     }
 }
 

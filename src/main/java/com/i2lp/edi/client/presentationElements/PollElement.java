@@ -22,13 +22,11 @@ import javafx.scene.paint.Color;
 import javafx.util.Duration;
 import org.kordamp.bootstrapfx.scene.layout.Panel;
 
-import java.beans.EventHandler;
 import java.sql.Time;
 import java.time.Instant;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
 
 /**
  * Created by Koen on 06/04/2017.
@@ -234,6 +232,7 @@ public class PollElement extends InteractiveElement {
             //answerButton[i].setMinWidth(slideCanvas.getWidth());
             answerButton[i].getStyleClass().setAll("btn", "btn-default");
             int finalI = i;
+            ToggleButton selectedButton = answerButton[i];
             answerButton[i].addEventHandler(MouseEvent.MOUSE_CLICKED, evt -> {
                 //responseIndicator.incrementResponses();
                 //checkIfDone();
