@@ -17,8 +17,8 @@ import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.control.*;
 import javafx.scene.control.Button;
+import javafx.scene.control.*;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
@@ -28,6 +28,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.util.Duration;
@@ -52,7 +53,7 @@ import static com.i2lp.edi.client.Constants.PRESENTATIONS_PATH;
 public class WordCloudElement extends InteractiveElement {
     protected Time startTime;
     protected String question;
-    protected Panel wordCloudPanel;
+    protected BorderPane wordCloudPanel;
     protected List<String> wordList;
     protected Label remainingTime;
     protected int timeLimit = 30;
@@ -82,6 +83,7 @@ public class WordCloudElement extends InteractiveElement {
         }
 
         if (iv != null) {
+
             if (xSize == 0 || ySize == 0) {
                 iv.setFitHeight(slideHeight);
                 iv.setFitWidth(slideWidth);
@@ -100,8 +102,8 @@ public class WordCloudElement extends InteractiveElement {
                 startWordCloud.setFitWidth(slideWidth * xSize);
             }
         }
-        wordCloudPanel.setTranslateX(slideWidth * xPosition);
-        wordCloudPanel.setTranslateY(slideHeight * yPosition);
+        //wordCloudPanel.setTranslateX(slideWidth * xPosition);
+        //wordCloudPanel.setTranslateY(slideHeight * yPosition);
 
         getCoreNode().addEventHandler(MouseEvent.MOUSE_CLICKED, evt -> {
             if (!buttonActive) {
@@ -144,7 +146,9 @@ public class WordCloudElement extends InteractiveElement {
             startWordCloud.addEventHandler(MouseEvent.MOUSE_EXITED, evt -> {
                 buttonActive = false;
             });
-            wordCloudPanel.setBody(startBox);
+            //wordCloudPanel.setBody(startBox);
+            wordCloudPanel.setAlignment(startBox, Pos.CENTER);
+            wordCloudPanel.setCenter(startBox);
         }
 
 
@@ -209,7 +213,7 @@ public class WordCloudElement extends InteractiveElement {
                 dataBox.setAlignment(Pos.CENTER);
                 wordCloudBox.setAlignment(Pos.CENTER);
                 wordCloudBox.getChildren().addAll(wordCloudQuestion, countdownTile, dataBox);
-                wordCloudPanel.setBody(wordCloudBox);
+                wordCloudPanel.setCenter(wordCloudBox);
                 timeline.play();
             }
         });
@@ -319,13 +323,16 @@ public class WordCloudElement extends InteractiveElement {
         iv = new ImageView(wordCloud);
         iv.setFitWidth(xSize*slideWidth);
         iv.setFitHeight(xSize*slideHeight);
+
         iv.setPreserveRatio(true);
         iv.setSmooth(true);
 
         VBox wordCloudBox = new VBox();
         wordCloudBox.setAlignment(Pos.CENTER);
         wordCloudBox.getChildren().addAll(iv);
-        wordCloudPanel.setBody(iv);
+        //wordCloudPanel.setBody(iv);
+        wordCloudPanel.setCenter(iv);
+
         //wordCloudBox.layoutXProperty().bind(wordCloudPanel.widthProperty().subtract(wordCloudBox.widthProperty()).divide(2)); //do not use
         //wordCloudBox.layoutYProperty().bind(wordCloudPanel.heightProperty().subtract(wordCloudBox.heightProperty()).divide(2)); //do not use
         //wordCloudPanel.setStyle("-fx-background-color: #00000000"); //do not use
