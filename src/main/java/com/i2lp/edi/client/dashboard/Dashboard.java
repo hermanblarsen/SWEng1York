@@ -153,10 +153,10 @@ public abstract class Dashboard extends Application {
         currentState = state;
         logger.info("State: " + currentState.name());
 
-        if (searchField != null) {
-            if (state == DashboardState.MODULE || state == DashboardState.TOP_LEVEL)
-                searchField.setText("");
-        }
+//        if (searchField != null) {
+//            if (state == DashboardState.MODULE || state == DashboardState.TOP_LEVEL)
+//                searchField.setText("");
+//        }
 
         if (state == DashboardState.TOP_LEVEL) {
             setSelectedPreviewPanel(selectedPresPanel, false);
@@ -247,14 +247,12 @@ public abstract class Dashboard extends Application {
             centerVBox.getChildren().clear();
         }
 
-        if (subjectsScrollPane == null) {
-            subjectsScrollPane = new ScrollPane();
-            subjectsScrollPane.setContent(subjectPanelsVBox);
-            subjectsScrollPane.setHbarPolicy(ScrollBarPolicy.NEVER);
-            subjectsScrollPane.setVbarPolicy(ScrollBarPolicy.NEVER);
-            subjectsScrollPane.setFitToWidth(true);
-            subjectsScrollPane.getStyleClass().add("edge-to-edge");
-        }
+        subjectsScrollPane = new ScrollPane();
+        subjectsScrollPane.setContent(subjectPanelsVBox);
+        subjectsScrollPane.setHbarPolicy(ScrollBarPolicy.NEVER);
+        subjectsScrollPane.setVbarPolicy(ScrollBarPolicy.NEVER);
+        subjectsScrollPane.setFitToWidth(true);
+        subjectsScrollPane.getStyleClass().add("edge-to-edge");
 
         if (presentationsScrollPane == null) {
             presentationsScrollPane = new ScrollPane();
@@ -695,8 +693,9 @@ public abstract class Dashboard extends Application {
             subjectPanels.add(new SubjectPanel(subject, subjectPanelsVBox));
         }
 
-        if (subjectSortCombo != null)
+        if (subjectSortCombo != null) {
             sortSubjects(subjectSortCombo.getValue());
+        }
     }
 
     private void setupModulePanels() {
@@ -1534,7 +1533,9 @@ public abstract class Dashboard extends Application {
         GridPane.setConstraints(saveInModule, 0, 2, 1, 1, HPos.CENTER, VPos.CENTER);
 
         ComboBox<DashModule> modulesCombo = new ComboBox<>();
-        modulesCombo.getItems().addAll(availableModules);
+        ArrayList<DashModule> modulesSorted = (ArrayList<DashModule>) availableModules.clone();
+        modulesSorted.sort((m1, m2) -> DashModuleSortKey.NAME_AZ.compare(m1, m2));
+        modulesCombo.getItems().addAll(modulesSorted);
         addToServerGridPane.add(modulesCombo, 0, 3);
         GridPane.setConstraints(modulesCombo, 0, 3, 1, 1, HPos.CENTER, VPos.CENTER);
 

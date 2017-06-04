@@ -87,6 +87,7 @@ public class SubjectPanel extends PreviewPanel {
             } else {
                 this.setHidden(false);
             }
+            updateVisibility();
         });
 
         this.addEventFilter(MouseEvent.ANY, event -> {

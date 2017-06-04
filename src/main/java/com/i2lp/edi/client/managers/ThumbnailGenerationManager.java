@@ -109,7 +109,7 @@ public class ThumbnailGenerationManager extends PresentationManager {
 
         //Move to end of current slide so all elements are visible in snapshot.
         int moveStatus = Presentation.SAME_SLIDE;
-        while (moveStatus != Presentation.SLIDE_LAST_ELEMENT){
+        while (moveStatus != Presentation.SLIDE_LAST_ELEMENT && moveStatus != Presentation.SLIDE_CHANGE) {
             moveStatus = slideGenController.slideAdvance(presentation, Slide.SLIDE_FORWARD);
             if(moveStatus == Presentation.PRESENTATION_FINISH){
                 break;
@@ -140,7 +140,7 @@ public class ThumbnailGenerationManager extends PresentationManager {
                     }
                     logger.debug("All webviews on TextElements in slide " + (slideGenController.currentSlideNumber) + " have completed rendering.");
                     //This value may need to be upped on slower systems to ensure successful screenshot
-                    Thread.sleep(100);
+                    Thread.sleep(2000);
                     return null;
                 }
             }
@@ -163,7 +163,9 @@ public class ThumbnailGenerationManager extends PresentationManager {
             WritableImage thumbnail = slideToRender.snapshot(snapParam, null);
             try {
                 //Write the snapshot to the chosen file
-                ImageIO.write(SwingFXUtils.fromFXImage(thumbnail, null), "png", thumbnailFile);
+                if (!thumbnailFile.exists()) {
+                    ImageIO.write(SwingFXUtils.fromFXImage(thumbnail, null), "png", thumbnailFile);
+                }
                 //Advance to next slide, and generate next Slide Thumbnail
                 if (finalMoveStatus == Presentation.PRESENTATION_FINISH) {
                     logger.info("Done generating thumbnails for presentation " + presentation.getDocumentID());
