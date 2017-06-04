@@ -336,7 +336,9 @@ public class PresentationManagerTeacher extends PresentationManager {
             }
 
         }
-        sp.setContent(fp);
+        if(sp!= null) {
+            sp.setContent(fp);
+        }
     }
 
     protected BorderPane studentStats(List<Student> studentList) {

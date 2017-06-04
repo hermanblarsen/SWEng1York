@@ -186,6 +186,8 @@ public class ThumbnailGenerationManager extends PresentationManager {
 
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Save PDF");
+        File poop = new File(System.getProperty("user.home"),"Desktop");
+        fileChooser.setInitialDirectory(poop);
         fileChooser.setInitialFileName(presentationElement.getDocumentID());
         Stage saveStage = new Stage();
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PDF", "*.pdf"));
