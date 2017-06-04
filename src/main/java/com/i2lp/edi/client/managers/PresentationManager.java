@@ -370,17 +370,20 @@ public abstract class PresentationManager {
                 isMouseOverSlide = false;
             }
 
-            if (drawControls.getOpacity() == 0) {
-                controlsFadeInTimed(drawControls);
-            }
-            if (drawControls.getOpacity() == 0) {
-                controlsFadeInTimed(presControls);
+            if (event.getEventType().equals(MouseEvent.MOUSE_MOVED)) {
+                if (drawControls.getOpacity() == 0) {
+                    controlsFadeInTimed(drawControls);
+                }
+                if (drawControls.getOpacity() == 0) {
+                    controlsFadeInTimed(presControls);
+                }
+
+                if (currentCursorState.equals(CursorState.HIDDEN)) {
+                    setCursorState(CursorState.DEFAULT);
+                }
             }
 
             mouseActivityRegistered = true;
-            if (currentCursorState.equals(CursorState.HIDDEN)) {
-                setCursorState(CursorState.DEFAULT);
-            }
         });
 
         drawPane.addEventFilter(MouseEvent.MOUSE_ENTERED, event -> {
