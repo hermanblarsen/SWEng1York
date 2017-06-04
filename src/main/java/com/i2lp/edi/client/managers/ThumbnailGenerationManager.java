@@ -23,7 +23,6 @@ import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
-import org.apache.pdfbox.util.Matrix;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -221,7 +220,6 @@ public class ThumbnailGenerationManager extends PresentationManager {
                     try {
                         logger.info("Slide Image Generation Path: " + f.getAbsolutePath().toString());
                         PDPage page = new PDPage(PDRectangle.A4);
-                        //page.setRotation(90);
                         doc.addPage(page);
                         PDImageXObject imageObject = PDImageXObject.createFromFile(f.getAbsolutePath(), doc);
                         PDPageContentStream contentStream = new PDPageContentStream(doc, page, PDPageContentStream.AppendMode.APPEND, false);
@@ -230,31 +228,22 @@ public class ThumbnailGenerationManager extends PresentationManager {
                         float imageAspectRatio = imageWidth/imageHeight;
                         PDRectangle mediaBox = page.getMediaBox();
                         float margin = 10;
-                        float boxWidth = mediaBox.getWidth(); //- 2 * margin;
-                        float boxHeight = mediaBox.getHeight(); //- 2 * margin;
+                        float boxWidth = mediaBox.getWidth() - 2 * margin;
+                        float boxHeight = mediaBox.getHeight() - 2 * margin;
                         float boxAspectRatio = boxWidth/boxHeight;
 
                         if (imageAspectRatio > boxAspectRatio) {
-                            contentStream.drawImage(imageObject, 0, mediaBox.getHeight() - mediaBox.getWidth()/imageAspectRatio, mediaBox.getWidth(), mediaBox.getWidth()/imageAspectRatio);
+                            contentStream.drawImage(imageObject, margin, mediaBox.getHeight() - boxWidth/imageAspectRatio - margin, boxWidth, boxWidth/imageAspectRatio);
                         } else {
-                            contentStream.drawImage(imageObject, 0, mediaBox.getHeight() - mediaBox.getHeight()*imageAspectRatio, mediaBox.getHeight()*imageAspectRatio, mediaBox.getHeight());
+                            contentStream.drawImage(imageObject, margin, mediaBox.getHeight() - boxHeight*imageAspectRatio - margin, mediaBox.getHeight()*imageAspectRatio, boxHeight);
                         }
 
-                        //mediaBox.transform(new Matrix(0, 1, -1, 0, imageWidth, 0));
-
-
-// add the rotation using the current transformation matrix
-// including a translation of pageWidth to use the lower left corner as 0,0 reference
-                        //contentStream.transform(new Matrix(0, 1, -1, 0, imageWidth, 0));
-
-//                        contentStream.drawImage(imageObject, 0, 0, mediaBox.getWidth(), mediaBox.getHeight());
                         contentStream.close();
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
                 }
                 try {
-                    //doc.save(PRESENTATIONS_PATH + this.presentationElement.getDocumentID() + "/Print/"+"/pdf/"+"output.pdf");
                     doc.save(pdfPath);
                     doc.close();
                     logger.info("PDF Generation Complete.");
