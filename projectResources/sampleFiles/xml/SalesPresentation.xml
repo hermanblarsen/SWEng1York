@@ -689,7 +689,7 @@
                 <onclickaction></onclickaction><onclickinfo></onclickinfo>
             </text>
             <!-- Vlad -->
-            <image elementid ="3" layer="3" startsequence="2">
+            <image elementid ="3" layer="3"  startsequence="2">
                 <xposition>0.15</xposition>
                 <yposition>0.6</yposition>
                 <xsize>0.2</xsize>
