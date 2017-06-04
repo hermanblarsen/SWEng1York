@@ -30,63 +30,453 @@
                                 &lt;li&gt; &lt;/li&gt;
                             &lt;/ul&gt;    -->
         <!--illegals        &lt; &gt; &amp; &apos; &quot;     -->
+        <!--Title Slide-->
+        <slide slideid="1">
+            <image elementid ="0" layer="1" startsequence="1" >
+                <xposition>0.05</xposition> <yposition>0.30</yposition>
+                <xsize>0.5</xsize>          <ysize>0.5</ysize>
+                <path>projectResources/_salesPresentation/V4_logo(text)2000x1000.png</path>
+                <opacity>1</opacity>
+                <aspectratiolock>true</aspectratiolock>
+            </image>
 
-        <!--In the UK -->
+            <image elementid ="1" layer="2" startsequence="1" >
+                <xposition>0.6</xposition> <yposition>0.2</yposition>
+                <xsize>0.5</xsize>          <ysize>0.5</ysize>
+                <path>projectResources/logos/ediLogo1000x1000.png</path>
+                <opacity>1</opacity>
+                <aspectratiolock>true</aspectratiolock>
+            </image>
+
+
+        </slide>
+
+
+        <!--Normal Text Slide-->
         <slide slideid="2">
+            <!--Title-->
+            <text elementid ="0" layer="1" startsequence="1" >
+                <font>Verdana, Geneva, sans-serif</font>
+                <textcontent>
+                    &lt;p&gt;&lt;center&gt;Our Mission&lt;/center&gt;&lt;/p&gt;
+                </textcontent>
+                <fontsize>40</fontsize>
+                <xposition>0.2</xposition>  <yposition>0.05</yposition>
+                <xsize>0.6</xsize>          <ysize>0.15</ysize>
+            </text>
+
+            <text elementid ="1" layer="2" startsequence="1"  >
+                <font>Verdana, Geneva, sans-serif</font>
+                <textcontent>
+                    &lt;p align="center"&gt;&lt;i&gt;“Increase student participation, engagement and learning outcome through interactive and intuitive technologies” &lt;/i&gt; &lt;/&gt;
+                </textcontent>
+                <fontsize>25</fontsize>
+                <xposition>0.1</xposition>  <yposition>0.3</yposition>
+                <xsize>0.8</xsize>          <ysize>0.6</ysize>
+                <onclickaction></onclickaction><onclickinfo></onclickinfo>
+            </text>
+
+            <image elementid ="2" layer="3" startsequence="1" >
+                <xposition>0.6</xposition> <yposition>0.5</yposition>
+                <xsize>0.5</xsize>          <ysize>0.5</ysize>
+                <path>projectResources/logos/ediLogo1000x1000.png</path>
+                <opacity>1</opacity>
+                <aspectratiolock>true</aspectratiolock>
+            </image>
+        </slide>
+
+        <slide slideid="3">
+            <text elementid ="1" layer="1" startsequence="1" >
+                <font>Verdana, Geneva, sans-serif</font>
+                <textcontent>
+                    &lt;p align="left"&gt;
+                    &lt;font color="#66cd37"&gt;Ed&lt;/font&gt;ucation:
+                    &lt;ul&gt;
+                    &lt;li&gt;&lt;font color="#fe8f32"&gt;I&lt;/font&gt;nteractive&lt;/li&gt;
+                    &lt;li&gt;&lt;font color="#fe8f32"&gt;I&lt;/font&gt;ntegrated&lt;/li&gt;
+                    &lt;/ul&gt;
+                    &lt;/p&gt;
+                </textcontent>
+                <fontsize>40</fontsize>
+                <xposition>0.1</xposition>  <yposition>0.3</yposition>
+                <xsize>0.38</xsize>          <ysize>0.6</ysize>
+                <onclickaction></onclickaction><onclickinfo></onclickinfo>
+            </text>
+            <font>Verdana, Geneva, sans-serif</font>
+            <image elementid ="1" layer="2" startsequence="1" >
+                <xposition>0.6</xposition> <yposition>0.2</yposition>
+                <xsize>0.5</xsize>          <ysize>0.5</ysize>
+                <path>projectResources/logos/ediLogo1000x1000.png</path>
+                <opacity>1</opacity>
+                <aspectratiolock>true</aspectratiolock>
+            </image>
+        </slide>
+
+        <slide slideid="4">
+            <image elementid ="1" layer="2" startsequence="1" >
+                <xposition>0.175</xposition> <yposition>0.1</yposition>
+                <xsize>0.8</xsize>          <ysize>0.8</ysize>
+                <path>projectResources/_salesPresentation/lecture.png</path>
+                <opacity>1</opacity>
+                <aspectratiolock>true</aspectratiolock>
+            </image>
+        </slide>
+
+        <slide slideid="5">
+            <text elementid ="0" layer="1" startsequence="1" >
+                <font>Verdana, Geneva, sans-serif</font>
+                <textcontent>
+                    &lt;p&gt;&lt;center&gt;Questionnaire&lt;/center&gt;&lt;/p&gt;
+                </textcontent>
+                <fontsize>40</fontsize>
+                <xposition>0.2</xposition>  <yposition>0.05</yposition>
+                <xsize>0.6</xsize>          <ysize>0.15</ysize>
+            </text>
+
+            <image elementid ="1" layer="2" startsequence="1" >
+                <xposition>0.1</xposition> <yposition>0.3</yposition>
+                <xsize>0.8</xsize>          <ysize>0.8</ysize>
+                <path>projectResources/_salesPresentation/Questionaire.png</path>
+                <opacity>1</opacity>
+                <aspectratiolock>true</aspectratiolock>
+            </image>
+        </slide>
+
+        <slide slideid="6">
+            <text elementid ="0" layer="1" startsequence="1" >
+                <font>Verdana, Geneva, sans-serif</font>
+                <textcontent>
+                    &lt;p&gt;&lt;center&gt;!!!!COMING SOON!!!!&lt;/center&gt;&lt;/p&gt;
+                </textcontent>
+                <fontsize>40</fontsize>
+                <xposition>0.2</xposition>  <yposition>0.05</yposition>
+                <xsize>0.6</xsize>          <ysize>0.15</ysize>
+            </text>
+        </slide>
+
+        <slide slideid="7">
+            <image elementid ="8" layer="2" startsequence="1" >
+                <xposition>0.3</xposition> <yposition>0.2</yposition>
+                <xsize>0.5</xsize>          <ysize>0.5</ysize>
+                <path>projectResources/logos/ediLogo1000x1000.png</path>
+                <opacity>1</opacity>
+                <aspectratiolock>true</aspectratiolock>
+            </image>
+            <text elementid ="0" layer="1" startsequence="2" >
+                <font>Verdana, Geneva, sans-serif</font>
+                <textcontent>
+                    &lt;p&gt;&lt;center&gt;Integrated Platform&lt;/center&gt;&lt;/p&gt;
+                </textcontent>
+                <fontsize>40</fontsize><bgcolour>#66cd37FF</bgcolour><fontcolour>#ffffffFF</fontcolour>
+                <xposition>0.34</xposition>  <yposition>0.07</yposition>
+                <xsize>0.3</xsize>          <ysize>0.15</ysize>
+            </text>
+
+            <text elementid ="1" layer="3" startsequence="6" >
+                <font>Verdana, Geneva, sans-serif</font>
+                <textcontent>
+                    &lt;p&gt;&lt;center&gt;Database&lt;/center&gt;&lt;/p&gt;
+                </textcontent>
+                <fontsize>40</fontsize><bgcolour>#66cd37FF</bgcolour><fontcolour>#ffffffFF</fontcolour>
+                <xposition>0.34</xposition>  <yposition>0.7</yposition>
+                <xsize>0.3</xsize>          <ysize>0.15</ysize>
+            </text>
+
+            <text elementid ="2" layer="4" startsequence="9" >
+                <font>Verdana, Geneva, sans-serif</font>
+                <textcontent>
+                    &lt;p&gt;&lt;center&gt;Interactiveness at its core&lt;/center&gt;&lt;/p&gt;
+                </textcontent>
+                <fontsize>40</fontsize><bgcolour>#66cd37FF</bgcolour><fontcolour>#ffffffFF</fontcolour>
+                <xposition>0.03</xposition>  <yposition>0.17</yposition>
+                <xsize>0.3</xsize>          <ysize>0.15</ysize>
+            </text>
+
+            <text elementid ="3" layer="5" startsequence="8" >
+                <font>Verdana, Geneva, sans-serif</font>
+                <textcontent>
+                    &lt;p&gt;&lt;center&gt;Versitility&lt;/center&gt;&lt;/p&gt;
+                </textcontent>
+                <fontsize>40</fontsize><bgcolour>#66cd37FF</bgcolour><fontcolour>#ffffffFF</fontcolour>
+                <xposition>0.03</xposition>  <yposition>0.375</yposition>
+                <xsize>0.3</xsize>          <ysize>0.15</ysize>
+            </text>
+
+            <text elementid ="4" layer="6" startsequence="7" >
+                <font>Verdana, Geneva, sans-serif</font>
+                <textcontent>
+                    &lt;p&gt;&lt;center&gt;Low Price&lt;/center&gt;&lt;/p&gt;
+                </textcontent>
+                <fontsize>40</fontsize><bgcolour>#66cd37FF</bgcolour><fontcolour>#ffffffFF</fontcolour>
+                <xposition>0.03</xposition>  <yposition>0.6</yposition>
+                <xsize>0.3</xsize>          <ysize>0.15</ysize>
+            </text>
+
+            <text elementid ="5" layer="7" startsequence="5" >
+                <font>Verdana, Geneva, sans-serif</font>
+                <textcontent>
+                    &lt;p&gt;&lt;center&gt;Presentation Insights &lt;/center&gt;&lt;/p&gt;
+                </textcontent>
+                <fontsize>40</fontsize><bgcolour>#66cd37FF</bgcolour><fontcolour>#ffffffFF</fontcolour>
+                <xposition>0.65</xposition>  <yposition>0.6</yposition>
+                <xsize>0.3</xsize>          <ysize>0.15</ysize>
+            </text>
+
+            <text elementid ="6" layer="8" startsequence="4" >
+                <font>Verdana, Geneva, sans-serif</font>
+                <textcontent>
+                    &lt;p&gt;&lt;center&gt;Offline Features &lt;/center&gt;&lt;/p&gt;
+                </textcontent>
+                <fontsize>40</fontsize><bgcolour>#66cd37FF</bgcolour><fontcolour>#ffffffFF</fontcolour>
+                <xposition>0.65</xposition>  <yposition>0.375</yposition>
+                <xsize>0.3</xsize>          <ysize>0.15</ysize>
+            </text>
+
+            <text elementid ="7" layer="9" startsequence="3" >
+                <font>Verdana, Geneva, sans-serif</font>
+                <textcontent>
+                    &lt;p&gt;&lt;center&gt;Community &lt;/center&gt;&lt;/p&gt;
+                </textcontent>
+                <fontsize>40</fontsize><bgcolour>#66cd37FF</bgcolour><fontcolour>#ffffffFF</fontcolour>
+                <xposition>0.65</xposition>  <yposition>0.17</yposition>
+                <xsize>0.3</xsize>          <ysize>0.15</ysize>
+            </text>
+
+        </slide>
+
+
+        <!-- Edi Class -->
+        <slide slideid="8">
+            <!-- Edi Class -->
+            <image elementid ="1" layer="1" startsequence="1">
+                <xposition>0.15</xposition> <yposition>0.01</yposition>
+                <xsize>1.0</xsize>          <ysize>0.95</ysize>
+                <path>projectResources/_salesPresentation/ediClass.png</path>
+                <onclickaction></onclickaction><onclickinfo></onclickinfo>
+                <opacity>1</opacity>
+                <aspectratiolock>true</aspectratiolock>
+            </image>
+        </slide>
+
+        <!-- Edi Community -->
+        <slide slideid="9">
+            <!-- Edi Community -->
+            <image elementid ="1" layer="1" startsequence="1">
+                <xposition>0.12</xposition> <yposition>0.01</yposition>
+                <xsize>1.0</xsize>          <ysize>0.95</ysize>
+                <path>projectResources/_salesPresentation/ediCommunity.png</path>
+                <onclickaction></onclickaction><onclickinfo></onclickinfo>
+                <opacity>1</opacity>
+                <aspectratiolock>true</aspectratiolock>
+            </image>
+        </slide>
+
+        <!-- UK Unlink -->
+        <slide slideid="10">
+            <!-- UK Unlink -->
+            <image elementid ="1" layer="1" startsequence="1">
+                <xposition>0.2</xposition> <yposition>0.01</yposition>
+                <xsize>1.0</xsize>          <ysize>0.95</ysize>
+                <path>projectResources/_salesPresentation/ukUnlink.png</path>
+                <onclickaction></onclickaction><onclickinfo></onclickinfo>
+                <opacity>1</opacity>
+                <aspectratiolock>true</aspectratiolock>
+            </image>
+        </slide>
+
+        <!-- UK Link -->
+        <slide slideid="11">
+            <!-- Anal Beads -->
+            <image elementid ="1" layer="1" startsequence="1">
+                <xposition>0.2</xposition> <yposition>0.01</yposition>
+                <xsize>1.0</xsize>          <ysize>0.95</ysize>
+                <path>projectResources/_salesPresentation/ukLink.png</path>
+                <onclickaction></onclickaction><onclickinfo></onclickinfo>
+                <opacity>1</opacity>
+                <aspectratiolock>true</aspectratiolock>
+            </image>
+        </slide>
+
+        <!--Communities -->
+        <slide slideid="12">
+            <!--Release Schedule-->
+            <text elementid ="0" layer="0" startsequence="1">
+                <textcontent>
+                    &lt;b&gt;&lt;p&gt;&lt;center&gt;Resource Platform&lt;/center&gt;&lt;/p&gt;&lt;/b&gt;
+                </textcontent>
+                <fontsize>48</fontsize>
+                <font>Verdana, Geneva, sans-serif</font>
+                <xposition>0.05</xposition>  <yposition>0.05</yposition>
+                <xsize>0.6</xsize>          <ysize>0.2</ysize>
+            </text>
+
+            <!-- Biology -->
+            <image elementid ="1" layer="1" startsequence="2">
+                <xposition>0.6</xposition> <yposition>0.17</yposition>
+                <xsize>0.3</xsize>          <ysize>0.5</ysize>
+                <path>projectResources/_salesPresentation/bio.png</path>
+                <onclickaction></onclickaction><onclickinfo></onclickinfo>
+                <opacity>1</opacity>
+                <aspectratiolock>true</aspectratiolock>
+                <animation type="in">
+                    <simplescale start="0" end="1" duration="500"/>
+                </animation>
+            </image>
+
+            <!-- Electronics -->
+            <image elementid ="2" layer="1" startsequence="3">
+                <xposition>0.2</xposition> <yposition>0.25</yposition>
+                <xsize>0.25</xsize>          <ysize>0.5</ysize>
+                <path>projectResources/_salesPresentation/electronics.png</path>
+                <onclickaction></onclickaction><onclickinfo></onclickinfo>
+                <opacity>1</opacity>
+                <aspectratiolock>true</aspectratiolock>
+                <animation type="in">
+                    <simplescale start="0" end="1" duration="500"/>
+                </animation>
+            </image>
+
+            <!-- Math -->
+            <image elementid ="3" layer="1" startsequence="4">
+                <xposition>0.1</xposition> <yposition>0.57</yposition>
+                <xsize>0.2</xsize>          <ysize>0.5</ysize>
+                <path>projectResources/_salesPresentation/math.png</path>
+                <onclickaction></onclickaction><onclickinfo></onclickinfo>
+                <opacity>1</opacity>
+                <aspectratiolock>true</aspectratiolock>
+                <animation type="in">
+                    <simplescale start="0" end="1" duration="500"/>
+                </animation>
+            </image>
+
+            <!-- Physics -->
+            <image elementid ="4" layer="1" startsequence="5">
+                <xposition>0.39</xposition> <yposition>0.55</yposition>
+                <xsize>0.3</xsize>          <ysize>0.5</ysize>
+                <path>projectResources/_salesPresentation/phys.png</path>
+                <onclickaction></onclickaction><onclickinfo></onclickinfo>
+                <opacity>1</opacity>
+                <aspectratiolock>true</aspectratiolock>
+                <animation type="in">
+                    <simplescale start="0" end="1" duration="500"/>
+                </animation>
+            </image>
+
+            <!-- Signals and Systems -->
+            <image elementid ="5" layer="1" startsequence="6">
+                <xposition>0.7</xposition> <yposition>0.6</yposition>
+                <xsize>0.2</xsize>          <ysize>0.5</ysize>
+                <path>projectResources/_salesPresentation/sig.png</path>
+                <onclickaction></onclickaction><onclickinfo></onclickinfo>
+                <opacity>1</opacity>
+                <aspectratiolock>true</aspectratiolock>
+                <animation type="in">
+                    <simplescale start="0" end="1" duration="500"/>
+                </animation>
+            </image>
+        </slide>
+
+        <!--Release Schedule -->
+        <slide slideid="13">
+            <!--Release Schedule-->
+            <text elementid ="0" layer="0" startsequence="1">
+                <textcontent>
+                    &lt;b&gt;&lt;p&gt;&lt;center&gt;Release&lt;/center&gt;&lt;/p&gt;&lt;/b&gt;
+                </textcontent>
+                <fontsize>48</fontsize>
+                <font>Verdana, Geneva, sans-serif</font>
+                <xposition>0.2</xposition>  <yposition>0.05</yposition>
+                <xsize>0.6</xsize>          <ysize>0.2</ysize>
+            </text>
+
+            <!-- Anal Beads -->
+            <image elementid ="1" layer="1" startsequence="2">
+                <xposition>0.1</xposition> <yposition>0.35</yposition>
+                <xsize>0.85</xsize>          <ysize>0.5</ysize>
+                <path>projectResources/_salesPresentation/releaseSchedule.png</path>
+                <onclickaction></onclickaction><onclickinfo></onclickinfo>
+                <opacity>1</opacity>
+                <aspectratiolock>true</aspectratiolock>
+            </image>
+        </slide>
+
+        <!--Market Product Fit -->
+        <slide slideid="14">
+            <!--Market Product Fit-->
+            <text elementid ="0" layer="0" startsequence="1">
+                <textcontent>
+                    &lt;b&gt;&lt;p&gt;&lt;center&gt;Market Product Fit&lt;/center&gt;&lt;/p&gt;&lt;/b&gt;
+                </textcontent>
+                <fontsize>48</fontsize>
+                <font>Verdana, Geneva, sans-serif</font>
+                <xposition>0.2</xposition>  <yposition>0.05</yposition>
+                <xsize>0.6</xsize>          <ysize>0.2</ysize>
+            </text>
+
+            <!-- MPF Jigsaw -->
+            <image elementid ="1" layer="1" startsequence="2">
+                <xposition>0.25</xposition> <yposition>0.3</yposition>
+                <xsize>0.6</xsize>          <ysize>0.5</ysize>
+                <path>projectResources/_salesPresentation/mpfJigsaw.png</path>
+                <onclickaction></onclickaction><onclickinfo></onclickinfo>
+                <opacity>1</opacity>
+                <aspectratiolock>true</aspectratiolock>
+            </image>
+        </slide>
+
+        <!--Pricing -->
+        <slide slideid="15">
             <!--Price-->
             <text elementid ="0" layer="0" startsequence="1">
                 <textcontent>
                     &lt;b&gt;&lt;p&gt;&lt;center&gt;Price&lt;/center&gt;&lt;/p&gt;&lt;/b&gt;
                 </textcontent>
-                <fontsize>36</fontsize>
+                <fontsize>64</fontsize>
                 <font>Verdana, Geneva, sans-serif</font>
-                <xposition>0.1</xposition>  <yposition>0.05</yposition>
+                <xposition>0.2</xposition>  <yposition>0.05</yposition>
                 <xsize>0.6</xsize>          <ysize>0.2</ysize>
-                <animation type="in">
-                    <simpletranslate startx="-0.2" starty="-0.2" endx="0.1" endy="0.05" duration="1000"/>
-                </animation>
             </text>
 
             <!--199.99-->
             <text elementid ="1" layer="1" startsequence="2" >
                 <textcontent>
-                    &lt;b&gt;&lt;p&gt;&lt;center&gt;£199.99&lt;/center&gt;&lt;/p&gt;&lt;\b&gt;
+                    &lt;b&gt;&lt;p&gt;&lt;center&gt;£199.99&lt;/center&gt;&lt;/p&gt;&lt;/b&gt;
                 </textcontent>
                 <fontcolour>#3498dbFF</fontcolour>
-                <fontsize>52</fontsize>
+                <fontsize>64</fontsize>
                 <font>Verdana, Geneva, sans-serif</font>
-                <xposition>0.2</xposition>  <yposition>0.2</yposition>
+                <xposition>0.18</xposition>  <yposition>0.35</yposition>
                 <xsize>0.6</xsize>          <ysize>0.15</ysize>
             </text>
 
             <!-- \year -->
-            <text elementid ="1" layer="1" startsequence="2" >
+            <text elementid ="2" layer="1" startsequence="2" >
                 <textcontent>
-                    &lt;b&gt;&lt;p&gt;&lt;center&gt;/year&lt;/center&gt;&lt;/p&gt;&lt;\b&gt;
+                    &lt;b&gt;&lt;p&gt;&lt;center&gt;/year&lt;/center&gt;&lt;/p&gt;&lt;/b&gt;
                 </textcontent>
                 <fontcolour>#3498dbFF</fontcolour>
                 <fontsize>26</fontsize>
                 <font>Verdana, Geneva, sans-serif</font>
-                <xposition>0.3</xposition>  <yposition>0.2</yposition>
+                <xposition>0.42</xposition>  <yposition>0.38</yposition>
                 <xsize>0.6</xsize>          <ysize>0.15</ysize>
             </text>
 
-            <!--SubTitle-->
-            <text elementid ="2" layer="2" startsequence="3" >
+            <!--100 users-->
+            <text elementid ="3" layer="2" startsequence="3" >
                 <textcontent>
-                    &lt;b&gt;&lt;p&gt;&lt;center&gt;100 users&lt;/center&gt;&lt;/p&gt;&lt;\b&gt;
+                    &lt;b&gt;&lt;p&gt;&lt;center&gt;100 users&lt;/center&gt;&lt;/p&gt;&lt;/b&gt;
                 </textcontent>
                 <fontcolour>#000000FF</fontcolour>
                 <font>Verdana, Geneva, sans-serif</font>
                 <fontsize>32</fontsize>
-                <xposition>0.2</xposition>  <yposition>0.4</yposition>
+                <xposition>0.2</xposition>  <yposition>0.7</yposition>
                 <xsize>0.6</xsize>          <ysize>0.15</ysize>
             </text>
         </slide>
 
 
         <!--In the UK -->
-        <slide slideid="2">
+        <slide slideid="16">
             <!--Title-->
             <text elementid ="0" layer="0" startsequence="1">
                 <textcontent>
@@ -168,7 +558,7 @@
 
 
         <!--Invest in Future slide -->
-        <slide slideid="3">
+        <slide slideid="17">
             <!--Invest in future-->
             <text elementid ="0" layer="10" startsequence="1">
                 <textcontent>
@@ -205,7 +595,7 @@
 
 
         <!--What does Edi Offer -->
-        <slide slideid="4">
+        <slide slideid="18">
             <!--Title-->
             <text elementid ="0" layer="10" startsequence="1">
                 <textcontent>
@@ -254,9 +644,9 @@
         </slide>
 
         <!-- Team Images Slide -->
-        <slide slideid="5">
+        <slide slideid="19">
             <!-- Edi Logo -->
-            <image elementid ="1" layer="0" startsequence="1" endsequence="4">
+            <image elementid ="1" layer="0" startsequence="2" endsequence="4">
                 <xposition>0.0</xposition> <yposition>0.0</yposition>
                 <xsize>0.5</xsize>          <ysize>0.5</ysize>
                 <path>projectResources/logos/ediLogo1000x1000.png</path>
