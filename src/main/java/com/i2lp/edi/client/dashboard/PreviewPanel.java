@@ -17,7 +17,7 @@ import java.util.ArrayList;
 public abstract class PreviewPanel extends StackPane {
 
     protected static Logger logger = LoggerFactory.getLogger(PreviewPanel.class);
-    private final Pane parentPane;
+    private Pane parentPane;
     private boolean isSelected;
     private boolean isHidden = false;
     private boolean isFiltered = false, isSearchResult = true;
@@ -69,7 +69,7 @@ public abstract class PreviewPanel extends StackPane {
                 parentPane.getChildren().add(this);
             }
         } catch(NullPointerException e) {
-            logger.info("Couldn't show/hide previewPanel");
+            logger.debug("Couldn't show/hide previewPanel");
             //Do nothing
         }
     }
@@ -115,6 +115,10 @@ public abstract class PreviewPanel extends StackPane {
     }
 
     public Panel getDisplayPanel() { return displayPanel; }
+
+    public void setParentPane(Pane parentPane) {
+        this.parentPane = parentPane;
+    }
 
     public Pane getParentPane() { return parentPane; }
 }

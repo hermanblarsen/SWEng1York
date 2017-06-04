@@ -525,7 +525,6 @@ public abstract class Dashboard extends Application {
 
         Panel schedulePanel = new Panel("Schedule");
         schedulePanel.getStyleClass().add("panel-primary");
-        schedulePanel.setMaxWidth(RIGHT_PANEL_WIDTH);
 
         calendar = new DatePicker(selectedDate);
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("E, dd.MM.YYYY");
@@ -544,6 +543,8 @@ public abstract class Dashboard extends Application {
                             public void updateItem(LocalDate item, boolean empty) {
                                 super.updateItem(item, empty);
 
+                                setPadding(new Insets(0));
+
                                 for (Presentation presentation : availablePresentations) {
                                     try {
                                         if (item.isEqual(presentation.getGoLiveDateTime().toLocalDate())) {
@@ -560,7 +561,7 @@ public abstract class Dashboard extends Application {
         calendar.setDayCellFactory(dayCellFactory);
         DatePickerSkin calendarSkin = new DatePickerSkin(calendar);
         calendarNode = calendarSkin.getPopupContent();
-        calendarNode.setStyle("-fx-font-size: 8px;");
+        calendarNode.setStyle("-fx-font-size: 10px;");
         calendarNode.setEffect(null);
 
         switch (state) {
@@ -832,11 +833,17 @@ public abstract class Dashboard extends Application {
         if (schedulePanels == null) {
             schedulePanels = new ArrayList<>();
         } else {
+            for (PresSchedulePanel panel : schedulePanels) {
+                panel.setParentPane(null);
+            }
+
             schedulePanels.clear();
         }
 
         if (scheduleVBox == null) {
             scheduleVBox = new VBox();
+        } else {
+            scheduleVBox.getChildren().clear();
         }
 
         for (PresentationPanel presPanel : presentationPanels) {
