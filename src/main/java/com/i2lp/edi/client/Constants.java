@@ -17,7 +17,7 @@ public class Constants {
     private static final String BUILD_NUMBER = "100";
     public static final String BUILD_STRING = "Version: v0." + Constants.BUILD_NUMBER;
 
-    public static final String BASE_PATH = System.getProperty("java.io.tmpdir") + "Edi/";
+    public static final String BASE_PATH = System.getProperty("user.home") + "/Edi/";
     public static final String TEMP_PATH = BASE_PATH + "Temp/";
     public static final String PRESENTATIONS_PATH = BASE_PATH + "Modules";
 
