@@ -135,6 +135,8 @@ public class PollElement extends InteractiveElement {
         if (teacher && !timerStart) {
             Image startPollIcon = new Image("file:projectResources/icons/StartPoll.png");
             startPoll = new ImageView(startPollIcon);
+            startPoll.setPreserveRatio(true);
+            startPoll.setSmooth(true);
             HBox startBox = new HBox();
             startBox.getChildren().add(startPoll);
             startBox.setAlignment(Pos.CENTER);
