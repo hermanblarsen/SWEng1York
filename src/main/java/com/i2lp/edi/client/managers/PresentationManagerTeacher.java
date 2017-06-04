@@ -127,6 +127,9 @@ public class PresentationManagerTeacher extends PresentationManager {
                     updateStudentList();
                 }
             };
+            presentationStage.setOnCloseRequest(evt->{
+                toolkitTimer.cancel();
+            });
             toolkitTimer.schedule(toolkitUpdateTask, 5000, 10000);
             firstRun = true;
             questions = new Tab();
