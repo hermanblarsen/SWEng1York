@@ -126,7 +126,10 @@ public abstract class PresentationManager {
         presentationStage.getIcons().add(ediLogoSmall);
         presentationStage.setMinWidth(STAGE_MIN_WIDTH);
         presentationStage.setMinHeight(STAGE_MIN_HEIGHT);
-        presentationStage.setOnCloseRequest(event -> doCloseSequence());
+        presentationStage.setOnCloseRequest(event -> {
+            logger.info("Closing");
+            doCloseSequence();
+        });
 
         sceneBox = new VBox();
         sceneBox.addEventHandler(MouseEvent.MOUSE_PRESSED, event -> {
@@ -375,7 +378,7 @@ public abstract class PresentationManager {
                 if (drawControls.getOpacity() == 0) {
                     controlsFadeInTimed(drawControls);
                 }
-                if (drawControls.getOpacity() == 0) {
+                if (presControls.getOpacity() == 0) {
                     controlsFadeInTimed(presControls);
                 }
 

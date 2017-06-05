@@ -117,12 +117,12 @@ public class Login extends Application {
         GridPane.setHalignment(sceneTitle, HPos.CENTER);
 
         usernameField = new TextField();
-        usernameField.setText("Teacher");
+//        usernameField.setText("Teacher");
         gridPane.add(usernameField, 1, 2);
         GridPane.setHalignment(usernameField, HPos.RIGHT);
 
         passwordField = new PasswordField();
-        passwordField.setText("password");
+//        passwordField.setText("password");
         gridPane.add(passwordField, 1, 3);
         GridPane.setHalignment(passwordField, HPos.RIGHT);
 
@@ -289,8 +289,7 @@ public class Login extends Application {
                 new FileChooser.ExtensionFilter("XML Presentations (*.XML)", "*.xml", "*.XML");
         fileChooser.getExtensionFilters().add(xmlExtensionFilter);
         fileChooser.setSelectedExtensionFilter(xmlExtensionFilter);
-        fileChooser.setInitialDirectory(new File("projectResources/sampleFiles/xml"));
-        //fileChooser.setInitialDirectory(new File(System.getProperty("user.home"))); //TODO reinstate when tested
+        fileChooser.setInitialDirectory(new File(BASE_PATH));
         fileChooser.setTitle("Open Presentation");
 
         File file = fileChooser.showOpenDialog(loginStage);

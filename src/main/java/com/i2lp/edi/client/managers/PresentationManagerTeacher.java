@@ -57,6 +57,7 @@ public class PresentationManagerTeacher extends PresentationManager {
     private Tab studentStats;
     private Label questionNumberLabel;
     private int questionID;
+    private Timer toolkitTimer;
     //private Timestamp openTime;
 
     public PresentationManagerTeacher(EdiManager ediManager) {
@@ -119,7 +120,7 @@ public class PresentationManagerTeacher extends PresentationManager {
                 event.consume();
             });
 
-            Timer toolkitTimer = new Timer();
+            toolkitTimer = new Timer();
             TimerTask toolkitUpdateTask = new TimerTask() {
                 @Override
                 public void run() {
@@ -127,9 +128,6 @@ public class PresentationManagerTeacher extends PresentationManager {
                     updateStudentList();
                 }
             };
-            presentationStage.setOnCloseRequest(evt->{
-                toolkitTimer.cancel();
-            });
             toolkitTimer.schedule(toolkitUpdateTask, 5000, 10000);
             firstRun = true;
             questions = new Tab();
@@ -423,7 +421,6 @@ public class PresentationManagerTeacher extends PresentationManager {
                 if (!questionQueueActive) {
                     loadSpecificFeatures();
                     questionQueueActive = true;
-
                 } else {
                     loadSpecificFeatures();
                     questionQueueActive = false;
@@ -474,7 +471,7 @@ public class PresentationManagerTeacher extends PresentationManager {
         ft0.play();
     }
 
-    public void updateQuestionList(){
+    public void updateQuestionList() {
         setListOfQuestions();
         Platform.runLater(() -> setUpQuestionList(newQuestionList));
         Platform.runLater(() -> notifyQuestionQueueUI());
@@ -500,6 +497,9 @@ public class PresentationManagerTeacher extends PresentationManager {
 
     @Override
     protected void doCloseSequence() {
+        if(toolkitTimer != null) {
+            toolkitTimer.cancel();
+        }
         if (teacherToolKitStage != null) {
             teacherToolKitStage.close();
         }

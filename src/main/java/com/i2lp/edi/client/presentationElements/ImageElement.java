@@ -182,11 +182,15 @@ public class ImageElement extends SlideElement {
         coreNode.setTranslateX(posX*(float)getSlideWidth());
         coreNode.setTranslateY(posY*(float)getSlideHeight());
 
-        if (width != null) {
-            imageView.setFitWidth(width*(float)getSlideWidth());
+        try {
+            imageView.setFitWidth(width * (float) getSlideWidth());
+        } catch (NullPointerException e) {
+            //Do nothing
         }
-        if (height != null) {
+        try {
             imageView.setFitHeight(height*(float)getSlideHeight());
+        } catch (NullPointerException e) {
+            //Do nothing
         }
 
         // Border box
