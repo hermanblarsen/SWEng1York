@@ -68,7 +68,7 @@ public class TeacherDashboardTest extends DashboardTest{
         Assume.assumeFalse(presPanel.isHidden());
 
         rightClickOn(presPanel);
-        push(KeyCode.DOWN).push(KeyCode.DOWN).push(KeyCode.DOWN).push(KeyCode.DOWN);
+        push(KeyCode.DOWN).push(KeyCode.DOWN).push(KeyCode.DOWN);
         push(KeyCode.ENTER);
 
         calendar = myDashboard.calendar;

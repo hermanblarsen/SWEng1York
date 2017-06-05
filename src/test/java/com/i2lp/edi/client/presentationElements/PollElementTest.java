@@ -1,7 +1,14 @@
 package com.i2lp.edi.client.presentationElements;
 
 import com.i2lp.edi.client.animation.Animation;
+import com.i2lp.edi.client.managers.EdiManager;
+import com.i2lp.edi.client.managers.PresentationManager;
+import com.i2lp.edi.client.managers.PresentationManagerStudent;
+import com.i2lp.edi.client.managers.PresentationManagerTeacher;
 import com.i2lp.edi.client.utilities.GraphicalTest;
+import com.i2lp.edi.client.utilities.ParserXML;
+import com.i2lp.edi.server.packets.PresentationMetadata;
+import com.i2lp.edi.server.packets.User;
 import eu.hansolo.tilesfx.Tile;
 import javafx.application.Platform;
 import javafx.scene.Scene;
@@ -26,19 +33,15 @@ import static org.junit.Assert.*;
  * Created by Luke on 26/05/2017.
  */
 
-@Ignore //TODO @Luke Fails due to null start timer
 public class PollElementTest extends GraphicalTest {
     private PollElement myPollElement;
-    private HBox controlPanel;
     private ToggleButton[] answerButton;
-    private Button startTimer;
-    private Label remainingTime;
 
     private String question;
     private String answers;
-    private boolean timerStart;
     private int timeLimit;
     private Tile answerOutputTile;
+    private Tile countdownTile;
 
     @Override
     public void start(Stage stage) throws Exception {
@@ -47,30 +50,23 @@ public class PollElementTest extends GraphicalTest {
             return;
         }
 
-        BorderPane pane = new BorderPane();
-        Scene scene = new Scene(pane, 600, 600);
+        EdiManager ediManager = new EdiManager();
+        ediManager.start(stage);
+        ediManager.loginSucceeded(true, new User(1, "First", "Last", "email", "teacher"));
 
-        myPollElement = new PollElement();
-        myPollElement.setTeacher(true);
-        myPollElement.setAnswers("ANS1,ANS2");
-        myPollElement.setQuestion("Test question?");
-        myPollElement.setTimeLimit(3);
+        PresentationManager presManager = new PresentationManagerTeacher(ediManager);
 
-        myPollElement.setSlideWidth(scene.getWidth());
-        myPollElement.setSlideHeight(scene.getHeight());
-        myPollElement.setSlideCanvas(pane);
-        myPollElement.renderElement(Animation.NO_ANIMATION);
+        ParserXML parser = new ParserXML("projectResources/sampleFiles/xml/pollSample.xml");
+        Presentation pres = parser.parsePresentation();
 
-        answerButton = myPollElement.answerButton;
-        startTimer = myPollElement.startTimer;
-        controlPanel = new HBox();
-        controlPanel.getChildren().add(startTimer);
-        pane.setBottom(controlPanel);
-        pane.setTop(remainingTime);
+        pres.setPresentationMetadata(new PresentationMetadata(
+                0,0,0, "", true, null));
 
-        stage.setTitle("Poll Element Test");
-        stage.setScene(scene);
-        stage.show();
+        ediManager.setPresentationManager(presManager);
+        ediManager.getPresentationManager().openPresentation(pres, false);
+
+        myPollElement = (PollElement) ediManager.getPresentationManager().getElement(0);
+
         stage.toFront();
     }
 
@@ -81,57 +77,63 @@ public class PollElementTest extends GraphicalTest {
 
         question = myPollElement.question;
         answers = myPollElement.answers;
-        timerStart = myPollElement.timerStart;
         timeLimit = myPollElement.timeLimit;
-        remainingTime = myPollElement.remainingTime;
         answerOutputTile = myPollElement.answerOutputTile;
+        countdownTile = myPollElement.countdownTile;
     }
 
     @Test
     public void testCreation() {
         assertEquals("Test question?" ,question);
         assertEquals("ANS1,ANS2", answers);
-        assertFalse(timerStart);
         assertEquals(3, timeLimit);
     }
 
     @Test
-    public void testTimer() {
-        assertFalse(timerStart);
-
-        clickOn(startTimer);
-        answerButton = myPollElement.answerButton;
-
-        sleep(500);
-        assertEquals("Time Remaining: 3", remainingTime.getText());
-        sleep(1000);
-        assertEquals("Time Remaining: 2", remainingTime.getText());
-        sleep(1000);
-        assertEquals("Time Remaining: 1", remainingTime.getText());
-        sleep(1000);
-        assertEquals("Time Remaining: 0", remainingTime.getText());
+    public void testStartElement() {
+        assertFalse(myPollElement.isTimerStart());
+        clickOn(myPollElement.getCoreNode());
+        assertTrue(myPollElement.isTimerStart());
     }
 
-    @Ignore
+    @Ignore //TODO @Luke Dependent on testAnswerButtons
+    @Test
+    public void testRestartElement() {
+        clickOn(myPollElement.getCoreNode());
+        sleep(4000);
+        assertTrue(myPollElement.isTimerStart());
+
+        clickOn(myPollElement.getCoreNode(), MouseButton.SECONDARY);
+        push(KeyCode.RIGHT);
+        push(KeyCode.ENTER);
+        assertFalse(myPollElement.isTimerStart());
+    }
+
+    @Test
+    public void testTimer() {
+        clickOn(myPollElement.getCoreNode());
+        countdownTile = myPollElement.countdownTile;
+
+        sleep(500);
+        assertEquals(3.0, countdownTile.getCurrentValue(), 0);
+        sleep(1000);
+        assertEquals(2.0, countdownTile.getCurrentValue(), 0);
+        sleep(1000);
+        assertEquals(1.0, countdownTile.getCurrentValue(), 0);
+        sleep(1000);
+        assertEquals(0.0, countdownTile.getCurrentValue(), 0);
+    }
+
+    @Ignore //TODO @Luke No longer works
     @Test
     public void testAnswerButtons() {
-        clickOn(startTimer);
+        clickOn(myPollElement.getCoreNode());
         answerButton = myPollElement.answerButton;
 
-        Platform.runLater(new Runnable() {
-            @Override public void run() {
-                for(ToggleButton temp : answerButton) {
-                    controlPanel.getChildren().add(temp);
-                }
-            }
-        });
-        sleep(500);
-
-        //TODO @Luke No longer works due to no instance of StudentSession
         clickOn(answerButton[0]);
         sleep(1000);
         clickOn(answerButton[1]);
-        sleep(2000);
+        sleep(1000);
 
         answerOutputTile = myPollElement.answerOutputTile;
         assertEquals(1.0, answerOutputTile.getRadialChartData().get(1).getValue(), 0);

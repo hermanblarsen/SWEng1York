@@ -1,6 +1,7 @@
-package com.i2lp.edi.client.utilities;
+package com.i2lp.edi.client.animation;
 
 import com.i2lp.edi.client.managers.PresentationManagerTeacher;
+import com.i2lp.edi.client.utilities.ParserXML;
 import javafx.application.Application;
 import javafx.stage.Stage;
 

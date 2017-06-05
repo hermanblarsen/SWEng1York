@@ -45,7 +45,7 @@ public class PollElement extends InteractiveElement {
     protected Panel questionPane;
     //protected ResponseIndicator responseIndicator;
     protected Label remainingTime;
-    private Tile countdownTile;
+    protected Tile countdownTile;
     protected Tile answerOutputTile;
     protected ToggleButton[] answerButton;
     private ChartData[] chartDataArray;
@@ -260,7 +260,7 @@ public class PollElement extends InteractiveElement {
 
     public void displayDone() {
 
-        double testShit[] = new double[possibleAnswers.size()];
+        double testAnswers[] = new double[possibleAnswers.size()];
         chartDataArray = new ChartData[possibleAnswers.size()];
         questionPane.getChildren().remove(questionPane.getBody());
         for (int i = 0; i < possibleAnswers.size(); i++) {
@@ -269,11 +269,11 @@ public class PollElement extends InteractiveElement {
         }
 
         for(int i=0; i<pollOutput.size();i++){
-            testShit[Integer.parseInt(pollOutput.get(i))]++;
+            testAnswers[Integer.parseInt(pollOutput.get(i))]++;
         }
 
         for(int i=0; i<possibleAnswers.size();i++){
-            chartDataArray[i].setValue(testShit[i]);
+            chartDataArray[i].setValue(testAnswers[i]);
         }
 
         answerOutputTile.setRadialChartData(chartDataArray);

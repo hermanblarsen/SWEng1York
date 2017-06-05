@@ -1,0 +1,30 @@
+<document documentid="I2lpSamplePresentation">
+	<documentdetails>
+		<title>I2LP Sample Presentation</title>
+		<author>Herman Larsen</author>
+		<version>1.0</version>
+		<documentaspectratio>1</documentaspectratio>
+		<description>I2LP Sample XML input</description>
+		<tags>sample,xml,input,I2LP</tags>
+		<groupformat>2</groupformat>
+	</documentdetails>
+	<slideshow>
+		<defaults>
+			<bgcolour>#FFFFFFFF</bgcolour>
+			<font>"Times New Roman", Times, serif</font>
+			<fontsize>12</fontsize>
+			<fontcolour>#000000FF</fontcolour>
+			<graphicscolour>#2ecc71FF</graphicscolour>
+			<autoplaymedia>true</autoplaymedia>
+		</defaults>
+
+        <slide slideid="6">
+            <poll elementid ="0" layer="2" startsequence="1" endsequence = "2">
+                <timelimit>3</timelimit>
+                <question>Test question?</question>
+                <answers>ANS1,ANS2</answers>
+            </poll>
+        </slide>
+
+	</slideshow>
+</document>

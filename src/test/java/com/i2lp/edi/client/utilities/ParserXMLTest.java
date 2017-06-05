@@ -60,7 +60,7 @@ public class ParserXMLTest {
     }
 
     @Test
-    public void verifyCreationOfPresentationAndID() {
+    public void testCreationOfPresentationAndID() {
         assertNotNull(presentation);
         assertTrue(presentation instanceof Presentation);
 
@@ -69,7 +69,7 @@ public class ParserXMLTest {
 
 
     @Test
-    public void verifyCreationOfSlidesAndIDs() {
+    public void testCreationOfSlidesAndIDs() {
         for (Slide slide : slideArray) assertNotNull(slide);
 
         //Verify IDs
@@ -78,7 +78,7 @@ public class ParserXMLTest {
 
 
     @Test
-    public void verifyCreationOfSlideElements () {
+    public void testCreationOfSlideElements () {
         for (SlideElement element : slideElementArray1) assertNotNull(element);
         for (SlideElement element : slideElementArray2) assertNotNull(element);
         for (SlideElement element : slideElementArray3) assertNotNull(element);
@@ -86,7 +86,7 @@ public class ParserXMLTest {
     }
 
     @Test
-    public void verifyDocumentDetails() {
+    public void testDocumentDetails() {
         assertEquals("Joe Bloggs", presentation.getAuthor());
         assertEquals(1.0, presentation.getVersion(), ERROR_MARGIN);
         assertEquals( 1.78, presentation.getDocumentAspectRatio(), ERROR_MARGIN);
@@ -96,7 +96,7 @@ public class ParserXMLTest {
     }
 
     @Test
-    public void verifyPresentationDefaults() {
+    public void testPresentationDefaults() {
         assertNotNull(theme);
         assertEquals("#FF2304FF", theme.getBackgroundColour());
         assertEquals("Arial, Helvetica, sans-serif", theme.getFont());
@@ -107,7 +107,7 @@ public class ParserXMLTest {
     }
 
     @Test
-    public void verifyElementArraySizes () {
+    public void testElementArraySizes () {
         assertEquals(2, slideElementArray1.size(), ERROR_MARGIN );
         assertEquals(3, slideElementArray2.size(), ERROR_MARGIN );
         assertEquals(2, slideElementArray3.size(), ERROR_MARGIN );
@@ -115,7 +115,7 @@ public class ParserXMLTest {
     }
 
     @Test
-    public void verifySlide1TextElement1Content() {
+    public void testSlide1TextElement1Content() {
         for (SlideElement element : slideElementArray1) assertNotNull(element);
 
         ArrayList<TextElement> slide1TextElementArray = (ArrayList)slide1.getTextElementList();
@@ -141,7 +141,7 @@ public class ParserXMLTest {
     }
 
     @Test
-    public void verifyOtherContent () {
+    public void testOtherContent () {
         for (SlideElement element : slideElementArray2) assertNotNull(element);
         for (SlideElement element : slideElementArray3) assertNotNull(element);
         for (SlideElement element : slideElementArray4) assertNotNull(element);
@@ -265,7 +265,7 @@ public class ParserXMLTest {
 
     @Ignore
     @Test
-    public void testWritingXML() {
+    public void testWritingXml() {
         assertTrue(true);
     }
 

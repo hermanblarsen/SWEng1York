@@ -56,6 +56,7 @@ public class WordCloudElement extends InteractiveElement {
     protected BorderPane wordCloudPanel;
     protected List<String> wordList;
     protected Label remainingTime;
+    protected boolean timerStart = false;
     protected int timeLimit = 30;
     protected Timeline timeline;
     protected Tile countdownTile;
@@ -217,6 +218,7 @@ public class WordCloudElement extends InteractiveElement {
                 wordCloudBox.getChildren().addAll(wordCloudQuestion, countdownTile, dataBox);
                 wordCloudPanel.setCenter(wordCloudBox);
                 timeline.play();
+                timerStart = true;
             }
         });
 
@@ -353,6 +355,7 @@ public class WordCloudElement extends InteractiveElement {
                     reset.setOnAction(event1 -> {
                         ediManager.getPresentationManager().getTeacherSession().resetInteractiveElement(this);
                         slideCanvas.getChildren().remove(this.getCoreNode());
+                        timerStart = false;
                         setupElement();
                         doClassSpecificRender();
                         slideCanvas.getChildren().add(wordCloudPanel);
@@ -419,5 +422,8 @@ public class WordCloudElement extends InteractiveElement {
         this.ySize = ySize;
     }
 
+    public boolean isTimerStart() {
+        return timerStart;
+    }
 
 }
