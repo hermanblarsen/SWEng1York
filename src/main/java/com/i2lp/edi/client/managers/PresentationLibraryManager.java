@@ -287,7 +287,7 @@ public class PresentationLibraryManager {
             @Override
             protected Object call() throws Exception {
                 try {
-                    Thread.sleep(15000); //Wait for thumbnails to be generated TODO: replace with checker for numFiles (y)
+                    Thread.sleep(10000); //Wait for thumbnails to be generated TODO: replace with checker for numFiles (y)
                     new ZipUtils(TEMP_PATH + presentation.getDocumentID(), zipPath);
                     return null;
                 } catch (InterruptedException e) {

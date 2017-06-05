@@ -117,12 +117,12 @@ public class Login extends Application {
         GridPane.setHalignment(sceneTitle, HPos.CENTER);
 
         usernameField = new TextField();
-        usernameField.setText("Teacher");
+//        usernameField.setText("Teacher");
         gridPane.add(usernameField, 1, 2);
         GridPane.setHalignment(usernameField, HPos.RIGHT);
 
         passwordField = new PasswordField();
-        passwordField.setText("password");
+//        passwordField.setText("password");
         gridPane.add(passwordField, 1, 3);
         GridPane.setHalignment(passwordField, HPos.RIGHT);
 
