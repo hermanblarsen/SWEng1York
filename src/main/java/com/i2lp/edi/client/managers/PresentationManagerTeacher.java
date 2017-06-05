@@ -497,7 +497,9 @@ public class PresentationManagerTeacher extends PresentationManager {
 
     @Override
     protected void doCloseSequence() {
-        toolkitTimer.cancel();
+        if(toolkitTimer != null) {
+            toolkitTimer.cancel();
+        }
         if (teacherToolKitStage != null) {
             teacherToolKitStage.close();
         }
