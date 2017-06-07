@@ -327,6 +327,7 @@ public class ParserXML {
 
                                 }
                                 mySlide.setUserComments(textContent);
+                                break;
                             case "poll":
                                 PollElement pollElement = new PollElement();
                                 parseElementAttributes(slideElementNode, pollElement);
