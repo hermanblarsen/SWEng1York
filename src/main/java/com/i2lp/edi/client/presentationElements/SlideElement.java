@@ -63,6 +63,10 @@ public abstract class SlideElement {
     protected SlideElement mediaElement;
     protected boolean isForceMute;
 
+    BorderPane embeddedBrowserPane;
+    WebView webView;
+    WebEngine engine;
+
     public abstract void doClassSpecificRender();
 
     public void removeElement() {
@@ -82,6 +86,14 @@ public abstract class SlideElement {
 
     //Empty interface for tagging our actual slide elements
     public void renderElement(int animationType) {
+        if(embeddedBrowserPane == null){
+            embeddedBrowserPane = new BorderPane();
+        }
+        if(webView == null || engine == null){
+            webView = new WebView();
+            engine = webView.getEngine();
+        }
+
         //Added to the canvas at render time, as otherwise negates use of VisibleSet
         //If we bind to canvas, the element is always visible. Ignoring the sequencing and anims.
         //Add CoreNode to the Pane
@@ -327,9 +339,7 @@ public abstract class SlideElement {
         else logger.info("Element with ElementID: " + getElementID() + " has no OnClickAction");
     }
 
-    BorderPane embeddedBrowserPane = new BorderPane();;
-    WebView webView = new WebView();
-    WebEngine engine = webView.getEngine();
+
 
     final SimpleChangeListener sequenceChangeListener = new SimpleChangeListener() {
         //Changing Sequence so close the browser
