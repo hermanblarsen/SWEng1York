@@ -327,8 +327,10 @@ public abstract class SlideElement {
         else logger.info("Element with ElementID: " + getElementID() + " has no OnClickAction");
     }
 
-    BorderPane embeddedBrowserPane;
-    WebEngine engine;
+    BorderPane embeddedBrowserPane = new BorderPane();;
+    WebView webView = new WebView();
+    WebEngine engine = webView.getEngine();
+
     final SimpleChangeListener sequenceChangeListener = new SimpleChangeListener() {
         //Changing Sequence so close the browser
         @Override
@@ -339,10 +341,10 @@ public abstract class SlideElement {
 
     public void openEmbeddedBrowser() {
         HBox browserToolbar = new HBox();
-        WebView webView = new WebView();
+        //webView = new WebView();
 
-        embeddedBrowserPane = new BorderPane();
-        engine = webView.getEngine();
+
+        //engine = webView.getEngine();
 
         //Load the page:
         webView.setPrefWidth(getSlideWidth());
@@ -370,7 +372,9 @@ public abstract class SlideElement {
 
         //Toolbar listeners
         engine.locationProperty().addListener((obs, oldVal, newVal) -> browserLocation.setText(newVal));
+
         backButton.setOnMouseClicked(event -> {
+            logger.info("Web browser Going Back");
             WebHistory history = engine.getHistory();
             if (history.getCurrentIndex() > 0) {
                 history.go(-1);
@@ -378,6 +382,7 @@ public abstract class SlideElement {
         });
 
         forwardButton.setOnMouseClicked(event -> {
+            logger.info("Web browser Going forward");
             WebHistory history = engine.getHistory();
             if (history.getCurrentIndex() != history.getEntries().size() - 1) {
                 history.go(1);
@@ -385,6 +390,7 @@ public abstract class SlideElement {
         });
 
         reloadButton.setOnMouseClicked(event -> {
+            logger.info("Webrowser reloading page");
             engine.reload();
         });
 
@@ -403,6 +409,7 @@ public abstract class SlideElement {
 
         //exitButton.setOnMouseClicked(event -> closeEmbeddedBrowser());
         exitButton.addEventFilter(MouseEvent.MOUSE_CLICKED,event->{
+            logger.info("Closing browser");
             closeEmbeddedBrowser();
             event.consume();
         });
@@ -424,7 +431,9 @@ public abstract class SlideElement {
                 slideCanvas.setOnKeyPressed(null);
             }
         });
-        slideCanvas.getChildren().add(embeddedBrowserPane);
+        if(!slideCanvas.getChildren().contains(embeddedBrowserPane)) {
+            slideCanvas.getChildren().add(embeddedBrowserPane);
+        }
         embeddedBrowserPane.toFront();
 
         //Listeners to resize and close the browser.
@@ -436,8 +445,9 @@ public abstract class SlideElement {
     }
 
     public void closeEmbeddedBrowser() {
-        engine.load(null);
         slideCanvas.getChildren().remove(embeddedBrowserPane);
+        engine.load(null);
+        //embeddedBrowserPane.setVisible(false);
         ediManager.getPresentationManager().setIsEmbeddedBrowserOpen(false);
         ediManager.getPresentationManager().removeSequenceChangeListener(sequenceChangeListener);
     }
