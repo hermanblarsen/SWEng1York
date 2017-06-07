@@ -9,13 +9,13 @@
       <element name="documentdetails">
         <annotation>
           <info>
-            Details such as author, version, slide aspectratio, etc. 
-			Note: i) Tags are separated by comma ONLY. 
+            Details such as author, version, slide aspectratio, etc.
+			Note: i) Tags are separated by comma ONLY.
 			ii) Group format allows to determine whether given file is native to the application, each group should use its number to annotate their files.
           </info>
         </annotation>
         <type>
-          <element name="documentTitle" type="string"/>
+          <element name="title" type="string"/>
           <element name="author" type="string"/>
           <element name="version" type="float"/>
           <element name="documentaspectratio" type="float"/>
@@ -71,6 +71,8 @@
             </annotation>
             <type>
               <attribute name="slideid" type="int"/>
+
+              <element name="comment" type="string"/>
               <element name="text">
                 <annotation>
                   <info>
@@ -224,6 +226,50 @@
                   <element name="endtime" type="int"/>
                   <element name="animation" type="Animation"/> <!-- See Animation.xsd-->
                 </type>
+              </element>
+              <element name="poll">
+                  <annotation>
+                      <info>
+                          Poll to be displayed and answered, answers are comma separated.
+                      </info>
+                  </annotation>
+                  <type>
+                      <attribute name="elementid" type="int"/>
+                      <attribute name="layer" type="int"/>
+                      <attribute name="visibility" type="boolean"/>
+                      <attribute name="startsequence" type="int"/>
+                      <attribute name="endsequence" type="int"/>
+                      <attribute name="duration" type="int"/>
+                      <element name= "question" type="string"/>
+                      <element name= "answers" type="string"/>
+                      <element name= "timelimit" type="int"/>
+                      <element name= "xsize" type="float"/>
+                      <element name= "ysize" tpye="float"/>
+                      <element name= "xposition" type="float"/>
+                      <element name= "yposition" type="float"/>
+                  </type>
+              </element>
+              <element name="WordCloud">
+                  <annotation>
+                      <info>
+                          WordCloud interactive element
+                      </info>
+                  </annotation>
+                  <type>
+                      <attribute name="elementid" type="int"/>
+                      <attribute name="layer" type="int"/>
+                      <attribute name="visibility" type="boolean"/>
+                      <attribute name="startsequence" type="int"/>
+                      <attribute name="endsequence" type="int"/>
+                      <attribute name="duration" type="int"/>
+                      <element name="cloudshapepath" type="string"/>
+                      <element name="question" type="string"/>
+                      <element name= "timelimit" type="int"/>
+                      <element name= "xsize" type="float"/>
+                      <element name= "ysize" tpye="float"/>
+                      <element name= "xposition" type="float"/>
+                      <element name= "yposition" type="float"/>
+                  </type>
               </element>
             </type>
           </element>

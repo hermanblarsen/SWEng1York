@@ -3,7 +3,7 @@
 
     <xs:annotation>
         <xs:documentation>
-            Schema for Animations defined using proper XSD 1.0. (This means we can automatically validate Animation XMLs)
+            Schema for defining animations for use un Edi. This schema is written usinf the W3C XSD 1.0 Standard which allows us to validate animation parts of presentation XMLs using standard tools .
             An Example use is:
 
             <animation type="in">
