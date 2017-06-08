@@ -675,10 +675,10 @@ public class ParserXML {
                         audioElement.isAutoPlay(Boolean.valueOf(elementContent));
                         break;
                     case "starttime":
-                        audioElement.setStartTime(Duration.seconds(Integer.valueOf(elementContent)));
+                        audioElement.setStartTime(Duration.millis(Integer.valueOf(elementContent)));
                         break;
                     case "endtime":
-                        audioElement.setEndTime(Duration.seconds(Integer.valueOf(elementContent)));
+                        audioElement.setEndTime(Duration.millis(Integer.valueOf(elementContent)));
                         break;
                     case "animation":
                         parseAnimationElement(elementNode, audioElement);

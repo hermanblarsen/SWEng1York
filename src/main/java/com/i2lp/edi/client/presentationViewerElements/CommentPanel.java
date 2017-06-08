@@ -72,7 +72,7 @@ public class CommentPanel extends Panel {
     }
 
     public void setSlide(Slide currentSlide) {
-        this.currentSlide.setUserComments(htmlEditor.getHtmlText()); //Make sure the previous slide comment is stored
+//        this.currentSlide.setUserComments(htmlEditor.getHtmlText()); //Make sure the previous slide comment is stored
         this.currentSlide = currentSlide; //Set new slide
         updateHtmlEditor();
     }

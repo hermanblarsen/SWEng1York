@@ -96,7 +96,8 @@
 				<onclickinfo>3</onclickinfo>
             </text>
 		</slide>
-
+<!-- 0.54, 0.64, 0.87, 0.71, 0.74, 0.54, 0.35, 0.38, 0.22, 0.45 -->
+<!-- 0.15, 0.35, 0.38, 0.54, 0.76, 0.66, 0.76, 0.54, 0.38, 0.35 -->
 
 		<slide slideid="2">
             <graphic elementid ="0" layer="1" visibility="true" startsequence="2" endsequence="3">
@@ -106,15 +107,10 @@
                 <fillcolour>#FF00008F</fillcolour>
                 <polygon>
                     <xpositions>0.54, 0.64, 0.87, 0.71, 0.74, 0.54, 0.35, 0.38, 0.22, 0.45</xpositions>
-                    <ypositions>0.15, 0.35, 0.38, 0.54, 0.76, 0.66, 0.76, 0.54, 0.38, 0.35</ypositions>
+                    <ypositions> 0, 0.35, 0.38, 0.54, 0.76, 0.66, 0.76, 0.54, 0.38, 0.35 </ypositions>
 					<isclosed>true</isclosed>
                 </polygon>
-				<animation type="in">
-					<simplescale start="0" end="1" duration="500"/>
-				</animation>
-				<animation type="out">
-					<simplescale start="1" end="0" duration="500"/>
-				</animation>
+
 
             </graphic>
 
@@ -148,10 +144,10 @@
 
 			<audio elementid ="2" startsequence="3">
 				<path>projectResources/sampleFiles/NeverGonnaGiveYouUp.mp3</path>
-				<loop>true</loop>
+				<loop>false</loop>
 				<autoplay>true</autoplay>
 				<starttime>0</starttime>
-				<endtime>15</endtime>
+				<endtime>15000</endtime>
 			</audio>
 
 

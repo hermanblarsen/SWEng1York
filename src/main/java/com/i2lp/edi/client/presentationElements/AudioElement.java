@@ -319,6 +319,13 @@ public class AudioElement extends SlideElement{
                 }
             });
 
+            mediaPlayer.setOnEndOfMedia(new Runnable() {
+                @Override
+                public void run() {
+                    mediaPlayer.stop();
+                }
+            });
+
             // Add player to a MediaView
             mediaView.setMediaPlayer(mediaPlayer);
 
