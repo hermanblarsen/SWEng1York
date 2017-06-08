@@ -62,7 +62,7 @@ public class ModulePanel extends PreviewPanel {
 
     /**
      * Returns an ArrayList of items which could match a search for thig module.
-     * @return An arraylist of terms which can be used to match search terms.
+     * @return An arraylist of relevant terms which can be used to match search terms.
      */
     @Override
     public ArrayList<String> getSearchableTerms() {
@@ -73,6 +73,12 @@ public class ModulePanel extends PreviewPanel {
         return searchableTerms;
     }
 
+    /**
+     * Finds a module in an array based on the module ID
+     * @param moduleId Id to search for
+     * @param arrayList List to search in
+     * @return The ModulePanel for the corresponding module.
+     */
     public static ModulePanel findInArray(int moduleId, ArrayList<ModulePanel> arrayList) {
         for (ModulePanel panel : arrayList) {
             if (panel.getModule().getModuleID() == moduleId) {
@@ -83,6 +89,9 @@ public class ModulePanel extends PreviewPanel {
         return null;
     }
 
+    /**
+     * Updates the isLive indicator on the module panels.
+     */
     public void updateIsLive() {
         boolean isLive = false;
         for (Presentation presentation : module.getPresentations()) {
@@ -96,6 +105,9 @@ public class ModulePanel extends PreviewPanel {
         updateVisibility();
     }
 
+    /**
+     * Adds or removed the live icon from the module panel, depending on whether isLive is set.
+     */
     @Override
     public void updateVisibility() {
         super.updateVisibility();

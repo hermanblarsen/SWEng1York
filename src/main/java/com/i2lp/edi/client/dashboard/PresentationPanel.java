@@ -18,6 +18,8 @@ import java.util.ArrayList;
 
 /**
  * Created by Kacper on 2017-04-08.
+ *
+ * Panel representing  presentations in the ui.
  */
 public class PresentationPanel extends PreviewPanel {
     private static final double MAX_PRES_PREVIEW_WIDTH = 200;
@@ -29,6 +31,11 @@ public class PresentationPanel extends PreviewPanel {
     private boolean isLive;
     private ImageView liveIcon;
 
+    /**
+     * Constructs a presentationPanel for a given presentation inside a given parent node
+     * @param presentation
+     * @param parentPane
+     */
     public PresentationPanel(Presentation presentation, Pane parentPane) {
         super(parentPane);
         this.presentation = presentation;
@@ -75,6 +82,9 @@ public class PresentationPanel extends PreviewPanel {
 
     public Presentation getPresentation() { return presentation; }
 
+    /**
+     * Returns a list of words which can be used to search against to identify this presentation
+     */
     @Override
     public ArrayList<String> getSearchableTerms() {
         ArrayList<String> searchableTerms = new ArrayList<>();
@@ -88,6 +98,10 @@ public class PresentationPanel extends PreviewPanel {
 
     public boolean isLive() { return isLive; }
 
+    /**
+     * Sets the isLive property and causes an update on relevant parts of this preview.
+     * @param live
+     */
     public void setLive(boolean live) {
         isLive = live;
         updateVisibility();
@@ -97,6 +111,9 @@ public class PresentationPanel extends PreviewPanel {
         presentation.getModule().getModulePanel().updateIsLive();
     }
 
+    /**
+     * Updates the visibility of the live icon on the presentation preview.
+     */
     @Override
     public void updateVisibility() {
         super.updateVisibility();
@@ -112,6 +129,12 @@ public class PresentationPanel extends PreviewPanel {
         }
     }
 
+    /**
+     * Finds the presentation panel with a given presentation id in an array.
+     * @param presentationID  The presentation id of teh presentation to search for.
+     * @param arrayList The array to search in.
+     * @return The Presentation Panel with teh matching ID, or null if none is found.
+     */
     public static PresentationPanel findInArray(int presentationID, ArrayList<PresentationPanel> arrayList) {
         for (PresentationPanel panel : arrayList) {
             if (panel.getPresentation().getPresentationMetadata().getPresentationID() == presentationID) {

@@ -11,6 +11,8 @@ import javafx.stage.StageStyle;
 
 /**
  * Created by Kacper on 2017-06-02.
+ *
+ * Displays a loading indicator for downloading presentations.
  */
 public class PresDownloadLoadingScreen extends Application {
 

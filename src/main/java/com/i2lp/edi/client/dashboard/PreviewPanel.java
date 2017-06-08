@@ -13,6 +13,8 @@ import java.util.ArrayList;
 
 /**
  * Created by Kacper on 2017-05-25.
+ *
+ * Presentation Preview provides a base implementation for preview nodes.
  */
 public abstract class PreviewPanel extends StackPane {
 

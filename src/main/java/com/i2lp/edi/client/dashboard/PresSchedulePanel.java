@@ -1,14 +1,10 @@
 package com.i2lp.edi.client.dashboard;
 
-import javafx.scene.Node;
 import javafx.scene.control.Label;
-import javafx.scene.control.Tooltip;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
-import javafx.scene.paint.Color;
-import javafx.scene.text.Text;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -16,11 +12,18 @@ import java.util.ArrayList;
 
 /**
  * Created by Kacper on 2017-05-31.
+ *
+ * Represents a schedule viewer used for visulising the scheduled go live date of presentations.
  */
 public class PresSchedulePanel extends PreviewPanel {
 
     PresentationPanel presPanel;
 
+    /**
+     * Creates a new Presentation Schedule Viewer for a given presentation (Given via a PresentationPanel) and a parent node.
+     * @param parentPane The parent note of this Scheddule viewer
+     * @param presPanel The PresentationPanel of the presentation this shecule viewer is associated with.
+     */
     public PresSchedulePanel(Pane parentPane, PresentationPanel presPanel) {
         super(parentPane, false);
         this.presPanel = presPanel;
@@ -38,6 +41,10 @@ public class PresSchedulePanel extends PreviewPanel {
         this.getDisplayPanel().setBody(body);
     }
 
+    /**
+     * Not used in this context.
+     * @return null
+     */
     @Override
     public ArrayList<String> getSearchableTerms() {
         return null;
