@@ -37,6 +37,11 @@ import static com.i2lp.edi.client.Constants.*;
 /**
  * Created by amriksadhra on 12/04/2017.
  */
+
+/**
+ * Thumbnail generator based on presentation manager, generating thumbnails
+ * for presentations in the background.
+ */
 public class ThumbnailGenerationManager extends PresentationManager {
 
     private static Logger logger = LoggerFactory.getLogger(ThumbnailGenerationManager.class);
@@ -44,6 +49,19 @@ public class ThumbnailGenerationManager extends PresentationManager {
 
     public ThumbnailGenerationManager(EdiManager ediManager) {
         super(ediManager);
+    }
+
+    /**
+     * Generate slide thumbnails for presentation, and save to PDF if boolean is true
+     *
+     * @param presentation          presentation to generate thumbnails for
+     * @param savePresentationToPdf true if we want to save to PDF
+     */
+    public static void generateSlideThumbnails(Presentation presentation, boolean savePresentationToPdf) {
+        ThumbnailGenerationManager slideGenController = new ThumbnailGenerationManager(null);
+        slideGenController.openPresentation(presentation, true);
+        slideGenController.generateSlideThumbNail(slideGenController, savePresentationToPdf);
+        if (savePresentationToPdf) slideGenController.savePresentationToPdf(slideGenController);
     }
 
     public void openPresentation(Presentation presentation, boolean printToggle) {
@@ -82,13 +100,12 @@ public class ThumbnailGenerationManager extends PresentationManager {
         return null;
     }
 
-    public static void generateSlideThumbnails(Presentation presentation, boolean savePresentationToPdf) {
-        ThumbnailGenerationManager slideGenController = new ThumbnailGenerationManager(null);
-        slideGenController.openPresentation(presentation, true);
-        slideGenController.generateSlideThumbNail(slideGenController, savePresentationToPdf);
-        if (savePresentationToPdf) slideGenController.savePresentationToPdf(slideGenController);
-    }
-
+    /**
+     * Generate slide thumbnails for presentation, and save to PDF if boolean is true
+     *
+     * @param slideGenController    slideGenController to save from
+     * @param savePresentationToPdf true if wanting to save to PDF
+     */
     public void generateSlideThumbNail(ThumbnailGenerationManager slideGenController, boolean savePresentationToPdf) {
         Presentation presentation = slideGenController.presentationElement;
 
@@ -111,7 +128,7 @@ public class ThumbnailGenerationManager extends PresentationManager {
         int moveStatus = Presentation.SAME_SLIDE;
         while (moveStatus != Presentation.SLIDE_LAST_ELEMENT && moveStatus != Presentation.SLIDE_CHANGE) {
             moveStatus = slideGenController.slideAdvance(presentation, Slide.SLIDE_FORWARD);
-            if(moveStatus == Presentation.PRESENTATION_FINISH){
+            if (moveStatus == Presentation.PRESENTATION_FINISH) {
                 break;
             }
         }
@@ -180,6 +197,10 @@ public class ThumbnailGenerationManager extends PresentationManager {
         });
     }
 
+    /**
+     * Save presentation to PDF
+     * @param slideGenController contrller to save from
+     */
     private void savePresentationToPdf(ThumbnailGenerationManager slideGenController) {
         PDDocument doc = new PDDocument();
         Presentation presentation = slideGenController.presentationElement;
@@ -188,7 +209,7 @@ public class ThumbnailGenerationManager extends PresentationManager {
 
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Save PDF");
-        File file = new File(System.getProperty("user.home"),"Desktop");
+        File file = new File(System.getProperty("user.home"), "Desktop");
         fileChooser.setInitialDirectory(file);
         fileChooser.setInitialFileName(presentationElement.getDocumentID());
         Stage saveStage = new Stage();
@@ -225,17 +246,17 @@ public class ThumbnailGenerationManager extends PresentationManager {
                         PDPageContentStream contentStream = new PDPageContentStream(doc, page, PDPageContentStream.AppendMode.APPEND, false);
                         float imageWidth = imageObject.getWidth();
                         float imageHeight = imageObject.getHeight();
-                        float imageAspectRatio = imageWidth/imageHeight;
+                        float imageAspectRatio = imageWidth / imageHeight;
                         PDRectangle mediaBox = page.getMediaBox();
                         float margin = 10;
                         float boxWidth = mediaBox.getWidth() - 2 * margin;
                         float boxHeight = mediaBox.getHeight() - 2 * margin;
-                        float boxAspectRatio = boxWidth/boxHeight;
+                        float boxAspectRatio = boxWidth / boxHeight;
 
                         if (imageAspectRatio > boxAspectRatio) {
-                            contentStream.drawImage(imageObject, margin, mediaBox.getHeight() - boxWidth/imageAspectRatio - margin, boxWidth, boxWidth/imageAspectRatio);
+                            contentStream.drawImage(imageObject, margin, mediaBox.getHeight() - boxWidth / imageAspectRatio - margin, boxWidth, boxWidth / imageAspectRatio);
                         } else {
-                            contentStream.drawImage(imageObject, margin, mediaBox.getHeight() - boxHeight*imageAspectRatio - margin, mediaBox.getHeight()*imageAspectRatio, boxHeight);
+                            contentStream.drawImage(imageObject, margin, mediaBox.getHeight() - boxHeight * imageAspectRatio - margin, mediaBox.getHeight() * imageAspectRatio, boxHeight);
                         }
 
                         contentStream.close();
@@ -250,7 +271,6 @@ public class ThumbnailGenerationManager extends PresentationManager {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-
             }
 
             try {

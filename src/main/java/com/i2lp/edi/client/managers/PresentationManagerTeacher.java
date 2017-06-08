@@ -69,14 +69,14 @@ public class PresentationManagerTeacher extends PresentationManager {
         super(ediManager);
     }
 
-    private void setListOfQuestions(){
-        if(slidePane != null && !firstRun){
+    private void setListOfQuestions() {
+        if (slidePane != null && !firstRun) {
             Platform.runLater(new Runnable() {
                 @Override
                 public void run() {
                     displayPane.getChildren().remove(slidePane);
                     slidePane.getChildren().removeAll(backgroundRegion, lab);
-                    if(!test) {
+                    if (!test) {
                         lab = new Label(slides[questionID].getText());
                         lab.setFont(new Font("Helvetica", 50));
                         lab.setTextFill(Color.WHITE);
@@ -85,7 +85,7 @@ public class PresentationManagerTeacher extends PresentationManager {
                         slidePane.setPrefSize(slideWidth, slideHeight);
                         slidePane.getChildren().addAll(backgroundRegion, lab);
                         displayPane.getChildren().addAll(slidePane);
-                    }else{
+                    } else {
                         test = false;
                     }
                     questionClicked = true;
@@ -93,13 +93,13 @@ public class PresentationManagerTeacher extends PresentationManager {
             });
 
         }
-        if(getTeacherSession() != null) {
+        if (getTeacherSession() != null) {
             newQuestionList = getTeacherSession().getQuestionQueue();
         }
-        if(newQuestionList == null){
+        if (newQuestionList == null) {
             newQuestionList = new ArrayList<>();
         }
-        for(Question question : newQuestionList){
+        for (Question question : newQuestionList) {
             logger.info("Question: " + question.getQuestion_data());
         }
     }
@@ -166,20 +166,20 @@ public class PresentationManagerTeacher extends PresentationManager {
 
     }
 
-    protected ArrayList<Student> generateStudentList(){
+    protected ArrayList<Student> generateStudentList() {
         int numberOfStudents = 0;
-        if(presentationElement.getPresentationMetadata().getLive()) {
-            if(getTeacherSession().getActiveUsers() != null) {
+        if (presentationElement.getPresentationMetadata().getLive()) {
+            if (getTeacherSession().getActiveUsers() != null) {
                 numberOfStudents = getTeacherSession().getActiveUsers().size();
             }
         }
         ArrayList<Student> studentList = new ArrayList<>();
-        for(int i = 0;i<numberOfStudents;i++){
-            String studentName = getTeacherSession().getActiveUsers().get(i).getFirstName()+" "+ getTeacherSession().getActiveUsers().get(i).getSecondName();
-            Student newStudent = new Student(studentName,10,true);//Todo add interaction stuff once it is ready
+        for (int i = 0; i < numberOfStudents; i++) {
+            String studentName = getTeacherSession().getActiveUsers().get(i).getFirstName() + " " + getTeacherSession().getActiveUsers().get(i).getSecondName();
+            Student newStudent = new Student(studentName, 10, true);//Todo add interaction stuff once it is ready
             studentList.add(newStudent);
         }
-        return  studentList;
+        return studentList;
     }
 
     protected BorderPane questionQueueFunction(List<Question> questions) {
@@ -200,11 +200,11 @@ public class PresentationManagerTeacher extends PresentationManager {
         return bp;
     }
 
-    private void setUpQuestionList(List<Question> questions){
+    private void setUpQuestionList(List<Question> questions) {
         slides = new Panel[questions.size()];
         slidePane = new StackPane();
         slidePane.setPickOnBounds(false);
-        if(sp != null) {
+        if (sp != null) {
             sp.setContent(null);
         }
         fp = new FlowPane();
@@ -217,23 +217,23 @@ public class PresentationManagerTeacher extends PresentationManager {
 
         for (int i = 0; i < questions.size(); i++) {
             slides[i] = new Panel(questions.get(i).getQuestion_data());
-            final int j= i;
+            final int j = i;
             slides[i].setMinWidth(400);
             slides[i].setPickOnBounds(false);
             fp.getChildren().add(slides[i]);
-            Image answered = new Image("file:projectResources/icons/Tick.png",50,50,true,true);
+            Image answered = new Image("file:projectResources/icons/Tick.png", 50, 50, true, true);
             ImageView answeredView = new ImageView(answered);
 
-            answeredView.addEventFilter(MouseEvent.MOUSE_CLICKED,evt->{
+            answeredView.addEventFilter(MouseEvent.MOUSE_CLICKED, evt -> {
                 test = true;
-                if(lab.getText() == slides[j].getText()) {
+                if (lab.getText() == slides[j].getText()) {
                     displayPane.getChildren().remove(slidePane);
                     slidePane.getChildren().removeAll(backgroundRegion, lab);
                 }
                 //buttonActive = true;
                 ediManager.getSocketClient().answerQuestionInQuestionQueue(questions.get(j).getQuestion_id());
                 Label questionComplete = new Label("Question Answered!");
-                logger.info("Question: "+j+" Answered");
+                logger.info("Question: " + j + " Answered");
                 slides[j].setBody(questionComplete);
                 evt.consume();
             });
@@ -253,7 +253,7 @@ public class PresentationManagerTeacher extends PresentationManager {
                     lab.setWrapText(true);
                     setText = lab.getText();
                     slidePane.setPrefSize(slideWidth, slideHeight);
-                    if(!buttonActive) {
+                    if (!buttonActive) {
                         slidePane.getChildren().addAll(backgroundRegion, lab);
                         displayPane.getChildren().addAll(slidePane);
                         questionID = val;
@@ -272,7 +272,7 @@ public class PresentationManagerTeacher extends PresentationManager {
                         lab.setTextFill(Color.WHITE);
                         lab.setWrapText(true);
                         setText = lab.getText();
-                        if(!buttonActive) {
+                        if (!buttonActive) {
                             slidePane.getChildren().addAll(backgroundRegion, lab);
                             displayPane.getChildren().addAll(slidePane);
                             questionID = val;
@@ -281,12 +281,12 @@ public class PresentationManagerTeacher extends PresentationManager {
                     }
                 }
             });
-            presentationStage.addEventHandler(MouseEvent.MOUSE_CLICKED, evt->{
+            presentationStage.addEventHandler(MouseEvent.MOUSE_CLICKED, evt -> {
                 displayPane.getChildren().remove(slidePane);
                 slidePane.getChildren().removeAll(backgroundRegion, lab);
                 questionClicked = false;
             });
-            if(teacherToolKitStage != null) {
+            if (teacherToolKitStage != null) {
                 teacherToolKitStage.addEventHandler(WindowEvent.WINDOW_CLOSE_REQUEST, evt -> {
                     displayPane.getChildren().remove(slidePane);
                     slidePane.getChildren().removeAll(backgroundRegion, lab);
@@ -301,30 +301,30 @@ public class PresentationManagerTeacher extends PresentationManager {
 
             long timeTaken = ts.getTime() - newQuestionList.get(i).getTime_created().getTime();
             long oneMin = 60000;
-            logger.info("TIME TAKEN: "+timeTaken);
-            if(timeTaken <= oneMin){
+            logger.info("TIME TAKEN: " + timeTaken);
+            if (timeTaken <= oneMin) {
                 slides[i].setStyle("-fx-background-color: green");
-            }else if(timeTaken> oneMin && timeTaken< oneMin*2){
+            } else if (timeTaken > oneMin && timeTaken < oneMin * 2) {
 
                 slides[i].setStyle("-fx-background-color: greenyellow");
-            }else if(timeTaken>= oneMin*2 && timeTaken< oneMin*3){
+            } else if (timeTaken >= oneMin * 2 && timeTaken < oneMin * 3) {
 
                 slides[i].setStyle("-fx-background-color: yellowgreen");
-            }else if(timeTaken>= oneMin*3 && timeTaken< oneMin*3){
+            } else if (timeTaken >= oneMin * 3 && timeTaken < oneMin * 3) {
 
                 slides[i].setStyle("-fx-background-color: orange");
-            }else if(timeTaken>= oneMin*4 && timeTaken< oneMin*5){
+            } else if (timeTaken >= oneMin * 4 && timeTaken < oneMin * 5) {
                 slides[i].setStyle("-fx-background-color: orangered");
-            }else{
+            } else {
                 slides[i].setStyle("-fx-background-color: red");
             }
         }
-        if(sp!= null) {
+        if (sp != null) {
             sp.setContent(fp);
         }
     }
 
-    protected BorderPane studentStats(List<Student> studentList) {
+    private BorderPane studentStats(List<Student> studentList) {
         BorderPane bp = new BorderPane();
         bp.setStyle("-fx-background-color: #34495e");
         bp.setPadding(new Insets(0, 10, 10, 10));
@@ -339,7 +339,7 @@ public class PresentationManagerTeacher extends PresentationManager {
         return bp;
     }
 
-    private void setUpStudentList(List<Student> studentList){
+    private void setUpStudentList(List<Student> studentList) {
         FlowPane fp = new FlowPane();
         fp.setPrefWrapLength(100);
         fp.setMaxWidth(Double.MAX_VALUE);
@@ -347,7 +347,6 @@ public class PresentationManagerTeacher extends PresentationManager {
         fp.setVgap(4);
         fp.setHgap(4);
         fp.setStyle("-fx-background-color: whitesmoke");
-
 
 
         Panel[] slides = new Panel[studentList.size()];
@@ -442,7 +441,7 @@ public class PresentationManagerTeacher extends PresentationManager {
         }
     }
 
-    protected void controlsFadeIn(Node controls) {
+    private void controlsFadeIn(Node controls) {
         FadeTransition ft0 = new FadeTransition(Duration.millis(500), controls);
         ft0.setFromValue(controls.getOpacity());
         ft0.setToValue(1.0);
@@ -460,13 +459,13 @@ public class PresentationManagerTeacher extends PresentationManager {
         logger.info("Setting question queue number to " + newQuestionList.size());
     }
 
-    public void updateStudentList(){
+    public void updateStudentList() {
         logger.info("STUDENT LIST UPDATE");
         studentList = generateStudentList();
         Platform.runLater(new Runnable() {
             @Override
             public void run() {
-                if(teacherToolKitStage != null) {
+                if (teacherToolKitStage != null) {
                     setUpStudentList(studentList);
                 }
             }
@@ -475,7 +474,7 @@ public class PresentationManagerTeacher extends PresentationManager {
 
     @Override
     protected void doCloseSequence() {
-        if(toolkitTimer != null) {
+        if (toolkitTimer != null) {
             toolkitTimer.cancel();
         }
         if (teacherToolKitStage != null) {

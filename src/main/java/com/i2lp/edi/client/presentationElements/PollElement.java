@@ -31,12 +31,15 @@ import java.util.List;
 /**
  * Created by Koen on 06/04/2017.
  */
+
+/**
+ * Poll element, used for asking multiple choice questions.
+ */
 public class PollElement extends InteractiveElement {
     protected String question;
     protected List<String> possibleAnswers;
     protected List<String> pollOutput;
     protected String answers;
-    protected boolean answered = false;
     protected boolean timerStart = false;
     protected LocalTime startTime;
 
@@ -98,26 +101,15 @@ public class PollElement extends InteractiveElement {
         return questionPane;
     }
 
+    /**
+     * Sets up the element
+     */
     @Override
     public void setupElement() {
 
         questionPane = new Panel();
         setUpQuestionList(answers);
-        //questionPane.getStyleClass().add("panel-primary");
-        //questionPane.setBackground(new Background(new BackgroundFill(Tile.BACKGROUND, null, null)));
         questionPane.setStyle("-fx-background-color: #2a2a2a");
-        //question.setMinWidth(Double.MAX_VALUE);
-
-
-        //question.setStyle("-fx-background-color: blueviolet");
-        //question.setAlignment(Pos.CENTER);
-//        PauseTransition delay = new PauseTransition(Duration.seconds(10));
-//        delay.setOnFinished(evt -> {
-//            pollPane.getChildren().remove(answerSelection);
-
-//        });
-
-
 
         countdownTile = TileBuilder.create()
                 .skinType(Tile.SkinType.NUMBER)
@@ -140,8 +132,6 @@ public class PollElement extends InteractiveElement {
             HBox startBox = new HBox();
             startBox.getChildren().add(startPoll);
             startBox.setAlignment(Pos.CENTER);
-            //startTimer = new Button("START");
-            //startTimer.getStyleClass().setAll("btn", "btn-default");
             startPoll.addEventHandler(MouseEvent.MOUSE_CLICKED, evt -> {
                 setUpPollData(new Time(Instant.now().toEpochMilli()));
                 if (ediManager.getPresentationManager().getTeacherSession()!= null) {
@@ -154,12 +144,14 @@ public class PollElement extends InteractiveElement {
             startPoll.addEventHandler(MouseEvent.MOUSE_EXITED, evt -> {
                 buttonActive = false;
             });
-            //pollPane.setCenter(startTimer);
             questionPane.setBody(startBox);
         }
         questionPane.setVisible(visibility);
     }
 
+    /**
+     * Destroy the element
+     */
     @Override
     public void destroyElement() {
 
@@ -181,7 +173,6 @@ public class PollElement extends InteractiveElement {
                                 Duration.seconds(1),
                                 evt -> {
                                     i.set(i.get() - 1);
-                                    //double percentage = ((i.get()/timeLimit)*100);
                                     countdownTile.setMaxValue(newTimeLimit);
                                     countdownTile.setValue(i.get());
 
@@ -193,7 +184,6 @@ public class PollElement extends InteractiveElement {
                 timeline.setCycleCount(newTimeLimit);
                 timeline.setOnFinished(event -> {
                     elementActive = false;
-                    //displayDone();
                 });
 
 
@@ -206,15 +196,11 @@ public class PollElement extends InteractiveElement {
                 pollQuestion.setFont(new javafx.scene.text.Font("Helvetica", 50));
                 pollQuestion.setTextFill(javafx.scene.paint.Color.WHITE);
                 pollQuestion.setWrapText(true);
-                //responseIndicator = new ResponseIndicator();
-                //responseIndicator.setNumberOfStudents(20); //TODO: Get this from server
                 pollOptions = new VBox();
                 pollOptions.getChildren().setAll(pollQuestion,countdownTile, setUpQuestions());
                 pollOptions.setAlignment(Pos.CENTER);
                 pollOptions.setSpacing(20);
-                //pollPane.setCenter(pollOptions);
                 questionPane.setBody(pollOptions);
-                //delay.play();
                 timeline.play();
             }
         });
@@ -225,19 +211,13 @@ public class PollElement extends InteractiveElement {
         answerButton = new ToggleButton[possibleAnswers.size()];
         final ToggleGroup group = new ToggleGroup();
         HBox answerSelection = new HBox();
-        //answerSelection.setMaxWidth(slideCanvas.getMaxWidth());
-        //answerSelection.setMaxHeight(slideCanvas.getMaxHeight());
         for (int i = 0; i < possibleAnswers.size(); i++) {
             final int number = i;
-            //chartDataArray[i].setName(possibleAnswers.get(i));
             answerButton[i] = new ToggleButton(possibleAnswers.get(i));
-            //answerButton[i].setMinWidth(slideCanvas.getWidth());
             answerButton[i].getStyleClass().setAll("btn", "btn-default");
             int finalI = i;
             ToggleButton selectedButton = answerButton[i];
             answerButton[i].addEventHandler(MouseEvent.MOUSE_CLICKED, evt -> {
-                //responseIndicator.incrementResponses();
-                //checkIfDone();
                 setValue = number;
                 if((ediManager.getPresentationManager().getTeacherSession()) != null){
                     ediManager.getPresentationManager().getTeacherSession().sendResponse(this, Integer.toString(finalI));
@@ -258,6 +238,9 @@ public class PollElement extends InteractiveElement {
         return answerSelection;
     }
 
+    /**
+     * Do this when poll timer is counted down
+     */
     public void displayDone() {
 
         double testAnswers[] = new double[possibleAnswers.size()];

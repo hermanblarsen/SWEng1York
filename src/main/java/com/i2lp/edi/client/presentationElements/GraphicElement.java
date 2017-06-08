@@ -92,7 +92,7 @@ public class GraphicElement extends SlideElement {
     }
 
     /**
-     * Returns the core node whichshould be used for rendering this element.
+     * Returns the core node which should be used for rendering this element.
      * @return The core node.
      */
     @Override

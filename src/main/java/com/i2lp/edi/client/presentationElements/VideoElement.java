@@ -28,6 +28,10 @@ import java.io.File;
 /**
  * Created by Koen on 11/04/2017.
  */
+
+/**
+ * VideoElement, displaying video through JavaFX mediaplayer
+ */
 public class VideoElement extends SlideElement{
     protected boolean mediaControl = true;
     protected float xPosition = 0.5f;
@@ -71,13 +75,12 @@ public class VideoElement extends SlideElement{
             mediaPlayer.play();
             started = true;
         }
-        //TODO this needs to be changed to something else, we shouldn't change the presentation like that.. Added "started" to help, but needs refining
-//        setAutoplay(false); //Only autoplay on first render (prevents resizing from causing the video to play)
-            getCoreNode().addEventHandler(MouseEvent.MOUSE_CLICKED, evt -> {
-                if(!controlActive){
-                    performOnClickAction();
-                }
-            });
+        getCoreNode().addEventHandler(MouseEvent.MOUSE_CLICKED, evt -> {
+            if(!controlActive){
+                performOnClickAction();
+            }
+        });
+
         if(isForceMute){
             mediaPlayer.setVolume(0);
         }
@@ -264,17 +267,9 @@ public class VideoElement extends SlideElement{
     private HBox mediaControl() {
 
         HBox mediaBar = new HBox();
-//        mediaBar.setMaxSize(media.getWidth(),media.getHeight());
         mediaBar.setStyle("-fx-background-color: transparent");
         mediaBar.setAlignment(Pos.BOTTOM_CENTER);
-//        if(xSize != 0 && ySize !=0) {
-//            mediaBar.setTranslateX(0);
-//            mediaBar.setTranslateY(ySize);
-//        }else{
-//            mediaBar.setAlignment(Pos.BOTTOM_CENTER);
-//        }
         mediaBar.setPadding(new Insets(5, 10, 5, 10));
-        //BorderPane.setAlignment(mediaBar, Pos.CENTER);
 
         //Play/Pause Button
         Image play = new Image("file:projectResources/icons/PLAY_WHITE.png",20,20,true,true);
@@ -298,7 +293,6 @@ public class VideoElement extends SlideElement{
         playPauseButton.addEventHandler(MouseEvent.MOUSE_EXITED,evt->{
             controlActive = false;
         });
-        // mediaBar.getChildren().add(playPauseButton);
 
         //Stop Button
         Image stop = new Image("file:projectResources/icons/STOP_WHITE.png",20,20,true,true);
@@ -313,7 +307,6 @@ public class VideoElement extends SlideElement{
         stopButton.addEventHandler(MouseEvent.MOUSE_EXITED,evt->{
             controlActive = false;
         });
-        // mediaBar.getChildren().add(stopButton);
 
         // Seek Control
         final Slider videoTime = new Slider(startTime.toMillis(), 0, 0);
@@ -340,7 +333,6 @@ public class VideoElement extends SlideElement{
             if (!isProgrammaticChange.getValue())
                 mediaPlayer.seek(new javafx.util.Duration(videoTime.getValue()));
         });
-        //mediaBar.getChildren().add(videoTime);
 
         //Remaining Time
         Label playTime = new Label();
@@ -360,7 +352,6 @@ public class VideoElement extends SlideElement{
         playTime.addEventHandler(MouseEvent.MOUSE_EXITED,evt->{
             controlActive = false;
         });
-        //mediaBar.getChildren().add(playTime);
 
         //Volume Label
         final Label volume = new Label("  Volume: ");
@@ -371,7 +362,6 @@ public class VideoElement extends SlideElement{
         volume.addEventHandler(MouseEvent.MOUSE_EXITED,evt->{
             controlActive = false;
         });
-        //mediaBar.getChildren().add(volume);
         //Volume Slider
         final Slider volumeSlider = new Slider(0, 1, 0.5);
         volumeSlider.addEventHandler(MouseEvent.MOUSE_ENTERED,evt->{
@@ -385,10 +375,8 @@ public class VideoElement extends SlideElement{
                 mediaPlayer.setVolume(volumeSlider.getValue());
             }
         });
-        //mediaBar.getChildren().add(volumeSlider);
 
         //Fullscreen Button
-        //final ToggleButton fullscreenButton = new ToggleButton("Fullscreen");
         Image fullscreenIcon = new Image("file:projectResources/icons/Fullscreen_NEW.png",20,20,true,true);
         ImageView fullscreenButton = new ImageView(fullscreenIcon);
         fullscreenButton.addEventHandler(MouseEvent.MOUSE_ENTERED,evt->{
@@ -397,14 +385,9 @@ public class VideoElement extends SlideElement{
         fullscreenButton.addEventHandler(MouseEvent.MOUSE_EXITED,evt->{
             controlActive = false;
         });
-        //final Rectangle2D initialBounds = new Rectangle2D(mediaView.getFitWidth(), mediaView.getFitWidth(), mediaView.getFitHeight(), mediaView.getFitWidth());
         fullscreenButton.addEventHandler(MouseEvent.MOUSE_CLICKED,(event) -> {
             // TODO: Implement this properly
             if (!fullscreen) {
-//                mediaPane.setTranslateX(0);
-//                mediaPane.setTranslateY(0);
-//                mediaView.setFitHeight(slideHeight); //slideCanvas.getHeight()
-//                mediaView.setFitWidth(slideWidth);  //slideCanvas.getWidth()
                 videoFullscreenStage = new Stage();
                 StackPane mediaplayerPane = new StackPane();
                 mediaplayerPane.getStylesheets().add("bootstrapfx.css");
@@ -418,9 +401,6 @@ public class VideoElement extends SlideElement{
                     mediaView.setFitHeight(screenSize.getHeight());
                 }
                 mediaView.setFitWidth(screenSize.getWidth());
-//                if(aspectRatioLock) {
-//                    mediaView.setTranslateY((screenSize.getHeight()/8));
-//                }
 
                 StackPane.setAlignment(mediaView,Pos.CENTER);
                 mediaplayerPane.getChildren().add(mediaControl());

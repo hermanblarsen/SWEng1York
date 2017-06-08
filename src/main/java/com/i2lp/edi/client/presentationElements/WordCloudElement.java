@@ -50,6 +50,11 @@ import static com.i2lp.edi.client.Constants.PRESENTATIONS_PATH;
 /**
  * Created by Koen on 06/04/2017.
  */
+
+/**
+ * Wordcloud element, an interactive element which generates a "cloud"
+ * of words where thir size is based on the word frequency.
+ */
 public class WordCloudElement extends InteractiveElement {
     protected Time startTime;
     protected String question;
@@ -103,8 +108,6 @@ public class WordCloudElement extends InteractiveElement {
                 startWordCloud.setFitWidth(slideWidth * xSize);
             }
         }
-        //wordCloudPanel.setTranslateX(slideWidth * xPosition);
-        //wordCloudPanel.setTranslateY(slideHeight * yPosition);
 
         getCoreNode().addEventHandler(MouseEvent.MOUSE_CLICKED, evt -> {
             if (!buttonActive) {
@@ -122,10 +125,8 @@ public class WordCloudElement extends InteractiveElement {
     public void setupElement() {
         wordList = new ArrayList<String>();
         wordCloudPanel = new Panel();
-        //wordCloudPanel.getStyleClass().add("panel-primary");
         wordCloudPanel.setStyle("-fx-background-color: #2a2a2a");
         if (teacher) {
-//            Button start_Task = new Button("Start");
             Image startWordCloudTask = new Image("file:projectResources/icons/startWC.png");
             startWordCloud = new ImageView(startWordCloudTask);
             startWordCloud.setPreserveRatio(true);
@@ -133,9 +134,6 @@ public class WordCloudElement extends InteractiveElement {
             HBox startBox = new HBox();
             startBox.setAlignment(Pos.CENTER);
             startBox.getChildren().add(startWordCloud);
-//            start_Task.getStyleClass().setAll("btn","btn-default");
-//            start_Task.setAlignment(Pos.TOP_CENTER);
-//            //wordCloudPanel.getChildren().add(start_Task);
             startWordCloud.addEventHandler(MouseEvent.MOUSE_CLICKED, evt -> {
                 wordCloudPanel.getChildren().remove(startBox);
                 setUpWordCloudData(new Time(Instant.now().toEpochMilli()));
@@ -149,12 +147,9 @@ public class WordCloudElement extends InteractiveElement {
             startWordCloud.addEventHandler(MouseEvent.MOUSE_EXITED, evt -> {
                 buttonActive = false;
             });
-            //wordCloudPanel.setBody(startBox);
             wordCloudPanel.setAlignment(startBox, Pos.CENTER);
             wordCloudPanel.setCenter(startBox);
         }
-
-
     }
 
     public void setUpWordCloudData(Time startTime) {
@@ -163,11 +158,9 @@ public class WordCloudElement extends InteractiveElement {
         //Start Time
         //We count out from current system time
         //And display current System time - startTime
-        //Time currentTime = new Time(Instant.now().toEpochMilli());
         LocalTime currentTime = LocalTime.now();
         LocalTime startTimeNew = startTime.toLocalTime();
         int timeDifference = currentTime.getSecond() - startTimeNew.getSecond();
-        //Time timeDifference = new Time(currentTime.toInstant().getEpochSecond()-startTime.toInstant().getEpochSecond());
         int newTimeLimit = Math.round(timeLimit - timeDifference);
         remainingTime = new Label("Time Remaining: " + (newTimeLimit));
         final IntegerProperty i = new SimpleIntegerProperty(newTimeLimit);
@@ -198,7 +191,6 @@ public class WordCloudElement extends InteractiveElement {
                 .descriptionAlignment(Pos.BASELINE_RIGHT)
                 .build();
         wordCloudPanel.setVisible(visibility);
-        //getCoreNode().addEventFilter(MouseEvent.MOUSE_CLICKED, event -> performOnClickAction());
 
         Platform.runLater(new Runnable() {
             @Override
@@ -334,12 +326,7 @@ public class WordCloudElement extends InteractiveElement {
         VBox wordCloudBox = new VBox();
         wordCloudBox.setAlignment(Pos.CENTER);
         wordCloudBox.getChildren().addAll(iv);
-        //wordCloudPanel.setBody(iv);
         wordCloudPanel.setCenter(iv);
-
-        //wordCloudBox.layoutXProperty().bind(wordCloudPanel.widthProperty().subtract(wordCloudBox.widthProperty()).divide(2)); //do not use
-        //wordCloudBox.layoutYProperty().bind(wordCloudPanel.heightProperty().subtract(wordCloudBox.heightProperty()).divide(2)); //do not use
-        //wordCloudPanel.setStyle("-fx-background-color: #00000000"); //do not use
 
 
         if (ediManager.getPresentationManager().getTeacherSession() != null) {
@@ -362,8 +349,6 @@ public class WordCloudElement extends InteractiveElement {
                     });
                     cm.getItems().add(reset);
                     cm.show(this.getCoreNode(), event.getScreenX(), event.getScreenY());
-
-
                 }
                 //});
                 event.consume();
@@ -425,5 +410,4 @@ public class WordCloudElement extends InteractiveElement {
     public boolean isTimerStart() {
         return timerStart;
     }
-
 }

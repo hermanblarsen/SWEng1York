@@ -13,6 +13,10 @@ import java.util.ListIterator;
 /**
  * Created by habl on 23/02/2017.
  */
+
+/**
+ * Slide element storing slide elements
+ */
 @SuppressWarnings({"WeakerAccess", "unused"})
 public class Slide extends Pane {
     Logger logger = LoggerFactory.getLogger(Slide.class);
@@ -101,14 +105,15 @@ public class Slide extends Pane {
         //Add slideElements to specific arraylists
         for (SlideElement slideElement : slideElementList) {
             if (slideElement instanceof TextElement) textElementList.add((TextElement) slideElement);
-//            if (slideElement instanceof GraphicElement) graphicElementList.add((GraphicElement) slideElement);
-//            if (slideElement instanceof ImageElement) imageElementList.add((ImageElement) slideElement);
-//            if (slideElement instanceof VideoElement) videoElementList.add((VideoElement) slideElement);
-//            if (slideElement instanceof AudioElement) audioElementList.add((AudioElement) slideElement);
             if(slideElement instanceof InteractiveElement) interactiveElementList.add((InteractiveElement) slideElement);
         }
     }
 
+    /**
+     * Get the maximum sequence number of start and end sequence on a slide
+     * @param slideElementList slideElement list to check
+     * @return maximum sequence
+     */
     private static int getListMaxSequenceNumber(List<SlideElement> slideElementList) {
         int max = 0;
 
@@ -132,6 +137,10 @@ public class Slide extends Pane {
         this.slideID = slideID;
     }
 
+    /**
+     * Sort elements on the slide by layer
+     * @param slideElementListToSort list to sort by layer
+     */
     public static void sortElementsByLayer(List<SlideElement> slideElementListToSort) {
         //Sort by Layer
         slideElementListToSort.sort((element1, element2) -> {
@@ -177,38 +186,6 @@ public class Slide extends Pane {
         this.textElementList = textElementList;
     }
 
-//    public List<GraphicElement> getGraphicElementList() {
-//        return graphicElementList;
-//    }
-//
-//    public void setGraphicElementList(List<GraphicElement> graphicElementList) {
-//        this.graphicElementList = graphicElementList;
-//    }
-//
-//    public List<ImageElement> getImageElementList() {
-//        return imageElementList;
-//    }
-//
-//    public void setImageElementList(List<ImageElement> imageElementList) {
-//        this.imageElementList = imageElementList;
-//    }
-//
-//    public List<VideoElement> getVideoElementList() {
-//        return videoElementList;
-//    }
-//
-//    public void setVideoElementList(List<VideoElement> videoElementList) {
-//        this.videoElementList = videoElementList;
-//    }
-//
-//    public List<AudioElement> getAudioElementList() {
-//        return audioElementList;
-//    }
-//
-//    public void setAudioElementList(List<AudioElement> audioElementList) {
-//        this.audioElementList = audioElementList;
-//    }
-
     public List<SlideElement> getVisibleSlideElementList() {
         return visibleSlideElementList;
     }
@@ -222,6 +199,10 @@ public class Slide extends Pane {
             return  slideDrawings.get(drawingIndex);
     }
 
+    /**
+     * Get the next slide drawing
+     * @return drawing
+     */
     public WritableImage getNextSlideDrawing() {
         if(drawingIndex < slideDrawings.size() - 1)
             return slideDrawings.get(++drawingIndex);
@@ -229,6 +210,10 @@ public class Slide extends Pane {
             return slideDrawings.get(drawingIndex);
     }
 
+    /**
+     * Add drawings to slide
+     * @param slideDrawing the drawing
+     */
     public void addSlideDrawing(WritableImage slideDrawing) {
         ListIterator<WritableImage> iterator = slideDrawings.listIterator(drawingIndex + 1);
         while(iterator.hasNext()) {

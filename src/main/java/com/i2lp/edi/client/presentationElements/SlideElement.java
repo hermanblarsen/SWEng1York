@@ -33,17 +33,15 @@ import org.slf4j.LoggerFactory;
 /**
  * Created by habl on 23/02/2017.
  */
+
+/**
+ * Slide element, abstract skeleton for slide elements
+ */
 @SuppressWarnings({"WeakerAccess", "unused"})
 public abstract class SlideElement {
     Logger logger = LoggerFactory.getLogger(getClass());
-
-
-
     protected EdiManager ediManager;
     protected float duration = -1;
-
-
-
     protected int slideID; //Needed for CSS generation, CSS filename needs this to identify what to apply
 
     protected String presentationID; //Needed for CSS generation
@@ -69,6 +67,9 @@ public abstract class SlideElement {
 
     public abstract void doClassSpecificRender();
 
+    /**
+     * Remove element from slide
+     */
     public void removeElement() {
         destroyElement();
         if (onCanvas) {
@@ -77,6 +78,9 @@ public abstract class SlideElement {
         }
     }
 
+    /**
+     * Add core node of element to slide
+     */
     public void addCoreNodeToSlide() {
         if (!onCanvas) {
             onCanvas = true;
@@ -84,7 +88,10 @@ public abstract class SlideElement {
         }
     }
 
-    //Empty interface for tagging our actual slide elements
+    /**
+     * Empty interface for tagging our actual slide elements
+     * @param animationType anyiation type
+     */
     public void renderElement(int animationType) {
         if(embeddedBrowserPane == null){
             embeddedBrowserPane = new BorderPane();

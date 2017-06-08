@@ -22,6 +22,10 @@ import static com.i2lp.edi.client.Constants.PRESENTATIONS_PATH;
 /**
  * Created by habl on 23/02/2017.
  */
+
+/**
+ * Presentation element, storing slides which again stores slide elements
+ */
 @SuppressWarnings({"WeakerAccess", "unused"})
 public class Presentation extends Pane {
     protected static Logger logger = LoggerFactory.getLogger(Presentation.class);
@@ -69,7 +73,7 @@ public class Presentation extends Pane {
     public Presentation() {
         slideList = new ArrayList<>();
         this.theme = new Theme();
-    } //this.xmlPath = getFileParentDirectory(path);
+    }
 
     //---------- Getters and setters required for presentation sequencing ---------------
     public int getMaxSlideNumber() {
@@ -191,229 +195,6 @@ public class Presentation extends Pane {
     public void setDocumentTitle(String documentTitle) { this.documentTitle = documentTitle; }
 
     public Subject getSubject() { return module.getSubject(); }
-
-    public static Presentation generateTestPresentation() {
-        ArrayList<Slide> slides = new ArrayList<>();
-
-        Slide slide1 = new Slide();
-        slide1.setSlideID(1);
-        slides.add(slide1);
-
-        //Create some test Slide Elements
-        ArrayList<SlideElement> slideElementsSlide1 = new ArrayList<>();
-
-        //Create a test Text element, add some text and pop it onto our stack pane. This code will all be driven from XML parser
-        TextElement myTextElement = new TextElement();
-        myTextElement.setLayer(0);
-        myTextElement.setStartSequence(1);
-        myTextElement.setEndSequence(3);
-        myTextElement.setDuration(1);
-        myTextElement.setElementID(0);
-        myTextElement.setFont("Arial");
-        myTextElement.setFontSize(12);
-        myTextElement.setFontColour("#AF4567");
-        myTextElement.setBgColour("#000000");
-        //myTextElement.setBgColour("#000000");
-        myTextElement.setBorderSize(2);
-        myTextElement.setBorderColour("#000000");
-        myTextElement.setTextContent("<b>IILP HTML Support Test</b>");
-        myTextElement.setSlideCanvas(slide1);
-        slideElementsSlide1.add(myTextElement);
-
-        //Create a test Text element, add some text and pop it onto our stack pane. This code will all be driven from XML parser
-        TextElement myTextElement1 = new TextElement();
-        myTextElement1.setLayer(0);
-        myTextElement1.setStartSequence(1);
-        myTextElement1.setEndSequence(3);
-        myTextElement1.setDuration(0.5f);
-        myTextElement1.setElementID(9);
-        myTextElement1.setFont("Arial");
-        myTextElement1.setFontSize(12);
-        myTextElement1.setFontColour("#AF4567");
-        myTextElement1.setBgColour("#000000");
-        myTextElement1.setBorderSize(2);
-        myTextElement1.setBorderColour("#000000");
-        myTextElement1.setTextContent("<b>Same starting sequence</b>");
-        myTextElement1.setSlideCanvas(slide1);
-        slideElementsSlide1.add(myTextElement1);
-
-        GraphicElement myGraphicElement2 = new GraphicElement();
-        myGraphicElement2.setLayer(1);
-        myGraphicElement2.setStartSequence(3);
-        myGraphicElement2.setEndSequence(5);
-        myGraphicElement2.setDuration(0.5f);
-        myGraphicElement2.setFillColour("#00000000");
-        myGraphicElement2.setLineColour("#00FF00FF");
-        myGraphicElement2.setOvalYPosition(0.5f);
-        myGraphicElement2.setOvalXPosition(0.5f);
-        myGraphicElement2.setrHorizontal(0.2f);
-        myGraphicElement2.setrVertical(0.1f);
-        myGraphicElement2.setRotation(0);
-        myGraphicElement2.setPolygon(false);
-        myGraphicElement2.setSlideCanvas(slide1);
-        slideElementsSlide1.add(myGraphicElement2);
-
-        GraphicElement myGraphicElement = new GraphicElement();
-        myGraphicElement.setLayer(2);
-        myGraphicElement.setStartSequence(2);
-        myGraphicElement.setEndSequence(5);
-        myGraphicElement.setDuration(1);
-        myGraphicElement.setFillColour("#EEFFFFFF");
-        myGraphicElement.setLineColour("#0000FFFF");
-        myGraphicElement.polySetXPoints(new float[] {0.1f, 0.5f, 0.5f});
-        myGraphicElement.polySetYPoints(new float[] {0.1f, 0.1f, 0.6f});
-        myGraphicElement.setPolygon(true);
-        myGraphicElement.setClosed(true);
-        myGraphicElement.setSlideCanvas(slide1);
-        slideElementsSlide1.add(myGraphicElement);
-
-
-        GraphicElement myGraphicElement3 = new GraphicElement();
-        myGraphicElement3.setLayer(3);
-        myGraphicElement3.setStartSequence(6);
-        myGraphicElement3.setEndSequence(8);
-        myGraphicElement3.setDuration(0.5f);
-        myGraphicElement3.setFillColour("#FF0000FF");
-        myGraphicElement3.setLineColour("#0000FFFF");
-        myGraphicElement3.polySetXPoints(new float[] {0.5f, 0.5f, 0.4f});
-        myGraphicElement3.polySetYPoints(new float[] {0.2f, 0.8f, 0.3f});
-        myGraphicElement3.setPolygon(true);
-        myGraphicElement3.setClosed(true);
-        myGraphicElement3.setSlideCanvas(slide1);
-        slideElementsSlide1.add(myGraphicElement3);
-
-
-        TextElement myTextElement11 = new TextElement();
-        myTextElement11.setLayer(2);
-        myTextElement11.setStartSequence(4);
-        myTextElement11.setEndSequence(7);
-        myTextElement11.setDuration(0.5f);
-        myTextElement11.setElementID(5);
-        myTextElement11.setFont("Times New Roman");
-        myTextElement11.setFontSize(24);
-        myTextElement11.setFontColour("#AA4567");
-        myTextElement11.setBgColour("#000000");
-        myTextElement11.setTextContent("<b>This is some sample text for Adar to be impressed by</b>");
-        myTextElement11.setSlideCanvas(slide1);
-        slideElementsSlide1.add(myTextElement11);
-
-
-        PollElement poll = new PollElement();
-        List<String> answers = new ArrayList<>();
-        answers.add(0,"ANS 1");
-        answers.add(1,"ANS 2");
-        answers.add(2,"ANS 3");
-        answers.add(3,"ANS 4");
-        poll.setPossibleAnswers(answers);
-        poll.setQuestion("HERE IS A SAMPLE QUESTION!");
-        poll.setTimeLimit(15);
-
-        poll.setLayer(6);
-        poll.setStartSequence(9);
-        poll.setEndSequence(10);
-        poll.setDuration(1);
-        poll.setElementID(111111);
-        poll.setSlideCanvas(slide1);
-        slideElementsSlide1.add(poll);
-
-        WordCloudElement myWordCloudElement = new WordCloudElement();
-        myWordCloudElement.setQuestion("Enter Words about Edi");
-        myWordCloudElement.setTimeLimit(10);
-        myWordCloudElement.setLayer(7);
-        myWordCloudElement.setStartSequence(11);
-        myWordCloudElement.setEndSequence(12);
-        myWordCloudElement.setDuration(10);
-        //myWordCloudElement.setCloudShapePath("file:/projectResources/logos/ediLogo400x400.png");
-        myWordCloudElement.setElementID(123456);
-        myWordCloudElement.setSlideCanvas(slide1);
-        slideElementsSlide1.add(myWordCloudElement);
-
-        slide1.setSlideElementList(slideElementsSlide1);
-
-
-        Slide slide2 = new Slide();
-        slide2.setSlideID(2);
-        slides.add(slide2);
-
-        //Create some test Slide Elements
-        ArrayList<SlideElement> slideElementsSlide2 = new ArrayList<>();
-
-        //Create a test Text element, add some text and pop it onto our stack pane. This code will all be driven from XML parser
-        TextElement myTextElementNewSlide = new TextElement();
-        myTextElementNewSlide.setLayer(2);
-        myTextElementNewSlide.setStartSequence(2);
-        myTextElementNewSlide.setEndSequence(4);
-        myTextElementNewSlide.setDuration(1);
-        myTextElementNewSlide.setElementID(69);
-        myTextElementNewSlide.setTextContent("<b>Slide2</b>");
-        myTextElementNewSlide.setSlideCanvas(slide2);
-        slideElementsSlide2.add(myTextElementNewSlide);
-
-        VideoElement myVideoElement = new VideoElement();
-        myVideoElement.setPath("projectResources/sampleFiles/prometheus.mp4");
-        myVideoElement.setAutoplay(true);
-        myVideoElement.setMediaControl(true);
-        myVideoElement.setLoop(false);
-        myVideoElement.setStartTime(Duration.seconds(0));
-        myVideoElement.setEndTime(Duration.seconds(30));
-        myVideoElement.setElementAspectRatio(1.777777f);
-        myVideoElement.setAspectRatioLock(false);
-        myVideoElement.setxSize(0.300f);
-        myVideoElement.setySize(0.3f);
-        myVideoElement.setxPosition(0.2f);
-        myVideoElement.setyPosition(0.2f);
-        myVideoElement.setLayer(1);
-        myVideoElement.setStartSequence(1);
-        myVideoElement.setEndSequence(3);
-        myVideoElement.setDuration(0.5f);
-        myVideoElement.setSlideCanvas(slide2);
-        slideElementsSlide2.add(myVideoElement);
-
-        slide2.setSlideElementList(slideElementsSlide2);
-
-
-        Slide slide3 = new Slide();
-        slide3.setSlideID(3);
-        slides.add(slide3);
-
-        //Create some test Slide Elements
-        ArrayList<SlideElement> slideElementsSlide3 = new ArrayList<>();
-
-        //Create a test Text element, add some text and pop it onto our stack pane. This code will all be driven from XML parser
-        TextElement myTextElementNewSlide2 = new TextElement();
-        myTextElementNewSlide2.setLayer(1);
-        myTextElementNewSlide2.setStartSequence(1);
-        myTextElementNewSlide2.setEndSequence(2);
-        myTextElementNewSlide2.setDuration(1);
-        myTextElementNewSlide2.setElementID(124214);
-        myTextElementNewSlide2.setTextContent("<b>Slide3</b>");
-        myTextElementNewSlide2.setSlideCanvas(slide3);
-        slideElementsSlide3.add(myTextElementNewSlide2);
-
-        AudioElement audioElement = new AudioElement();
-        audioElement.setLayer(0);
-        audioElement.setElementID(1);
-        audioElement.setStartSequence(2);
-        audioElement.setEndSequence(3);
-        audioElement.setDuration(5);
-        audioElement.setPath("projectResources/sampleFiles/example.mp3");
-        audioElement.isLoop(false);
-        audioElement.isAutoPlay(false);
-        audioElement.setStartTime(Duration.seconds(0));
-        audioElement.setEndTime(Duration.seconds(5));
-        slideElementsSlide3.add(audioElement);
-
-        slide3.setSlideElementList(slideElementsSlide3);
-
-        Presentation myPresentation = new Presentation();
-        myPresentation.setSlideList(slides);
-        myPresentation.setDocumentAspectRatio((float) 4/3);
-        Theme theme = new Theme();
-        theme.setBackgroundColour("#2ECC71FF");
-        myPresentation.setTheme(theme);
-
-        return myPresentation;
-    }
 
     public void setI2lpFormat(boolean i2lpFormat) {
         isI2lpFormat = i2lpFormat;

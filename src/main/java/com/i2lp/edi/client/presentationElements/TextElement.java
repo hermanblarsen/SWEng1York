@@ -26,6 +26,10 @@ import static com.i2lp.edi.client.utilities.Utilities.readFile;
  * Created by habl on 26/02/2017.
  */
 
+/**
+ * Text element based on webviews rendering HTML with custom
+ * CSS generation
+ */
 public class TextElement extends SlideElement {
     protected String textContent = "Error: No Text Content Fund!";
     protected String textFilepath;
