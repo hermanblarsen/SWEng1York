@@ -112,6 +112,7 @@ public abstract class Dashboard extends Application {
     protected DateTimePicker dateTimePicker;
     protected StackPane welcomePane;
     protected Button closeWelcomeButton;
+    protected Button backButton;
 
     @Override
     public void start(Stage dashboardStage) {
@@ -330,7 +331,7 @@ public abstract class Dashboard extends Application {
 
             case MODULE:
             case SEARCH_IN_MODULE:
-                Button backButton = new Button("Back");
+                backButton = new Button("Back");
                 backButton.getStyleClass().setAll("btn", "btn-default");
                 backButton.setAlignment(Pos.CENTER);
                 backButton.setOnAction(event -> goToState(DashboardState.TOP_LEVEL));

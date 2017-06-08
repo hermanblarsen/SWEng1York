@@ -83,12 +83,14 @@ public abstract class DashboardTest extends ApplicationTest {
         modulePanels = subjectPanels.get(0).getModulePanels();
     }
 
+
     @Test
     public void testSearch() {
         Boolean presSearchFailed = false;
         Boolean moduleSearchFailed = false;
         String searchText = "Y1 Maths";
 
+        //Search all presentations for a match
         clickOn(searchField).write("Y1 Maths");
         for(PresentationPanel temp : presentationPanels) {
             if(temp.isHidden()) {
@@ -108,6 +110,7 @@ public abstract class DashboardTest extends ApplicationTest {
             }
         }
 
+        //Search all modules for a match
         for(ModulePanel temp : modulePanels) {
             if(temp.isHidden()) {
                 for (String term : temp.getSearchableTerms()) {
@@ -139,6 +142,7 @@ public abstract class DashboardTest extends ApplicationTest {
             subjectFails[i] = false;
         }
 
+        //Click on each subject filter and verify only selected subjects appear
         for(CheckBox subjectButton : subjectCheckboxes) {
             clickOn(subjectButton);
             for(SubjectPanel temp : subjectPanels) {
@@ -150,6 +154,7 @@ public abstract class DashboardTest extends ApplicationTest {
             clickOn(subjectButton);
         }
 
+        //Click on show all button and verify all subjects appear
         clickOn(showAllButton);
         for(SubjectPanel temp : subjectPanels) {
             if(temp.isHidden())
@@ -174,6 +179,7 @@ public abstract class DashboardTest extends ApplicationTest {
         Boolean presNumAscFailed = false, presNumDescFailed = false;
         Boolean ignore = true;
 
+        //Iterate through each subject for each sort option and verify correct ordering
         clickOn(subjectSortCombo);
         for(int i = 0; i < 6; i++) {
             for (SubjectPanel temp : subjectPanels) {
@@ -236,6 +242,7 @@ public abstract class DashboardTest extends ApplicationTest {
         Boolean presNumAscFailed = false, presNumDescFailed = false;
         Boolean ignore = true;
 
+        //Iterate through each module for each sort option and verify correct ordering
         clickOn(moduleSortCombo);
         for(int i = 0; i < 4; i++) {
             for (ModulePanel temp : subjectPanels.get(0).getModulePanels()) {
@@ -298,6 +305,7 @@ public abstract class DashboardTest extends ApplicationTest {
         presSortCombo = myDashboard.presSortCombo;
         clickOn(presSortCombo);
 
+        //Iterate through each presentation for each sort option and verify correct ordering
         for(int i = 0; i < 6; i++) {
             for (PresentationPanel temp : currentPresPanels) {
                 currentName = temp.getPresentation().getId();

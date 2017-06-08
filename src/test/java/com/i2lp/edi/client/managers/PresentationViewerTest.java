@@ -85,7 +85,6 @@ public abstract class PresentationViewerTest extends ApplicationTest {
         }
 
         progress = (myPresentationManager.currentSequenceNumber - 1) / (double) sequenceNumberMax;
-        progress = 0.0;
         assertEquals(progress, myPresentationManager.progressBar.getProgress(), 0.01);
 
         clickOn(leftButton);
@@ -131,6 +130,7 @@ public abstract class PresentationViewerTest extends ApplicationTest {
 
     @Test
     public void testKeyboardListeners() {
+        //Test slide sequence forward/backward for each key bind
         assertEquals(1, myPresentationManager.currentSequenceNumber);
         push(KeyCode.SPACE);
         assertEquals(2, myPresentationManager.currentSequenceNumber);
@@ -149,6 +149,7 @@ public abstract class PresentationViewerTest extends ApplicationTest {
         push(KeyCode.LEFT);
         assertEquals(1, myPresentationManager.currentSequenceNumber);
 
+        //Test fullscreen and exit fullscreen for each key bind
         assertFalse(myPresentationManager.isFullscreen);
         push(KeyCode.F5);
         assertTrue(myPresentationManager.isFullscreen);
@@ -156,12 +157,14 @@ public abstract class PresentationViewerTest extends ApplicationTest {
         push(KeyCode.ESCAPE);
         assertFalse(myPresentationManager.isFullscreen);
 
+        //Test show black key bind
         assertFalse(myPresentationManager.isShowBlack);
         push(KeyCode.B);
         assertTrue(myPresentationManager.isShowBlack);
         push(KeyCode.B);
         assertFalse(myPresentationManager.isShowBlack);
 
+        //Test start slide and end slide key binds
         push(KeyCode.END);
         assertEquals(myPresentation.getMaxSlideNumber() - 1, myPresentationManager.currentSlideNumber);
         push(KeyCode.HOME);
