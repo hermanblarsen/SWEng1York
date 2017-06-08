@@ -32,6 +32,8 @@ import static java.lang.Thread.currentThread;
 /**
  * Created by amriksadhra on 20/03/2017.
  */
+
+
 public class SocketClient {
     /* Constant to indicate server has not responded */
     private static final int NO_RESPONSE = -1;
@@ -62,10 +64,18 @@ public class SocketClient {
         }
     }
 
+    /**
+     * Sets the Edi Manager
+     * @param ediManager the edi manager
+     */
     public void setEdiManager(EdiManager ediManager) {
         this.ediManager = ediManager;
     }
 
+    /**
+     * Connects to the database with dbHostName
+     * @param dbHostName the database host name
+     */
     public void connectToRemoteDB(String dbHostName) {
         //Connect to PostgreSQL Instance
         dataSource = new PGDataSource();
@@ -82,6 +92,11 @@ public class SocketClient {
         }
     }
 
+    /**
+     * Connects to remote socket using socketHostName and serverPort
+     * @param socketHostName the socket host name
+     * @param serverPort the server port
+     */
     public void connectToRemoteSocket(String socketHostName, int serverPort) {
         String serverIPAddress = Utilities.buildIPAddress(socketHostName, serverPort);
 
@@ -293,7 +308,12 @@ public class SocketClient {
         return associatedUsers;
     }
 
-    //Gets most of a User entry (Doesn't get password or salt)
+
+    /**
+     * Gets most of a User entry (Doesn't get password or salt)
+     * @param userId the user ID
+     * @return the user with the user ID matching
+     */
     public User getUser(int userId) {
         User retrievedUser = null;
 
@@ -442,6 +462,9 @@ public class SocketClient {
         return additionSuccessFinal.get();
     }
 
+    /**
+     * Closes all sockets and connections
+     */
     public void closeAll() {
         try {
             dataSource.getConnection().close();
@@ -451,6 +474,11 @@ public class SocketClient {
         socket.close();
     }
 
+    /**
+     * Gets presentations of which the user has access
+     * @param userID the user ID
+     * @return
+     */
     public ArrayList<PresentationMetadata> getPresentationsForUser(int userID) {
         ArrayList<PresentationMetadata> presentationsForUser = new ArrayList<>();
 
@@ -475,6 +503,11 @@ public class SocketClient {
         return presentationsForUser;
     }
 
+    /**
+     * Get modules of which the user is part of
+     * @param userID the user ID
+     * @return modules of which the user is part of
+     */
     public ArrayList<Module> getModulesForUser(int userID) {
         ArrayList<Module> modulesForUser = new ArrayList<>();
 
@@ -522,6 +555,12 @@ public class SocketClient {
         });
     }
 
+    /**
+     * Set a presentation go live date
+     * @param presentationId the presentation ID
+     * @param goLiveDate The go live date
+     * @return true if successfull
+     */
     public boolean setPresentationGoLive(int presentationId, String goLiveDate) {
         boolean statementSuccess = false;
 
@@ -552,6 +591,11 @@ public class SocketClient {
         return statementSuccess;
     }
 
+    /**
+     * Send the interactive element to server
+     * @param presentation the presentation element
+     * @param presentationId the presentation ID
+     */
     private void sendInteractiveElementsToServer(Presentation presentation, int presentationId) {
         //Presentation successfully uploaded, send the details of the interactive elements to the DB.
         for (Slide slides : presentation.getSlideList()) {
@@ -568,10 +612,10 @@ public class SocketClient {
     }
 
     /**
-     * Delete the requested presentation from the respective module, deleting the data base table reference and the server zip contents
-     *
+     * Delete the requested presentation from the respective module,
+     * deleting the data base table reference.
      * @param presentationID Presentation ID to delete
-     * @return
+     * @return contains success if successful
      */
     public String removePresentationFromModule(int presentationID) {
         String return_status_removal = "";
@@ -601,6 +645,11 @@ public class SocketClient {
         return return_status_removal;
     }
 
+    /**
+     * Get the interactions for a interactive element
+     * @param interactiveElementID the interactive element ID
+     * @return returns the interactions for the interactive element
+     */
     public ArrayList<InteractionRecord> getInteractionsForInteractiveElement(int interactiveElementID) {
         ArrayList<InteractionRecord> interactionsForElement = new ArrayList<>();
 
@@ -626,6 +675,12 @@ public class SocketClient {
         return interactionsForElement;
     }
 
+    /**
+     * Sets a presentation live
+     * @param presentationID the presentation ID
+     * @param live true if the presentation is live
+     * @return true if success
+     */
     public boolean setPresentationLive(int presentationID, boolean live) {
         boolean statementSuccess = false;
         try (PGConnection connection = (PGConnection) dataSource.getConnection()) {
@@ -652,6 +707,11 @@ public class SocketClient {
         return !statementSuccess;
     }
 
+    /**
+     * Gets the active users in a presentation
+     * @param presentationID the presentation ID
+     * @return an array of users active in the presentation
+     */
     public ArrayList<User> getPresentationActiveUsers(int presentationID) {
         ArrayList<User> activeUsers = new ArrayList<>();
 
@@ -683,6 +743,12 @@ public class SocketClient {
         return activeUsers;
     }
 
+    /**
+     * Set the current slide and sequence for a presentation
+     * @param presentationID the presentation ID
+     * @param currentSlide the current slide number
+     * @param currentSequence the current sequence number
+     */
     public void setCurrentSlideAndSequenceForPresentation(int presentationID, int currentSlide, int currentSequence) {
         Thread statementThread = new Thread(() -> {
             boolean statementSuccess = false;
@@ -717,6 +783,11 @@ public class SocketClient {
         statementThread.start();
     }
 
+    /**
+     * Get the current slide for a presentation
+     * @param presentationID the presentation ID
+     * @return an integer array with [0]-currentSlide and [1]-currentSequenceNumber
+     */
     public Integer[] getCurrentSlideForPresentation(int presentationID) {
         Integer[] toReturn = new Integer[2];
 
@@ -751,6 +822,13 @@ public class SocketClient {
         return toReturn;
     }
 
+    /**
+     * set Interactive elements for presentation
+     * @param elements interactive elements
+     * @param presentationID presentation ID
+     * @param slideNumber slide number
+     * @return true if successful
+     */
     public boolean setInteractiveElementsForPresentation(List<InteractiveElement> elements, int presentationID, int slideNumber) {
         boolean statementSuccess = false;
         try (PGConnection connection = (PGConnection) dataSource.getConnection()) {
@@ -795,6 +873,12 @@ public class SocketClient {
         return true;
     }
 
+    /**
+     * Set user active in presentation
+     * @param presentationID presentation ID
+     * @param userID user ID
+     * @return true if successful
+     */
     public boolean setUserActivePresentation(int presentationID, int userID) {
         boolean statementSuccess = false;
         try (PGConnection connection = (PGConnection) dataSource.getConnection()) {
@@ -827,6 +911,14 @@ public class SocketClient {
         return statementSuccess;
     }
 
+    /**
+     * add question to question que for specific presentaion and slide
+     * @param userID user ID
+     * @param presentationID presentation ID
+     * @param questionData question
+     * @param slideNumber slidenumber question was asked at
+     * @return true if successful
+     */
     public boolean addQuestionToQuestionQueue(int userID, int presentationID, String questionData, int slideNumber) {
         boolean statementSuccess = false;
 
@@ -863,6 +955,11 @@ public class SocketClient {
         return statementSuccess;
     }
 
+    /**
+     * Asnwer question in question que
+     * @param questionID question ID to be answered
+     * @return true if successful
+     */
     public boolean answerQuestionInQuestionQueue(int questionID) {
         boolean statementSuccess = false;
 
@@ -896,6 +993,12 @@ public class SocketClient {
         return statementSuccess;
     }
 
+    /**
+     * Get the questions for a presentation
+     * @param presentationID presentation ID
+     * @param retrieveAnswered boolean to choose if you want all questions or only unanswered ones.
+     * @return a question array
+     */
     public ArrayList<Question> getQuestionsForPresentation(int presentationID, boolean retrieveAnswered) {
         ArrayList<Question> activeQuestions = new ArrayList<>();
 
@@ -932,6 +1035,13 @@ public class SocketClient {
         return activeQuestions;
     }
 
+    /**
+     * Set interactive element live
+     * @param presentationID presentaion ID
+     * @param interactiveElementID interactive element ID
+     * @param isLive true if element is live
+     * @return true if successful
+     */
     public boolean setInteractiveElementLive(int presentationID, int interactiveElementID, boolean isLive) {
         boolean statementSuccess = false;
 
@@ -976,6 +1086,11 @@ public class SocketClient {
         return statementSuccess;
     }
 
+    /**
+     *  Get interactive elements form presentation
+     * @param presentationID presentation ID
+     * @return arrau of interactive elements
+     */
     public ArrayList<InteractiveElementRecord> getInteractiveElementsForPresentation(int presentationID) {
         ArrayList<InteractiveElementRecord> interactiveElementRecords = new ArrayList<>();
 
@@ -1016,6 +1131,13 @@ public class SocketClient {
         return interactiveElementRecords;
     }
 
+    /**
+     * Add interaction to interactive element
+     * @param userID user ID
+     * @param interactiveElementID interactive element ID
+     * @param interactionData interaction data
+     * @return
+     */
     public boolean addInteractionToInteractiveElement(int userID, int interactiveElementID, String interactionData) {
         boolean statementSuccess = false;
 
@@ -1051,6 +1173,11 @@ public class SocketClient {
         return statementSuccess;
     }
 
+    /**
+     * Get interactions for presentation
+     * @param presentationID presentation ID
+     * @return interaction array
+     */
     public ArrayList<InteractionRecord> getInteractionsForPresentation(int presentationID) {
         ArrayList<InteractionRecord> interactionsForPresentation = new ArrayList<>();
 
@@ -1076,7 +1203,13 @@ public class SocketClient {
         return interactionsForPresentation;
     }
 
-
+    /**
+     * Send presentation statistics for presentation
+     * @param presentationId presentation ID
+     * @param userId user ID
+     * @param slideTimes CSV separated seconds on each slide
+     * @return true if successful
+     */
     public boolean sendPresentationStatistics(int presentationId, int userId, ArrayList<Duration> slideTimes) {
 
         //Concatinate the slide times for storage
@@ -1122,6 +1255,11 @@ public class SocketClient {
         return statementSuccess;
     }
 
+    /**
+     * Get Presentation Statistics for presentation
+     * @param presentationID presentation ID
+     * @return return presentation statistics array
+     */
     public ArrayList<PresentationStatisticsRecord> getPresentationStatistics(int presentationID) {
         ArrayList<PresentationStatisticsRecord> statisticEntries = new ArrayList<>();
 
