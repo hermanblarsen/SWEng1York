@@ -201,8 +201,8 @@ public class ParserXMLTest {
         assertEquals("projectResources/sampleFiles/example.mp3", audioElement.getPath());
         assertEquals(Boolean.TRUE, audioElement.getLoop());
         assertEquals(Boolean.FALSE, audioElement.getAutoPlay());
-        assertEquals(1f, audioElement.getStartTime().toSeconds(), ERROR_MARGIN);
-        assertEquals(5f, audioElement.getEndTime().toSeconds(), ERROR_MARGIN);
+        assertEquals(0.001f, audioElement.getStartTime().toSeconds(), ERROR_MARGIN);
+        assertEquals(0.005f, audioElement.getEndTime().toSeconds(), ERROR_MARGIN);
 
 
         //Slide 3
