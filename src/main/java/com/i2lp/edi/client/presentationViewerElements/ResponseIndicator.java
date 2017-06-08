@@ -10,6 +10,11 @@ import javafx.scene.text.Text;
 /**
  * Created by Luke on 22/04/2017.
  */
+
+/**
+ * Response indicator indicating in presentation how many
+ * responses have been received
+ */
 public class ResponseIndicator extends HBox {
 
     private int numberOfStudents;

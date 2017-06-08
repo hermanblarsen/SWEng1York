@@ -18,6 +18,10 @@ import static com.i2lp.edi.client.managers.PresentationManager.MIN_ERASER_SIZE;
 /**
  * Created by Kacper on 2017-04-30.
  */
+
+/**
+ * Drawpane to be able to draw onto slides
+ */
 public class DrawPane extends Pane {
 
     private boolean isActive;

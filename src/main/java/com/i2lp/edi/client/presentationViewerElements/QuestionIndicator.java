@@ -11,6 +11,11 @@ import javafx.scene.text.Text;
 /**
  * Created by Luke on 07/05/2017.
  */
+
+/**
+ * Question indicator indicating in presentation how many
+ * questions are unanswered
+ */
 public class QuestionIndicator extends HBox{
     private int numberOfQuestions;
     protected GraphicsContext gc;

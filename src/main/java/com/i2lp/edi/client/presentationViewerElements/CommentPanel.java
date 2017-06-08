@@ -20,9 +20,12 @@ import java.util.ArrayList;
 /**
  * Created by Luke on 19/04/2017.
  */
+
+/**
+ * Comment panel for slide comments in HTML, save to the respective presentation slide.
+ */
 public class CommentPanel extends Panel {
     private static final String EMPTY_HTML_TEXT = "<html dir=\"ltr\"><head></head><body contenteditable=\"true\"></body></html>";
-    Logger logger = LoggerFactory.getLogger(CommentPanel.class);
     protected HTMLEditor htmlEditor;
     protected String comment;
     protected boolean teacher;
@@ -36,7 +39,7 @@ public class CommentPanel extends Panel {
         htmlEditor.setMaxWidth(Double.MAX_VALUE);
         htmlEditor.setHtmlText(EMPTY_HTML_TEXT);
         VBox commentEditor = new VBox();
-        commentEditor.getChildren().addAll(htmlEditor);//, controlPanel());
+        commentEditor.getChildren().addAll(htmlEditor);
         addActionListeners();
 
         getStyleClass().add("panel-primary");
@@ -55,24 +58,11 @@ public class CommentPanel extends Panel {
         htmlEditor.addEventHandler(InputEvent.ANY, event -> currentSlide.setUserComments(htmlEditor.getHtmlText()));
     }
 
-    private HBox controlPanel() { //TODO delete if not used for question que tabs or something
-        HBox controlBox = new HBox();
-        controlBox.setStyle("-fx-background-color: #34495e;");
-        controlBox.setPadding(new Insets(5, 12, 5, 12));
-        controlBox.setSpacing(12);
-        controlBox.setMaxWidth(Double.MAX_VALUE);
-
-//        if(!teacher) controlBox.getChildren().addAll(submitButton);
-
-        return controlBox;
-    }
-
     public String getComment() {
         return currentSlide.getUserComments();
     }
 
     public void setSlide(Slide currentSlide) {
-//        this.currentSlide.setUserComments(htmlEditor.getHtmlText()); //Make sure the previous slide comment is stored
         this.currentSlide = currentSlide; //Set new slide
         updateHtmlEditor();
     }
