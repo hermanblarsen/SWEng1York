@@ -17,7 +17,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.I2LP</groupId>
-    <artifactId>edi</artifactId><version>0.100</version>
+    <artifactId>edi</artifactId><version>0.103</version>
 
     <name>Edi</name>
     <description>
@@ -53,6 +53,13 @@
     </reporting>
 
     <build>
+        <!--Package the project images etc.-->
+        <resources>
+            <resource>
+                <directory>projectResources</directory>
+            </resource>
+        </resources>
+
         <plugins>
             <!-- Auto increment build number -->
             <plugin>

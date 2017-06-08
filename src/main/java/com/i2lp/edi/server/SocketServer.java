@@ -99,7 +99,7 @@ public class SocketServer {
 
                 //Attempt to add a user using stored procedure
                 try (PGConnection connection = (PGConnection) dataSource.getConnection()) {
-                    PreparedStatement statement = connection.prepareStatement("SELECT edi.public.sp_adduser(?, ?, ?, ?, ?);");
+                    PreparedStatement statement = connection.prepareStatement("SELECT edi.public.sp_add_user(?, ?, ?, ?, ?);");
 
                     //Fill prepared statements to avoid SQL injection
                     statement.setString(1, data.getFirstName());
@@ -134,7 +134,7 @@ public class SocketServer {
                 User userDataSend = new User(PASSWORD_INVALID, "", "", "", "");
 
                 try (PGConnection connection = (PGConnection) dataSource.getConnection()) {
-                    PreparedStatement statement = connection.prepareStatement("SELECT user_id, user_type, username, first_name, last_name, email_address FROM edi.public.sp_authuser(?, ?);");
+                    PreparedStatement statement = connection.prepareStatement("SELECT user_id, user_type, username, first_name, last_name, email_address FROM edi.public.sp_authenticate_user(?, ?);");
 
                     //Fill prepared statements to avoid SQL injection
                     statement.setString(1, data.getUserToLogin());
@@ -201,7 +201,7 @@ public class SocketServer {
 
                 //Insert new presentation into database
                 try (PGConnection connection = (PGConnection) dataSource.getConnection()) {
-                    PreparedStatement statement = connection.prepareStatement("select sp_addpresentationtomodulenew(?, ?);");
+                    PreparedStatement statement = connection.prepareStatement("select sp_add_presentation_to_module(?, ?);");
 
                     //Fill prepared statements to avoid SQL injection
                     statement.setInt(1, moduleID);

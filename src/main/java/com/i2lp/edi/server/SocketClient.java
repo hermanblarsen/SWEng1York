@@ -456,7 +456,7 @@ public class SocketClient {
 
         //Attempt to add a user using stored procedure
         try (PGConnection connection = (PGConnection) dataSource.getConnection()) {
-            PreparedStatement statement = connection.prepareStatement("SELECT * FROM edi.public.sp_getpresentationsforuser(?);");
+            PreparedStatement statement = connection.prepareStatement("SELECT * FROM edi.public.sp_get_presentations_for_user(?);");
 
             //Fill prepared statements to avoid SQL injection
             statement.setInt(1, userID);
@@ -481,7 +481,7 @@ public class SocketClient {
         //Attempt to add a user using stored procedure
         try (PGConnection connection = (PGConnection) dataSource.getConnection()) {
 
-            PreparedStatement statement = connection.prepareStatement("SELECT * FROM edi.public.sp_getmodulesforuser(?);");
+            PreparedStatement statement = connection.prepareStatement("SELECT * FROM edi.public.sp_get_modules_for_user(?);");
 
             //Fill prepared statements to avoid SQL injection
             statement.setInt(1, userID);
@@ -577,7 +577,7 @@ public class SocketClient {
         String return_status_removal = "";
         try (PGConnection connection = (PGConnection) dataSource.getConnection()) {
             //When the xml for the presentation is retrieved, then remove it for the respective module
-            PreparedStatement statementRemovePresentation = connection.prepareStatement("SELECT * FROM edi.public.sp_removepresentation(?);");
+            PreparedStatement statementRemovePresentation = connection.prepareStatement("SELECT * FROM edi.public.sp_remove_presentation(?);");
             //Fill prepared statements to avoid SQL injection
             statementRemovePresentation.setInt(1, presentationID);
 
@@ -606,7 +606,7 @@ public class SocketClient {
 
         //Attempt to add a user using stored procedure
         try (PGConnection connection = (PGConnection) dataSource.getConnection()) {
-            PreparedStatement statement = connection.prepareStatement("SELECT * FROM public.sp_getinteractionsforinteractiveelement(?);");
+            PreparedStatement statement = connection.prepareStatement("SELECT * FROM public.sp_get_interactions_for_interactiveelement(?);");
 
             //Fill prepared statements to avoid SQL injection
             statement.setInt(1, interactiveElementID);
@@ -833,7 +833,7 @@ public class SocketClient {
         //Attempt to add a user using stored procedure
         try (PGConnection connection = (PGConnection) dataSource.getConnection()) {
 
-            PreparedStatement statement = connection.prepareStatement("SELECT * FROM public.sp_addquestion_to_questionqueue(?, ?, ?, ?);");
+            PreparedStatement statement = connection.prepareStatement("SELECT * FROM public.sp_add_question_to_questionqueue(?, ?, ?, ?);");
 
             //Fill prepared statements to avoid SQL injection
             statement.setInt(1, userID);
@@ -940,7 +940,7 @@ public class SocketClient {
             if (isLive) {
                 statement =
                         connection.prepareStatement("UPDATE interactive_elements " +
-                                "SET live = ?, response_interval = ? " +
+                                "SET live = ?, local_start_time = ? " +
                                 "WHERE interactive_element_id = ? AND presentation_id = ?;");
 
                 //Fill prepared statements to avoid SQL injection
@@ -980,7 +980,7 @@ public class SocketClient {
         ArrayList<InteractiveElementRecord> interactiveElementRecords = new ArrayList<>();
 
         try (PGConnection connection = (PGConnection) dataSource.getConnection()) {
-            PreparedStatement statement = connection.prepareStatement("SELECT * FROM edi.public.sp_getinteractiveelementsforpresentation(?);");
+            PreparedStatement statement = connection.prepareStatement("SELECT * FROM edi.public.sp_get_interactiveelements_for_presentation(?);");
 
             //Fill prepared statements to avoid SQL injection
             statement.setInt(1, presentationID);
@@ -1022,7 +1022,7 @@ public class SocketClient {
         //Attempt to add a user using stored procedure
         try (PGConnection connection = (PGConnection) dataSource.getConnection()) {
 
-            PreparedStatement statement = connection.prepareStatement("SELECT * FROM public.sp_addinteraction_to_interactiveelemnt(?,?,?);");
+            PreparedStatement statement = connection.prepareStatement("SELECT * FROM public.sp_add_interaction_to_interactiveelement(?,?,?);");
 
             //Fill prepared statements to avoid SQL injection
             statement.setInt(1, userID);
@@ -1056,7 +1056,7 @@ public class SocketClient {
 
         //Attempt to add a user using stored procedure
         try (PGConnection connection = (PGConnection) dataSource.getConnection()) {
-            PreparedStatement statement = connection.prepareStatement("SELECT * FROM public.sp_getinteractionsforpresentation(?);");
+            PreparedStatement statement = connection.prepareStatement("SELECT * FROM public.sp_get_interactions_for_presentation(?);");
 
             //Fill prepared statements to avoid SQL injection
             statement.setInt(1, presentationID);
@@ -1093,7 +1093,7 @@ public class SocketClient {
 
         try (PGConnection connection = (PGConnection) dataSource.getConnection()) {
             PreparedStatement statement = connection.prepareStatement(
-                    "SELECT * FROM sp_addstatistics_to_presentation(?, ?, ?)");
+                    "SELECT * FROM sp_add_statistics_to_presentation(?, ?, ?)");
 
             statement.setInt(1, userId);
             statement.setInt(2, presentationId);

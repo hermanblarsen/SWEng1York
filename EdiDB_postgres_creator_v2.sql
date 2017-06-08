@@ -73,7 +73,7 @@ CREATE TABLE "interactive_elements" (
 ) WITH (
 OIDS=FALSE
 );
-INSERT INTO public.interactive_elements (interactive_element_id, presentation_id, interactive_element_data, type, live, slide_number)
+INSERT INTO public.interactive_elements (interactive_element_id, presentation_id, interactive_element_data, type, live, xml_slide_id)
 VALUES (1, 1, 'Test Questions', 'poll', FALSE , 1);
 
 
