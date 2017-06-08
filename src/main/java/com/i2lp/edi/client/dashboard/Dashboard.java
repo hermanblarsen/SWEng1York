@@ -56,6 +56,8 @@ import static javafx.scene.layout.BorderPane.setAlignment;
 
 /**
  * Created by amriksadhra on 24/01/2017.
+ *
+ * Implements the UI and associated features for displaying and controlling the Elements of the Edi Dashboard which are shared by both Teachers and Students.
  */
 @SuppressWarnings({"WeakerAccess", "unused", "Duplicates"})
 public abstract class Dashboard extends Application {
@@ -64,25 +66,38 @@ public abstract class Dashboard extends Application {
     private static final String OPEN_LOCAL_PRES_CAPTION = "Local (from this computer)";
     private static final String OPEN_REMOTE_PRES_CAPTION = "Remote (from this http)";
     protected static Logger logger = LoggerFactory.getLogger(Dashboard.class);
-    private EdiManager ediManager;
     protected PresentationManager presentationManager;
     protected Scene scene;
     protected BorderPane border;
     protected Stage dashboardStage;
-    private PresentationPanel selectedPresPanel;
-    private ModulePanel selectedModulePanel;
     protected ArrayList<PresentationPanel> presentationPanels;
     protected ArrayList<SubjectPanel> subjectPanels;
-    private FlowPane presentationPanelsFlowPane;
-    private VBox subjectPanelsVBox;
     protected ComboBox<PresSortKey> presSortCombo;
     protected ComboBox<DashModuleSortKey> moduleSortCombo;
     protected ComboBox<SubjectSortKey> subjectSortCombo;
+    protected boolean isWelcomeTextHidden = false;
+    protected CustomTextField searchField;
+    protected Button showAllButton;
+    protected ArrayList<CheckBox> subjectCheckboxes;
+    protected ArrayList<String> filterSubjects;
+    protected Button openPresButton;
+    protected FileChooser fileChooser;
+    protected MenuBar menuBar;
+    protected Popup aboutPopup;
+    protected Node calendarNode;
+    protected DatePicker calendar;
+    protected DateTimePicker dateTimePicker;
+    protected StackPane welcomePane;
+    protected Button closeWelcomeButton;
+    private EdiManager ediManager;
+    private PresentationPanel selectedPresPanel;
+    private ModulePanel selectedModulePanel;
+    private FlowPane presentationPanelsFlowPane;
+    private VBox subjectPanelsVBox;
     private Stage addToServerStage;
     private ArrayList<Presentation> availablePresentations;
     private ArrayList<DashModule> availableModules;
     private ArrayList<Subject> availableSubjects;
-    protected boolean isWelcomeTextHidden = false;
     private DashboardState currentState;
     private Text noMatchesSubject, noMatchesPres;
     private VBox controlsVBox;
@@ -96,24 +111,14 @@ public abstract class Dashboard extends Application {
     private ScrollPane subjectsScrollPane;
     private VBox centerVBox;
     private VBox subjectCheckboxesVBox;
-
-    protected CustomTextField searchField;
-    protected Button showAllButton;
-    protected ArrayList<CheckBox> subjectCheckboxes;
-    protected ArrayList<String> filterSubjects;
     private ArrayList<PresSchedulePanel> schedulePanels;
     private VBox scheduleVBox;
-    protected Button openPresButton;
-    protected FileChooser fileChooser;
-    protected MenuBar menuBar;
-    protected Popup aboutPopup;
-    protected Node calendarNode;
-    protected DatePicker calendar;
-    protected DateTimePicker dateTimePicker;
-    protected StackPane welcomePane;
-    protected Button closeWelcomeButton;
     protected Button backButton;
 
+    /**
+     * JavaFX entry point for Dashboard UI.
+     * @param dashboardStage
+     */
     @Override
     public void start(Stage dashboardStage) {
         this.dashboardStage = dashboardStage;
@@ -149,6 +154,10 @@ public abstract class Dashboard extends Application {
         dashboardStage.show();
     }
 
+    /**
+     * Sets the dashboard state
+     * @param state
+     */
     public void goToState(DashboardState state) {
         currentState = state;
         logger.info("State: " + currentState.name());
@@ -600,6 +609,9 @@ public abstract class Dashboard extends Application {
         }
     }
 
+    /**
+     * Updates the displayed list of avaliable presentaions from the server.
+     */
     public void updateAvailablePresentations() {
         if (availablePresentations == null)
             availablePresentations = new ArrayList<>();

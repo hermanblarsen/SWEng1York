@@ -5,7 +5,10 @@ import com.i2lp.edi.client.presentationElements.Presentation;
 import com.i2lp.edi.client.presentationElements.SlideElement;
 import com.i2lp.edi.client.presentationElements.WordCloudElement;
 import com.i2lp.edi.server.SocketClient;
-import com.i2lp.edi.server.packets.*;
+import com.i2lp.edi.server.packets.InteractionRecord;
+import com.i2lp.edi.server.packets.InteractiveElementRecord;
+import com.i2lp.edi.server.packets.PresentationStatisticsRecord;
+import com.i2lp.edi.server.packets.Question;
 import com.sun.javafx.scene.control.skin.TableHeaderRow;
 import eu.hansolo.tilesfx.Tile;
 import eu.hansolo.tilesfx.TileBuilder;
@@ -46,24 +49,34 @@ import static com.i2lp.edi.client.Constants.PRESENTATIONS_PATH;
 
 /**
  * Created by Koen on 25/05/2017.
- */
-
-/**
- * Class to generate reports of previously viewed presentations,
- * with interaction data from interactive elements, and other
- * statistics such as attendance.
+ *
+ * Manager which handles generation od displaying of presentation statistics reports.  </br>
+ * Avaliable statistics include:
+ * <ul>
+ *     <li>Question Queue Contents and additional information about the questions asked</li>
+ *     <li>Interactive Element results</li>
+ *     <li>Attendance Report</li>
+ *     <li>Participation Report</li>
+ *     <li>Time spent on Slides</li>
+ * </ul>
  */
 public class ReportManager {
-    private Logger logger = LoggerFactory.getLogger(this.getClass());
     ArrayList<Question> questionQueueQuestions;
     ArrayList<PresentationStatisticsRecord> presentationStatistics;
     ArrayList<InteractionRecord> interactions;
     ArrayList<InteractiveElementRecord> interactiveElementsData;
     HashMap<Integer, User> students = new HashMap<>();
-    private int totalParticipatingStudents = 0;
-
     EdiManager ediManager;
     Presentation presentation;
+    private Logger logger = LoggerFactory.getLogger(this.getClass());
+    private int totalParticipatingStudents = 0;
+
+    // A Predicate for identifing items in a stream which are unique by a particular key.
+    private static <T> Predicate<T> distinctByKey(Function<? super T,Object> keyExtractor) {
+        Map<Object,Boolean> seen = new ConcurrentHashMap<>();
+        return t -> seen.putIfAbsent(keyExtractor.apply(t), Boolean.TRUE) == null;
+    }
+
 
     private void getAllPresentationData(){
         SocketClient sock = ediManager.getSocketClient();
@@ -91,10 +104,9 @@ public class ReportManager {
     }
 
     /**
-     * Opens the report panel for a presentation, which will generate a report for the
-     * selected presentaton.
-     * @param presentation presentation selected
-     * @param ediManager edimanager of selected presentation
+     * Opens a Presentation report panel for a given presentation.
+     * @param presentation The presentation to generate a report for.
+     * @param ediManager The associated ediManager.
      */
     public void openReportPanel(Presentation presentation, EdiManager ediManager){
         this.ediManager = ediManager;
@@ -446,12 +458,12 @@ public class ReportManager {
             return this.firstName + " " + this.lastName;
         }
 
-        public void setWasPresent(boolean wasPresent){
-            this.wasPresent = wasPresent;
-        }
-
         public boolean getWasPresent() {
             return wasPresent;
+        }
+
+        public void setWasPresent(boolean wasPresent){
+            this.wasPresent = wasPresent;
         }
 
         public boolean isTeacher() {
@@ -459,10 +471,6 @@ public class ReportManager {
         }
     }
 
-    public static <T> Predicate<T> distinctByKey(Function<? super T,Object> keyExtractor) {
-        Map<Object,Boolean> seen = new ConcurrentHashMap<>();
-        return t -> seen.putIfAbsent(keyExtractor.apply(t), Boolean.TRUE) == null;
-    }
     //Class for the slide timing table's structure.
     private class StudentSlideTimes{
         private ArrayList<ObservableValue<Integer>> slideTimes = new ArrayList<>();
@@ -488,12 +496,12 @@ public class ReportManager {
             return studentName.get();
         }
 
-        public SimpleStringProperty studentNameProperty() {
-            return studentName;
-        }
-
         public void setStudentName(String studentName) {
             this.studentName.set(studentName);
+        }
+
+        public SimpleStringProperty studentNameProperty() {
+            return studentName;
         }
 
         public ObservableValue<Integer> getSlideTime(int slideNum){

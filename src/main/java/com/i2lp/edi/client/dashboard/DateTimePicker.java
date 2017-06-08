@@ -12,6 +12,8 @@ import java.time.LocalDateTime;
 
 /**
  * Created by Kacper on 2017-05-31.
+ *
+ * Class provides a date and time picket used for scheduling presentations.
  */
 public class DateTimePicker extends VBox {
 
@@ -19,6 +21,9 @@ public class DateTimePicker extends VBox {
     private DatePicker datePicker;
     private TimePicker timePicker;
 
+    /**
+     * Creates a window containing the date time picker. Using getDateTime and getScheduleButton, developers can find the selected time.
+     */
     public DateTimePicker() {
         VBox popupVBoxTop = new VBox(5);
         popupVBoxTop.setPadding(new Insets(0, 0, 5, 0));

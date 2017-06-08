@@ -16,14 +16,12 @@ import javafx.scene.shape.Shape;
  */
 @SuppressWarnings({"WeakerAccess", "unused"})
 public class GraphicElement extends SlideElement {
+    private static final double LINE_THICKNESS = 3;
     protected boolean aspectRatioLock;
     protected float elementAspectRatio;
-
     //Shape Properties:
     protected String lineColour;
     protected String fillColour;
-    private static final double LINE_THICKNESS = 3;
-
     protected Shape graphicShape;
 
     //Polygon Properties
@@ -45,9 +43,28 @@ public class GraphicElement extends SlideElement {
     private Pane wrapperPane;//Wrap the graphics within its own pane so that absolute positioning works properly.
 
     public GraphicElement() {
-
+        //Constructor is not used.
     }
 
+    /**
+     * A utility method which converts a hex colour string with alpha into a JavaFX colour.
+     * @param rgba Hex Colour string in the form RRGGBBAA  (Case insensitive) do not include a # at the beginning of the string.
+     * @return JavaFX colour corresponding to the given string.
+     */
+    public static Color parseRGBAString(String rgba){
+       String rgb = rgba.substring(0, 7);
+       String alphaString = rgba.substring(7);
+       double alpha = (float)Integer.parseInt(alphaString, 16)/255f;
+       //Clamp alpha at maximum of 1, else Color.web fails
+       if(alpha > 1.0) alpha = 1.0;
+       return Color.web(rgb, alpha);
+    }
+
+    /**
+     * Does redraw operations specific to graphic elements.
+     * This involves denormalising coordinates, and setting colors.</br>
+     * setupElement() and setSlideWidth/Height must be set before calling this.
+     */
     @Override
     public void doClassSpecificRender() {
             if (isPolygon) {
@@ -74,11 +91,18 @@ public class GraphicElement extends SlideElement {
 
     }
 
+    /**
+     * Returns the core node whichshould be used for rendering this element.
+     * @return The core node.
+     */
     @Override
     public Node getCoreNode() {
         return wrapperPane;
     }
 
+    /**
+     * Sets up the element in a pre-JavaFX thread environment.  Should be called after all initial properties have been set.
+     */
     @Override
     public void setupElement() {
         wrapperPane = new Pane();
@@ -122,6 +146,9 @@ public class GraphicElement extends SlideElement {
         return pointsArray;
     }
 
+    /**
+     * Not used.
+     */
     @Override
     public void destroyElement() {
 
@@ -166,15 +193,6 @@ public class GraphicElement extends SlideElement {
         return graphicShape;
     }
 
-    public static Color parseRGBAString(String rgba){
-       String rgb = rgba.substring(0, 7);
-       String alphaString = rgba.substring(7);
-       double alpha = (float)Integer.parseInt(alphaString, 16)/255f;
-       //Clamp alpha at maximum of 1, else Color.web fails
-       if(alpha > 1.0) alpha = 1.0;
-       return Color.web(rgb, alpha);
-    }
-
     public void polySetXPoints(float[] points){
         this.normalisedPolygonXPoints = points;
     }
@@ -191,52 +209,52 @@ public class GraphicElement extends SlideElement {
         return this.normalisedPolygonYPoints;
     }
 
-    public void setClosed(boolean isClosed){
-        this.isClosed = isClosed;
-    }
-
     public boolean isClosed(){
         return isClosed;
     }
 
-    public void setOvalXPosition(float x){
-        this.normalisedOvalPos[0] = x;
+    public void setClosed(boolean isClosed){
+        this.isClosed = isClosed;
     }
 
     public float getOvalXPosition(){
         return normalisedOvalPos[0];
     }
 
-    public void setOvalYPosition(float y){
-        this.normalisedOvalPos[1] = y;
+    public void setOvalXPosition(float x){
+        this.normalisedOvalPos[0] = x;
     }
 
     public float getOvalYPosition(){
         return normalisedOvalPos[1];
     }
 
-    public void setrHorizontal(float r){
-        this.normalisedOvalRadii[1] = r;
+    public void setOvalYPosition(float y){
+        this.normalisedOvalPos[1] = y;
     }
 
     public double getrHorizontal() {
         return normalisedOvalRadii[1];
     }
 
-    public void setrVertical(float r){
-        this.normalisedOvalRadii[0] = r;
+    public void setrHorizontal(float r){
+        this.normalisedOvalRadii[1] = r;
     }
 
     public double getrVertical() {
         return normalisedOvalRadii[0];
     }
 
-    public void setRotation(float rotation){
-        this.rotation = rotation;
+    public void setrVertical(float r){
+        this.normalisedOvalRadii[0] = r;
     }
 
     public float getRotation() {
         return rotation;
+    }
+
+    public void setRotation(float rotation){
+        this.rotation = rotation;
     }
 
     public void setPolygon(boolean isPolygon){

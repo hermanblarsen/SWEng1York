@@ -9,6 +9,8 @@ import java.util.ArrayList;
 
 /**
  * Created by Kacper on 2017-05-25.
+ *
+ * Container class for something.
  */
 public class DashModule {
 

@@ -14,6 +14,8 @@ import java.util.ArrayList;
 
 /**
  * Created by Kacper on 2017-05-25.
+ *
+ * UI Container for Teaching Modules.
  */
 public class ModulePanel extends PreviewPanel {
 
@@ -24,6 +26,11 @@ public class ModulePanel extends PreviewPanel {
     private ImageView liveIcon;
     private SubjectPanel subjectPanel;
 
+    /**
+     * Constructs a ModulePanel based on a given module and its parent subject.
+     * @param module The module the module belongs to.
+     * @param parentPanel
+     */
     public ModulePanel(DashModule module, SubjectPanel parentPanel) {
         super(parentPanel.getModulePanelsHBox());
         this.module = module;
@@ -53,6 +60,10 @@ public class ModulePanel extends PreviewPanel {
 
     public DashModule getModule() { return module; }
 
+    /**
+     * Returns an ArrayList of items which could match a search for thig module.
+     * @return An arraylist of terms which can be used to match search terms.
+     */
     @Override
     public ArrayList<String> getSearchableTerms() {
         ArrayList<String> searchableTerms = new ArrayList<>();

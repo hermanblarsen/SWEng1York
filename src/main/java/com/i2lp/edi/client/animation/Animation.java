@@ -11,13 +11,13 @@ import org.slf4j.LoggerFactory;
 
 
 /**
- * Created by amriksadhra on 02/03/2017.
+ * An abstract class defining a standard form for all animation types for use as part of a presentation.
+ *
  */
 
 public abstract class Animation {
-    //Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    //animation Appearance Types
+    //Animation Appearance Types
     public final static int NO_ANIMATION = 0;
     public final static int ENTRY_ANIMATION = 1;
     public final static int EXIT_ANIMATION = 2;
@@ -29,10 +29,14 @@ public abstract class Animation {
     protected Transition animation;
 
 
+    /**
+     * Constructor Not used.
+     */
     public  Animation(){
     }
-    /*
-     * Play animation
+
+    /**
+     * Starts an animation.
      */
     public abstract void play();
 
