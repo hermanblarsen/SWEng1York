@@ -24,6 +24,11 @@ import static com.i2lp.edi.client.Constants.MAX_QUESTION_LENGTH;
 /**
  * Created by kma517 on 16/03/2017.
  */
+
+/**
+ * Presentation Manager for students, extending PresentationManager
+ * Displays slides with a specific set of buttons.
+ */
 public class PresentationManagerStudent extends PresentationManager {
     protected Boolean elementClicked = false;
     protected Stage questionQueueStage;

@@ -38,6 +38,10 @@ import static com.i2lp.edi.server.SocketClient.PASSWORD_INVALID;
 /**
  * Created by amriksadhra on 20/03/2017.
  */
+
+/**
+ * Class to communicate with SocketClient on client side
+ */
 @SuppressWarnings("Convert2Lambda")
 public class SocketServer {
     private Logger logger = LoggerFactory.getLogger(SocketServer.class);

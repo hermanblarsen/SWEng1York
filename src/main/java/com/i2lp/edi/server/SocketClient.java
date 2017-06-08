@@ -33,7 +33,9 @@ import static java.lang.Thread.currentThread;
  * Created by amriksadhra on 20/03/2017.
  */
 
-
+/**
+ * Class to connect with Socket Server on server side.
+ */
 public class SocketClient {
     /* Constant to indicate server has not responded */
     private static final int NO_RESPONSE = -1;

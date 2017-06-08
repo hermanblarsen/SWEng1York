@@ -29,6 +29,11 @@ import static com.i2lp.edi.client.utilities.Utilities.getFilesInFolder;
 /**
  * Created by amriksadhra on 03/05/2017.
  */
+
+/**
+ * Presentation Library Manager, managing the presentations the user has access to
+ * in his/her library.
+ */
 public class PresentationLibraryManager {
     private SocketClient socketClient;
     private EdiManager ediManager;
@@ -242,6 +247,12 @@ public class PresentationLibraryManager {
         return remotePresentationDocumentIDs;
     }
 
+    /**
+     * Get module folder for remote presentations
+     * @param remotePresentationList list of presentations
+     * @param module module of presentation
+     * @return module folder of presentations the user doesn't have
+     */
     public ModuleFolder getRemotePresentationsWithModuleName(ArrayList<PresentationMetadata> remotePresentationList, Module module) {
         ModuleFolder remotePresentationsWithModuleName = new ModuleFolder(module.getModule_name());
 
@@ -253,6 +264,11 @@ public class PresentationLibraryManager {
         return remotePresentationsWithModuleName;
     }
 
+    /**
+     * Remove Presentation from database
+     * @param presentationID presentaton ID to remove
+     * @return
+     */
     public boolean removePresentation(int presentationID) {
         boolean status = false;
         String return_status;
@@ -263,6 +279,11 @@ public class PresentationLibraryManager {
         return status;
     }
 
+    /**
+     * Upload a presentation to the server tied to a specific module ID
+     * @param fileToUpload String of file to upload
+     * @param moduleID module ID to tie presentation to
+     */
     public void uploadPresentation(String fileToUpload, int moduleID) {
         ParserXML parserXML = null;
         try {
@@ -297,7 +318,7 @@ public class PresentationLibraryManager {
             }
         };
         Thread zipThread = new Thread(zipCreationTask);
-        zipThread.start(); //TODO: uncomment after debuggind
+        zipThread.start();
 
         Thread uploadThread = new Thread(() -> { //Make upload async to avoid blocking main thread
             FTPClient ftpClient = new FTPClient();
@@ -336,6 +357,6 @@ public class PresentationLibraryManager {
                 }
             }
         });
-        //zipCreationTask.setOnSucceeded(event -> uploadThread.start());
+        zipCreationTask.setOnSucceeded(event -> uploadThread.start());
     }
 }

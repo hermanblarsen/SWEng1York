@@ -57,7 +57,10 @@ public class Login extends Application {
 
     protected boolean offline = false;
 
-
+    /**
+     * Start the login stage
+     * @param loginStage JavaFX stage
+     */
     @Override
     public void start(Stage loginStage) {
         this.loginStage = loginStage;
@@ -69,10 +72,6 @@ public class Login extends Application {
         rootBox.setAlignment(Pos.CENTER);
         Scene scene = new Scene(rootBox, 550, 275);
 
-        //sets the stylesheet to https://github.com/aalmiray/bootstrapfx, giving us access to various premade CSS styles.
-        //More available on https://docs.oracle.com/javase/8/javafx/api/javafx/scene/doc-files/cssref.html
-        //IMprove looks: https://docs.oracle.com/javase/8/javafx/visual-effects-tutorial/effect-types.htm
-        //Another styling alternative, java internal: setUserAgentStylesheet(STYLESHEET_MODENA);
         scene.getStylesheets().add("bootstrapfx.css");
         loginStage.setScene(scene);
         loginStage.setResizable(false); //Do after setting scene
@@ -84,11 +83,11 @@ public class Login extends Application {
         populateGuiPreConnection();
         loginStage.show();
 
-        //TODO: Mode switching code depending on online/offline functionality
+
         if (!offline) {
             serverConnect();
         } else {
-            //TODO do something while offline!
+            //TODO: Mode switching code depending on online/offline functionality
         }
     }
 
@@ -117,12 +116,10 @@ public class Login extends Application {
         GridPane.setHalignment(sceneTitle, HPos.CENTER);
 
         usernameField = new TextField();
-//        usernameField.setText("Teacher");
         gridPane.add(usernameField, 1, 2);
         GridPane.setHalignment(usernameField, HPos.RIGHT);
 
         passwordField = new PasswordField();
-//        passwordField.setText("password");
         gridPane.add(passwordField, 1, 3);
         GridPane.setHalignment(passwordField, HPos.RIGHT);
 
@@ -169,7 +166,7 @@ public class Login extends Application {
         loginButton.setOnAction((ActionEvent event) -> {
             changeGuiLoggingIn();
             if (!offline) login();
-            else ;//TODO decide what to do if offline
+            else ;//TODO implement offline
         });
         gridPane.getChildren().remove(loadingImage);
 
@@ -243,7 +240,10 @@ public class Login extends Application {
             //TODO add colour events and stuff here to notify user of unsuccessful login.
         }
     }
-    
+
+    /**
+     * Connect to the server
+     */
     public void serverConnect() {
         if (!offline) {
             //Connect to edi server
@@ -252,10 +252,15 @@ public class Login extends Application {
             ediManager.setClient(mySocketClient);
         }
         else {
-            //TODO figure out what to do when offline
+            //TODO Implement offline mode
         }
     }
 
+    /**
+     * Verify login of user
+     * @param userToAuth user to authenticate
+     * @return return user if authenticated
+     */
     public User verifyLogin(UserAuth userToAuth) {
         return mySocketClient.userAuth(userToAuth);
     }

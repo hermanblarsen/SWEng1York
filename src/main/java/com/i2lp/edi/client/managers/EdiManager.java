@@ -20,6 +20,12 @@ import java.net.Socket;
 /**
  * Created by habl on 11/03/2017.
  */
+
+/**
+ * The overall program manager structuring the overall flow of the program.
+ * The class will start a login window, and after successful login, go ahead
+ * to either teacher or student dashboard depending on the user credentials
+ */
 public class EdiManager extends Application {
     Logger logger = LoggerFactory.getLogger(EdiManager.class);
 
@@ -40,7 +46,10 @@ public class EdiManager extends Application {
         launch(args);
     }
 
-    //Temporary, so that edimanager can close the ports and prevent port-in-use errors on next execution
+    /**
+     * Set global access to sockets in ediManager
+     * @param mySocketClient socket client
+     */
     public void setClient(SocketClient mySocketClient) {
         this.socketClient = mySocketClient;
     }
@@ -108,7 +117,6 @@ public class EdiManager extends Application {
 
         Stage dashboardStage = new Stage();
 
-        //Additional com.i2lp.edi.client.login stuff
         if (isTeacher) {
             logger.info("Teacher Dashboard Opened");
             dashboard = new TeacherDashboard();

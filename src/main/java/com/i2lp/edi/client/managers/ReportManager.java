@@ -47,6 +47,12 @@ import static com.i2lp.edi.client.Constants.PRESENTATIONS_PATH;
 /**
  * Created by Koen on 25/05/2017.
  */
+
+/**
+ * Class to generate reports of previously viewed presentations,
+ * with interaction data from interactive elements, and other
+ * statistics such as attendance.
+ */
 public class ReportManager {
     private Logger logger = LoggerFactory.getLogger(this.getClass());
     ArrayList<Question> questionQueueQuestions;
@@ -84,6 +90,12 @@ public class ReportManager {
         }
     }
 
+    /**
+     * Opens the report panel for a presentation, which will generate a report for the
+     * selected presentaton.
+     * @param presentation presentation selected
+     * @param ediManager edimanager of selected presentation
+     */
     public void openReportPanel(Presentation presentation, EdiManager ediManager){
         this.ediManager = ediManager;
         this.presentation = presentation;

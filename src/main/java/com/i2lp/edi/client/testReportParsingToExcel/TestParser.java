@@ -8,6 +8,10 @@ import java.util.Scanner;
 /**
  * Created by amriksadhra on 03/06/2017.
  */
+
+/**
+ * Parser of test reports to HTML for compilation of reports in QA
+ */
 public class TestParser {
     public static void main(String[] args) {
         String path = args[0];

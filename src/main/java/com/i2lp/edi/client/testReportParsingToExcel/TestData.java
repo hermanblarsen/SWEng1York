@@ -8,6 +8,10 @@ import java.util.Date;
 /**
  * Created by amriksadhra on 03/06/2017.
  */
+
+/**
+ * Class to parse test data to HTML for use in report generation
+ */
 public class TestData {
     private Date testDate;
     private String commitHash;
