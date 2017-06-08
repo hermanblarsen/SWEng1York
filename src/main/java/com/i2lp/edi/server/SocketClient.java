@@ -997,8 +997,8 @@ public class SocketClient {
                         rs.getString("interactive_element_data"),
                         rs.getString("type"),
                         rs.getBoolean("live"),
-                        rs.getTime("response_interval"),
-                        rs.getInt("slide_number"),
+                        rs.getTime("local_start_time"),
+                        rs.getInt("xml_slide_id"),
                         rs.getInt("xml_element_id")
                 ));
                 size++;
