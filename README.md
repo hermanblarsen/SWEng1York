@@ -6,46 +6,12 @@
 - [Circle CI](https://circleci.com)
 
 ### Running the Code
-See "Run Configurations"
-
-#### Viewer Teams
-For the teams not dealing with the database.
-
-##### Run Configuration
-
-1. Set Login.AM_I_ON_DB_TEAM = false. All networking and database functionality will be disabled for EdiManager.
-2. Create a Run Configuration in IntelliJ called "Edi", with the main class being "com.i2lp.edi.client.managers.EdiManager".
-3. Launch Edi
-4. Login can be 'bypassed' by pressing login button without entering details
-
-#### Database Team
-For the teams being on the database team.
-
-##### Database Management
-
-Use DataGrip/IntelliJ SQL management to connect to the database with the following details:
-
-	db.amriksadhra.com:5432
-	database: edi
-	user: iilp
-	pw: group1SWENG
-
-##### Run Configuration
-
-1. Set Login.AM_I_ON_DB_TEAM = true. All networking and database functionality will be enabled for EdiManager.
-2. Create a Run Configuration in IntelliJ called "Server", with the main class being "com.i2lp.edi.server.SocketServer"
-3. Create a Run Configuration in IntelliJ called "Edi", with the main class being "com.i2lp.edi.client.managers.EdiManager"
-4. Launch Server, wait for Startup information to appear:
-	INFO  SocketIOServer:155 - SocketIO com.i2lp.edi.server started at port: 8080
-	INFO  SocketServer:175 - Successful connection to PostgreSQL database instance
-5. Launch Edi
-6. Login with credentials: "LoginName" & "password"
-
-### Testing
-
+1. Create a Run Configuration in you IDE (We use IntelliJ) called "Edi", with main class  "com.i2lp.edi.client.managers.EdiManager".
+2. Launch Edi
+3. Login with Username "Teacher" or "Student" (depending on what you want content to see) with password "password".
 
 ### Logging
-
+The active sessions are logged in the target/logs, with varying filters in different logs.
 
 ### Maven
 
@@ -53,4 +19,4 @@ Maven is used to generate project structure and create build profiles. Key point
 
 - We don't have to add .jar files for libraries, can add < dependency> to pom.xml, can find these dependencies here: https://mvnrepository.com/. Latest library version will always be downloaded, and we only have to distribute the pom instead of all jars, reducing project size.
 
-##### - Amrik is a giant fart
+#### I2LP - Group 1 SWENG - Creators of Edi
